@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import BasicInfoForm from './basicinfo/basicInfoForm'
+import PersonalInfoForm from './personalinfo/personalInfoForm'
 
 
 export default function tabBar() {
@@ -97,24 +98,12 @@ export default function tabBar() {
         )}
         {activeTab === "Personal Info" && (
           <div className="p-4">
-            <h3 className="text-xl font-semibold">Personal Info</h3>
-            <p>Description for Project 2 goes here...</p>
-            <img
-              src="/project2-image.jpg"
-              alt="Project 2"
-              className="w-full rounded-lg"
-            />
+            <PersonalInfoForm/>
           </div>
         )}
         {activeTab === "Projects" && (
           <div className="p-4">
-            <h3 className="text-xl font-semibold">Projects</h3>
-            <p>Description for Project 3 goes here...</p>
-            <img
-              src="/project3-image.jpg"
-              alt="Project 3"
-              className="w-full rounded-lg"
-            />
+            
           </div>
         )}
         {activeTab === "Experience" && (
