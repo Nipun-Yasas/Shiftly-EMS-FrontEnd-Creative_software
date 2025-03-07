@@ -3,7 +3,7 @@ import Image from 'next/image'
 import EmailIcon from "@mui/icons-material/Email";
 import FolderIcon from "@mui/icons-material/Folder";
 import EditIcon from "@mui/icons-material/Edit";
-import TabBar from "./tabBar";
+import TabBar from "../tabBar";
 
 
 

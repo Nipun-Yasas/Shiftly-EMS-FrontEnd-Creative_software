@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import BasicInfoForm from './basicInfoForm'
+import BasicInfoForm from './basicinfo/basicInfoForm'
 
 
 export default function tabBar() {
