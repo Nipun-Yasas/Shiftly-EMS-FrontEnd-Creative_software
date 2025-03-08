@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BasicInfoForm from './basicinfo/basicInfoForm'
 import PersonalInfoForm from './personalinfo/personalInfoForm'
+import ProjectContent from './projects/page'
 
 
 export default function tabBar() {
@@ -104,6 +105,7 @@ export default function tabBar() {
         {activeTab === "Projects" && (
           <div className="p-4">
             
+            <ProjectContent/>
           </div>
         )}
         {activeTab === "Experience" && (
