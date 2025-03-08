@@ -4,6 +4,9 @@ import { useState } from "react";
 import BasicInfoForm from './basicinfo/basicInfoForm'
 import PersonalInfoForm from './personalinfo/personalInfoForm'
 import ProjectContent from './projects/page'
+import ExperienceContent from './experience/page'
+import EducationContent from './education/page'
+import SkillsContent from './skills/page'
 
 
 export default function tabBar() {
@@ -110,35 +113,17 @@ export default function tabBar() {
         )}
         {activeTab === "Experience" && (
           <div className="p-4">
-            <h3 className="text-xl font-semibold">Experience</h3>
-            <p>Description for Project 1 goes here...</p>
-            <img
-              src="/project1-image.jpg"
-              alt="Project 4"
-              className="w-full rounded-lg"
-            />
+            <ExperienceContent/>
           </div>
         )}
         {activeTab === "Education" && (
           <div className="p-4">
-            <h3 className="text-xl font-semibold">Education</h3>
-            <p>Description for Project 5 goes here...</p>
-            <img
-              src="/project1-image.jpg"
-              alt="Project 1"
-              className="w-full rounded-lg"
-            />
+            <EducationContent/>
           </div>
         )}
         {activeTab === "Skills" && (
           <div className="p-4">
-            <h3 className="text-xl font-semibold">Skills</h3>
-            <p>Description for Project 6 goes here...</p>
-            <img
-              src="/project1-image.jpg"
-              alt="Project 1"
-              className="w-full rounded-lg"
-            />
+            <SkillsContent/>
           </div>
         )}
       </div>
