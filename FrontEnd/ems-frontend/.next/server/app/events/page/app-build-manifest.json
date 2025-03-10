@@ -1,9 +1,8 @@
 {
   "pages": {
     "/events/page": [
+      "static/chunks/src_app_globals_b805903d.css",
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
-      "static/chunks/src_app_favicon_ico_mjs_7c387cfb._.js",
-      "static/chunks/[root of the server]__860c0698._.css",
       "static/chunks/src_app_layout_aaf7d535.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_fff34f97._.js",
       "static/chunks/node_modules_next_dist_compiled_react-dom_1f56dc06._.js",
