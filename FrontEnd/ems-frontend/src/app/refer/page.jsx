@@ -1,0 +1,97 @@
+"use client"
+
+
+export default function Refer() {
+
+    return (
+    <>
+      <div className="">
+        <h2 className='text-(color:--my1) text-4xl font-bold'>Refer Candidate</h2>
+        <p className='text-gray-500'>Refer Candidate <span className='text-gray-500'>&gt;</span></p>
+        <div className="flex flex-col items-center">
+          <div className="w-2xl">
+            <div className="flex justify-center shadow-2xl mt-5">
+                <form className="w-full max-w-xl m-5">
+                    <h4 className="text-center">Refer Candidate</h4>
+                    <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 ">
+                        <div className="sm:col-span-4">
+                            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
+                                Applicant Name
+                            </label>
+                            <div className="mt-2">
+                                <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+                                
+                                <input
+                                    id="applicant_name"
+                                    name="applicant_name"
+                                    type="text"
+                                    placeholder="Enter applicant Name"
+                                    className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none "
+                                />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-4">
+                            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
+                                Applicant Email
+                            </label>
+                            <div className="mt-2">
+                                <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+                                
+                                <input
+                                    id="applicant_email"
+                                    name="applicant_email"
+                                    type="text"
+                                    placeholder="Enter applicant email"
+                                    className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-4">
+                            <label htmlFor="message" className="block text-sm/6 font-medium text-gray-900">
+                                Your Message
+                            </label>
+                            <div className="mt-2">
+                                <textarea
+                                id="message"
+                                name="message"
+                                placeholder="Enter your message here."
+                                rows={3}
+                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                defaultValue={''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-4 flex">
+                            <div className="mr-5">Upload resume</div>
+                            <div className="border-1 py-2 px-2  rounded-md">
+                                <input 
+                                type="file" 
+                                className="border-1 w-50 bg-gray-300 rounded-md px-2 mr-2"
+                                
+                                />No file chosen
+                            </div>
+                        </div>
+
+                        <div className="sm:col-span-4 flex justify-end">
+                            <div>
+                                <button className="rounded-md px-3 py-2 text-(color:--closebtn) font-semibold shadow-xs hover:bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">Submit</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+      
+      
+    )
+  }
