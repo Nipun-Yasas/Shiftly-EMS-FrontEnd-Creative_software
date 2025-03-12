@@ -10,7 +10,7 @@ import TabBar from "../tabBar";
 function page() {
   return (
     <>
-      <div className="container w-auto mt-20 ml-3 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
+      <div className="container w-4/5 mt-20 ml-60 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
         <div className="text-4xl text-red-600 font-bold ">Profile</div>
         <div className="sub-path">
           <span className="text-gray-400 mx-2 ">Employee <span>›</span> </span> 
@@ -19,7 +19,7 @@ function page() {
 
       </div>
 
-    <div className="profile-basic h-35   flex item-center justify-between ml-3 mr-0 mt-5 p-1  shadow  bg-white rounded-xl">
+    <div className="profile-basic h-35  w-4/5 flex item-center justify-between ml-60 mr-0 mt-5 p-1  shadow  bg-white rounded-xl">
            <div className="flex items-center">
            <Image  src="/profilePic.jpg" 
             alt='Employee Profile Picture'
@@ -54,7 +54,7 @@ function page() {
           
     </div>
 
-    <div className="tabs-container shadow  bg-white rounded-xl">
+    <div className="tabs-container shadow ml-60 bg-white rounded-xl">
       <TabBar/>
       
 
