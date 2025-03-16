@@ -912,6 +912,10 @@
     width: calc(var(--spacing) * 1);
   }
 
+  .w-1\/2 {
+    width: 50%;
+  }
+
   .w-2 {
     width: calc(var(--spacing) * 2);
   }
@@ -1636,6 +1640,10 @@
 
   .gap-y-5 {
     row-gap: calc(var(--spacing) * 5);
+  }
+
+  .gap-y-6 {
+    row-gap: calc(var(--spacing) * 6);
   }
 
   .gap-y-8 {
@@ -3341,10 +3349,6 @@
     outline-offset: calc(2px * -1);
   }
 
-  .focus-within\:outline-gray-600:focus-within {
-    outline-color: var(--color-gray-600);
-  }
-
   .focus-within\:outline-indigo-600:focus-within {
     outline-color: var(--color-indigo-600);
   }
@@ -3382,12 +3386,6 @@
   @media (hover: hover) {
     .hover\:bg-gray-500:hover {
       background-color: var(--color-gray-500);
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:bg-gray-600:hover {
-      background-color: var(--color-gray-600);
     }
   }
 
