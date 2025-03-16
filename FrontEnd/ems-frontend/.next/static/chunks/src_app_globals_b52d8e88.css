@@ -699,6 +699,10 @@
     margin-left: calc(var(--spacing) * 1);
   }
 
+  .ml-2 {
+    margin-left: calc(var(--spacing) * 2);
+  }
+
   .ml-3 {
     margin-left: calc(var(--spacing) * 3);
   }
@@ -868,6 +872,10 @@
     height: calc(var(--spacing) * 10);
   }
 
+  .h-48 {
+    height: calc(var(--spacing) * 48);
+  }
+
   .h-auto {
     height: auto;
   }
@@ -962,6 +970,10 @@
 
   .w-100 {
     width: calc(var(--spacing) * 100);
+  }
+
+  .w-\[30\%\] {
+    width: 30%;
   }
 
   .w-auto {
@@ -1201,6 +1213,10 @@
 
   .cursor-default {
     cursor: default;
+  }
+
+  .cursor-not-allowed {
+    cursor: not-allowed;
   }
 
   .cursor-pointer {
@@ -1562,6 +1578,10 @@
 
   .justify-items-stretch {
     justify-items: stretch;
+  }
+
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
   }
 
   .gap-3 {
@@ -3366,6 +3386,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:bg-gray-600:hover {
+      background-color: var(--color-gray-600);
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:bg-gray-700:hover {
       background-color: var(--color-gray-700);
     }
@@ -3417,12 +3443,6 @@
     outline-style: none;
   }
 
-  @media (hover: hover) {
-    .focus\:hover\:bg-red-500:focus:hover {
-      background-color: var(--color-red-500);
-    }
-  }
-
   .focus-visible\:outline-2:focus-visible {
     outline-style: var(--tw-outline-style);
     outline-width: 2px;
@@ -3465,6 +3485,10 @@
   .data-enter\:ease-out[data-enter] {
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
+  }
+
+  .data-focus\:bg-gray-300[data-focus] {
+    background-color: var(--color-gray-300);
   }
 
   .data-focus\:bg-gray-400[data-focus] {
