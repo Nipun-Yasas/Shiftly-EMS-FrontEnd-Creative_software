@@ -1,3 +1,4 @@
 {
-  "/refer/page": "app/refer/page.js"
+  "/refer/page": "app/refer/page.js",
+  "/events/page": "app/events/page.js"
 }
