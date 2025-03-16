@@ -2590,6 +2590,10 @@
     color: var(--my1);
   }
 
+  .text-\(color\:--myvar1\) {
+    color: var(--myvar1);
+  }
+
   .text-black {
     color: var(--color-black);
   }

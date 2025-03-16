@@ -97,14 +97,8 @@ function EventForm(props) {
             },
             onSubmit: (values)=>{
                 console.log("Submitted:", values);
-                resetForm();
-                setFileName("");
-                setPreview(null);
-                if (bannerRef.current) {
-                    bannerRef.current.value = "";
-                }
             },
-            children: ({ errors, touched, setFieldTouched, setFieldValue, values, validateForm, isValid, resetForm: resetForm1 })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Form"], {
+            children: ({ errors, touched, setFieldTouched, setFieldValue, values, validateForm, isValid })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Form"], {
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
                         className: "grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6",
                         children: [
@@ -384,7 +378,7 @@ function EventForm(props) {
                                                 children: errors.banner
                                             }),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
-                                                className: "w-1/2",
+                                                className: "w-[30%]",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("input", {
                                                         ref: bannerRef,
@@ -412,7 +406,7 @@ function EventForm(props) {
                                                             id: "banner-label",
                                                             htmlFor: "banner",
                                                             className: `flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
-                        ${errors.banner && touched.banner ? "border-red-500" : ""}`,
+                      ${errors.banner && touched.banner ? "border-red-500" : ""}`,
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("img", {
                                                                     src: "/upload.png",
@@ -450,15 +444,7 @@ function EventForm(props) {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("button", {
                                             type: "reset",
-                                            onClick: ()=>{
-                                                resetForm1();
-                                                setFileName("");
-                                                setPreview(null);
-                                                if (bannerRef.current) {
-                                                    bannerRef.current.value = "";
-                                                }
-                                            },
-                                            className: "justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto",
+                                            className: "justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto",
                                             children: "Cancel"
                                         }),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("button", {

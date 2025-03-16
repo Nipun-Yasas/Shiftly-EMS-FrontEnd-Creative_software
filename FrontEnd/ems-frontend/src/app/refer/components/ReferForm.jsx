@@ -14,7 +14,7 @@ const vacancyOptions = [
 ];
 
 export default function ReferForm(props) {
-
+    
   const { setOpenSubmit } = props;
 
   const resumeRef = useRef(null);
@@ -233,7 +233,7 @@ export default function ReferForm(props) {
                       }}
                       className="hidden"
                     />
-                    <div className="flex justify-center">
+                    <div className="flex  justify-center">
                       <label
                         htmlFor="resume"
                         className={`flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
@@ -290,7 +290,7 @@ export default function ReferForm(props) {
                         resumeRef.current.value = "";
                       }
                     }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
+                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
                   </button>

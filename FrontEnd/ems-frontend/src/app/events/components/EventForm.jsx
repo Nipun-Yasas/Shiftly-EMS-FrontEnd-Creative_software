@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Formik, Form, Field } from "formik";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { Listbox,ListboxButton,ListboxOption,ListboxOptions} from "@headlessui/react";
+import { Listbox,ListboxButton,ListboxOption,ListboxOptions } from "@headlessui/react";
 
 const audienceOptions = [
   { id: 1, name: "Software Engineer" },
@@ -16,6 +16,7 @@ const eventTypeOptions = [
 ];
 
 export default function EventForm(props) {
+  
   const { openForm, setOpenForm } = props;
 
   const bannerRef = useRef(null);
@@ -74,12 +75,6 @@ export default function EventForm(props) {
         }}
         onSubmit={(values) => {
           console.log("Submitted:", values);
-          resetForm();
-          setFileName("");
-          setPreview(null);
-          if (bannerRef.current) {
-            bannerRef.current.value = "";
-          }
         }}
       >
         {({
@@ -90,7 +85,6 @@ export default function EventForm(props) {
           values,
           validateForm,
           isValid,
-          resetForm,
         }) => (
           <Form>
             <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -364,7 +358,7 @@ export default function EventForm(props) {
                       {errors.banner}
                     </p>
                   )}
-                  <div className="w-1/2">
+                  <div className="w-[30%]">
                     <input
                       ref={bannerRef}
                       type="file"
@@ -387,22 +381,23 @@ export default function EventForm(props) {
                       className="hidden"
                     />
                     <div className="flex justify-center">
-                      <label
-                        id="banner-label"
-                        htmlFor="banner"
-                        className={`flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
-                        ${
-                          errors.banner && touched.banner ? "border-red-500" : ""
-                        }`}
-                      >
-                        <img
-                          src="/upload.png"
-                          alt="Upload Icon"
-                          className="w-5 h-5 mr-3"
-                        />
-                        Upload Banner
-                      </label>
+                    <label
+                      id="banner-label"
+                      htmlFor="banner"
+                      className={`flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
+                      ${
+                        errors.banner && touched.banner ? "border-red-500" : ""
+                      }`}
+                    >
+                      <img
+                        src="/upload.png"
+                        alt="Upload Icon"
+                        className="w-5 h-5 mr-3"
+                      />
+                      Upload Banner
+                    </label>
                     </div>
+
                   </div>
                 </div>
                 <div className="sm:col-span-full mt-5">
@@ -425,15 +420,7 @@ export default function EventForm(props) {
                 <div className="px-4 flex justify-end">
                   <button
                     type="reset"
-                    onClick={() => {
-                      resetForm();
-                      setFileName("");
-                      setPreview(null);
-                      if (bannerRef.current) {
-                        bannerRef.current.value = "";
-                      }
-                    }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
+                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
                   </button>
