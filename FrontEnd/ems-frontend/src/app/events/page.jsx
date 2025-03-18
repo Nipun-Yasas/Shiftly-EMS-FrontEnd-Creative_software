@@ -1,63 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
 import FormDialog from "./components/FormDialog";
-import SubmitDialog from "./components/SubmitDialog";
 
-const rows = [
-  {
-    id: 1,
-    col1: "Hello",
-    col2: "World",
-    col3: "Hello",
-    col4: "World",
-    col5: "Hello",
-    col6: "World",
-    col7: "Hello",
-    col8: "World",
-  },
-  {
-    id: 2,
-    col1: "Hello",
-    col2: "World",
-    col3: "Hello",
-    col4: "World",
-    col5: "Hello",
-    col6: "World",
-    col7: "Hello",
-    col8: "World",
-  },
-  {
-    id: 3,
-    col1: "Hello",
-    col2: "World",
-    col3: "Hello",
-    col4: "World",
-    col5: "Hello",
-    col6: "World",
-    col7: "Hello",
-    col8: "World",
-  },
-];
+import axios from "axios";
+
 
 const columns = [
-  { field: "col1", headerName: "Title", width: 150 },
-  { field: "col2", headerName: "Form URL", width: 150 },
-  { field: "col3", headerName: "Response URl", width: 150 },
-  { field: "col4", headerName: "audience", width: 150 },
-  { field: "col5", headerName: "Event Type", width: 150 },
-  { field: "col6", headerName: "Projects", width: 150 },
-  { field: "col7", headerName: "Created date", width: 150 },
-  { field: "col8", headerName: "Expire date", width: 150 },
+  { field: "id", headerName: "Event ID", width: 100 },
+  { field: "title", headerName: "Title", width: 150 },
+  { field: "audience", headerName: "Audience", width: 150 },
+  { field: "eventType", headerName: "Event Type", width: 150 },
+  { field: "projects", headerName: "Projects", width: 150 },
+  { field: "enableDate", headerName: "Enabled Date", width: 150 },
+  { field: "expireDate", headerName: "Expire Date", width: 150 },
+  { field: "formUrl", headerName: "Form Url", width: 150 },
+  { field: "responseUrl", headerName: "Response Url", width: 150 },
+
 ];
+
 
 export default function Event() {
   
   const [openForm, setOpenForm] = useState(false);
-  const [openSubmit, setOpenSubmit] = useState(false);
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/event/all')
+      .then(response => response.json())
+      .then(json => setEvents(json))
+  }, []);
+
 
   return (
     <>
@@ -83,7 +59,10 @@ export default function Event() {
             </div>
             <div className="flex justify-center mt-2 m-3">
               <div style={{ height: 300, width: "100%" }}>
-                <DataGrid rows={rows} columns={columns} />
+              <DataGrid
+  rows={events}
+  columns={columns}
+/>
               </div>
             </div>
           </div>
@@ -91,12 +70,9 @@ export default function Event() {
       </div>
 
       <FormDialog
-        openForm={openForm}
         setOpenForm={setOpenForm}
-       
+        openForm={openForm}
       />
-
-<SubmitDialog openSubmit={openSubmit} setOpenSubmit={setOpenSubmit} openForm={openForm} />
     </>
   );
 }

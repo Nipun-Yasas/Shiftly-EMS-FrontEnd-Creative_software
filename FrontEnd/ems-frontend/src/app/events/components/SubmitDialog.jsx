@@ -5,13 +5,13 @@ import { Dialog,DialogBackdrop,DialogPanel,DialogTitle } from "@headlessui/react
 
 export default function SubmitDialog(props) {
 
-  const {openSubmit,setOpenSubmit} = props
+  const {openMessage,setOpenMessage,setOpenForm,status} = props
 
   return (
     <>
     <Dialog
-        open={openSubmit}
-        onClose={() => setOpenSubmit(false)}
+        open={openMessage}
+        onClose={setOpenMessage}
         className="relative z-10"
       >
         <DialogBackdrop
@@ -31,7 +31,7 @@ export default function SubmitDialog(props) {
                     as="h3"
                     className="text-center font-bold text-lg text-(color:--my1)"
                   >
-                    EVENT ADDED SUCCESSFULLY
+                  {status === "success" ? "EVENT ADDED SUCCESSFULLY" : status}
                   </DialogTitle>
                 </div>
               </div>
@@ -39,8 +39,8 @@ export default function SubmitDialog(props) {
                 <button
                   type="button"
                   onClick={() => {
-                    if(!OpenForm)
-                    setOpenSubmit(false);
+                    setOpenForm(false)
+                    setOpenMessage(false)
                   }}
                   className="mt-5 rounded-md px-3 py-2 text-(color:--closebtn) font-semibold shadow-xs hover:bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                 >

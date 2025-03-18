@@ -14,6 +14,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$di
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$16$2f$solid$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/16/solid/esm/ChevronDownIcon.js [app-client] (ecmascript) <export default as ChevronDownIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$20$2f$solid$2f$esm$2f$CheckIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/20/solid/esm/CheckIcon.js [app-client] (ecmascript) <export default as CheckIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$headlessui$2f$react$2f$dist$2f$components$2f$listbox$2f$listbox$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@headlessui/react/dist/components/listbox/listbox.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
+;
 ;
 ;
 ;
@@ -43,23 +45,40 @@ const eventTypeOptions = [
 ];
 function EventForm(props) {
     const { openForm, setOpenForm } = props;
-    const bannerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const [preview, setPreview] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    const [fileName, setFileName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    // const bannerRef = useRef(null);
+    // const [preview, setPreview] = useState(null);
+    // const [fileName, setFileName] = useState("");
+    const handleSubmit = async (values, { setSubmitting, resetForm })=>{
+        try {
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post("http://localhost:8080/event/add", values);
+            console.log(response.data);
+        } catch (error) {
+            console.log({
+                error
+            });
+        } finally{
+            setSubmitting(false);
+            resetForm();
+        // setFileName("");
+        // setPreview(null);
+        // if (bannerRef.current) {
+        //   bannerRef.current.value = "";
+        // }
+        }
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Formik"], {
             initialValues: {
                 title: "",
                 actionbtn: "",
                 showtitle: false,
-                url: "",
-                resurl: "",
+                formUrl: "",
+                responseUrl: "",
                 audience: "",
-                project: "",
-                type: "",
-                startdate: "",
-                enddate: "",
-                banner: null
+                projects: "",
+                eventType: "",
+                enableDateTime: "",
+                expireDateTime: ""
             },
             validate: (values)=>{
                 const errors = {};
@@ -69,36 +88,40 @@ function EventForm(props) {
                 if (!values.actionbtn) {
                     errors.actionbtn = "Action Button text is required";
                 }
-                if (!values.url) {
-                    errors.url = "URL of the form(Eg: Google form) is required";
+                if (!values.formUrl) {
+                    errors.formUrl = "URL of the form(Eg: Google form) is required";
                 }
-                if (!values.resurl) {
-                    errors.resurl = "Response URL of the form is required";
+                if (!values.responseUrl) {
+                    errors.responseUrl = "Response URL of the form is required";
                 }
                 if (!values.audience) {
                     errors.audience = "Select a Audience";
                 }
-                if (!values.project) {
-                    errors.project = "Project is required";
+                if (!values.projects) {
+                    errors.projects = "Project is required";
                 }
-                if (!values.type) {
-                    errors.type = "Event type is required";
+                if (!values.eventType) {
+                    errors.eventType = "Event type is required";
                 }
-                if (!values.startdate) {
-                    errors.startdate = "Starting date is required";
+                if (!values.enableDateTime) {
+                    errors.enableDateTime = "Starting date is required";
                 }
-                if (!values.enddate) {
-                    errors.enddate = "Ending date is required";
+                if (!values.expireDateTime) {
+                    errors.expireDateTime = "Ending date is required";
                 }
-                if (!values.banner) {
-                    errors.banner = "Banner is required";
-                }
+                // if (!values.banner) {
+                //   errors.banner = "Banner is required";
+                // }
                 return errors;
             },
-            onSubmit: (values)=>{
+            onSubmit: (values, { resetForm, setSubmitting })=>{
                 console.log("Submitted:", values);
+                handleSubmit(values, {
+                    resetForm,
+                    setSubmitting
+                });
             },
-            children: ({ errors, touched, setFieldTouched, setFieldValue, values, validateForm, isValid })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Form"], {
+            children: ({ errors, touched, setFieldTouched, setFieldValue, values, validateForm, isValid, isSubmitting, resetForm })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Form"], {
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
                         className: "grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6",
                         children: [
@@ -149,14 +172,14 @@ function EventForm(props) {
                                 className: "sm:col-span-full",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Field"], {
-                                        name: "url",
+                                        name: "formUrl",
                                         type: "text",
                                         placeholder: "URL of the form(Eg: Google form)",
-                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.url && touched.url ? "border-red-500" : ""}`
+                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.formUrl && touched.formUrl ? "border-red-500" : ""}`
                                     }),
-                                    errors.url && touched.url && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                    errors.formUrl && touched.formUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                         className: "text-red-500 text-sm mt-1",
-                                        children: errors.url
+                                        children: errors.formUrl
                                     })
                                 ]
                             }),
@@ -164,14 +187,14 @@ function EventForm(props) {
                                 className: "sm:col-span-full",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Field"], {
-                                        name: "resurl",
+                                        name: "responseUrl",
                                         type: "text",
                                         placeholder: "Response URL of the form",
-                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.resurl && touched.resurl ? "border-b-2 border-red-500" : ""}`
+                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.responseUrl && touched.responseUrl ? "border-b-2 border-red-500" : ""}`
                                     }),
-                                    errors.resurl && touched.resurl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                    errors.responseUrl && touched.responseUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                         className: "text-red-500 text-sm mt-1",
-                                        children: errors.resurl
+                                        children: errors.responseUrl
                                     })
                                 ]
                             }),
@@ -185,7 +208,6 @@ function EventForm(props) {
                                             onChange: (selectedOption)=>{
                                                 setFieldValue("audience", selectedOption.name);
                                                 setFieldTouched("audience", true, false);
-                                                console.log(selectedOption);
                                             },
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
                                                 className: "relative",
@@ -247,14 +269,14 @@ function EventForm(props) {
                                 className: "sm:col-span-full",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Field"], {
-                                        name: "project",
+                                        name: "projects",
                                         type: "text",
                                         placeholder: "Project",
-                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.project && touched.project ? "border-red-500" : ""}`
+                                        className: `w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${errors.projects && touched.projects ? "border-red-500" : ""}`
                                     }),
-                                    errors.project && touched.project && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                    errors.projects && touched.projects && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                         className: "text-red-500 text-sm mt-1",
-                                        children: errors.project
+                                        children: errors.projects
                                     })
                                 ]
                             }),
@@ -264,26 +286,26 @@ function EventForm(props) {
                                     className: "relative",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$headlessui$2f$react$2f$dist$2f$components$2f$listbox$2f$listbox$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Listbox"], {
-                                            value: values.type,
+                                            value: values.eventType,
                                             onChange: (selectedOption)=>{
-                                                setFieldValue("type", selectedOption.name);
-                                                setFieldTouched("type", true, false);
+                                                setFieldValue("eventType", selectedOption.name);
+                                                setFieldTouched("eventType", true, false);
                                             },
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
                                                 className: "relative",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$headlessui$2f$react$2f$dist$2f$components$2f$listbox$2f$listbox$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ListboxButton"], {
-                                                        name: "type",
+                                                        name: "eventType",
                                                         onBlur: ()=>{
-                                                            setFieldTouched("type", true, true);
+                                                            setFieldTouched("eventType", true, true);
                                                         },
-                                                        className: `grid w-full px-1 text-left focus:outline-none border-b-2 ${errors.type && touched.type ? "border-red-500" : values.type ? "border-gray-400" : "focus:border-(color:--my1) border-gray-400"}`,
+                                                        className: `grid w-full px-1 text-left focus:outline-none border-b-2 ${errors.eventType && touched.eventType ? "border-red-500" : values.eventType ? "border-gray-400" : "focus:border-(color:--my1) border-gray-400"}`,
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("span", {
                                                                 className: "col-start-1 row-start-1 flex items-center gap-3 pr-6",
                                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("span", {
-                                                                    className: `block truncate ${!values.type ? "text-gray-400" : ""}`,
-                                                                    children: values.type || "Select a Event type"
+                                                                    className: `block truncate ${!values.eventType ? "text-gray-400" : ""}`,
+                                                                    children: values.eventType || "Select a Event type"
                                                                 })
                                                             }),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$16$2f$solid$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
@@ -318,9 +340,9 @@ function EventForm(props) {
                                                 ]
                                             })
                                         }),
-                                        errors.type && touched.type && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                        errors.eventType && touched.eventType && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                             className: "text-red-500 text-sm mt-1",
-                                            children: errors.type
+                                            children: errors.eventType
                                         })
                                     ]
                                 })
@@ -329,19 +351,19 @@ function EventForm(props) {
                                 className: "sm:col-span-3",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Field"], {
-                                        name: "startdate",
+                                        name: "enableDateTime",
                                         type: "text",
                                         onFocus: (e)=>e.target.type = "date",
                                         onBlur: (e)=>{
                                             e.target.type = "text";
-                                            setFieldTouched("startdate", true, true);
+                                            setFieldTouched("enableDateTime", true, true);
                                         },
                                         placeholder: "Select a Starting Date",
-                                        className: `w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${errors.startdate && touched.startdate ? "border-red-500" : ""}`
+                                        className: `w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${errors.enableDateTime && touched.enableDateTime ? "border-red-500" : ""}`
                                     }),
-                                    errors.startdate && touched.startdate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                    errors.enableDateTime && touched.enableDateTime && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                         className: "text-red-500 text-sm mt-1",
-                                        children: errors.startdate
+                                        children: errors.enableDateTime
                                     })
                                 ]
                             }),
@@ -349,91 +371,21 @@ function EventForm(props) {
                                 className: "sm:col-span-3",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$formik$2f$dist$2f$formik$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Field"], {
-                                        name: "enddate",
+                                        name: "expireDateTime",
                                         type: "text",
                                         onFocus: (e)=>{
                                             e.target.type = "date";
                                         },
                                         onBlur: (e)=>{
                                             e.target.type = "text";
-                                            setFieldTouched("enddate", true, true);
+                                            setFieldTouched("expireDateTime", true, true);
                                         },
                                         placeholder: "Select a Ending Date",
-                                        className: `w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${errors.enddate && touched.enddate ? "border-red-500" : ""}`
+                                        className: `w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${errors.expireDateTime && touched.expireDateTime ? "border-red-500" : ""}`
                                     }),
-                                    errors.enddate && touched.enddate && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
+                                    errors.expireDateTime && touched.expireDateTime && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
                                         className: "text-red-500 text-sm mt-1",
-                                        children: errors.enddate
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
-                                className: "sm:col-span-full",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
-                                        className: "flex justify-center w-full",
-                                        children: [
-                                            errors.banner && touched.banner && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
-                                                className: "text-red-500 text-sm mt-2 mx-5",
-                                                children: errors.banner
-                                            }),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
-                                                className: "w-[30%]",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("input", {
-                                                        ref: bannerRef,
-                                                        type: "file",
-                                                        id: "banner",
-                                                        name: "banner",
-                                                        accept: "image/*",
-                                                        onChange: (e)=>{
-                                                            const file = e.target.files[0];
-                                                            if (file) {
-                                                                setFieldValue("banner", file);
-                                                                setFileName(file.name);
-                                                                const reader = new FileReader();
-                                                                reader.readAsDataURL(file);
-                                                                reader.onloadend = ()=>{
-                                                                    setPreview(reader.result);
-                                                                };
-                                                            }
-                                                        },
-                                                        className: "hidden"
-                                                    }),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("div", {
-                                                        className: "flex justify-center",
-                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("label", {
-                                                            id: "banner-label",
-                                                            htmlFor: "banner",
-                                                            className: `flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
-                      ${errors.banner && touched.banner ? "border-red-500" : ""}`,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("img", {
-                                                                    src: "/upload.png",
-                                                                    alt: "Upload Icon",
-                                                                    className: "w-5 h-5 mr-3"
-                                                                }),
-                                                                "Upload Banner"
-                                                            ]
-                                                        })
-                                                    })
-                                                ]
-                                            })
-                                        ]
-                                    }),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {
-                                        className: "sm:col-span-full mt-5",
-                                        children: [
-                                            preview && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("img", {
-                                                src: preview,
-                                                alt: "Banner Preview",
-                                                className: "w-full h-48 object-cover"
-                                            }),
-                                            fileName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("p", {
-                                                className: "mt-2 text-gray-700 text-sm text-center",
-                                                children: fileName
-                                            })
-                                        ]
+                                        children: errors.expireDateTime
                                     })
                                 ]
                             }),
@@ -444,6 +396,15 @@ function EventForm(props) {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsx"])("button", {
                                             type: "reset",
+                                            disabled: isSubmitting,
+                                            onClick: ()=>{
+                                                resetForm();
+                                                setFileName("");
+                                                setPreview(null);
+                                                if (bannerRef.current) {
+                                                    bannerRef.current.value = "";
+                                                }
+                                            },
                                             className: "justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto",
                                             children: "Cancel"
                                         }),
@@ -452,10 +413,6 @@ function EventForm(props) {
                                             disabled: !isValid,
                                             onClick: ()=>{
                                                 validateForm;
-                                                if (isValid && openForm) {
-                                                    setOpenSubmit(true);
-                                                    setOpenForm(false);
-                                                }
                                             },
                                             className: `justify-center ml-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset sm:w-auto ${!isValid ? "cursor-not-allowed" : "hover:bg-gray-300 cursor-pointer"}`,
                                             children: "Add"
@@ -628,7 +585,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$x$2
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$20$2f$solid$2f$esm$2f$PlusIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PlusIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/20/solid/esm/PlusIcon.js [app-client] (ecmascript) <export default as PlusIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$events$2f$components$2f$FormDialog$2e$jsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/events/components/FormDialog.jsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$events$2f$components$2f$SubmitDialog$2e$jsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/events/components/SubmitDialog.jsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
 "use client";
+;
 ;
 ;
 ;
@@ -715,6 +674,11 @@ const columns = [
 function Event() {
     const [openForm, setOpenForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [openSubmit, setOpenSubmit] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const getEvent = async ()=>{
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].get("http://localhost:5000/api/events").then((response)=>{
+            console.log(response.data);
+        });
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxs"])("div", {

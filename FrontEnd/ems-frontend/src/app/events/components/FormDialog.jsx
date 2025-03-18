@@ -7,13 +7,13 @@ import EventForm from "./EventForm";
 
 export default function FormDialog(props) {
   
-  const { openForm, setOpenForm } = props;
+  const {openForm,setOpenForm } = props;
 
   return (
     <>
       <Dialog
         open={openForm}
-        onClose={() => setOpenForm(false)}
+        onClose={setOpenForm}
         className="relative z-10 w-full "
       >
         <DialogBackdrop
@@ -46,7 +46,7 @@ export default function FormDialog(props) {
                     </div>
                   </div>
 
-                  <EventForm openForm={openForm} setOpenForm={setOpenForm} />
+                  <EventForm setOpenForm={setOpenForm} openForm={openForm}/>
                 </div>
               </div>
             </DialogPanel>

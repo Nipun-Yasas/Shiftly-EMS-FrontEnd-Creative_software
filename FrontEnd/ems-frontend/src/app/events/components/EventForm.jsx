@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useRef, useState } from "react";
 
@@ -5,6 +7,9 @@ import { Formik, Form, Field } from "formik";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { Listbox,ListboxButton,ListboxOption,ListboxOptions } from "@headlessui/react";
+
+import axios from "axios";
+import SubmitDialog from "./SubmitDialog";
 
 const audienceOptions = [
   { id: 1, name: "Software Engineer" },
@@ -17,11 +22,39 @@ const eventTypeOptions = [
 
 export default function EventForm(props) {
   
-  const { openForm, setOpenForm } = props;
+  const { openForm,setOpenForm } = props;
+  const [openMessage, setOpenMessage] = useState(false);
+  const [status, setStatus] = useState("");
+  // const bannerRef = useRef(null);
+  // const [preview, setPreview] = useState(null);
+  // const [fileName, setFileName] = useState("");
 
-  const bannerRef = useRef(null);
-  const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState("");
+  const handleSubmit = async (values,{setSubmitting,resetForm}) =>{
+    try{
+      const response = await axios.post("http://localhost:8080/event/add", values);
+      console.log(response.data);
+
+      if(response.status === 200){
+        setOpenMessage(true);  
+        setStatus('success');
+    
+      }
+    }
+    catch(error){
+      setStatus(error);
+      console.log({error})
+    }
+    finally{
+      setSubmitting(false);
+      resetForm();
+          // setFileName("");
+          // setPreview(null);
+          // if (bannerRef.current) {
+          //   bannerRef.current.value = "";
+          // }
+    }
+
+  }
 
   return (
     <>
@@ -30,14 +63,14 @@ export default function EventForm(props) {
           title: "",
           actionbtn: "",
           showtitle: false,
-          url: "",
-          resurl: "",
+          formUrl: "",
+          responseUrl: "",
           audience: "",
-          project: "",
-          type: "",
-          startdate: "",
-          enddate: "",
-          banner: null,
+          projects: "",
+          eventType: "",
+          enableDate: "",
+          expireDate: "",
+          // banner: null,
         }}
         validate={(values) => {
           const errors = {};
@@ -47,34 +80,36 @@ export default function EventForm(props) {
           if (!values.actionbtn) {
             errors.actionbtn = "Action Button text is required";
           }
-          if (!values.url) {
-            errors.url = "URL of the form(Eg: Google form) is required";
+          if (!values.formUrl) {
+            errors.formUrl = "URL of the form(Eg: Google form) is required";
           }
-          if (!values.resurl) {
-            errors.resurl = "Response URL of the form is required";
+          if (!values.responseUrl) {
+            errors.responseUrl = "Response URL of the form is required";
           }
           if (!values.audience) {
             errors.audience = "Select a Audience";
           }
-          if (!values.project) {
-            errors.project = "Project is required";
+          if (!values.projects) {
+            errors.projects = "Project is required";
           }
-          if (!values.type) {
-            errors.type = "Event type is required";
+          if (!values.eventType) {
+            errors.eventType = "Event type is required";
           }
-          if (!values.startdate) {
-            errors.startdate = "Starting date is required";
+          if (!values.enableDate) {
+            errors.enableDate = "Starting date is required";
           }
-          if (!values.enddate) {
-            errors.enddate = "Ending date is required";
+          if (!values.expireDate) {
+            errors.expireDate = "Ending date is required";
           }
-          if (!values.banner) {
-            errors.banner = "Banner is required";
-          }
+          // if (!values.banner) {
+          //   errors.banner = "Banner is required";
+          // }
           return errors;
         }}
-        onSubmit={(values) => {
+        onSubmit={(values,{setSubmitting,resetForm}) => {
+  
           console.log("Submitted:", values);
+          handleSubmit(values,{resetForm,setSubmitting});
         }}
       >
         {({
@@ -85,6 +120,8 @@ export default function EventForm(props) {
           values,
           validateForm,
           isValid,
+          isSubmitting,
+          resetForm
         }) => (
           <Form>
             <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -130,31 +167,31 @@ export default function EventForm(props) {
 
               <div className="sm:col-span-full">
                 <Field
-                  name="url"
+                  name="formUrl"
                   type="text"
                   placeholder="URL of the form(Eg: Google form)"
                   className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
-                    errors.url && touched.url ? "border-red-500" : ""
+                    errors.formUrl && touched.formUrl ? "border-red-500" : ""
                   }`}
                 />
-                {errors.url && touched.url && (
-                  <p className="text-red-500 text-sm mt-1">{errors.url}</p>
+                {errors.formUrl && touched.formUrl && (
+                  <p className="text-red-500 text-sm mt-1">{errors.formUrl}</p>
                 )}
               </div>
 
               <div className="sm:col-span-full">
                 <Field
-                  name="resurl"
+                  name="responseUrl"
                   type="text"
                   placeholder="Response URL of the form"
                   className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
-                    errors.resurl && touched.resurl
+                    errors.responseUrl && touched.responseUrl
                       ? "border-b-2 border-red-500"
                       : ""
                   }`}
                 />
-                {errors.resurl && touched.resurl && (
-                  <p className="text-red-500 text-sm mt-1">{errors.resurl}</p>
+                {errors.responseUrl && touched.responseUrl && (
+                  <p className="text-red-500 text-sm mt-1">{errors.responseUrl}</p>
                 )}
               </div>
 
@@ -165,7 +202,6 @@ export default function EventForm(props) {
                     onChange={(selectedOption) => {
                       setFieldValue("audience", selectedOption.name);
                       setFieldTouched("audience", true, false);
-                      console.log(selectedOption);
                     }}
                   >
                     <div className="relative">
@@ -230,37 +266,37 @@ export default function EventForm(props) {
 
               <div className="sm:col-span-full">
                 <Field
-                  name="project"
+                  name="projects"
                   type="text"
                   placeholder="Project"
                   className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
-                    errors.project && touched.project ? "border-red-500" : ""
+                    errors.projects && touched.projects ? "border-red-500" : ""
                   }`}
                 />
-                {errors.project && touched.project && (
-                  <p className="text-red-500 text-sm mt-1">{errors.project}</p>
+                {errors.projects && touched.projects && (
+                  <p className="text-red-500 text-sm mt-1">{errors.projects}</p>
                 )}
               </div>
 
               <div className="sm:col-span-full">
                 <div className="relative">
                   <Listbox
-                    value={values.type}
+                    value={values.eventType}
                     onChange={(selectedOption) => {
-                      setFieldValue("type", selectedOption.name);
-                      setFieldTouched("type", true, false);
+                      setFieldValue("eventType", selectedOption.name);
+                      setFieldTouched("eventType", true, false);
                     }}
                   >
                     <div className="relative">
                       <ListboxButton
-                        name="type"
+                        name="eventType"
                         onBlur={() => {
-                          setFieldTouched("type", true, true);
+                          setFieldTouched("eventType", true, true);
                         }}
                         className={`grid w-full px-1 text-left focus:outline-none border-b-2 ${
-                          errors.type && touched.type
+                          errors.eventType && touched.eventType
                             ? "border-red-500"
-                            : values.type
+                            : values.eventType
                             ? "border-gray-400"
                             : "focus:border-(color:--my1) border-gray-400"
                         }`}
@@ -268,10 +304,10 @@ export default function EventForm(props) {
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
                           <span
                             className={`block truncate ${
-                              !values.type ? "text-gray-400" : ""
+                              !values.eventType ? "text-gray-400" : ""
                             }`}
                           >
-                            {values.type || "Select a Event type"}
+                            {values.eventType || "Select a Event type"}
                           </span>
                         </span>
                         <ChevronDownIcon
@@ -303,55 +339,55 @@ export default function EventForm(props) {
                       </ListboxOptions>
                     </div>
                   </Listbox>
-                  {errors.type && touched.type && (
-                    <p className="text-red-500 text-sm mt-1">{errors.type}</p>
+                  {errors.eventType && touched.eventType && (
+                    <p className="text-red-500 text-sm mt-1">{errors.eventType}</p>
                   )}
                 </div>
               </div>
 
               <div className="sm:col-span-3">
                 <Field
-                  name="startdate"
+                  name="enableDate"
                   type="text"
                   onFocus={(e) => (e.target.type = "date")}
                   onBlur={(e) => {
                     e.target.type = "text";
-                    setFieldTouched("startdate", true, true);
+                    setFieldTouched("enableDate", true, true);
                   }}
                   placeholder="Select a Starting Date"
                   className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${
-                    errors.startdate && touched.startdate
+                    errors.enableDate && touched.enableDate
                       ? "border-red-500"
                       : ""
                   }`}
                 />
-                {errors.startdate && touched.startdate && (
+                {errors.enableDate && touched.enableDate && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.startdate}
+                    {errors.enableDate}
                   </p>
                 )}
               </div>
               <div className="sm:col-span-3">
                 <Field
-                  name="enddate"
+                  name="expireDate"
                   type="text"
                   onFocus={(e) => {
                     e.target.type = "date";
                   }}
                   onBlur={(e) => {
                     e.target.type = "text";
-                    setFieldTouched("enddate", true, true);
+                    setFieldTouched("expireDate", true, true);
                   }}
                   placeholder="Select a Ending Date"
                   className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${
-                    errors.enddate && touched.enddate ? "border-red-500" : ""
+                    errors.expireDate && touched.expireDate ? "border-red-500" : ""
                   }`}
                 />
-                {errors.enddate && touched.enddate && (
-                  <p className="text-red-500 text-sm mt-1">{errors.enddate}</p>
+                {errors.expireDate && touched.expireDate && (
+                  <p className="text-red-500 text-sm mt-1">{errors.expireDate}</p>
                 )}
               </div>
-              <div className="sm:col-span-full">
+              {/* <div className="sm:col-span-full">
                 <div className="flex justify-center w-full">
                   {errors.banner && touched.banner && (
                     <p className="text-red-500 text-sm mt-2 mx-5">
@@ -414,12 +450,21 @@ export default function EventForm(props) {
                     </p>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               <div className="sm:col-span-full">
                 <div className="px-4 flex justify-end">
                   <button
                     type="reset"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      resetForm();
+                      setFileName("");
+                      setPreview(null);
+                      if (bannerRef.current) {
+                        bannerRef.current.value = "";
+                      }
+                    }}
                     className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
@@ -429,10 +474,7 @@ export default function EventForm(props) {
                     disabled={!isValid}
                     onClick={() => {
                       validateForm;
-                      if (isValid && openForm) {
-                        setOpenSubmit(true);
-                        setOpenForm(false);
-                      }
+                      
                     }}
                     className={`justify-center ml-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset sm:w-auto ${
                       !isValid
@@ -448,6 +490,8 @@ export default function EventForm(props) {
           </Form>
         )}
       </Formik>
+
+      <SubmitDialog openMessage={openMessage} setOpenMessage={setOpenMessage} setOpenForm={setOpenForm} status={status} />
     </>
   );
 }

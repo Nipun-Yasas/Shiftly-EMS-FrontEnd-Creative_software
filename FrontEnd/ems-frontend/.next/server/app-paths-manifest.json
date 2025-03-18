@@ -1,7 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/claims/page": "app/claims/page.js",
-  "/claims/claimsubmission/page": "app/claims/claimsubmission/page.js",
-  "/claims/claimhistory/page": "app/claims/claimhistory/page.js"
+  "/events/page": "app/events/page.js"
 }
