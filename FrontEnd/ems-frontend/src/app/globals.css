@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+:root {
+  --my1: #E90A4D;
+  --my2: #E80A4D;
+  --closebtn:#6C6C6C;
+}

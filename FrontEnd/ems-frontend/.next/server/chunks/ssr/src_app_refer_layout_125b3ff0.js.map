@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/USER/Desktop/Shiftly-EMS-FrontEnd-Creative_software/FrontEnd/ems-frontend/src/app/refer/layout.js"],"sourcesContent":["\r\nexport const metadata = {\r\n  title: \"Refer Candidate\",\r\n  description: \"Refer Candidate\",\r\n};\r\n\r\nexport default function ReferLayout({ children }) {\r\n  return (\r\n    <html lang=\"en\">\r\n      <body >\r\n        {children}\r\n      </body>\r\n    </html>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;;AACO,MAAM,WAAW;IACtB,OAAO;IACP,aAAa;AACf;AAEe,SAAS,YAAY,EAAE,QAAQ,EAAE;IAC9C,qBACE,oOAAC;QAAK,MAAK;kBACT,cAAA,oOAAC;sBACE;;;AAIT","debugId":null}},
+    {"offset": {"line": 25, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
