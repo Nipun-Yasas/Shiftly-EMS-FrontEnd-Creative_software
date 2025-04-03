@@ -16,25 +16,29 @@ export default function page() {
             />
             <div>
                 <h2 className="text-xl font-bold">Software Engineer</h2>
-                <p className="text-gray-600">Creative Technology Solutions (Pvt) Ltd</p>
-                <p className="text-sm text-gray-500">November 2021 - Present</p>
                 <span>
-                    <div className=" ml-280  cursor-pointer text-gray-500 hover:text-gray-700">
-                        <EditIcon size={20} />
+                    <div className=" ml-200 cursor-pointer text-gray-500 hover:text-gray-700">
+                        <EditIcon size={40} />
                     </div>
                 </span>
+                <p className="text-gray-600">Creative Technology Solutions (Pvt) Ltd</p>
+                <p className="text-sm text-gray-500">November 2021 - Present</p>
+                
 
             </div>
       </div>
 
       
       <div className="ml-67 mt-4">
+            
             <h3 className="text-lg font-roboto font-bold text-black">DIPS</h3>
+           
             <p className="text-gray-700 text-m leading-relaxed">
             DIPS AS is Norway&apos;s leading provider of E-healthcare solutions for hospitals. The success of an initial
             collaboration to develop the first mobile applications led to DIPS establishing additional teams to work on
             other areas of their product.
             </p>
+            
       </div>
       
     </div>
