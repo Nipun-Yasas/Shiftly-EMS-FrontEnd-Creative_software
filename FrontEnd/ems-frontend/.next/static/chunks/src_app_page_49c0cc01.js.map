@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/USER/Desktop/Shiftly-EMS-FrontEnd-Creative_software/FrontEnd/ems-frontend/src/app/page.js"],"sourcesContent":["\"use client\";\r\n\r\n\r\nexport default function App() {\r\n  return (\r\n    <>\r\n    </>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;;AAGe,SAAS;IACtB,qBACE;AAGJ","debugId":null}},
-    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}

@@ -1,9 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
-    {"offset": {"line": 24, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/USER/Desktop/Shiftly-EMS-FrontEnd-Creative_software/FrontEnd/ems-frontend/src/app/page.js"],"sourcesContent":["import Image from \"next/image\";\r\nimport styles from \"./page.module.css\";\r\n\r\nexport default function Home() {\r\n  return (\r\n    \r\n  <>\r\n    <h6 className=\"text-3xl text-red-500 font-bold underline\">\r\n      Hello world!\r\n    </h6>\r\n  </>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;;;;;;;;;AAGe,SAAS;IACtB,qBAEA;kBACE,cAAA,8OAAC;YAAG,WAAU;sBAA4C;;;;;;;AAK9D","debugId":null}},
-    {"offset": {"line": 49, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}

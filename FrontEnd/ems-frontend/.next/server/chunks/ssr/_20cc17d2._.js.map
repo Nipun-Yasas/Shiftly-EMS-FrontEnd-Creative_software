@@ -1,9 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/USER/Desktop/Shiftly-EMS-FrontEnd-Creative_software/FrontEnd/ems-frontend/src/app/test/page.jsx"],"sourcesContent":["\"use cl\"\r\n\r\nimport { Formik, Form, Field } from 'formik';\r\n\r\n\r\nconst MyForm = () => {\r\n  return (\r\n    <Formik\r\n      initialValues={{ file: null }}\r\n      validate={(values) => {\r\n        if (!values.banner) {\r\n            errors.banner = \"Banner is required\";\r\n          }\r\n          return errors;\r\n      }}\r\n      onSubmit={(values, { setSubmitting }) => {\r\n        \r\n        console.log('Submitted:', values);\r\n        setSubmitting(false);\r\n      }}\r\n    >\r\n      {({errors,values, isSubmitting }) => (\r\n        <Form>\r\n          <Field name=\"file\" type='file' />\r\n          <button type=\"submit\" disabled={isSubmitting}>\r\n            Submit\r\n          </button>\r\n        </Form>\r\n      )}\r\n    </Formik>\r\n  );\r\n};\r\n\r\nexport default MyForm;"],"names":[],"mappings":";;;;AAEA;AAFA;;;AAKA,MAAM,SAAS;IACb,qBACE,oOAAC,+IAAA,CAAA,SAAM;QACL,eAAe;YAAE,MAAM;QAAK;QAC5B,UAAU,CAAC;YACT,IAAI,CAAC,OAAO,MAAM,EAAE;gBAChB,OAAO,MAAM,GAAG;YAClB;YACA,OAAO;QACX;QACA,UAAU,CAAC,QAAQ,EAAE,aAAa,EAAE;YAElC,QAAQ,GAAG,CAAC,cAAc;YAC1B,cAAc;QAChB;kBAEC,CAAC,EAAC,QAAA,OAAM,EAAC,MAAM,EAAE,YAAY,EAAE,iBAC9B,qOAAC,+IAAA,CAAA,OAAI;;kCACH,oOAAC,+IAAA,CAAA,QAAK;wBAAC,MAAK;wBAAO,MAAK;;kCACxB,oOAAC;wBAAO,MAAK;wBAAS,UAAU;kCAAc;;;;;AAOxD;uCAEe","debugId":null}},
-    {"offset": {"line": 57, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}
