@@ -1,4 +1,41 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 /FrontEnd/ems-frontend/node_modules
+/FrontEnd/ems-frontend/.pnp
+/FrontEnd/ems-frontend/.pnp.*
+/FrontEnd/ems-frontend/yarn/*
+!/FrontEnd/ems-frontend/yarn/patches
+!/FrontEnd/ems-frontend/yarn/plugins
+!/FrontEnd/ems-frontend/yarn/releases
+!/FrontEnd/ems-frontend/yarn/versions
+
+# testing
+/FrontEnd/ems-frontend/coverage
+
+# next.js
 /FrontEnd/ems-frontend/.next/
+/FrontEnd/ems-frontend/out/
 
+# production
+/FrontEnd/ems-frontend/build
 
+# misc
+/FrontEnd/ems-frontend/.DS_Store
+/FrontEnd/ems-frontend/*.pem
+
+# debug
+/FrontEnd/ems-frontend/npm-debug.log*
+/FrontEnd/ems-frontend/yarn-debug.log*
+/FrontEnd/ems-frontend/yarn-error.log*
+/FrontEnd/ems-frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+/FrontEnd/ems-frontend.env*
+
+# vercel
+/FrontEnd/ems-frontend/.vercel
+
+# typescript
+/FrontEnd/ems-frontend/*.tsbuildinfo
+/FrontEnd/ems-frontend/next-env.d.ts
