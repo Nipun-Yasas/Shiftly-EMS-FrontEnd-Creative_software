@@ -1,5 +1,4 @@
 /FrontEnd/ems-frontend/node_modules
+/FrontEnd/ems-frontend/.next/
 
-/FrontEnd/ems-frontend/*.next/
-/FrontEnd/ems-frontend/public
 
