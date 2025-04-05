@@ -61,7 +61,7 @@ export default function Event() {
   return (
     <>
       <div>
-        <h2 className="text-(color:--my1) text-4xl font-bold">Claim History</h2>
+        <h2 className="text-(color:--primary) text-4xl font-bold">Claim History</h2>
         <p className="text-gray-500">
         Claim<span className="text-gray-500"> &gt; </span>
           Claim History <span className="text-gray-500"> &gt; </span>
@@ -71,7 +71,7 @@ export default function Event() {
             <div className="flex justify-end m-3">
               <button
                
-                className="mx-2 bg-(color:--my1) shadow-xl rounded-full w-8 h-8 text-white"
+                className="mx-2 bg-(color:--primary) shadow-xl rounded-full w-8 h-8 text-white"
               >
                 <PlusIcon
                   aria-hidden="true"

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useState } from "react";
 
 import ReferForm from "./components/ReferForm";
@@ -12,7 +11,7 @@ export default function Refer() {
   return (
     <>
       <div>
-        <h2 className="text-(color:--my1) text-4xl font-bold">
+        <h2 className="text-(color:--primary) text-4xl font-bold">
           Refer Candidate
         </h2>
         <p className="text-gray-500">

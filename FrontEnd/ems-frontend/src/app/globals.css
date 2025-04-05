@@ -1,7 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --my1: #E90A4D;
-  --my2: #E80A4D;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+  --font-lexend: 'Lexend', sans-serif;
+  --primary: #E90A4D;
+  --secondary: #E80A4D;
   --closebtn:#6C6C6C;
+}
+
+body {
+  font-family: var(--font-lexend); 
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins);
+  color: var(--primary);
 }

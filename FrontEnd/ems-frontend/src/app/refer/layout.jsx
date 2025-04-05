@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "Claim",
+  title: "Refer Candidate"
 };
 
-export default function ClaimLayout({ children }) {
+export default function ReferLayout({ children }) {
   return (
     <div>
       {children}

@@ -38,7 +38,7 @@ export default function Event() {
   return (
     <>
       <div>
-        <h2 className="text-(color:--my1) text-4xl font-bold">Events</h2>
+        <h2 className="text-(color:--primary) text-4xl font-bold">Events</h2>
         <p className="text-gray-500">
           Events <span className="text-gray-500">&gt;</span>
         </p>
@@ -49,7 +49,7 @@ export default function Event() {
                 onClick={() => {
                   setOpenForm(true);
                 }}
-                className="mx-2 bg-(color:--my1) shadow-xl rounded-full w-8 h-8 text-white"
+                className="mx-2 bg-(color:--primary) shadow-xl rounded-full w-8 h-8 text-white"
               >
                 <PlusIcon
                   aria-hidden="true"

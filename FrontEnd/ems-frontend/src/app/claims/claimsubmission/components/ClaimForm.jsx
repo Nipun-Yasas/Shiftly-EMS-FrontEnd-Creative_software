@@ -87,7 +87,7 @@ export default function ReferForm(props) {
                             ? "border-red-500"
                             : values.claimtype
                             ? "border-gray-400"
-                            : "focus:border-(color:--my1) border-gray-400"
+                            : "focus:border-(color:--primary) border-gray-400"
                         }`}
                       >
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -148,7 +148,7 @@ export default function ReferForm(props) {
                     setFieldTouched("claimdate", true, true);
                   }}
                   placeholder="Select a Ending Date"
-                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${
+                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--primary)  appearance-none ${
                     errors.claimdate && touched.claimdate
                       ? "border-red-500"
                       : ""
@@ -168,7 +168,7 @@ export default function ReferForm(props) {
                   as="textarea"
                   rows="3"
                   placeholder="Write a description"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
                     errors.description && touched.description
                       ? "border-red-500"
                       : ""
@@ -278,7 +278,7 @@ export default function ReferForm(props) {
                         claimfileRef.current.value = "";
                       }
                     }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
+                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--primary) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
                   </button>

@@ -29,7 +29,7 @@ export default function SubmitDialog(props) {
                 <div className="mt-5 pt-5 text-center">
                   <DialogTitle
                     as="h3"
-                    className="text-center font-bold text-lg text-(color:--my1)"
+                    className="text-center font-bold text-lg text-(color:--primary)"
                   >
                   {status === "success" ? "EVENT ADDED SUCCESSFULLY" : status}
                   </DialogTitle>

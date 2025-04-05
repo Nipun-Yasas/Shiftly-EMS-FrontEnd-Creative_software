@@ -130,7 +130,7 @@ export default function EventForm(props) {
                   name="title"
                   type="text"
                   placeholder="Title"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1)${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
                     errors.title && touched.title
                       ? "border-b-2 border-red-500"
                       : ""
@@ -145,7 +145,7 @@ export default function EventForm(props) {
                   name="actionbtn"
                   type="text"
                   placeholder="Action Button Text"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1)${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
                     errors.actionbtn && touched.actionbtn
                       ? "border-b-2 border-red-500"
                       : ""
@@ -170,7 +170,7 @@ export default function EventForm(props) {
                   name="formUrl"
                   type="text"
                   placeholder="URL of the form(Eg: Google form)"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
                     errors.formUrl && touched.formUrl ? "border-red-500" : ""
                   }`}
                 />
@@ -184,7 +184,7 @@ export default function EventForm(props) {
                   name="responseUrl"
                   type="text"
                   placeholder="Response URL of the form"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
                     errors.responseUrl && touched.responseUrl
                       ? "border-b-2 border-red-500"
                       : ""
@@ -215,7 +215,7 @@ export default function EventForm(props) {
                             ? "border-red-500"
                             : values.audience
                             ? "border-gray-400"
-                            : "focus:border-(color:--my1) border-gray-400"
+                            : "focus:border-(color:--primary) border-gray-400"
                         }`}
                       >
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -269,7 +269,7 @@ export default function EventForm(props) {
                   name="projects"
                   type="text"
                   placeholder="Project"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
                     errors.projects && touched.projects ? "border-red-500" : ""
                   }`}
                 />
@@ -298,7 +298,7 @@ export default function EventForm(props) {
                             ? "border-red-500"
                             : values.eventType
                             ? "border-gray-400"
-                            : "focus:border-(color:--my1) border-gray-400"
+                            : "focus:border-(color:--primary) border-gray-400"
                         }`}
                       >
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -355,7 +355,7 @@ export default function EventForm(props) {
                     setFieldTouched("enableDate", true, true);
                   }}
                   placeholder="Select a Starting Date"
-                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${
+                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--primary)  appearance-none ${
                     errors.enableDate && touched.enableDate
                       ? "border-red-500"
                       : ""
@@ -379,7 +379,7 @@ export default function EventForm(props) {
                     setFieldTouched("expireDate", true, true);
                   }}
                   placeholder="Select a Ending Date"
-                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--my1)  appearance-none ${
+                  className={`w-full bg-white px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder-gray-400 focus:outline-none focus:border-(color:--primary)  appearance-none ${
                     errors.expireDate && touched.expireDate ? "border-red-500" : ""
                   }`}
                 />
@@ -465,7 +465,7 @@ export default function EventForm(props) {
                         bannerRef.current.value = "";
                       }
                     }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
+                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--primary) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
                   </button>

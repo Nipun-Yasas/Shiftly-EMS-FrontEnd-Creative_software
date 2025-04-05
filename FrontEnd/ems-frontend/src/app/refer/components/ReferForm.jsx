@@ -93,7 +93,7 @@ export default function ReferForm(props) {
                             ? "border-red-500"
                             : values.vacancy
                             ? "border-gray-400"
-                            : "focus:border-(color:--my1) border-gray-400"
+                            : "focus:border-(color:--primary) border-gray-400"
                         }`}
                       >
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -147,7 +147,7 @@ export default function ReferForm(props) {
                   name="applicantname"
                   type="text"
                   placeholder="Enter Applicant name"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1)${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
                     errors.applicantname && touched.applicantname
                       ? "border-b-2 border-red-500"
                       : ""
@@ -164,7 +164,7 @@ export default function ReferForm(props) {
                   name="applicantemail"
                   type="text"
                   placeholder="Enter Applicant email"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1)${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
                     errors.applicantemail && touched.applicantemail
                       ? "border-b-2 border-red-500"
                       : ""
@@ -184,7 +184,7 @@ export default function ReferForm(props) {
                   as="textarea"
                   rows="3"
                   placeholder="Write a message"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--my1) focus:border-(color:--my1) ${
+                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
                     errors.message && touched.message ? "border-red-500" : ""
                   }`}
                 />
@@ -290,7 +290,7 @@ export default function ReferForm(props) {
                         resumeRef.current.value = "";
                       }
                     }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--my1) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
+                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--primary) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
                   >
                     Cancel
                   </button>

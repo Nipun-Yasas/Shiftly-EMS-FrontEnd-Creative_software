@@ -12,7 +12,7 @@ export default function ClaimSubmission() {
   return (
     <>
       <div>
-        <h2 className="text-(color:--my1) text-4xl font-bold">
+        <h2 className="text-(color:--primary) text-4xl font-bold">
           Claim Submission
         </h2>
         <p className="text-gray-500">
