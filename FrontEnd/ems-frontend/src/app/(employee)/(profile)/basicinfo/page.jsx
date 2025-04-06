@@ -11,7 +11,7 @@ function page() {
   return (
     <>
       <div className="container w-4/5 mt-20 ml-60 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
-        <div className="text-4xl text-red-600 font-bold ">Profile</div>
+        <div id='mainName' className="text-4xl  font-bold" style={{ color: '#E90A4D' }}  >Profile</div>
         <div className="sub-path">
           <span className="text-gray-400 mx-2 ">Employee <span>›</span> </span> 
           <span className="text-gray-500 mx-2 "> profile <span>›</span></span>
