@@ -7,6 +7,7 @@ import ProjectContent from './projects/page'
 import ExperienceContent from './experience/page'
 import EducationContent from './education/page'
 import SkillsContent from './skills/page'
+import { Style } from "@mui/icons-material";
 
 
 export default function tabBar() {
@@ -18,17 +19,16 @@ export default function tabBar() {
 
       {/* Tab Navigation */}
       <ul className="flex space-x-4 mb-5 ">
-            <li className="text-center">
+      <li className="text-center">
             <button
                 onClick={() => setActiveTab("Basic Info")}
                 className={`py-2 px-4 text-sm font-medium uppercase ${
-                activeTab === "Basic Info"
-                    ? " border-b-2 border-[color:#E90A4D] text-[color:#E90A4D]"
-                    :  "border-transparent text-[color:#6B7280] hover:text-[color:#E90A4D] transition duration-500 ease-in-out"
-                }`}
-                
+                  activeTab === "Basic Info"
+                  ? " border-b-2 border-[color:#E90A4D] text-[color:#E90A4D]"
+                  :  "border-transparent text-[color:#6B7280] hover:text-[color:#E90A4D] transition duration-500 ease-in-out"
+              }`}
             >
-               Basic Info
+                Basic Info
             </button>
             </li>
             <li className="text-center">
