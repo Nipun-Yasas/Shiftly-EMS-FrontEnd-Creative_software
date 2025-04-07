@@ -70,8 +70,8 @@ export default function page() {
   );
   return (
     <>
-      <div className="container w-4/5 mt-20 ml-60 mr-0 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
-        <div className="text-4xl text-red-600 font-bold ">Letter</div>
+      <div className="container w-auto mt-10 mr-0 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
+        <div className="text-4xl font-bold ">Letter</div>
         <div className="sub-path">
           <span className="text-gray-400 mx-2 ">
             Letter <span> ›</span>{" "}
@@ -83,7 +83,7 @@ export default function page() {
         </div>
       </div>
 
-      <div className="w-auto mr-0 ml-60 mt-10 pt-20 pl-20 pr-30 shadow-md bg-white rounded-2xl">
+      <div className="w-auto mr-0  mt-10 pt-20 pl-20 pr-30 shadow-md bg-white rounded-2xl">
         <table className="w-full table-auto text-sm">
           <thead className="bg-gray-100 text-left">
             <tr>
