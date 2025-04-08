@@ -7,7 +7,7 @@ import ProjectContent from './projects/page'
 import ExperienceContent from './experience/page'
 import EducationContent from './education/page'
 import SkillsContent from './skills/page'
-import { Style } from "@mui/icons-material";
+
 
 
 export default function tabBar() {

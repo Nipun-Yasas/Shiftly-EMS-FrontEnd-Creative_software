@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from "@mui/material";
 import LetterRequestModal from '../../components/LetterRequestModal';
+import SearchField from '../../components/SearchField';
 
 const letterTypes = [
     "EPF/ETF Name Change Letter",
@@ -23,26 +23,72 @@ export default function page() {
     letter.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleSearch = () => {
+    console.log("User searched for:", searchTerm);
+  };
+
   return (
     <>
+      <div className="container w-auto mt-10 p-5 shadow bg-white rounded-xl">
+        <div id='mainName' className="text-4xl font-bold" style={{ color: 'var(--primary)', fontFamily: 'var(--font-poppins)' }} >Letter</div>
+        <div className="sub-path">
+          <span className=" mx-2 " style={{color :'var(--graylight) ' ,fontFamily: 'var(--font-poppins)'}}>Letter <span>›</span> </span> 
+          <span className=" mx-2 " style={{color :'var(--grayDark)', fontFamily: 'var(--font-poppins)'}}> Request Letter <span>›</span></span>
+        </div>
+
+      </div>
+
+
+
+      <div className='shadow p-5 justify-items-end pt-10 pr-5'>
+        <SearchField value={searchTerm} onChange={setSearchTerm} onSearch={handleSearch}/>
+      </div>
+
+        
+          
+     
+
 
 <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Available Letter Types</h1>
+      <h1 className="text-2xl font-regular mb-6"
+        style={{
+          color:'black',
+          fontFamily:'var(--font-poppins)',
+          fontSize:'20px',
+        }}
+      >Available Letter Types</h1>
 
-      {letterTypes.map((letter) => (
-        <div
-          key={letter}
-          className="flex justify-between items-center bg-gray-200 px-6 py-4 rounded mb-4"
-        >
+      
+        {filteredLetters.length > 0 ? (
+            filteredLetters.map((letter) => (
+              <div
+                key={letter}
+                className="flex justify-between items-center px-6 py-4 rounded mb-4"
+                style={{
+                  background: 'var(--requestBackground)',
+                  borderRadius: '10px',
+                }}
+            >
           <span className="text-gray-800">{letter}</span>
           <button
             onClick={() => setSelectedLetter(letter)}
-            className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
+            className=" px-4 py-2 rounded"
+            style={{
+              color:'white',
+              background:'var(--requestBtn)',
+              borderRadius:'10px',
+
+            }}
           >
             Request
           </button>
         </div>
-      ))}
+      ))
+    ) : (
+      <p className="text-gray-500">No matching letters found.</p>
+    )}
+    
+    
 
       {selectedLetter && (
         <LetterRequestModal
