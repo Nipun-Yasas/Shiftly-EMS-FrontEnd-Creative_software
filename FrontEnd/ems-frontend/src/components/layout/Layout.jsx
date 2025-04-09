@@ -1,0 +1,41 @@
+"use client";
+
+import React, { useState } from "react";
+import { Box } from "@mui/material";
+import TopBar from "./TopBar";
+import SideNav from "./SideNav";
+
+const Layout = ({ children }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  return (
+    <Box sx={{ display: "flex", height: "100vh", width: "100%" }}>
+      {/* Top Bar */}
+      <TopBar toggleDrawer={toggleDrawer} />
+
+      {/* Side Navigation */}
+      <SideNav isDrawerOpen={isDrawerOpen} />
+
+      {/* Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          mt: "86px",
+          bgcolor: "background.default",
+          marginLeft: isDrawerOpen ? "256px" : "72px",
+          transition: "margin-left 0.2s",
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  );
+};
+
+export default Layout;
