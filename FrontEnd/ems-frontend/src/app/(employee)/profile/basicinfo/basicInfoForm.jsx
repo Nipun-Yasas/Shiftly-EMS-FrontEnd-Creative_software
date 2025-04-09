@@ -1,5 +1,5 @@
 
-import Readonlyfield from "@/app/components/Readonlyfield";
+import Readonlyfield from "@/app/(employee)/profile/components/Readonlyfield";
 
 export default function BasicInfoForm() {
   return (
