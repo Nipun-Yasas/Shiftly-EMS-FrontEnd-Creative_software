@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import LetterRequestModal from '../../components/LetterRequestModal';
-import SearchField from '../../components/SearchField';
+import LetterRequestModal from '../components/LetterRequestModal';
+import SearchField from '../components/SearchField';
 
 const letterTypes = [
     "EPF/ETF Name Change Letter",
