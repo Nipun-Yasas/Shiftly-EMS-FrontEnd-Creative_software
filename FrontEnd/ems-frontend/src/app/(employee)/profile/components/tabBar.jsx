@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import BasicInfoForm from './basicinfo/basicInfoForm'
-import PersonalInfoForm from './personalinfo/personalInfoForm'
-import ProjectContent from './projects/page'
-import ExperienceContent from './experience/page'
-import EducationContent from './education/page'
-import SkillsContent from './skills/page'
+import BasicInfoForm from '../basicinfo/basicInfoForm'
+import PersonalInfoForm from '../personalinfo/personalInfoForm'
+import ProjectContent from '../projects/page'
+import ExperienceContent from '../experience/page'
+import EducationContent from '../education/page'
+import SkillsContent from '../skills/page'
 
 
 
