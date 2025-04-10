@@ -18,23 +18,25 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Check if current path matches exactly
-  const isExactActive = (link) => pathname === link;
-  
-  // Check if current path is within this section (for parent highlighting)
-  const isSectionActive = () => {
-    if (item.hasDropdown && item.dropdownItems) {
-      return item.dropdownItems.some(child => pathname.startsWith(child.link));
+  // Check if any dropdown item is active to auto-expand the dropdown
+  const isDropdownItemActive = item.hasDropdown && 
+    item.dropdownItems.some(dropdownItem => pathname === dropdownItem.link);
+
+  // Helper function to check if an item is active
+  const isActive = (link) => {
+    // For initial load when pathname is "/" or empty, make dashboard active
+    if (!pathname || pathname === "/" || pathname === "") {
+      return link === "/dashboard";
     }
-    return isExactActive(item.link);
+    return pathname === link;
   };
 
-  // Auto-expand dropdown when a child is active
+  // Auto-expand dropdown if a child item is selected
   useEffect(() => {
-    if (isSectionActive() && item.hasDropdown) {
+    if (isDropdownItemActive) {
       setIsOpen(true);
     }
-  }, [pathname]);
+  }, [isDropdownItemActive, pathname]);
 
   const toggleDropdown = (event) => {
     if (event) {
@@ -42,9 +44,6 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
     }
     setIsOpen(!isOpen);
   };
-
-  // Get active states
-  const isItemActive = item.hasDropdown ? isSectionActive() : isExactActive(item.link);
 
   return (
     <React.Fragment>
@@ -55,8 +54,8 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
               borderRadius: 1,
               px: 2,
               py: 1.5,
-              bgcolor: isItemActive ? "#e80a4d1a" : "transparent",
-              "&:hover": { bgcolor: isItemActive ? "#e80a4d26" : "rgba(0, 0, 0, 0.04)" },
+              bgcolor: isActive(item.link) || isDropdownItemActive ? "#e80a4d1a" : "transparent",
+              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
               display: "flex",
               alignItems: "center",
               justifyContent: isDrawerOpen ? "flex-start" : "center",
@@ -64,22 +63,15 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
             }}
             onClick={toggleDropdown}
           >
-            <ListItemIcon 
-              sx={{ 
-                minWidth: 0, 
-                mr: isDrawerOpen ? 2 : 0,
-                color: isItemActive ? "#e80a4d" : "inherit"
-              }}
-            >
+            <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 2 : 0 }}>
               {item.icon}
             </ListItemIcon>
             {isDrawerOpen && (
               <ListItemText
                 primary={item.text}
                 primaryTypographyProps={{
-                  color: isItemActive ? "#e80a4d" : "text.primary",
+                  color: isActive(item.link) || isDropdownItemActive ? "#e80a4d" : "text.primary",
                   variant: "body1",
-                  fontWeight: isItemActive ? 600 : 400,
                 }}
               />
             )}
@@ -88,9 +80,6 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
                 edge="end"
                 size="small"
                 onClick={(event) => toggleDropdown(event)}
-                sx={{
-                  color: isItemActive ? "#e80a4d" : "inherit"
-                }}
               >
                 <ExpandMoreIcon
                   sx={{
@@ -108,30 +97,23 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
                 borderRadius: 1,
                 px: 2,
                 py: 1.5,
-                bgcolor: isExactActive(item.link) ? "#e80a4d1a" : "transparent",
-                "&:hover": { bgcolor: isExactActive(item.link) ? "#e80a4d26" : "rgba(0, 0, 0, 0.04)" },
+                bgcolor: isActive(item.link) ? "#e80a4d1a" : "transparent",
+                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: isDrawerOpen ? "flex-start" : "center",
                 gap: isDrawerOpen ? 2 : 0,
               }}
             >
-              <ListItemIcon 
-                sx={{ 
-                  minWidth: 0, 
-                  mr: isDrawerOpen ? 2 : 0,
-                  color: isExactActive(item.link) ? "#e80a4d" : "inherit"
-                }}
-              >
+              <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 2 : 0 }}>
                 {item.icon}
               </ListItemIcon>
               {isDrawerOpen && (
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{
-                    color: isExactActive(item.link) ? "#e80a4d" : "text.primary",
+                    color: isActive(item.link) ? "#e80a4d" : "text.primary",
                     variant: "body1",
-                    fontWeight: isExactActive(item.link) ? 600 : 400,
                   }}
                 />
               )}
@@ -150,19 +132,13 @@ const NavItem = ({ item, isDrawerOpen, index }) => {
                   <ListItemButton
                     sx={{
                       pl: 4,
-                      py: 1.25,
-                      borderRadius: 1,
-                      bgcolor: isExactActive(dropdownItem.link) ? " #e80a4d1a" : "transparent",
-                      "&:hover": { bgcolor: isExactActive(dropdownItem.link) ? "#e80a4d26" : "rgba(0, 0, 0, 0.04)" },
-                      mr: 1,
+                      bgcolor: isActive(dropdownItem.link) ? "#e80a4d1a" : "transparent",
                     }}
                   >
                     <ListItemText
                       primary={dropdownItem.text}
                       primaryTypographyProps={{
-                        color: isExactActive(dropdownItem.link) ? "#e80a4d" : "text.primary",
-                        variant: "body2",
-                        fontWeight: isExactActive(dropdownItem.link) ? 600 : 400,
+                        color: isActive(dropdownItem.link) ? "#e80a4d" : "text.primary",
                       }}
                     />
                   </ListItemButton>

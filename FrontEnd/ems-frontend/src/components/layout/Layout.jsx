@@ -1,12 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
+import { useRouter, usePathname } from "next/navigation";
 import TopBar from "./TopBar";
 import SideNav from "./SideNav";
 
 const Layout = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Redirect to dashboard if path is root
+  useEffect(() => {
+    if (pathname === "/" || pathname === "" || !pathname) {
+      router.push("/dashboard");
+    }
+  }, [pathname, router]);
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
