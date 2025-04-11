@@ -52,22 +52,14 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   const [searchText, setSearchText] = React.useState('');
   const [searchAttribute, setSearchAttribute] = React.useState('None');
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
+  const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-  const handleSearchTextChange = (event) => {
-    setSearchText(event.target.value);
-  };
-
-  const handleSearchAttributeChange = (event) => {
-    setSearchAttribute(event.target.value);
-  };
+  const handleSearchTextChange = (event) => setSearchText(event.target.value);
+  const handleSearchAttributeChange = (event) => setSearchAttribute(event.target.value);
 
   const filteredRows = rows.filter((row) => {
     if (!searchText.trim()) return true;
@@ -114,14 +106,14 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
       <Divider className="mb-4" />
       <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
         <TableContainer sx={{ maxHeight: 300 }}>
-          <Table stickyHeader aria-label="sticky table">
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
                   <TableCell
                     key={column.id}
                     align={column.align || 'left'}
-                    style={{ minWidth: column.minWidth, borderBottom: '1px solid #e0e0e0' }}
+                    style={{ minWidth: column.minWidth }}
                   >
                     {column.label}
                   </TableCell>
@@ -129,16 +121,13 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
-                <TableRow hover tabIndex={-1} key={rowIndex} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align || 'left'}>
-                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                      </TableCell>
-                    );
-                  })}
+              {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, idx) => (
+                <TableRow hover tabIndex={-1} key={idx}>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} align={column.align || 'left'}>
+                      {row[column.id]}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
@@ -168,53 +157,56 @@ export default function MyProjectPage() {
       <Box className="flex">
         <Box className="w-64 bg-gray-300 rounded mr-4 h-[calc(100vh-5rem)]"></Box>
         <Box className="flex-1">
-          {/* Title and Breadcrumb */}
-          <Typography variant="h4" className="text-pink-600 font-bold mb-4">My Project</Typography>
-          <p className="text-sm text-gray-500 mb-6">project / my project</p>
+          {/* Title and Breadcrumb (outside the shadow box) */}
+          <Typography variant="h4" className="text-pink-600 font-bold mb-1">My Project</Typography>
+          <p className="text-sm text-gray-500 mb-4">project / my project</p>
 
-          {/* Header with Logo and Tabs */}
-          <Box className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/images/dips_logo.png"
-                alt="DIPS Logo"
-                width={120}
-                height={120}
-                className="object-contain"
-              />
-            </div>
-            <div className="flex gap-6 border-b border-gray-200 ">
-              {[
-                { name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
-                { name: "TEAM", href: "/projects/my-projects/team" },
-              ].map((tab) => {
-                const isActive = pathname === tab.href;
-                return (
-                  <Link
-                    key={tab.name}
-                    href={tab.href}
-                    className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
-                  >
-                    {tab.name}
-                  </Link>
-                );
-              })}
-            </div>
+          {/* Main content wrapped in one shadow box */}
+          <Box className="bg-white rounded-2xl shadow-md p-6">
+            {/* Header with Logo and Tabs */}
+            <Box className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/images/dips_logo.png"
+                  alt="DIPS Logo"
+                  width={120}
+                  height={120}
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex gap-6 border-b border-gray-200">
+                {[
+                  { name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
+                  { name: "TEAM", href: "/projects/my-projects/team" },
+                ].map((tab) => {
+                  const isActive = pathname === tab.href;
+                  return (
+                    <Link
+                      key={tab.name}
+                      href={tab.href}
+                      className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
+                    >
+                      {tab.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </Box>
+
+            {/* Tables */}
+            <ProjectTableSection
+              title="Project Users"
+              columns={columnsUsers}
+              rows={userRows}
+              searchLabel="User, Team, etc..."
+            />
+            <ProjectTableSection
+              title="Project Teams"
+              columns={columnsTeams}
+              rows={teamRows}
+              searchLabel="Project Team, Status, etc..."
+            />
           </Box>
-
-          {/* Project Tables */}
-          <ProjectTableSection
-            title="Project Users"
-            columns={columnsUsers}
-            rows={userRows}
-            searchLabel="User, Team, etc..."
-          />
-          <ProjectTableSection
-            title="Project Teams"
-            columns={columnsTeams}
-            rows={teamRows}
-            searchLabel="Project Team, Status, etc..."
-          />
         </Box>
       </Box>
     </Box>
