@@ -1,9 +1,13 @@
 "use client";
 
+import React from "react";
 
-export default function App() {
+
+// Your page content
+export default function Page() {
   return (
-    <>
-    </>
+   <>
+   hi
+   </>
   );
 }
