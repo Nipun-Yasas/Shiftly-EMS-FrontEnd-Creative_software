@@ -1,7 +1,5 @@
-
-import { Poppins,Roboto,Lexend } from "next/font/google";
+import { Poppins,Roboto,Lexend,Inter } from "next/font/google";
 import "./globals.css";
-import { Inter } from 'next/font/google';
 import Layout from './(components)/layout/Layout';
 
 const inter = Inter({ subsets: ['latin'] });

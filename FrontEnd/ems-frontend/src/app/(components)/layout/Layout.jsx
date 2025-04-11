@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
           p: 3,
           mt: "86px",
           bgcolor: "background.default",
-          marginLeft: isDrawerOpen ? "256px" : "72px",
+          
           transition: "margin-left 0.2s",
         }}
       >
