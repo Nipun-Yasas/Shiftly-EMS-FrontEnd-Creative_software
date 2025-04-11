@@ -3,7 +3,7 @@
 import React from "react";
 import { Drawer, List } from "@mui/material";
 import NavItem from "./NavItem";
-import { navItems } from "../../config/navigation";
+import { navItems } from "../../(utils)/navigation";
 
 const SideNav = ({ isDrawerOpen }) => {
   return (

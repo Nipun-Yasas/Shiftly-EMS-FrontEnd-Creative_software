@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@mui/material";
-import LetterRequestModal from '../../components/LetterRequestModal';
+import LetterRequestModal from '../../(components)/LetterRequestModal';
 
 const letterTypes = [
     "EPF/ETF Name Change Letter",

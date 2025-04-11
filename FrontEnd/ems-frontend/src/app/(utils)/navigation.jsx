@@ -93,12 +93,12 @@ export const navItems = [
     text: "Event",
     icon: <DateRangeIcon />,
     hasDropdown: false,
-    link: "/event",
+    link: "/events",
   },
   {
     text: "Refer Candidate",
     icon: <PersonIcon />,
     hasDropdown: false,
-    link: "/refCandidate",
+    link: "/refercandidate",
   },
 ];
