@@ -44,12 +44,7 @@ const demoProjects = [
 export default function AllProjects() {
   return (
     <div className="flex min-h-screen bg-[#f5f5f5]">
-      {/* Sidebar */}
-      <div className="w-75 bg-[#4d4d4d] text-white p-4">
-        <h2 className="text-lg font-semibold mb-4">Sidebar</h2>
-       
-      
-      </div>
+     
 
       {/* Main Content Area */}
       <div className="flex-1 p-6">
