@@ -1,47 +1,111 @@
 'use client';
-import React from 'react';
+import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { Eye, EyeOff } from 'lucide-react';
+import { X } from 'lucide-react';
 
-const LoginSchema = Yup.object().shape({
-    username: Yup.string()
-      .min(3, 'Username too short')
-      .max(20, 'Username too long')
-      .required('Username is required'),
-    password: Yup.string()
-      .min(6, 'Password too short')
-      .required('Password is required'),
-  });
-  
 
 export default function LoginForm({ onClose }) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const initialValues = {
+    username: '',
+    password: '',
+    remember: false,
+  };
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required('Username is required'),
+    password: Yup.string().required('Password is required'),
+  });
+
+  const handleSubmit = (values) => {
+    console.log(values);
+    // TODO: handle login logic
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-xl w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div style={{ color:'black'}}
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
+         
+         <div className="bg-white rounded-xl w-full max-w-md p-6 md:p-10 shadow-xl relative">
+
+          
+              {/* Close Button */}
+              <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+               >
+                  <X size={24} />
+              </button>
+                    
+        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+
         <Formik
-          initialValues={{ username: '', password: '' }}
-          validationSchema={LoginSchema}
-          onSubmit={(values) => {
-            console.log(values);
-            onClose(); 
-          }}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
         >
-          {() => (
+          {({ values }) => (
             <Form className="space-y-4">
               <div>
-                <Field name="username" type="text" placeholder="Username" className="w-full p-2 border rounded" />
-                <ErrorMessage name="username" component="div" className="text-sm text-red-500 mt-1" />
+                <Field
+                  name="username"
+                  placeholder="Username"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <ErrorMessage
+                  name="username"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
               </div>
-              <div>
-                <Field name="password" type="password" placeholder="Password" className="w-full p-2 border rounded" />
-                <ErrorMessage name="password" component="div" className="text-sm text-red-500 mt-1" />
+
+              <div className="relative">
+                <Field
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
               </div>
-              <button type="submit" className="w-full bg-black text-white py-2 rounded">Login</button>
+
+              <div className="flex justify-between items-center text-sm">
+                <label className="flex items-center gap-2">
+                  <Field type="checkbox" name="remember" />
+                  Remember Me
+                </label>
+                <a href="#" className="text-pink-600 font-medium">Forgot Password ?</a>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-3 rounded-full font-semibold hover:opacity-90 transition"
+              >
+                Login
+              </button>
+
+              <div className="text-center text-sm pt-4">
+                Don’t have an account?{' '}
+                <a href="#" className="text-blue-600 underline">Create account</a>
+              </div>
             </Form>
           )}
         </Formik>
-        <button onClick={onClose} className="mt-4 text-sm text-gray-500 w-full">Close</button>
       </div>
     </div>
   );

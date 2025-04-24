@@ -1,46 +1,137 @@
 'use client';
-import React from 'react';
+import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-
-const SignupSchema = Yup.object().shape({
-  name: Yup.string().required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(6, 'Password too short').required('Required'),
-});
+import { Eye, EyeOff } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function SignupForm({ onClose }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const initialValues = {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    terms: false,
+  };
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required('Username is required'),
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().min(6, 'Min 6 characters').required('Password is required'),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref('password')], 'Passwords must match')
+      .required('Confirm your password'),
+    terms: Yup.bool().oneOf([true], 'You must accept the terms'),
+  });
+
+  const handleSubmit = (values) => {
+    console.log(values);
+    // TODO: handle signup logic
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-xl w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+    <div
+        style={{
+          color:'black'
+        }}
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
+        <div className="bg-white rounded-xl w-full max-w-md p-6 md:p-10 shadow-xl relative">
+
+        <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+               >
+                  <X size={24} />
+              </button>
+
+
+
+        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+
         <Formik
-          initialValues={{ name: '', email: '', password: '' }}
-          validationSchema={SignupSchema}
-          onSubmit={(values) => {
-            console.log(values);
-            onClose(); // Close on successful submission
-          }}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
         >
           {() => (
             <Form className="space-y-4">
               <div>
-                <Field name="name" type="text" placeholder="Full Name" className="w-full p-2 border rounded" />
-                <ErrorMessage name="name" component="div" className="text-sm text-red-500 mt-1" />
+                <Field
+                  name="username"
+                  placeholder="Username"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <ErrorMessage name="username" component="div" className="text-red-500 text-sm mt-1" />
               </div>
+
               <div>
-                <Field name="email" type="email" placeholder="Email" className="w-full p-2 border rounded" />
-                <ErrorMessage name="email" component="div" className="text-sm text-red-500 mt-1" />
+                <Field
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
               </div>
-              <div>
-                <Field name="password" type="password" placeholder="Password" className="w-full p-2 border rounded" />
-                <ErrorMessage name="password" component="div" className="text-sm text-red-500 mt-1" />
+
+              <div className="relative">
+                <Field
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
               </div>
-              <button type="submit" className="w-full bg-black text-white py-2 rounded">Sign Up</button>
+
+              <div className="relative">
+                <Field
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm Password"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              <div className="text-sm flex items-center gap-2">
+                <Field type="checkbox" name="terms" />
+                <label htmlFor="terms">I accept the terms and conditions</label>
+              </div>
+              <ErrorMessage name="terms" component="div" className="text-red-500 text-sm mt-1" />
+
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-3 rounded-full font-semibold hover:opacity-90 transition"
+              >
+                Sign Up
+              </button>
+
+              <div className="text-center text-sm pt-4">
+                Already have an account?{' '}
+                <a href="#" className="text-blue-600 underline">Login</a>
+              </div>
             </Form>
           )}
         </Formik>
-        <button onClick={onClose} className="mt-4 text-sm text-gray-500 w-full">Close</button>
       </div>
     </div>
   );
