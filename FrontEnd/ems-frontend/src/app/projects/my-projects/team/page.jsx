@@ -1,15 +1,10 @@
 'use client';
-import '../../../globals.css';
 import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import { IconButton, TextField, MenuItem, Box, Typography, Divider } from '@mui/material';
+import {
+  Paper, Table, TableBody, TableCell, TableContainer, TableHead,
+  TablePagination, TableRow, IconButton, TextField, MenuItem,
+  Box, Typography, Divider
+} from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Image from 'next/image';
@@ -74,7 +69,7 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   });
 
   return (
-    <Box className="bg-white rounded-2xl shadow-md p-4 mb-6">
+    <Box className="bg-white rounded-2xl shadow-md p-6 mb-6">
       <Box className="flex items-center justify-between mb-4">
         <Typography variant="h6" className="font-semibold text-gray-800">
           {title}
@@ -147,67 +142,55 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   );
 }
 
-export default function MyProjectPage() {
+export default function MyProjectTeamPage() {
   const pathname = usePathname();
 
   return (
-    <Box className="p-4 bg-gray-100 min-h-screen">
-      {/* Top Nav and Sidebar placeholders */}
-      <Box className="h-16 bg-gray-300 rounded mb-4"></Box>
-      <Box className="flex">
-        <Box className="w-64 bg-gray-300 rounded mr-4 h-[calc(100vh-5rem)]"></Box>
-        <Box className="flex-1">
-          {/* Title and Breadcrumb (outside the shadow box) */}
-          <Typography variant="h4" className="text-pink-600 font-bold mb-1">My Project</Typography>
-          <p className="text-sm text-gray-500 mb-4">project / my project</p>
+    <Box className="p-4 bg-white min-h-screen">
+      <h1 className="text-2xl font-bold text-[#E90A4D] mb-2">My Project</h1>
+      <p className="text-sm text-gray-500 mb-4">project / my project</p>
 
-          {/* Main content wrapped in one shadow box */}
-          <Box className="bg-white rounded-2xl shadow-md p-6">
-            {/* Header with Logo and Tabs */}
-            <Box className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/images/dips_logo.png"
-                  alt="DIPS Logo"
-                  width={120}
-                  height={120}
-                  className="object-contain"
-                />
-              </div>
-              <div className="flex gap-6 border-b border-gray-200">
-                {[
-                  { name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
-                  { name: "TEAM", href: "/projects/my-projects/team" },
-                ].map((tab) => {
-                  const isActive = pathname === tab.href;
-                  return (
-                    <Link
-                      key={tab.name}
-                      href={tab.href}
-                      className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
-                    >
-                      {tab.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            </Box>
-
-            {/* Tables */}
-            <ProjectTableSection
-              title="Project Users"
-              columns={columnsUsers}
-              rows={userRows}
-              searchLabel="User, Team, etc..."
+      <Box className="bg-white rounded-2xl shadow-md p-6">
+        <Box className="flex items-center gap-150 mb-6">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/images/dips_logo.png"
+              alt="DIPS Logo"
+              width={120}
+              height={120}
+              className="object-contain"
             />
-            <ProjectTableSection
-              title="Project Teams"
-              columns={columnsTeams}
-              rows={teamRows}
-              searchLabel="Project Team, Status, etc..."
-            />
-          </Box>
+          </div>
+          <div className="flex gap-6 border-b border-gray-200">
+            {[{ name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
+              { name: "TEAM", href: "/projects/my-projects/team" }]
+              .map((tab) => {
+                const isActive = pathname === tab.href;
+                return (
+                  <Link
+                    key={tab.name}
+                    href={tab.href}
+                    className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
+                  >
+                    {tab.name}
+                  </Link>
+                );
+              })}
+          </div>
         </Box>
+
+        <ProjectTableSection
+          title="Project Users"
+          columns={columnsUsers}
+          rows={userRows}
+          searchLabel="User, Team, etc..."
+        />
+        <ProjectTableSection
+          title="Project Teams"
+          columns={columnsTeams}
+          rows={teamRows}
+          searchLabel="Project Team, Status, etc..."
+        />
       </Box>
     </Box>
   );
