@@ -7,6 +7,19 @@
   --primary: #E90A4D;
   --secondary: #E80A4D;
   --closebtn:#6C6C6C;
+  --graylight:#0000004D;
+  --grayLight2:#737791;
+  --grayDark:#00000080;
+  --blueDark:#05004E;
+  --labelColor:#000000A3;
+  --valueColor:#16151CCC;
+  --inputFieldColor:#E6E7E7;
+  --requestBtn:#FD3571;
+  --requestBtnHover:#d90056;
+  --requestBackground:#0000000F;
+  
+
+
 }
 
 body {

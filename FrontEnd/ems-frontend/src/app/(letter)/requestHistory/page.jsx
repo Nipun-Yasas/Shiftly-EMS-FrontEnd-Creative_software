@@ -70,23 +70,23 @@ export default function page() {
   );
   return (
     <>
-      <div className="container w-4/5 mt-20 ml-60 mr-0 pt-5 pb-5 pl-20 shadow bg-white rounded-xl">
-        <div className="text-4xl text-red-600 font-bold ">Letter</div>
+       <div className="container w-auto mt-10 p-5 shadow bg-white rounded-xl">
+        <div id='mainName' className="text-4xl font-bold" style={{ color: 'var(--primary)', fontFamily: 'var(--font-poppins)' }} >Letter</div>
         <div className="sub-path">
-          <span className="text-gray-400 mx-2 ">
-            Letter <span> ›</span>{" "}
-          </span>
-          <span className="text-gray-500 mx-2 ">
-            {" "}
-            Request History <span>›</span>
-          </span>
+          <span className=" mx-2 " style={{color :'var(--graylight) ' ,fontFamily: 'var(--font-poppins)'}}>Letter <span>›</span> </span> 
+          <span className=" mx-2 " style={{color :'var(--grayDark)', fontFamily: 'var(--font-poppins)'}}> Request History <span>›</span></span>
         </div>
+
       </div>
 
-      <div className="w-auto mr-0 ml-60 mt-10 pt-20 pl-20 pr-30 shadow-md bg-white rounded-2xl">
+      <div className="w-auto mr-0  mt-10 pt-20 pl-20 pr-30 shadow-md bg-white rounded-2xl">
         <table className="w-full table-auto text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
+          <thead className=" text-left"
+            style={{
+              color:'#000000',
+            }}
+          >
+            <tr >
               <th className="px-4 py-3 font-semibold">REQUEST ID</th>
               <th className="px-4 py-3 font-semibold">REQUEST BY</th>
               <th className="px-4 py-3 font-semibold">REQUEST ON</th>
@@ -95,7 +95,11 @@ export default function page() {
           </thead>
           <tbody>
             {currentData.map((item, index) => (
-              <tr key={index} className="gap-10 border-gray-200 border-b">
+              <tr key={index} className="gap-10 border-gray-200 border-b"
+                style={{
+                  color:'var(--grayDark)',
+                }}
+              >
                 <td className="px-4 py-3">{item.id}</td>
                 <td className="px-4 py-3">{item.name}</td>
                 <td className="px-4 py-3">{item.date}</td>
