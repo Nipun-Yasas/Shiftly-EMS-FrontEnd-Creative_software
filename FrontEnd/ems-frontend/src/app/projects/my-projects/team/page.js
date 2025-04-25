@@ -1,5 +1,4 @@
 'use client';
-import '../../../globals.css';
 import * as React from 'react';
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead,
@@ -11,6 +10,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
 
 const columnsUsers = [
   { id: 'user', label: 'User', minWidth: 150 },
@@ -42,6 +42,7 @@ const teamRows = [
   { projectTeam: 'ORBIS', defaultStatus: 'False', status: 'Active' },
 ];
 
+
 function ProjectTableSection({ title, columns, rows, searchLabel }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -70,7 +71,7 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   });
 
   return (
-    <Box className="bg-white rounded-2xl shadow-md p-4 mb-6">
+    <Box className="bg-white rounded-2xl shadow-md p-6 mb-6">
       <Box className="flex items-center justify-between mb-4">
         <Typography variant="h6" className="font-semibold text-gray-800">
           {title}
@@ -143,16 +144,17 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   );
 }
 
-export default function MyProjectPage() {
+
+export default function MyProjectTeamPage() {
   const pathname = usePathname();
 
   return (
     <Box className="p-4 bg-white min-h-screen">
-      <Typography variant="h4" className="text-pink-600 font-bold mb-1">My Project</Typography>
+      <h1 className="text-2xl font-bold text-[#E90A4D] mb-2">My Project</h1>
       <p className="text-sm text-gray-500 mb-4">project / my project</p>
 
       <Box className="bg-white rounded-2xl shadow-md p-6">
-        <Box className="flex items-center justify-between mb-6">
+        <Box className="flex items-center gap-150 mb-6">
           <div className="flex items-center gap-2">
             <Image
               src="/images/dips_logo.png"
@@ -180,6 +182,7 @@ export default function MyProjectPage() {
           </div>
         </Box>
 
+      
         <ProjectTableSection
           title="Project Users"
           columns={columnsUsers}

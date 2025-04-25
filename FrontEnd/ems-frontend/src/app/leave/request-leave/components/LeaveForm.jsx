@@ -67,7 +67,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
             await new Promise((res) => setTimeout(res, 1000));
             resetForm();
             setSelectedLeave(leaveOptions[0]);
-            onSubmitSuccess(); // trigger modal
+            onSubmitSuccess(); 
           } catch (error) {
             console.error('Submit error:', error);
           } finally {
@@ -86,7 +86,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
           return (
             <Form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Leave Type */}
+                
                 <div>
                   <label className="block text-sm font-medium mb-1">Leave Type</label>
                   <Listbox value={selectedLeave} onChange={setSelectedLeave}>
@@ -116,7 +116,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   </Listbox>
                 </div>
 
-                {/* Leave From */}
+              
                 <div>
                   <label className="block text-sm font-medium mb-1">Leave From</label>
                   <Field
@@ -127,7 +127,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   <ErrorMessage name="leaveFrom" className="text-red-500 text-sm" component="div" />
                 </div>
 
-                {/* Leave To */}
+               
                 <div>
                   <label className="block text-sm font-medium mb-1">Leave To</label>
                   <Field
@@ -138,7 +138,6 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   <ErrorMessage name="leaveTo" className="text-red-500 text-sm" component="div" />
                 </div>
 
-                {/* Leave Duration (auto-calculated) */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Leave Duration</label>
                   <Field
@@ -149,7 +148,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   <ErrorMessage name="leaveDuration" className="text-red-500 text-sm" component="div" />
                 </div>
 
-                {/* Cover Person */}
+               
                 <div>
                   <label className="block text-sm font-medium mb-1">Cover Person</label>
                   <Field
@@ -159,7 +158,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   <ErrorMessage name="coverPerson" className="text-red-500 text-sm" component="div" />
                 </div>
 
-                {/* Report Person */}
+                
                 <div>
                   <label className="block text-sm font-medium mb-1">Report to Person</label>
                   <Field
@@ -170,7 +169,6 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                 </div>
               </div>
 
-              {/* Leave Reason */}
               <div>
                 <label className="block text-sm font-medium mb-1">Leave Reason</label>
                 <Field
@@ -182,7 +180,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                 <ErrorMessage name="reason" className="text-red-500 text-sm" component="div" />
               </div>
 
-              {/* Buttons */}
+             
               <div className="flex justify-end gap-4">
                 <button
                   type="submit"

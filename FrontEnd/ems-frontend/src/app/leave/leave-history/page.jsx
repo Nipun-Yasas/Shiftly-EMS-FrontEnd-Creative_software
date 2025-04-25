@@ -133,17 +133,16 @@ export default function LeaveHistoryPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Page Header */}
+     
       <div>
-        <h1 className="text-3xl font-bold text-pink-600">Leave History</h1>
+        <h1 className="text-2xl font-bold text-pink-600">Leave History</h1>
         <div className="text-gray-400 text-sm mt-1">Leave &gt; Leave History</div>
       </div>
 
-      {/* Card */}
       <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Leave History</h2>
+        
 
-        {/* Top Controls */}
+       
         <div className="flex flex-wrap justify-between items-center mb-4">
           <div className="flex gap-4 flex-wrap">
             <TextField
@@ -178,7 +177,7 @@ export default function LeaveHistoryPage() {
           </IconButton>
         </div>
 
-        {/* DataGrid */}
+        
         <div style={{ height: 430, width: "100%" }}>
           <DataGrid
             rows={filteredRows}

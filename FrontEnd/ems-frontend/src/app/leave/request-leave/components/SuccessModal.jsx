@@ -20,12 +20,13 @@ const SuccessModal = ({ isOpen, onClose }) => {
               Your leave request has been submitted and is pending approval.
             </p>
             <div className="flex justify-end">
-              <button
-                onClick={onClose}
-                className="bg-[#E80A4D] text-white px-4 py-2 rounded hover:bg-[#c00840] transition"
-              >
-                Close
-              </button>
+            <button
+  onClick={onClose}
+  className="text-black px-4 py-2 font-bold rounded hover:bg-gray-100 transition"
+>
+  Close
+</button>
+
             </div>
           </motion.div>
         </div>

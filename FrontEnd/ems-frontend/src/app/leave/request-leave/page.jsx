@@ -15,8 +15,8 @@ const RequestLeavePage = () => {
   ];
 
   return (
-    <div className="px-6 py-8 space-y-6">
-      <h1 className="text-3xl font-bold text-[#E80A4D] mb-1">Request Leave</h1>
+    <div className="px-6 py-4 space-y-6">
+      <h1 className="text-2xl font-bold text-[#E80A4D] mb-1">Request Leave</h1>
       <div className="text-sm text-gray-400 ">Leave &gt; Request leave</div>
       
 
