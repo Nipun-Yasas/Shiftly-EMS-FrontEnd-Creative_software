@@ -11,7 +11,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-
 const columnsUsers = [
   { id: 'user', label: 'User', minWidth: 150 },
   { id: 'assignedDate', label: 'Assigned Date', minWidth: 100 },
@@ -41,7 +40,6 @@ const teamRows = [
   { projectTeam: 'VYNOTS', defaultStatus: 'False', status: 'Active' },
   { projectTeam: 'ORBIS', defaultStatus: 'False', status: 'Active' },
 ];
-
 
 function ProjectTableSection({ title, columns, rows, searchLabel }) {
   const [page, setPage] = React.useState(0);
@@ -144,7 +142,6 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   );
 }
 
-
 export default function MyProjectTeamPage() {
   const pathname = usePathname();
 
@@ -182,7 +179,6 @@ export default function MyProjectTeamPage() {
           </div>
         </Box>
 
-      
         <ProjectTableSection
           title="Project Users"
           columns={columnsUsers}

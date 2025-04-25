@@ -1,5 +1,3 @@
-
-
 const demoProjects = [
   {
     id: 1,
@@ -12,8 +10,7 @@ const demoProjects = [
   },
   {
     id: 2,
-    title:
-      "Streamlining Healthcare Operations Across Multiple Countries with IFS APP10",
+    title: "Streamlining Healthcare Operations Across Multiple Countries with IFS APP10",
     createdDate: "Apr 23, 2020",
     status: "Active",
     director: "Kristen Jom Stocklund",
@@ -31,8 +28,7 @@ const demoProjects = [
   },
   {
     id: 4,
-    title:
-      "Building a Scalable Multi-System Travel Booking Platform for the Nordics",
+    title: "Building a Scalable Multi-System Travel Booking Platform for the Nordics",
     createdDate: "Apr 23, 2020",
     status: "Active",
     director: "Kristen Jom Stocklund",
@@ -40,7 +36,7 @@ const demoProjects = [
     logo: "/images/booknordics_logo.png",
   },
   {
-    id: 4,
+    id: 5,
     title: "Empowering Norway’s largest e-health solutions provider",
     createdDate: "Apr 23, 2020",
     status: "Active",
@@ -49,9 +45,8 @@ const demoProjects = [
     logo: "/images/dips_logo.png",
   },
   {
-    id: 2,
-    title:
-      "Streamlining Healthcare Operations Across Multiple Countries with IFS APP10",
+    id: 6,
+    title: "Streamlining Healthcare Operations Across Multiple Countries with IFS APP10",
     createdDate: "Apr 23, 2020",
     status: "Active",
     director: "Kristen Jom Stocklund",
@@ -63,15 +58,12 @@ const demoProjects = [
 export default function AllProjects() {
   return (
     <div className="flex min-h-screen bg-white">
-   
       <div className="flex-1 p-2">
-        
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#e80a4d]">All Projects</h1>
           <p className="text-sm text-gray-500 mt-1">All Projects &gt;</p>
         </div>
 
-       
         <div className="bg-white shadow-xl rounded-xl px-16 py-6">
           <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-16">
             {demoProjects.map((project) => (
@@ -89,14 +81,14 @@ export default function AllProjects() {
                     <img src={project.logo} alt="Logo" className="h-5" />
                   </div>
                   <h3 className="text-sm font-semibold mb-1">{project.title}</h3>
-                  <p className="text-xs text-gray-600 pt-2 ">
+                  <p className="text-xs text-gray-600 pt-2">
                     <strong>Created:</strong> {project.createdDate}
                   </p>
-                  <p className="text-xs text-gray-600 ">
-                    <strong>Project Status:</strong>{" "}
+                  <p className="text-xs text-gray-600">
+                    <strong>Project Status:</strong>
                     <span className="text-green-600 font-medium">{project.status}</span>
                   </p>
-                  <p className="text-xs text-gray-600 ">
+                  <p className="text-xs text-gray-600">
                     <strong>Software Engineering Director:</strong> {project.director}
                   </p>
                 </div>

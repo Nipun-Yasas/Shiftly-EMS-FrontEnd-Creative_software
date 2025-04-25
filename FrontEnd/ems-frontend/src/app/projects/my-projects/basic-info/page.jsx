@@ -42,8 +42,7 @@ export default function MyProjectPage() {
           </div>
           <div className="flex gap-6 border-b border-gray-200">
             {[{ name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
-              { name: "TEAM", href: "/projects/my-projects/team" }]
-              .map((tab) => {
+              { name: "TEAM", href: "/projects/my-projects/team" }].map((tab) => {
                 const isActive = pathname === tab.href;
                 return (
                   <Link
@@ -58,26 +57,22 @@ export default function MyProjectPage() {
           </div>
         </div>
 
-       
         <div className="bg-white rounded-xl p-6 shadow mb-6">
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-6">
             <div>
               <p>
-                <span className="font-semibold">Project Dates:</span>{" "}
-                {project.projectDates}
+                <span className="font-semibold">Project Dates:</span> {project.projectDates}
               </p>
               <p>
                 <span className="font-semibold">Client:</span> {project.client}
               </p>
               <p>
-                <span className="font-semibold">Project Entity:</span>{" "}
-                {project.projectEntity}
+                <span className="font-semibold">Project Entity:</span> {project.projectEntity}
               </p>
             </div>
             <div>
               <p>
-                <span className="font-semibold">Project Status:</span>{" "}
-                {project.status}
+                <span className="font-semibold">Project Status:</span> {project.status}
               </p>
               <p>
                 <span className="font-semibold">Client:</span> {project.client}
@@ -85,16 +80,12 @@ export default function MyProjectPage() {
             </div>
           </div>
           <p className="text-sm text-gray-700">
-            <span className="font-semibold">Project Description:</span>{" "}
-            {project.description}
+            <span className="font-semibold">Project Description:</span> {project.description}
           </p>
         </div>
 
-       
         <div className="bg-white rounded-xl p-6 shadow mb-6">
-          <h3 className="font-semibold mb-4 text-gray-800">
-            Software Engineering Director:
-          </h3>
+          <h3 className="font-semibold mb-4 text-gray-800">Software Engineering Director:</h3>
           <div className="flex items-center gap-4 mb-6 bg-gray-100 px-6 py-3 rounded-lg max-w-sm">
             <Image
               src={project.director.image}
