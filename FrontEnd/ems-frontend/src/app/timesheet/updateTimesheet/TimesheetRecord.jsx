@@ -1,122 +1,150 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Collapse,
+  IconButton
+} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 /**
  * Component for displaying timesheet records
- * @returns {JSX.Element} The timesheet records section
+ * @returns {JSX.Element} The timesheet record section
  */
-const TimesheetRecord = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
+const TimeSheetRecord = () => {
+  const [expanded, setExpanded] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [timesheetRecords, setTimesheetRecords] = useState([
+    {
+      id: 1,
+      date: "15 Jan",
+      projectTask: "E_Interview",
+      workMode: "Online",
+      activity: "Development",
+      hours: "8.00",
+      status: "Submit" // Changed to "Pending" or "Approved" in real implementation
+    },
+    {
+      id: 2,
+      date: "15 Jan",
+      projectTask: "Bench_Engineering",
+      workMode: "On-site",
+      activity: "Development",
+      hours: "8.00",
+      status: "Submit" // Changed to "Pending" or "Approved" in real implementation
+    }
+  ]);
+
+  // Fetch timesheet records from the backend
+  useEffect(() => {
+    const fetchTimesheetRecords = async () => {
+      setLoading(true);
+      try {
+        // In a real app, you would fetch data from your API here
+        // For example:
+        // const response = await fetch('/api/timesheet-records');
+        // const data = await response.json();
+        // setTimesheetRecords(data);
+
+        // For demonstration purposes, we'll update the statuses to more realistic values
+        setTimesheetRecords(prev => prev.map(record => ({
+          ...record,
+          status: record.id % 2 === 0 ? "Approved" : "Pending"
+        })));
+      } catch (error) {
+        console.error("Error fetching timesheet records:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchTimesheetRecords();
+  }, []);
+
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
+  // Function to determine status class based on status text
+  const getStatusClass = (status) => {
+    switch (status.toLowerCase()) {
+      case "approved":
+        return "bg-green-500 text-white";
+      case "pending":
+        return "bg-yellow-500 text-white";
+      case "rejected":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-200";
+    }
+  };
 
   return (
-    <section className="p-5 mb-5 bg-white rounded-2xl">
-      <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl text-black">Timesheet Record</h2>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-expanded={isExpanded}
-          aria-controls="timesheet-records"
-          className="cursor-pointer"
-        >
-          <i
-            className={`ti ti-chevron-${isExpanded ? "up" : "down"}`}
-            aria-hidden="true"
-          />
-        </button>
+    <section className="mb-5 bg-white rounded-2xl">
+      <div className="flex justify-between items-center p-5 cursor-pointer" onClick={toggleExpanded}>
+        <h2 className="text-xl text-black flex items-center">
+          Timesheet Record
+          {expanded ? 
+            <ExpandLessIcon className="ml-2" /> : 
+            <ExpandMoreIcon className="ml-2" />
+          }
+        </h2>
       </div>
 
-      {isExpanded && (
-        <div id="timesheet-records" className="flex flex-col w-full">
-          <TableHeader />
-          <TableRow
-            date="15 Jan"
-            project="E_Interview"
-            workMode="Online"
-            activity="Development"
-            hours="8.00"
-          />
-          <TableRow
-            date="15 Jan"
-            project="Bench_Engineering"
-            workMode="On-site"
-            activity="Development"
-            hours="8.00"
-          />
+      <Collapse in={expanded}>
+        <div className="px-5 pb-5">
+          {loading ? (
+            <div className="text-center py-4">Loading records...</div>
+          ) : timesheetRecords.length > 0 ? (
+            <TableContainer component={Paper} className="shadow-none">
+              <Table sx={{ minWidth: 650 }} aria-label="timesheet records">
+                <TableHead>
+                  <TableRow className="bg-gray-100">
+                    <TableCell className="font-medium">Date</TableCell>
+                    <TableCell className="font-medium">Project Task</TableCell>
+                    <TableCell className="font-medium">Work mode</TableCell>
+                    <TableCell className="font-medium">Activity</TableCell>
+                    <TableCell className="font-medium">Hours</TableCell>
+                    <TableCell className="font-medium">Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {timesheetRecords.map((record) => (
+                    <TableRow
+                      key={record.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell>{record.date}</TableCell>
+                      <TableCell>{record.projectTask}</TableCell>
+                      <TableCell>{record.workMode}</TableCell>
+                      <TableCell>{record.activity}</TableCell>
+                      <TableCell>{record.hours}</TableCell>
+                      <TableCell>
+                        <span className={`px-3 py-1 rounded-full ${getStatusClass(record.status)}`}>
+                          {record.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <div className="text-center py-4">No timesheet records found.</div>
+          )}
         </div>
-      )}
+      </Collapse>
+
     </section>
   );
 };
 
-/**
- * Table header component
- * @returns {JSX.Element} The table header
- */
-const TableHeader = () => {
-  return (
-    <div className="px-6 py-2.5 bg-zinc-300 flex max-md:flex-col max-md:gap-2">
-      <div className="w-[17%] max-md:w-full">
-        <div>Date</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>Project Task</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>Work mode</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>Activity</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>Hours</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div className="pl-5 w-[150px]">Status</div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Table row component
- * @param {Object} props - Component props
- * @param {string} props.date - Date of the timesheet entry
- * @param {string} props.project - Project name
- * @param {string} props.workMode - Work mode (Online/On-site)
- * @param {string} props.activity - Activity type
- * @param {string} props.hours - Hours worked
- * @returns {JSX.Element} A table row
- */
-const TableRow = ({ date, project, workMode, activity, hours }) => {
-  return (
-    <div className="px-6 py-2.5 w-full flex max-md:flex-col max-md:gap-2">
-      <div className="w-[17%] max-md:w-full">
-        <div>{date}</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>
-          <span className="bg-[rgb(241,241,241)]">{project}</span>
-        </div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>{workMode}</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>{activity}</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <div>{hours}</div>
-      </div>
-      <div className="ml-5 w-[17%] max-md:ml-0 max-md:w-full">
-        <button
-          className="px-5 py-0 my-auto mr-auto text-white bg-green-500 rounded-2xl border-none h-[25px] w-[100px]"
-          aria-label="Submit timesheet entry"
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default TimesheetRecord;
+export default TimeSheetRecord;

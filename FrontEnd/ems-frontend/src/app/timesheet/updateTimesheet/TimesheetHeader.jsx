@@ -1,36 +1,71 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 
 /**
- * Header component for the Timesheet page
- * @returns {JSX.Element} The header section with title and status
+ * Component for the timesheet header with title and report button
+ * @returns {JSX.Element} The timesheet header section
  */
 const TimesheetHeader = () => {
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [reportMessage, setReportMessage] = useState({ text: "", type: "" });
+
+  const handleGenerateReport = async () => {
+    setIsGeneratingReport(true);
+    
+    try {
+      // In a real app, you would generate a report via API
+      // For now, we'll just simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulate successful report generation
+      setReportMessage({ text: "Report generated successfully", type: "success" });
+      
+      // Simulate downloading a file
+      const link = document.createElement('a');
+      link.href = 'data:text/plain;charset=utf-8,This is a placeholder for a timesheet report';
+      link.download = 'timesheet-report.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setTimeout(() => setReportMessage({ text: "", type: "" }), 3000);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      setReportMessage({ text: "Failed to generate report", type: "error" });
+      setTimeout(() => setReportMessage({ text: "", type: "" }), 3000);
+    }
+    
+    setIsGeneratingReport(false);
+  };
+
   return (
-    <header className="flex justify-between items-center self-center py-4 mb-5 bg-white rounded-xl border border-none max-sm:flex-col max-sm:gap-2.5 max-sm:items-start">
+    <div className="flex justify-between items-center bg-white p-5 rounded-2xl mb-5">
       <div className="flex flex-col">
-        <h1 className="pl-2.5 text-4xl font-semibold text-rose-600 leading-[60px] max-sm:text-3xl">
-          Timesheet
-        </h1>
-        <nav
-          aria-label="Breadcrumb"
-          className="pl-2.5 text-base text-black text-opacity-30"
+        <div className="flex items-center">
+          <h1 className="text-2xl text-rose-600 font-bold">Timesheet</h1>
+          <span className="ml-3 px-2 py-0.5 text-[10px] bg-gray-200 rounded-xl">IN PROGRESS</span>
+        </div>
+        <span className="text-sm text-zinc-500">Time Entries</span>
+      </div>
+      
+      {reportMessage.text && (
+        <div 
+          className={`p-2 rounded mx-4 ${
+            reportMessage.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+          }`}
         >
-          <span>Timesheet&nbsp; &gt;</span>
-        </nav>
-      </div>
-      <div
-        className="px-2.5 py-1 mr-auto ml-5 text-xs uppercase border border-solid border-black border-opacity-50 rounded-[30px]"
-        aria-label="Status"
+          {reportMessage.text}
+        </div>
+      )}
+      
+      <button 
+        onClick={handleGenerateReport}
+        disabled={isGeneratingReport}
+        className="px-4 py-2 text-sm text-blue-500 bg-white rounded-2xl border border-blue-500 border-solid hover:bg-blue-50"
       >
-        In Progress
-      </div>
-      <button
-        className="px-5 py-1.5 mr-5 text-sm text-blue-500 border-2 border-blue-500 border-solid cursor-pointer rounded-[30px]"
-        aria-label="View my timesheet report"
-      >
-        My timesheet's report
+        {isGeneratingReport ? "Generating..." : "My timesheet report"}
       </button>
-    </header>
+    </div>
   );
 };
 

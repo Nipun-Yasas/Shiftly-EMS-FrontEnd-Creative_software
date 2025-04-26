@@ -19,7 +19,12 @@ const Timesheet = () => {
       />
       <link
         rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+      />
+      {/* Alternative icon import if the above doesn't work */}
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/@tabler/icons-webfont@latest/tabler-icons.min.css"
       />
       <main className="p-5 mx-auto my-0 bg-zinc-100 max-w-[1128px]">
         <TimesheetHeader />
