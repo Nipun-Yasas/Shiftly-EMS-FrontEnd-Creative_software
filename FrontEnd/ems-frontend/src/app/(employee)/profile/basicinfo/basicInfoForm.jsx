@@ -1,5 +1,5 @@
 
-import Readonlyfield from "@/app/(employee)/profile/components/Readonlyfield";
+import Readonlyfield from "@/app/(employee)/profile/_components/Readonlyfield";
 
 const BasicInfoForm = () => {
   return (

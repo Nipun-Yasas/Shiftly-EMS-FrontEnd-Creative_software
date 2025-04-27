@@ -1,6 +1,6 @@
 import { Poppins,Roboto,Lexend,Inter } from "next/font/google";
 import "./globals.css";
-import Layout from './(components)/layout/Layout';
+import Layout from './_components/_navigation/Layout';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme';

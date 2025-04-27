@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import FormDialog from "./components/FormDialog";
+import FormDialog from "./_components/FormDialog";
 
 import axios from "axios";
 

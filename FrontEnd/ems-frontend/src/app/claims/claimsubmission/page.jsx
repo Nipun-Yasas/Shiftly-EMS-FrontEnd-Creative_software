@@ -3,8 +3,8 @@
 import React from "react";
 import { useState } from "react";
 
-import ClaimForm from "./components/ClaimForm";
-import SubmitDialog from "./components/SubmitDialog";
+import ClaimForm from "./_components/ClaimForm";
+import SubmitDialog from "./_components/SubmitDialog";
 
 export default function ClaimSubmission(){
   const [openSubmit, setOpenSubmit] = useState(false);
