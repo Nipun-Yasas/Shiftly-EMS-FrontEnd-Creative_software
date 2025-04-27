@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
-import TopBar from "./TopBar";
-import SideNav from "./SideNav";
+import TopBar from "../_components/_navigation/TopBar";
+import SideNav from "../_components/_navigation/SideNav";
 
-const Layout = ({ children }) => {
+export default function DashboardLayout({ children }){
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -47,5 +47,3 @@ const Layout = ({ children }) => {
     </Box>
   );
 };
-
-export default Layout;

@@ -1,6 +1,5 @@
 import { Poppins,Roboto,Lexend,Inter } from "next/font/google";
 import "./globals.css";
-import Layout from './_components/_navigation/Layout';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme';
@@ -40,7 +39,7 @@ export default function RootLayout({ children }) {
       <body className={`${poppins.variable} ${roboto.variable} ${lexend.variable} ${inter.variable}`}>
       <AppRouterCacheProvider options={{ enableCssLayer: true }}>
          <ThemeProvider theme={theme}>
-            <Layout>{children}</Layout>
+            {children}
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
