@@ -10,7 +10,7 @@ import TimesheetLegend from "./TimesheetLegend";
  * Main Timesheet component that orchestrates all sub-components
  * @returns {JSX.Element} The complete Timesheet interface
  */
-const Timesheet = () => {
+export default function Timesheet(){
   return (
     <>
       <link
@@ -44,4 +44,3 @@ const Timesheet = () => {
   );
 };
 
-export default Timesheet;

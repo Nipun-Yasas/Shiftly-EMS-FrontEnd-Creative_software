@@ -55,7 +55,7 @@ const demoProjects = [
   },
 ];
 
-const AllProjects = () => {
+export default function AllProjects(){
   return (
     <div className="flex min-h-screen bg-white">
       <div className="flex-1 p-2">
@@ -101,4 +101,3 @@ const AllProjects = () => {
   );
 }
 
-export default AllProjects;

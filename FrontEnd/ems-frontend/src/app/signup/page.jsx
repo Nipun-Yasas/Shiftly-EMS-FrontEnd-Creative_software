@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { Eye, EyeOff } from 'lucide-react';
 import { X } from 'lucide-react';
 
-const SignupForm = ({ onClose }) => {
+export default function SignupForm({ onClose }){
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -136,5 +136,3 @@ const SignupForm = ({ onClose }) => {
     </div>
   );
 }
-
-export default SignupForm;

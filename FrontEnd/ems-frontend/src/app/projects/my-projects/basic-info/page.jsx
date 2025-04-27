@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const MyProject = () => {
+export default function MyProject(){
   const pathname = usePathname();
 
   const project = {
@@ -120,5 +120,3 @@ const MyProject = () => {
     </div>
   );
 }
-
-export default MyProject;

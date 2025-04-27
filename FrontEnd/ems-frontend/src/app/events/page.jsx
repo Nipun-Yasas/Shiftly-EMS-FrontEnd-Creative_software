@@ -23,7 +23,7 @@ const columns = [
 ];
 
 
-const Event = () => {
+export default function Event(){
   
   const [openForm, setOpenForm] = useState(false);
   const [events, setEvents] = useState([]);
@@ -76,5 +76,3 @@ const Event = () => {
     </>
   );
 }
-
-export default Event;

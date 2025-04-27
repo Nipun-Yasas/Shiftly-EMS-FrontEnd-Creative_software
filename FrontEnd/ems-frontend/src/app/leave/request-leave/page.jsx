@@ -5,7 +5,7 @@ import LeaveForm from './components/LeaveForm';
 import SuccessModal from './components/SuccessModal';
 import { useState } from 'react';
 
-const RequestLeave = () => {
+export default function RequestLeave(){
   const [modalOpen, setModalOpen] = useState(false);
 
   const mockLeaves = [
@@ -29,4 +29,3 @@ const RequestLeave = () => {
   );
 };
 
-export default RequestLeave;

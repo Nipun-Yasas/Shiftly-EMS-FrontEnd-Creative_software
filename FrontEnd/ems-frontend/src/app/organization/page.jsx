@@ -242,7 +242,7 @@ const TeamCard = ({ team }) => (
   </StyledCard>
 );
 
-const Organization = () =>{
+export default function Organization(){
   return (
     <Box sx={{ padding: '20px', backgroundColor: '#F3F4F6', minHeight: '100vh' }}>
       <Typography
@@ -265,5 +265,3 @@ const Organization = () =>{
     </Box>
   );
 }
-
-export default Organization;

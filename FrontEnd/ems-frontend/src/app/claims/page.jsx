@@ -1,6 +1,4 @@
-
-
-const Claims = () => {
+export default function Claims(){
   return (
     <div>
       
@@ -8,4 +6,3 @@ const Claims = () => {
   )
 }
 
-export default Claims;
