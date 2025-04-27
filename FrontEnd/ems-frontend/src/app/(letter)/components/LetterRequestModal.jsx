@@ -1,4 +1,4 @@
-export default function LetterRequestModal({ letterType, onClose }) {
+const LetterRequestModal = ({ letterType, onClose }) => {
 
   const letterTypes = [
     "EPF/ETF Name Change Letter",
@@ -89,3 +89,5 @@ export default function LetterRequestModal({ letterType, onClose }) {
     </div>
   );
 }
+
+export default LetterRequestModal;

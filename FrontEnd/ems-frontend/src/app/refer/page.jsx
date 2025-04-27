@@ -5,7 +5,7 @@ import { useState } from "react";
 import ReferForm from "./components/ReferForm";
 import SubmitDialog from "./components/SubmitDialog";
 
-export default function Refer() {
+const Refer = () => {
   const [openSubmit, setOpenSubmit] = useState(false);
 
   return (
@@ -28,3 +28,5 @@ export default function Refer() {
     </>
   );
 }
+
+export default Refer;

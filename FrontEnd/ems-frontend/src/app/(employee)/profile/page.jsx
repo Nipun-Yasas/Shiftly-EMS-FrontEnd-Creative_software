@@ -3,11 +3,11 @@ import Image from 'next/image'
 import EmailIcon from "@mui/icons-material/Email";
 import FolderIcon from "@mui/icons-material/Folder";
 import EditIcon from "@mui/icons-material/Edit";
-import TabBar from "../../(employee)/profile/components/tabBar";
+import TabBar from "./components/TabBar";
 
 
 
-function page() {
+const Employee = () => {
   return (
     <>
       <div className="container w-auto mt-10 p-5 shadow bg-white rounded-xl">
@@ -66,4 +66,4 @@ function page() {
   )
 }
 
-export default page
+export default Employee;

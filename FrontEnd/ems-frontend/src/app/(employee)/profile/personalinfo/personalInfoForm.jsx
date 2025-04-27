@@ -1,6 +1,6 @@
 import Readonlyfield from "@/app/(employee)/profile/components/Readonlyfield"
 
-export default function PersonalInfoForm(){
+const PersonalInfoForm = () => {
 
     return(
         <div className="space-y-4">
@@ -12,3 +12,5 @@ export default function PersonalInfoForm(){
         </div>
     )
 }
+
+export default PersonalInfoForm;

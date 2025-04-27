@@ -3,7 +3,7 @@ import Image from 'next/image'
 import url from '../../../../../public/creative_software_logo.png'
 import EditIcon from "@mui/icons-material/Edit";
 
-export default function page() {
+const Projects = () => {
   return (
     <div className="mt-5 max-w-auto mx-auto bg-white shadow-lg rounded-2xl p-6 border border-black-200">
         <div className="flex items-center gap-4">
@@ -45,4 +45,4 @@ export default function page() {
   )
 }
 
-
+export default Projects;

@@ -50,7 +50,7 @@ const requests = [
 
 const rowsPerPageOptions = [5, 10];
 
-export default function page() {
+const RequestHistory = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -158,3 +158,5 @@ export default function page() {
     </>
   );
 }
+
+export default RequestHistory;

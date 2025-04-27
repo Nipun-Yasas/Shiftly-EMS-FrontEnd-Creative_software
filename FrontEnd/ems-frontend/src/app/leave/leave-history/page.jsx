@@ -118,7 +118,7 @@ const attributeMap = {
   Status: "status",
 };
 
-export default function LeaveHistoryPage() {
+const LeaveHistory = () => {
   const [searchText, setSearchText] = useState("");
   const [attribute, setAttribute] = useState("Leave To");
 
@@ -199,3 +199,5 @@ export default function LeaveHistoryPage() {
     </div>
   );
 }
+
+export default LeaveHistory;

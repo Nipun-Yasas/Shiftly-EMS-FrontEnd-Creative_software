@@ -1,7 +1,7 @@
 
 import Readonlyfield from "@/app/(employee)/profile/components/Readonlyfield";
 
-export default function BasicInfoForm() {
+const BasicInfoForm = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
       {/* Left */}
@@ -24,3 +24,5 @@ export default function BasicInfoForm() {
     </div>
   );
 }
+
+export default BasicInfoForm;

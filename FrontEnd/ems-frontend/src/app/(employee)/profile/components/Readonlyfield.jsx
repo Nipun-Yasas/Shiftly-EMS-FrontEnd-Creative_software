@@ -31,4 +31,4 @@ const Readonlyfield = ({label, value}) => {
   )
 }
 
-export default Readonlyfield
+export default Readonlyfield;

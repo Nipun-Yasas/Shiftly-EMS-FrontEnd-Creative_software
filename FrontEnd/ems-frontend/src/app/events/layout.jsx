@@ -2,10 +2,12 @@ export const metadata = {
   title: "Events",
 };
 
-export default function EventsLayout({ children }) {
+const EventsLayout = ({ children }) => {
   return (
     <div>
       {children}
     </div>
   );
 }
+
+export default EventsLayout;

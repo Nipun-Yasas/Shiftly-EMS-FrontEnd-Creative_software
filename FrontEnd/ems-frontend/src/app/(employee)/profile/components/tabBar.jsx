@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import BasicInfoForm from '../basicinfo/basicInfoForm'
-import PersonalInfoForm from '../personalinfo/personalInfoForm'
+import BasicInfoForm from '../basicinfo/BasicInfoForm'
+import PersonalInfoForm from '../personalinfo/PersonalInfoForm'
 import ProjectContent from '../projects/page'
 import ExperienceContent from '../experience/page'
 import EducationContent from '../education/page'
@@ -10,7 +10,7 @@ import SkillsContent from '../skills/page'
 
 
 
-export default function tabBar() {
+const TabBar = () =>{
   const [activeTab, setActiveTab] = useState("Basic Info"); // Default active tab
 
   return (
@@ -131,3 +131,5 @@ export default function tabBar() {
     </div>
   );
 }
+
+export default TabBar;

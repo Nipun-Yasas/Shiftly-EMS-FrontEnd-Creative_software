@@ -1,6 +1,6 @@
 import { Dialog,DialogBackdrop,DialogPanel,DialogTitle } from "@headlessui/react";
 
-export default function SubmitDialog(props) {
+const SubmitDialog = (props) => {
 
   const { openSubmit, setopenSubmit } = props;
 
@@ -48,3 +48,5 @@ export default function SubmitDialog(props) {
     </>
   );
 }
+
+export default SubmitDialog;

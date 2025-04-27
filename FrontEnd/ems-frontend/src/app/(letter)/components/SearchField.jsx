@@ -26,4 +26,4 @@ const SearchField = ({value, onChange,onSearch}) => {
   )
 }
 
-export default SearchField
+export default SearchField;

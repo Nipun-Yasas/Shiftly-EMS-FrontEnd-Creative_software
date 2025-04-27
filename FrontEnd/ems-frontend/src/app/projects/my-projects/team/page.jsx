@@ -142,7 +142,7 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   );
 }
 
-export default function MyProjectTeamPage() {
+const MyProjectTeam = () => {
   const pathname = usePathname();
 
   return (
@@ -195,3 +195,5 @@ export default function MyProjectTeamPage() {
     </Box>
   );
 }
+
+export default MyProjectTeam;

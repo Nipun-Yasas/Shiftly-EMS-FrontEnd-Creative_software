@@ -13,7 +13,7 @@ const letterTypes = [
   "Employment Confirmation Letter",
 ];
 
-export default function page() {
+const RequestLetter = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLetter, setSelectedLetter] = useState(null);
 
@@ -109,3 +109,5 @@ export default function page() {
     </>
   );
 }
+
+export default RequestLetter;

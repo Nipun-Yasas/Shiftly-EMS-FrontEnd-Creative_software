@@ -2,12 +2,12 @@
 
 import React from "react";
 
-
-// Your page content
-export default function Page() {
+const Page = () => {
   return (
    <>
    hi
    </>
   );
 }
+
+export default Page;

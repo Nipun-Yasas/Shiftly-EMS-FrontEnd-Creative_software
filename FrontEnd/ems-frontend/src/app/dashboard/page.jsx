@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignuUpFrom';
+import LoginForm from '../login/page';
+import SignupForm from '../signup/page';
 import mainImage from '../../../public/mainImage.png';
 
 export default function Dashboard() {

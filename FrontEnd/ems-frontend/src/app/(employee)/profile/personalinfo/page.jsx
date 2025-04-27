@@ -1,7 +1,7 @@
 import React from 'react'
-import PersonalInfoForm from './personalInfoForm'
+import PersonalInfoForm from './PersonalInfoForm'
 
-function page() {
+const PersonalInfo = () => {
   return (
     <>
     <PersonalInfoForm/>
@@ -9,4 +9,4 @@ function page() {
   )
 }
 
-export default page
+export default PersonalInfo;

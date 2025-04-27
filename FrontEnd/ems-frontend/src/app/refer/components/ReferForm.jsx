@@ -13,7 +13,7 @@ const vacancyOptions = [
   { id: 2, name: "HR" },
 ];
 
-export default function ReferForm(props) {
+const ReferForm = (props) => {
     
   const { setOpenSubmit } = props;
 
@@ -320,3 +320,5 @@ export default function ReferForm(props) {
     </>
   );
 }
+
+export default ReferForm;

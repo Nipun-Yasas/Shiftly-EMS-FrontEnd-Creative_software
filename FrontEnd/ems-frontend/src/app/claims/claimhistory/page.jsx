@@ -56,7 +56,7 @@ const columns = [
     editable: true, },
 ];
 
-export default function Event() {
+const ClaimHistory = () => {
   
   return (
     <>
@@ -90,3 +90,5 @@ export default function Event() {
     </>
   );
 }
+
+export default ClaimHistory;

@@ -6,7 +6,7 @@ import { useState } from "react";
 import ClaimForm from "./components/ClaimForm";
 import SubmitDialog from "./components/SubmitDialog";
 
-export default function ClaimSubmission() {
+const ClaimSubmission = () => {
   const [openSubmit, setOpenSubmit] = useState(false);
 
   return (
@@ -30,3 +30,5 @@ export default function ClaimSubmission() {
     </>
   );
 }
+
+export default ClaimSubmission;

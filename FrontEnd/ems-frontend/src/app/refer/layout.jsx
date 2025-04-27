@@ -2,10 +2,12 @@ export const metadata = {
   title: "Refer Candidate"
 };
 
-export default function ReferLayout({ children }) {
+const ReferLayout = ({ children }) => {
   return (
     <div>
       {children}
     </div>
   );
 }
+
+export default ReferLayout;

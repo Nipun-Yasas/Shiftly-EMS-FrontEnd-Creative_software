@@ -6,7 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { X } from 'lucide-react';
 
 
-export default function LoginForm({ onClose }) {
+const LoginForm = ({ onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const initialValues = {
@@ -110,3 +110,5 @@ export default function LoginForm({ onClose }) {
     </div>
   );
 }
+
+export default LoginForm;

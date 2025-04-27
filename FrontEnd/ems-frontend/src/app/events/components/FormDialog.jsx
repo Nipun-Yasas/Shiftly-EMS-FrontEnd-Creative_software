@@ -5,7 +5,7 @@ import { Dialog,DialogBackdrop,DialogPanel,DialogTitle } from "@headlessui/react
 
 import EventForm from "./EventForm";
 
-export default function FormDialog(props) {
+const FormDialog = (props) => {
   
   const {openForm,setOpenForm } = props;
 
@@ -56,3 +56,5 @@ export default function FormDialog(props) {
     </>
   );
 }
+
+export default FormDialog;

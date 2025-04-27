@@ -11,7 +11,7 @@ const claimtypeOptions = [
   { id: 2, name: "Insuarance" },
 ];
 
-export default function ReferForm(props) {
+const Claimorm = (props) => {
   const { setOpenSubmit } = props;
 
   const claimfileRef = useRef(null);
@@ -308,3 +308,5 @@ export default function ReferForm(props) {
     </>
   );
 }
+
+export default ClaimForm;

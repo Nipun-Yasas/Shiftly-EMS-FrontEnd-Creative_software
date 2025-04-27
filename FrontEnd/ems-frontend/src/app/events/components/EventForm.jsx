@@ -20,7 +20,7 @@ const eventTypeOptions = [
   { id: 2, name: "Managers only" },
 ];
 
-export default function EventForm(props) {
+const EventForm = (props) => {
   
   const { openForm,setOpenForm } = props;
   const [openMessage, setOpenMessage] = useState(false);
@@ -495,3 +495,5 @@ export default function EventForm(props) {
     </>
   );
 }
+
+export default EventForm;
