@@ -4,8 +4,8 @@ import React from "react";
 import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Image from "next/image";
-import SearchBar from "../_header/SearchBar";
-import UserMenu from "../_header/UserMenu";
+import SearchBar from "../header/SearchBar";
+import UserMenu from "../header/UserMenu";
 
 const TopBar = ({ toggleDrawer }) => {
   return (

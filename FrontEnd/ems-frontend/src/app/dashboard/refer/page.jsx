@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import ReferForm from "./_components/ReferForm";
-import SubmitDialog from "./_components/SubmitDialog";
+import ReferForm from "./components/ReferForm";
+import SubmitDialog from "./components/SubmitDialog";
 
 export default function Refer(){
   const [openSubmit, setOpenSubmit] = useState(false);

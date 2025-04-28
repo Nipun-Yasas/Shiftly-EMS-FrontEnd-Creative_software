@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import BasicInfoForm from '../basicinfo/BasicInfoForm'
-import PersonalInfoForm from '../personalinfo/PersonalInfoForm'
+import BasicInfoForm from '../basic-info/BasicInfoForm'
+import PersonalInfoForm from '../personal-info/PersonalInfoForm'
 import ProjectContent from '../projects/page'
 import ExperienceContent from '../experience/page'
 import EducationContent from '../education/page'

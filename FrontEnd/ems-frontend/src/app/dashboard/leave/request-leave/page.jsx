@@ -1,8 +1,8 @@
 'use client';
 
-import AvailableLeaves from './_components/AvailableLeaves';
-import LeaveForm from './_components/LeaveForm';
-import SuccessModal from './_components/SuccessModal';
+import AvailableLeaves from './components/AvailableLeaves';
+import LeaveForm from './components/LeaveForm';
+import SuccessModal from './components/SuccessModal';
 import { useState } from 'react';
 
 export default function RequestLeave(){

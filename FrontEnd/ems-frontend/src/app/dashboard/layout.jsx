@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
-import TopBar from "../_components/_navigation/TopBar";
-import SideNav from "../_components/_navigation/SideNav";
+import TopBar from "../_components/navigation/TopBar";
+import SideNav from "../_components/navigation/SideNav";
 
 export default function DashboardLayout({ children }){
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
