@@ -11,7 +11,7 @@ const claimtypeOptions = [
   { id: 2, name: "Insuarance" },
 ];
 
-const Claimorm = (props) => {
+const ClaimForm = (props) => {
   const { setOpenSubmit } = props;
 
   const claimfileRef = useRef(null);

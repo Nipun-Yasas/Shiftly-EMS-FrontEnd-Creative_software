@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@mui/material";
-import LetterRequestModal from '../../_components/LetterRequestModal';
+import LetterRequestModal from '../components/LetterRequestModal';
 import SearchField from '../components/SearchField';
 
 const letterTypes = [
