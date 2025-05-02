@@ -238,14 +238,20 @@ const UpdateTimesheet = () => {
       // For now, we'll just simulate a delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Reset the rows to empty
-      setRows([]);
+      // Clear all rows and add a single empty row
+      const emptyRow = {
+        id: Date.now(),
+        project: "",
+        workMode: "",
+        activity: "",
+        hours: Array(7).fill(""),
+      };
+      
+      // Important: Set a new array with only the empty row, not appending to existing rows
+      setRows([emptyRow]);
       
       setMessage({ text: "All timesheet entries deleted successfully", type: "success" });
       setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-      
-      // Add a blank row after deleting
-      addRow();
     } catch (error) {
       console.error("Error deleting timesheet:", error);
       setMessage({ text: "Failed to delete timesheet entries", type: "error" });
@@ -356,7 +362,7 @@ const UpdateTimesheet = () => {
               type="text"
               value={startDate}
               readOnly
-              className="px-3 py-2 w-full text-sm rounded-xl border border-solid border-black border-opacity-20"
+              className="p-2 w-full text-sm rounded-xl border border-solid border-black border-opacity-20"
               aria-label="Start date"
             />
           </div>
@@ -375,7 +381,7 @@ const UpdateTimesheet = () => {
               type="text"
               value={endDate}
               readOnly
-              className="px-3 py-2 w-full text-sm rounded-xl border border-solid border-black border-opacity-20"
+              className="p-2 w-full text-sm rounded-xl border border-solid border-black border-opacity-20"
               aria-label="End date"
             />
           </div>

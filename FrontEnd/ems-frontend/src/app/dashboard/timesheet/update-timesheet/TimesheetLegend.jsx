@@ -20,7 +20,7 @@ const TimesheetLegend = () => {
       <div className="flex flex-col gap-3">
         {legendItems.map((item, index) => (
           <div key={index} className="flex items-center">
-            <div className={`w-8 h-8 ${item.color} rounded flex items-center justify-center text-white font-medium mr-3`}>
+            <div className={`w-12 h-8 ${item.color} rounded flex items-center justify-center text-white font-medium mr-3`}>
               {item.value}
             </div>
             <span className="text-sm text-gray-700">{item.text}</span>
