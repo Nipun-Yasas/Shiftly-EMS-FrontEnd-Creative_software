@@ -11,17 +11,16 @@ import {
   TableHead,
   TableRow,
   Collapse,
-  IconButton
+  IconButton,
+  Button
 } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 /**
  * Component for displaying timesheet records
  * @returns {JSX.Element} The timesheet record section
  */
 const TimeSheetRecord = () => {
-  const [expanded, setExpanded] = useState(true);
+  const [tableExpanded, setTableExpanded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [timesheetRecords, setTimesheetRecords] = useState([
     {
@@ -31,7 +30,7 @@ const TimeSheetRecord = () => {
       workMode: "Online",
       activity: "Development",
       hours: "8.00",
-      status: "Submit" // Changed to "Pending" or "Approved" in real implementation
+      status: "Pending" // Changed to "Pending" or "Approved" in real implementation
     },
     {
       id: 2,
@@ -40,7 +39,7 @@ const TimeSheetRecord = () => {
       workMode: "On-site",
       activity: "Development",
       hours: "8.00",
-      status: "Submit" // Changed to "Pending" or "Approved" in real implementation
+      status: "Approved" // Changed to "Pending" or "Approved" in real implementation
     }
   ]);
 
@@ -69,8 +68,8 @@ const TimeSheetRecord = () => {
     fetchTimesheetRecords();
   }, []);
 
-  const toggleExpanded = () => {
-    setExpanded(!expanded);
+  const toggleTableExpanded = () => {
+    setTableExpanded(!tableExpanded);
   };
 
   // Function to determine status class based on status text
@@ -89,17 +88,21 @@ const TimeSheetRecord = () => {
 
   return (
     <section className="mb-5 bg-white rounded-2xl">
-      <div className="flex justify-between items-center p-5 cursor-pointer" onClick={toggleExpanded}>
-        <h2 className="text-xl text-black flex items-center">
+      <div className="flex justify-between items-center p-5">
+        <h2 className="text-xl text-black">
           Timesheet Record
-          {expanded ? 
-            <ExpandLessIcon className="ml-2" /> : 
-            <ExpandMoreIcon className="ml-2" />
-          }
         </h2>
+        <Button 
+          variant="outlined" 
+          size="small"
+          onClick={toggleTableExpanded}
+          sx={{ ml: 2, borderRadius: '0.75rem' }}
+        >
+          {tableExpanded ? "Collapse" : "Expand"}
+        </Button>
       </div>
 
-      <Collapse in={expanded}>
+      <Collapse in={tableExpanded}>
         <div className="px-5 pb-5">
           {loading ? (
             <div className="text-center py-4">Loading records...</div>

@@ -53,9 +53,9 @@ export const navItems = [
     icon: <AccessTimeIcon />,
     hasDropdown: true,
     dropdownItems: [
-      { text: "Update Timesheet", link: "/dashboard/time-sheet" },
-      { text: "Review Timesheets", link: "/timesheet/reviewTimesheets" },
-      { text: "Work Calendar", link: "/timesheet/workCalendar" },
+      { text: "Update Timesheet", link: "/dashboard/timesheet/update-timesheet" },
+      { text: "Review Timesheets", link: "/dashboard/timesheet/review-timesheet" },
+      { text: "Work Calendar", link: "/dashboard/timesheet/workCalendar" },
     ],
   },
   {
