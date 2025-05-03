@@ -107,89 +107,99 @@ export default function Dashboard() {
       </div>
 
       {/* Foreground content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="relative bg-white/5 backdrop-blur-xl rounded-3xl w-full max-w-lg sm:max-w-xl min-h-[600px] flex flex-col justify-center items-center shadow-2xl border border-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-6 sm:p-8"
-        >
-          {/* Creative Software Logo (Top-Left) */}
-          <div className="absolute top-4 left-4 z-10">
-            <Image
-              src={companyLogo}
-              alt="Creative Software Logo"
-              width={200}
-              height={50}
-              className="object-contain"
-            />
-          </div>
-
-          
-          {/* Shiftly logo (Centered) */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 flex items-center justify-center w-full">
           <motion.div
-            initial={{ y: -40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative z-10 mb-8"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="relative bg-white/5 backdrop-blur-xl rounded-3xl w-full max-w-lg sm:max-w-xl min-h-[600px] flex flex-col justify-center items-center shadow-2xl border border-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-6 sm:p-8"
           >
-            <motion.div
-              initial={{ y: -10 }}
-              animate={{ y: 0 }}
-              transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse' }}
-            >
+            {/* Creative Software Logo (Top-Left) */}
+            <div className="absolute top-4 left-4 z-10">
               <Image
-                src={shiftlyLogo}
-                alt="Shiftly Logo"
-                width={300}
-                height={100}
+                src={companyLogo}
+                alt="Creative Software Logo"
+                width={200}
+                height={50}
                 className="object-contain"
               />
+            </div>
+
+            {/* Shiftly logo (Centered) */}
+            <motion.div
+              initial={{ y: -40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative z-10 mb-8"
+            >
+              <motion.div
+                initial={{ y: -10 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse' }}
+              >
+                <Image
+                  src={shiftlyLogo}
+                  alt="Shiftly Logo"
+                  width={300}
+                  height={100}
+                  className="object-contain"
+                />
+              </motion.div>
             </motion.div>
+
+            {/* Buttons (Centered Below Shiftly Logo) */}
+            <div className="flex space-x-4 z-10">
+              <motion.button
+                initial={{ backgroundColor: '#1F2937' }} // Initial background color (gray-800)
+                whileHover={{
+                  scale: 1.1,
+                  backgroundColor: '#3e4756', // Darker shade on hover (gray-700)
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }} // Smooth transition for all properties
+                className="bg-black-800 text-white font-semibold px-6 py-3 rounded-md shadow-md"
+                onClick={() => setShowLogin
+
+(true)}
+                aria-label="Open login form"
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                LOGIN
+              </motion.button>
+              <motion.button
+                initial={{ backgroundColor: '#FFFFFF' }} // Initial background color (white)
+                whileHover={{
+                  scale: 1.1,
+                  backgroundColor: '#E5E7EB', // Lighter shade on hover (gray-200)
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }} // Smooth transition for all properties
+                className="bg-white text-black font-semibold px-6 py-3 rounded-md shadow-md"
+                onClick={() => setShowSignup(true)}
+                aria-label="Open sign up form"
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                SIGN UP
+              </motion.button>
+            </div>
           </motion.div>
 
-          {/* Buttons (Centered Below Shiftly Logo) */}
-          <div className="flex space-x-4 z-10">
-            <motion.button
-              initial={{ backgroundColor: '#1F2937' }} // Initial background color (gray-800)
-              whileHover={{
-                scale: 1.1,
-                backgroundColor: '#3e4756', // Darker shade on hover (gray-700)
-              }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }} // Smooth transition for all properties
-              className="bg-black-800 text-white font-semibold px-6 py-3 rounded-md shadow-md"
-              onClick={() => setShowLogin(true)}
-              aria-label="Open login form"
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              LOGIN
-            </motion.button>
-            <motion.button
-              initial={{ backgroundColor: '#FFFFFF' }} // Initial background color (white)
-              whileHover={{
-                scale: 1.1,
-                backgroundColor: '', // Lighter shade on hover (gray-200)
-              }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }} // Smooth transition for all properties
-              className="bg-white text-black font-semibold px-6 py-3 rounded-md shadow-md"
-              onClick={() => setShowSignup(true)}
-              aria-label="Open sign up form"
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              SIGN UP
-            </motion.button>
-          </div>
-        </motion.div>
+          {/* Forms */}
+          {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
+          {showSignup && <SignupForm onClose={() => setShowSignup(false)} />}
+        </div>
 
-        {/* Forms */}
-        {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
-        {showSignup && <SignupForm onClose={() => setShowSignup(false)} />}
+        {/* Copyright Notice */}
+        <footer className="relative z-10 w-full text-center py-4">
+          <p className="text-sm text-black font-bold">
+            &copy; Copyright 2025 by Creative Software. All Rights Reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );
