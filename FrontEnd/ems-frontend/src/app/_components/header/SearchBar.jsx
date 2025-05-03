@@ -1,40 +1,44 @@
 "use client";
 
-import React from "react";
-import { Autocomplete, InputAdornment, TextField } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+import SearchIcon from '@mui/icons-material/Search';
 
-const SearchBar = () => {
+
+export default function SearchBar() {
   return (
-    <Autocomplete
-      freeSolo
-      options={[]}
-      sx={{
-        width: 402,
-        bgcolor: "rgb(243, 246, 249)",
-        borderRadius: "16px",
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Search"
-          variant="outlined"
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: "text.secondary" }} />
-              </InputAdornment>
+    <Stack direction="row">
+      <Tooltip title="Search" enterDelay={1000}>
+        <div>
+          <IconButton
+            type="button"
+            aria-label="search"
+            sx={{
+              display: { xs: 'inline', md: 'none' },
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </div>
+      </Tooltip>
+      <TextField
+        label="Search"
+        size="small"
+        color="primary" 
+        slotProps={{
+          input: {
+            endAdornment: (
+              <IconButton type="button" aria-label="search" size="small">
+                <SearchIcon />
+              </IconButton>
             ),
-            sx: {
-              borderRadius: "16px",
-              "& fieldset": { border: "1px solid rgb(224, 230, 237)" },
-            },
-          }}
-        />
-      )}
-    />
+            sx: { pr: 0.5 },
+          },
+        }}
+        sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1, }}
+      />
+    </Stack>
   );
-};
-
-export default SearchBar;
+}

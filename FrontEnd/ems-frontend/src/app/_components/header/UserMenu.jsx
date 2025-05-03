@@ -46,18 +46,6 @@ const UserMenu = () => {
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      <IconButton
-        size="small"
-        sx={{ bgcolor: "#737791", width: 22, height: 22 }}
-      >
-        <DarkModeIcon sx={{ color: "white", fontSize: 13 }} />
-      </IconButton>
-
-      {/* Notifications Menu */}
-      <NotificationMenu />
-
-      {/* Calendar Menu - Replaced Mail Icon */}
-      <CalendarMenu />
 
       <Divider orientation="vertical" flexItem />
 
@@ -72,7 +60,7 @@ const UserMenu = () => {
       >
         <Stack direction="row" spacing={1} alignItems="center">
           <Avatar
-            src="/image-55.png"
+            src="/profilePic.jpg"
             alt="User Avatar"
             sx={{ width: 44, height: 44 }}
           />
