@@ -32,7 +32,7 @@ const EducationForm = ({ formData, handleInputChange, handleSubmit, handleCancel
         <Button onClick={handleCancel} color="inherit">
           Cancel
         </Button>
-        <Button type="submit" variant="contained" color="primary"
+        <Button type="submit" variant="contained" 
             style={{
                 margin:'5px',
                 paddingTop: '10px',

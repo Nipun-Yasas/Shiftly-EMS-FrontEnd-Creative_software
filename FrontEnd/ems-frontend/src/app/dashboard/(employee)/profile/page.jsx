@@ -26,7 +26,7 @@ const Employee = () => {
             className='rounded-8xl pb-3 pl-0 pt-5 pr-4 ml-10 mt-4 '
             width={93} height={93}
            />
-           <EditIcon className="w-4 h-4 text-gray-500 ml-1 mt-20" />
+           <EditIcon className=" cursor-pointer  w-4 h-4 text-gray-500 ml-1 mt-20" />
          
             <div className=" emp-name text-2xl font-semibold pl-0 pt-5 ml-5 " style={{color :'var(--blueDark)', fontFamily: 'var(--font-poppins)'}}>Brooklyn Simmons</div>
 
