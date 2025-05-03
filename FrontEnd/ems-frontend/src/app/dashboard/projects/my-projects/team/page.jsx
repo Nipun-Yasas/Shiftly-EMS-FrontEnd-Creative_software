@@ -69,12 +69,12 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   });
 
   return (
-    <Box className="bg-white rounded-2xl shadow-md p-6 mb-6">
-      <Box className="flex items-center justify-between mb-4">
+    <Box className="bg-white rounded-2xl shadow-md p-6 mb-6 overflow-x-auto">
+      <Box className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
         <Typography variant="h6" className="font-semibold text-gray-800">
           {title}
         </Typography>
-        <Box className="flex gap-2">
+        <Box className="flex flex-col sm:flex-row gap-2">
           <TextField
             size="small"
             label={searchLabel}
@@ -142,16 +142,19 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   );
 }
 
-export default function MyProjectTeam(){
+export default function MyProjectTeam() {
   const pathname = usePathname();
 
   return (
-    <Box className="p-4 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold text-[#E90A4D] mb-2">My Project</h1>
-      <p className="text-sm text-gray-500 mb-4">project / my project</p>
+    <Box className="p-4 bg-gray-200 min-h-screen">
+      {/* Shadow box for title and breadcrumb */}
+      <Box className="bg-white rounded-2xl shadow-md p-4 mb-6">
+        <h1 className="text-2xl font-bold text-[#E90A4D] mb-1">My Project</h1>
+        <p className="text-sm text-gray-500">project / my project</p>
+      </Box>
 
       <Box className="bg-white rounded-2xl shadow-md p-6">
-        <Box className="flex items-center gap-150 mb-6">
+        <Box className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
           <div className="flex items-center gap-2">
             <Image
               src="/images/dips_logo.png"
@@ -161,21 +164,20 @@ export default function MyProjectTeam(){
               className="object-contain"
             />
           </div>
-          <div className="flex gap-6 border-b border-gray-200">
-            {[{ name: "BASIC INFO", href: "/projects/my-projects/basic-info" },
-              { name: "TEAM", href: "/projects/my-projects/team" }]
-              .map((tab) => {
-                const isActive = pathname === tab.href;
-                return (
-                  <Link
-                    key={tab.name}
-                    href={tab.href}
-                    className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
-                  >
-                    {tab.name}
-                  </Link>
-                );
-              })}
+          <div className="flex gap-6 border-b border-gray-200 overflow-x-auto">
+            {[{ name: "BASIC INFO", href: "/dashboard/projects/my-projects/basic-info" },
+              { name: "TEAM", href: "/dashboard/projects/my-projects/team" }].map((tab) => {
+              const isActive = pathname === tab.href;
+              return (
+                <Link
+                  key={tab.name}
+                  href={tab.href}
+                  className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
+                >
+                  {tab.name}
+                </Link>
+              );
+            })}
           </div>
         </Box>
 

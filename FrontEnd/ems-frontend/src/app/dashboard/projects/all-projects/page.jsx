@@ -1,3 +1,5 @@
+"use client";
+
 const demoProjects = [
   {
     id: 1,
@@ -55,49 +57,48 @@ const demoProjects = [
   },
 ];
 
-export default function AllProjects(){
+export default function AllProjects() {
   return (
-    <div className="flex min-h-screen bg-white">
-      <div className="flex-1 p-2">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#e80a4d]">All Projects</h1>
-          <p className="text-sm text-gray-500 mt-1">All Projects &gt;</p>
-        </div>
+    <div className="px-6 py-4 space-y-6 bg-gray-200 min-h-screen">
+      {/* Title Card */}
+      <div className="bg-white rounded-2xl shadow-md p-4">
+        <h1 className="text-2xl font-bold text-[#E80A4D] mb-1">All Projects</h1>
+        <div className="text-sm text-gray-400">All Projects &gt;</div>
+      </div>
 
-        <div className="bg-white shadow-xl rounded-xl px-16 py-6">
-          <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-16">
-            {demoProjects.map((project) => (
-              <div
-                key={project.id}
-                className="bg-white rounded-lg shadow-xl hover:shadow-md transition duration-200"
-              >
-                <img
-                  src={project.imageUrl}
-                  alt="Project"
-                  className="w-full h-40 object-cover rounded-t-lg"
-                />
-                <div className="p-4">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <img src={project.logo} alt="Logo" className="h-5" />
-                  </div>
-                  <h3 className="text-sm font-semibold mb-1">{project.title}</h3>
-                  <p className="text-xs text-gray-600 pt-2">
-                    <strong>Created:</strong> {project.createdDate}
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    <strong>Project Status:</strong>
-                    <span className="text-green-600 font-medium">{project.status}</span>
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    <strong>Software Engineering Director:</strong> {project.director}
-                  </p>
+      {/* Project Cards */}
+      <div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-8">
+          {demoProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white rounded-xl shadow hover:shadow-lg transition duration-200 overflow-hidden"
+            >
+              <img
+                src={project.imageUrl}
+                alt="Project"
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <img src={project.logo} alt="Logo" className="h-5" />
                 </div>
+                <h3 className="text-sm font-semibold">{project.title}</h3>
+                <p className="text-xs text-gray-600">
+                  <strong>Created:</strong> {project.createdDate}
+                </p>
+                <p className="text-xs text-gray-600">
+                  <strong>Project Status:</strong>{" "}
+                  <span className="text-green-600 font-medium">{project.status}</span>
+                </p>
+                <p className="text-xs text-gray-600">
+                  <strong>Software Engineering Director:</strong> {project.director}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
-
