@@ -118,13 +118,12 @@ const attributeMap = {
   Status: "status",
 };
 
-export default function LeaveHistory(){
+export default function LeaveHistory() {
   const [searchText, setSearchText] = useState("");
   const [attribute, setAttribute] = useState("Leave To");
 
   const filteredRows = useMemo(() => {
     if (!searchText.trim()) return demoRows;
-
     const field = attributeMap[attribute];
     return demoRows.filter((row) =>
       row[field]?.toString().toLowerCase().includes(searchText.toLowerCase())
@@ -132,19 +131,17 @@ export default function LeaveHistory(){
   }, [searchText, attribute]);
 
   return (
-    <div className="p-6 space-y-6">
-     
-      <div>
-        <h1 className="text-2xl font-bold text-pink-600">Leave History</h1>
-        <div className="text-gray-400 text-sm mt-1">Leave &gt; Leave History</div>
+    <div className="p-6 bg-gray-200 min-h-screen space-y-6">
+      
+      <div className="bg-white rounded-2xl shadow-md p-4">
+        <h1 className="text-2xl font-bold text-[#E90A4D] mb-1">Leave History</h1>
+        <p className="text-sm text-gray-500">Leave &gt; Leave History</p>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
-        
-
+      <div className="bg-white rounded-2xl shadow-md p-6">
        
-        <div className="flex flex-wrap justify-between items-center mb-4">
-          <div className="flex gap-4 flex-wrap">
+        <div className="flex flex-wrap justify-between items-center mb-4 gap-y-4">
+          <div className="flex flex-wrap gap-4 items-center">
             <TextField
               label="Search"
               placeholder="Leave Id, Leave Type etc..."
@@ -172,12 +169,12 @@ export default function LeaveHistory(){
               <FilterList />
             </IconButton>
           </div>
-          <IconButton size="small" className="mt-2 sm:mt-0">
+          <IconButton>
             <Settings />
           </IconButton>
         </div>
 
-        
+       
         <div style={{ height: 430, width: "100%" }}>
           <DataGrid
             rows={filteredRows}
