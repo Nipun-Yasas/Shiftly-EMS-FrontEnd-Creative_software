@@ -1,4 +1,4 @@
-import Readonlyfield from "@/app/(employee)/profile/_components/Readonlyfield"
+import Readonlyfield from "../components/Readonlyfield"
 
 const PersonalInfoForm = () => {
 

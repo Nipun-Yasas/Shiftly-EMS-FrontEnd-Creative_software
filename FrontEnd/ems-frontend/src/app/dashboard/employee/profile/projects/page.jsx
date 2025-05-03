@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import url from '../../../../../public/creative_software_logo.png'
+import url from '../../../../../../public/creative_software_logo.png'
 import EditIcon from "@mui/icons-material/Edit";
 
 const Projects = () => {
@@ -17,7 +17,7 @@ const Projects = () => {
             <div>
                 <h2 className="text-xl font-bold" style={{ color: '#000000' }} >Software Engineer</h2>
                 <span>
-                    <div className="pl-280 cursor-pointer text-gray-500 hover:text-gray-700">
+                    <div className=" pl-100 pt-0 cursor-pointer text-gray-500 hover:text-gray-700">
                         <EditIcon size={40} />
                     </div>
                 </span>

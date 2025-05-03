@@ -10,7 +10,7 @@ import TabBar from "./components/TabBar";
 const Employee = () => {
   return (
     <>
-      <div className="container w-auto mt-10 p-5 shadow bg-white rounded-xl">
+      <div className="container w-auto p-5 shadow bg-white rounded-xl">
         <div id='mainName' className="text-4xl font-bold" style={{ color: 'var(--primary)', fontFamily: 'var(--font-poppins)' }} >Profile</div>
         <div className="sub-path">
           <span className=" mx-2 " style={{color :'var(--graylight) ' ,fontFamily: 'var(--font-poppins)'}}>Employee <span>›</span> </span> 
@@ -19,14 +19,14 @@ const Employee = () => {
 
       </div>
 
-    <div className="profile-basic h-35  w-auto flex item-center justify-between  mt-5 shadow  bg-white rounded-xl">
+    <div className="profile-basic   w-auto flex item-center justify-between  mt-5 shadow  bg-white rounded-xl">
            <div className="flex items-center">
            <Image  src="/profilePic.jpg" 
             alt='Employee Profile Picture'
             className='rounded-8xl pb-3 pl-0 pt-5 pr-4 ml-10 mt-4 '
             width={93} height={93}
            />
-           <EditIcon className="w-4 h-4 text-gray-500 ml-1 mt-20" />
+           <EditIcon className=" cursor-pointer  w-4 h-4 text-gray-500 ml-1 mt-20" />
          
             <div className=" emp-name text-2xl font-semibold pl-0 pt-5 ml-5 " style={{color :'var(--blueDark)', fontFamily: 'var(--font-poppins)'}}>Brooklyn Simmons</div>
 
