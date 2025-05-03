@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import url from '../../../../../public/creative_software_logo.png'
+import url from '../../../../../../public/creative_software_logo.png'
 import EditIcon from "@mui/icons-material/Edit";
 
 const Projects = () => {

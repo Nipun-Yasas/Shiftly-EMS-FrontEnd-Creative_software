@@ -1,8 +1,5 @@
 import { Poppins,Roboto,Lexend,Inter } from "next/font/google";
 import "./globals.css";
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from '../theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,11 +34,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${roboto.variable} ${lexend.variable} ${inter.variable}`}>
-      <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-         <ThemeProvider theme={theme}>
-            {children}
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+      {children}
       </body>
     </html>
   );
