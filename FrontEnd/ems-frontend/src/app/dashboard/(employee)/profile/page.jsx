@@ -10,7 +10,7 @@ import TabBar from "./components/TabBar";
 const Employee = () => {
   return (
     <>
-      <div className="container w-auto mt-10 p-5 shadow bg-white rounded-xl">
+      <div className="container w-auto p-5 shadow bg-white rounded-xl">
         <div id='mainName' className="text-4xl font-bold" style={{ color: 'var(--primary)', fontFamily: 'var(--font-poppins)' }} >Profile</div>
         <div className="sub-path">
           <span className=" mx-2 " style={{color :'var(--graylight) ' ,fontFamily: 'var(--font-poppins)'}}>Employee <span>›</span> </span> 
@@ -19,7 +19,7 @@ const Employee = () => {
 
       </div>
 
-    <div className="profile-basic h-35  w-auto flex item-center justify-between  mt-5 shadow  bg-white rounded-xl">
+    <div className="profile-basic   w-auto flex item-center justify-between  mt-5 shadow  bg-white rounded-xl">
            <div className="flex items-center">
            <Image  src="/profilePic.jpg" 
             alt='Employee Profile Picture'
