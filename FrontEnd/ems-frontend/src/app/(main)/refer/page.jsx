@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Paper } from "@mui/material";
+import { Paper,Box,Typography } from "@mui/material";
 
 import ReferForm from "./components/ReferForm";
 import SubmitDialog from "./components/SubmitDialog";
@@ -12,16 +12,17 @@ export default function Refer(){
 
   return (
     <>
-      <Paper elevation={10}
+      <Paper elevation={3} square={false}
       sx={{
+        justifyItems: 'center',
+        alignContent: 'center',
         height: '100%',
         width: '100%',
       }}>
-        <div className="flex justify-center">
-          <div className="w-5/6 items-center  rounded-lg bg-white mt-5 p-5">
-            <ReferForm setOpenSubmit={setOpenSubmit} />
-          </div>
-        </div>
+        <Box><Typography variant="h5">Refer Candidates Form</Typography></Box>
+        <Box sx={{ width: '100%', maxWidth: 1000, mt: 5, px: 2}}>
+        <ReferForm setOpenSubmit={setOpenSubmit} />
+        </Box>
       </Paper>
 
       <SubmitDialog openSubmit={openSubmit} setopenSubmit={setOpenSubmit} />

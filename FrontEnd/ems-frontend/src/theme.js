@@ -18,7 +18,7 @@ const theme = createTheme({
           main: "#E80A4D",
           light: "#E80A4D",
           dark: "#E80A4D",
-          contrastText: "#fff"
+          contrastText: "#0000"
         },
         error: {
           main: "#d32f2f",
@@ -44,6 +44,10 @@ const theme = createTheme({
           dark: "#1b5e20",
           contrastText: "#fff"
         },
+        canclebtn: {
+          main: '#000000',
+          contrastText: '#ffffff',
+        }
       }
     },
     dark: {
@@ -83,6 +87,10 @@ const theme = createTheme({
           light: "#81c784",
           dark: "#388e3c",
           contrastText: "rgba(0, 0, 0, 0.87)"
+        },
+        canclebtn: {
+          main: '#ffffff',
+          contrastText: '#000000',
         }
       },
     }
@@ -122,13 +130,11 @@ const theme = createTheme({
       fontSize: '1.25rem',
       fontWeight: 700,
       fontFamily: 'Poppins, sans-serif',
-      color: '#E90A4D',
     },
     h6: {
       fontSize: '1rem',
       fontWeight: 700,
       fontFamily: 'Poppins, sans-serif',
-      color: '#E90A4D',
     },
   },
 });

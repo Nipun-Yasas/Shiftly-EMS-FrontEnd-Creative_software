@@ -1,20 +1,28 @@
-import react from "react";
-
 import { useRef, useState } from "react";
 
-import { Label,Listbox,ListboxButton,ListboxOption,ListboxOptions } from "@headlessui/react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+} from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
-
 import { Formik, Form, Field } from "formik";
+import { Stack, Box, Button, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 const vacancyOptions = [
   { id: 1, name: "Software Engineer" },
   { id: 2, name: "HR" },
 ];
 
-const ReferForm = (props) => {
-    
+const Item = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  textAlign: "center",
+}));
+
+export default function ReferForm(props) {
   const { setOpenSubmit } = props;
 
   const resumeRef = useRef(null);
@@ -71,8 +79,8 @@ const ReferForm = (props) => {
           resetForm,
         }) => (
           <Form>
-            <div className="grid mt-2 grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 w-full">
-              <div className="sm:col-span-full">
+            <Stack>
+              <Item>
                 <div className="relative">
                   <Listbox
                     value={values.vacancy}
@@ -92,8 +100,8 @@ const ReferForm = (props) => {
                           errors.vacancy && touched.vacancy
                             ? "border-red-500"
                             : values.vacancy
-                            ? "border-gray-400"
-                            : "focus:border-(color:--primary) border-gray-400"
+                              ? "border-gray-400"
+                              : "focus:border-(color:--primary) border-gray-400"
                         }`}
                       >
                         <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
@@ -140,9 +148,9 @@ const ReferForm = (props) => {
                     </p>
                   )}
                 </div>
-              </div>
+              </Item>
 
-              <div className="sm:col-span-full">
+              <Item>
                 <Field
                   name="applicantname"
                   type="text"
@@ -158,8 +166,8 @@ const ReferForm = (props) => {
                     {errors.applicantname}
                   </p>
                 )}
-              </div>
-              <div className="sm:col-span-full">
+              </Item>
+              <Item>
                 <Field
                   name="applicantemail"
                   type="text"
@@ -175,9 +183,9 @@ const ReferForm = (props) => {
                     {errors.applicantemail}
                   </p>
                 )}
-              </div>
+              </Item>
 
-              <div className="sm:col-span-full">
+              <Item>
                 <Field
                   name="message"
                   type="text"
@@ -191,16 +199,16 @@ const ReferForm = (props) => {
                 {errors.message && touched.message && (
                   <p className="text-red-500 text-sm mt-1">{errors.message}</p>
                 )}
-              </div>
+              </Item>
 
-              <div className="sm:col-span-full">
-                <div className="flex justify-center w-full">
+              <Item>
+                <Box display="flex" justifyContent="center" width="100%">
                   {errors.resume && touched.resume && (
-                    <p className="text-red-500 text-sm mt-2 mx-5">
+                    <Typography color="error" fontSize="0.875rem" mt={2} mx={2}>
                       {errors.resume}
-                    </p>
+                    </Typography>
                   )}
-                  <div className="w-1/2">
+                  <Box width="50%">
                     <input
                       ref={resumeRef}
                       type="file"
@@ -231,94 +239,111 @@ const ReferForm = (props) => {
                           }
                         }
                       }}
-                      className="hidden"
+                      style={{ display: "none" }}
                     />
-                    <div className="flex  justify-center">
-                      <label
-                        htmlFor="resume"
-                        className={`flex bg-white border-2 border-gray-400 px-4 py-2 rounded-md text-gray-400 text-center cursor-pointer hover:bg-gray-100
-                        ${
-                        errors.resume && touched.resume
-                        ? "border-red-500"
-                        : ""
-                        }`}
-                      >
-                        <img
-                          src="/upload.png"
-                          alt="Upload Icon"
-                          className="w-5 h-5 mr-3"
-                        />
-                        Upload Resume
-                      </label>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="sm:col-span-full mt-5 flex flex-col items-center">
+                    <Item>
+                      <label htmlFor="resume">
+                        <Button
+                          color="canclebtn"
+                          variant="outlined"
+                          component="span"
+                          startIcon={
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                              />
+                            </svg>
+                          }
+                          fullWidth
+                          sx={{
+                            borderColor:
+                              errors.resume && touched.resume
+                                ? "error.main"
+                                : "grey.400",
+                            px: 2,
+                            py: 1.5,
+                            textTransform: "none",
+                          }}
+                        >
+                          Upload Resume
+                        </Button>
+                      </label>
+                    </Item>
+                  </Box>
+                </Box>
+
+                <Item>
                   {preview ? (
                     preview.type === "image" ? (
-                      <img
+                      <Box
+                        component="img"
                         src={preview.url}
                         alt="Resume Preview"
-                        className="w-full h-48 object-cover"
+                        sx={{ width: "100%", height: 192, objectFit: "cover" }}
                       />
                     ) : preview.type === "pdf" ? (
-                      <iframe
+                      <Box
+                        component="iframe"
                         src={preview.url}
-                        className="w-full h-48 border"
+                        sx={{
+                          width: "100%",
+                          height: 192,
+                          border: "1px solid #ccc",
+                        }}
                         title="PDF Preview"
                       />
                     ) : null
                   ) : (
                     fileName && (
-                      <p className="mt-2 text-gray-700 text-sm text-center">
-                        {fileName}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{{fileName}}</p>
+                      
                     )
                   )}
-                </div>
-              </div>
-              <div className="sm:col-span-full">
-                <div className="px-4 flex justify-end">
-                  <button
-                    type="reset"
-                    onClick={() => {
-                      resetForm();
-                      setFileName("");
-                      setPreview(null);
-                      if (resumeRef.current) {
-                        resumeRef.current.value = "";
-                      }
-                    }}
-                    className="justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-(color:--primary) shadow-xs ring-gray-300 ring-inset hover:bg-gray-300 sm:w-auto"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!isValid}
-                    onClick={() => {
-                      validateForm;
-                      if (isValid) {
-                        setOpenSubmit(true);
-                      }
-                    }}
-                    className={`justify-center ml-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-gray-300 ring-inset sm:w-auto ${
-                      !isValid
-                        ? "cursor-not-allowed"
-                        : "hover:bg-gray-300 cursor-pointer"
-                    }`}
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            </div>
+                </Item>
+              </Item>
+
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                <Button
+                  color="canclebtn"
+                  type="reset"
+                  onClick={() => {
+                    resetForm();
+                    setFileName("");
+                    setPreview(null);
+                    if (resumeRef.current) {
+                      resumeRef.current.value = "";
+                    }
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={Object.keys(errors).length > 0}
+                  onClick={() => {
+                    validateForm;
+                    if (isValid) {
+                      setOpenSubmit(true);
+                    }
+                  }}
+                >
+                  Add
+                </Button>
+              </Box>
+            </Stack>
           </Form>
         )}
       </Formik>
     </>
   );
 }
-
-export default ReferForm;
