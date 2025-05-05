@@ -1,15 +1,16 @@
+"use client";
+
 import { useRef, useState } from "react";
 
+import { Formik, Form } from "formik";
 import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { CheckIcon } from "@heroicons/react/20/solid";
-import { Formik, Form, Field } from "formik";
-import { Stack, Box, Button, Typography } from "@mui/material";
+  Stack,
+  Box,
+  Button,
+  Typography,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const vacancyOptions = [
@@ -18,11 +19,12 @@ const vacancyOptions = [
 ];
 
 const Item = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
+  padding: theme.spacing(1.5),
   textAlign: "center",
 }));
 
 export default function ReferForm(props) {
+  
   const { setOpenSubmit } = props;
 
   const resumeRef = useRef(null);
@@ -33,9 +35,9 @@ export default function ReferForm(props) {
     <>
       <Formik
         initialValues={{
-          vacancy: "",
-          applicantname: "",
-          applicantemail: "",
+          vacancy: null,
+          applicantName: "",
+          applicantEmail: "",
           message: "",
           resume: null,
         }}
@@ -44,11 +46,11 @@ export default function ReferForm(props) {
           if (!values.vacancy) {
             errors.vacancy = "Vacancy is required";
           }
-          if (!values.applicantname) {
-            errors.applicantname = "Applicant name is required";
+          if (!values.applicantName) {
+            errors.applicantName = "Applicant name is required";
           }
-          if (!values.applicantemail) {
-            errors.applicantemail = "Applicant email is required";
+          if (!values.applicantEmail) {
+            errors.applicantEmail = "Applicant email is required";
           }
           if (!values.message) {
             errors.message = "Message is required";
@@ -81,124 +83,113 @@ export default function ReferForm(props) {
           <Form>
             <Stack>
               <Item>
-                <div className="relative">
-                  <Listbox
-                    value={values.vacancy}
-                    onChange={(selectedOption) => {
-                      setFieldValue("vacancy", selectedOption.name);
-                      setFieldTouched("vacancy", true, false);
-                      console.log(selectedOption);
-                    }}
-                  >
-                    <div className="relative">
-                      <ListboxButton
-                        name="vacancy"
-                        onBlur={() => {
-                          setFieldTouched("vacancy", true, true);
-                        }}
-                        className={`grid w-full px-1 text-left focus:outline-none border-b-2 ${
-                          errors.vacancy && touched.vacancy
-                            ? "border-red-500"
-                            : values.vacancy
-                              ? "border-gray-400"
-                              : "focus:border-(color:--primary) border-gray-400"
-                        }`}
-                      >
-                        <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
-                          <span
-                            className={`block truncate  ${
-                              !values.vacancy ? "text-gray-400" : ""
-                            }`}
-                          >
-                            {values.vacancy || "Select a vacancy"}
-                          </span>
-                        </span>
-                        <ChevronDownIcon
-                          aria-hidden="true"
-                          className="col-start-1 row-start-1 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                        />
-                      </ListboxButton>
-
-                      <ListboxOptions className="absolute z-10 mt-1 max-h-56 w-full overflow-auto bg-white py-1 text-base shadow-lg sm:text-sm">
-                        {vacancyOptions.map((option) => (
-                          <ListboxOption
-                            key={option.id}
-                            value={option}
-                            className="group relative py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-gray-300 data-focus:text-white"
-                          >
-                            <div className="flex items-center">
-                              <span className="ml-3 block truncate font-normal group-data-selected:font-semibold">
-                                {option.name}
-                              </span>
-                            </div>
-                            <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-600 group-not-data-selected:hidden group-data-focus:text-white">
-                              <CheckIcon
-                                aria-hidden="true"
-                                className="size-5"
-                              />
-                            </span>
-                          </ListboxOption>
-                        ))}
-                      </ListboxOptions>
-                    </div>
-                  </Listbox>
-                  {errors.vacancy && touched.vacancy && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.vacancy}
-                    </p>
+                <Autocomplete
+                  id="vacancy"
+                  options={vacancyOptions}
+                  getOptionLabel={(option) => option.name || ""}
+                  value={values.vacancy}
+                  onChange={(e, selectedOption) => {
+                    setFieldValue("vacancy", selectedOption);
+                    setFieldTouched("vacancy", true, false);
+                  }}
+                  onBlur={() => setFieldTouched("vacancy", true, true)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Vacancy"
+                      variant="standard"
+                      error={Boolean(errors.vacancy && touched.vacancy)}
+                      helperText={
+                        errors.vacancy && touched.vacancy ? errors.vacancy : ""
+                      }
+                      fullWidth
+                      sx={{
+                        "& label": {
+                          color: "inputlabel.main",
+                        },
+                      }}
+                    />
                   )}
-                </div>
+                />
               </Item>
 
               <Item>
-                <Field
-                  name="applicantname"
-                  type="text"
-                  placeholder="Enter Applicant name"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
-                    errors.applicantname && touched.applicantname
-                      ? "border-b-2 border-red-500"
+                <TextField
+                  id="applicantName"
+                  label="Enter Applicant name"
+                  variant="standard"
+                  value={values.applicantName}
+                  onChange={(e) => {
+                    setFieldValue("applicantName", e.target.value);
+                    setFieldTouched("applicantName", true, false);
+                  }}
+                  onBlur={() => setFieldTouched("applicantName", true, true)}
+                  error={Boolean(errors.applicantName && touched.applicantName)}
+                  helperText={
+                    errors.applicantName && touched.applicantName
+                      ? errors.applicantName
                       : ""
-                  }`}
+                  }
+                  fullWidth
+                  sx={{
+                    "& label": {
+                      color: "inputlabel.main",
+                    },
+                  }}
                 />
-                {errors.applicantname && touched.applicantname && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.applicantname}
-                  </p>
-                )}
               </Item>
               <Item>
-                <Field
-                  name="applicantemail"
-                  type="text"
-                  placeholder="Enter Applicant email"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary)${
-                    errors.applicantemail && touched.applicantemail
-                      ? "border-b-2 border-red-500"
+                <TextField
+                  id="applicantEmail"
+                  label="Enter Applicant email"
+                  variant="standard"
+                  value={values.applicantEmail}
+                  onChange={(e) => {
+                    setFieldValue("applicantEmail", e.target.value);
+                    setFieldTouched("applicantEmail", true, false);
+                  }}
+                  onBlur={() => setFieldTouched("applicantEmail", true, true)}
+                  error={Boolean(
+                    errors.applicantEmail && touched.applicantEmail
+                  )}
+                  helperText={
+                    errors.applicantEmail && touched.applicantEmail
+                      ? errors.applicantEmail
                       : ""
-                  }`}
+                  }
+                  fullWidth
+                  sx={{
+                    "& label": {
+                      color: "inputlabel.main",
+                    },
+                  }}
                 />
-                {errors.applicantemail && touched.applicantemail && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.applicantemail}
-                  </p>
-                )}
               </Item>
 
               <Item>
-                <Field
-                  name="message"
-                  type="text"
-                  as="textarea"
-                  rows="3"
-                  placeholder="Write a message"
-                  className={`w-full px-1 text-base text-gray-900 border-b-2 border-gray-400 placeholder:text-gray-400 focus:outline-none focus:placeholder-(color:--primary) focus:border-(color:--primary) ${
-                    errors.message && touched.message ? "border-red-500" : ""
-                  }`}
+                <TextField
+                  id="message"
+                  label="Write a message"
+                  variant="standard"
+                  value={values.message}
+                  multiline
+                  rows={4}
+                  fullWidth
+                  onChange={(e) => {
+                    setFieldValue("message", e.target.value);
+                    setFieldTouched("message", true, false);
+                  }}
+                  onBlur={() => setFieldTouched("message", true, true)}
+                  error={Boolean(errors.message && touched.message)}
+                  helperText={
+                    errors.message && touched.message ? errors.message : ""
+                  }
+                  sx={{
+                    "& label": {
+                      color: "inputlabel.main",
+                    },
+                  }}
                 />
-                {errors.message && touched.message && (
-                  <p className="text-red-500 text-sm mt-1">{errors.message}</p>
-                )}
               </Item>
 
               <Item>
@@ -269,7 +260,7 @@ export default function ReferForm(props) {
                             borderColor:
                               errors.resume && touched.resume
                                 ? "error.main"
-                                : "grey.400",
+                                : "grey.500",
                             px: 2,
                             py: 1.5,
                             textTransform: "none",
@@ -304,10 +295,7 @@ export default function ReferForm(props) {
                       />
                     ) : null
                   ) : (
-                    fileName && (
-                      <p className="text-red-500 text-sm mt-1">{{fileName}}</p>
-                      
-                    )
+                    fileName && <p className="text-sm mt-1">{fileName}</p>
                   )}
                 </Item>
               </Item>

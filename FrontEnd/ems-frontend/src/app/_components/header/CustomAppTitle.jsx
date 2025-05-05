@@ -19,10 +19,6 @@ export default function CustomAppTitle() {
         alt="Company Logo"
         width={50}
         height={50}
-        style={{
-          margin: 0, 
-          padding: 0, 
-        }}
       />
       <SearchBar/>
     </Box>

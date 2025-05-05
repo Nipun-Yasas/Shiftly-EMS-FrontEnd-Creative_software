@@ -1,6 +1,8 @@
 'use client';
 import { createTheme } from '@mui/material/styles';
 
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+
 const theme = createTheme({
   cssVariables: {
     colorSchemeSelector: 'data-toolpad-color-scheme',
@@ -21,7 +23,7 @@ const theme = createTheme({
           contrastText: "#0000"
         },
         error: {
-          main: "#d32f2f",
+          main: "#F44336",
           light: "#ef5350",
           dark: "#c62828",
           contrastText: "#fff"
@@ -47,6 +49,10 @@ const theme = createTheme({
         canclebtn: {
           main: '#000000',
           contrastText: '#ffffff',
+        },
+        inputlabel:{
+          main: '#000000',
+          contrastText: '#ffffff',
         }
       }
     },
@@ -65,9 +71,9 @@ const theme = createTheme({
           contrastText: "#fff"
         },
         error: {
-          main: "#f44336",
-          light: "#e57373",
-          dark: "#d32f2f",
+          main: "#F44336",
+          light: "#ef5350",
+          dark: "#c62828",
           contrastText: "#fff"
         },
         warning: {
@@ -91,14 +97,60 @@ const theme = createTheme({
         canclebtn: {
           main: '#ffffff',
           contrastText: '#000000',
+        },
+        inputlabel:{
+          main: '#ffffff',
+          contrastText: '#000000',
         }
       },
-    }
+    },
   },
-
   components: {
-
-  },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '--TextField-borderColor': '#E0E3E7',
+            '--TextField-borderHoverColor': '#E90A4D', 
+          }
+        }
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          notchedOutline: {
+            borderColor: 'var(--TextField-borderColor)',
+          },
+          root: {
+            [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+              borderColor: 'var(--TextField-borderHoverColor)',
+            }  
+          }
+        }
+      },
+      MuiFilledInput: {
+        styleOverrides: {
+          root: {
+            '&::before, &::after': {
+              borderBottom: '2px solid var(--TextField-borderColor)',
+            },
+            '&:hover:not(.Mui-disabled, .Mui-error):before': {
+              borderBottom: '2px solid var(--TextField-borderHoverColor)',
+            }
+          }
+        }
+      },
+      MuiInput: {
+        styleOverrides: {
+          root: {
+            '&::before': {
+              borderBottom: '2px solid var(--TextField-borderColor)',
+            },
+            '&:hover:not(.Mui-disabled, .Mui-error):before': {
+              borderBottom: '2px solid var(--TextField-borderHoverColor)',
+            }
+          }
+        }
+      }
+    },
   typography: {
     fontFamily: 'Lexend, sans-serif',
     fontSize: 14,
