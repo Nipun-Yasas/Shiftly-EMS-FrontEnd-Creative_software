@@ -159,6 +159,18 @@ const  NAVIGATION = [
     segment: 'events',
     title: 'Event',
     icon: <DateRangeIcon/>,
+    children: [
+      {
+        segment: 'add-event',
+        title: 'Add Event',
+        icon: <PersonIcon />,
+      },
+      {
+        segment: 'event-history',
+        title: 'Event History',
+        icon: <PersonIcon />,
+      },
+    ],
   },
   {
     segment: 'refer',
