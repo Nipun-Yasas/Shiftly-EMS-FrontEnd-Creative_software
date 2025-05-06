@@ -8,7 +8,8 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import WorkIcon from "@mui/icons-material/Work";
-
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 
 const  NAVIGATION = [
   {
@@ -163,12 +164,12 @@ const  NAVIGATION = [
       {
         segment: 'add-event',
         title: 'Add Event',
-        icon: <PersonIcon />,
+        icon: <AddCircleOutlineIcon />,
       },
       {
         segment: 'event-history',
         title: 'Event History',
-        icon: <PersonIcon />,
+        icon: <HistoryEduIcon />,
       },
     ],
   },

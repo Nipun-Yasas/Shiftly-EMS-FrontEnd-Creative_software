@@ -110,7 +110,7 @@ const theme = createTheme({
         styleOverrides: {
           root: {
             '--TextField-borderColor': '#E0E3E7',
-            '--TextField-borderHoverColor': '#E90A4D', 
+            '--TextField-borderHoverColor': '#E90A4D',
           }
         }
       },
@@ -122,7 +122,8 @@ const theme = createTheme({
           root: {
             [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
               borderColor: 'var(--TextField-borderHoverColor)',
-            }  
+            },
+            
           }
         }
       },
