@@ -22,7 +22,7 @@ const eventTypeOptions = [
   { id: 2, name: "Managers only" },
 ];
 
-const EventForm = (props) => {
+export default function EventForm(props){
   const { setOpenSubmit } = props;
 
   const bannerRef = useRef(null);
@@ -228,4 +228,3 @@ const EventForm = (props) => {
   );
 };
 
-export default EventForm;

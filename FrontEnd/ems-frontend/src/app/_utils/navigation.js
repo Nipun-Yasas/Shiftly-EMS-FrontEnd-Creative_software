@@ -10,6 +10,8 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import WorkIcon from "@mui/icons-material/Work";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 const  NAVIGATION = [
   {
@@ -140,12 +142,12 @@ const  NAVIGATION = [
       {
         segment: 'claim-submission',
         title: 'Claim Submission',
-        icon: <PersonIcon />,
+        icon: <ContentPasteIcon />,
       },
       {
         segment: 'claim-history',
         title: 'Claim History',
-        icon: <PersonIcon />,
+        icon: <PendingActionsIcon />,
       },
     ],
   },
