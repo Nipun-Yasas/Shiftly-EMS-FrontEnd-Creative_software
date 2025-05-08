@@ -40,14 +40,12 @@ const Projects = () => {
           >
             Software Engineer
           </Typography>
-          <Box display="flex" alignItems="center" >
-            <IconButton sx={{ color: theme.palette.text }}>
-              <EditIcon />
-            </IconButton>
+          <Box  >
+           
             <Typography
               variant="body2"
               sx={{
-                color: theme.palette.text, // Ensure consistent text color for this part
+                color: theme.palette.text, 
               }}
             >
               Creative Technology Solutions (Pvt) Ltd
@@ -64,8 +62,19 @@ const Projects = () => {
           </Typography>
         </Box>
       </Box>
+      <Box>
+          <IconButton  
+              sx={{
+                
+                ml:100,
+                color: theme.palette.text
+              }}>
+              <EditIcon />
+            </IconButton>
 
-      <Box sx={{ ml: 8, mt: 4 }}>
+      </Box>
+
+      <Box sx={{ ml: 8}}>
         <Typography
           variant="h6"
           sx={{

@@ -30,7 +30,7 @@ const Employee = () => {
             alt="Employee Profile Picture"
             sx={{ width: 93, height: 93, ml: 2, mt: 1 }}
           />
-          <IconButton sx={{ mt: 5, ml: 1 }} aria-label="edit">
+          <IconButton sx={{ mt: 8, ml: 0 }} aria-label="edit">
             <EditIcon
               sx={{
                 color: theme.palette.text, // Use the correct text color for dark and light mode
@@ -42,11 +42,11 @@ const Employee = () => {
           <Typography
             variant="h5"
             sx={{
-              color: 'black', // Set the color of the employee name to black
+              color: theme.palette.text,
               fontFamily: 'var(--font-poppins)',
-              fontWeight: 600,
+              fontWeight: 450,
               ml: 3,
-              mt: 2,
+             
             }}
           >
             Brooklyn Simmons
@@ -90,10 +90,12 @@ const Employee = () => {
                   width: 24,
                   height: 24,
                   mr: 1,
-                  color: theme.palette.text, // Ensure icons are using correct colors
+                  color: theme.palette.text // Ensure icons are using correct colors
                 }}
               />
-              <Typography variant="body1" sx={{ fontWeight: 'light' }}>
+              <Typography variant="body1" sx={{ fontWeight: 'light',
+            
+               }}>
                 brooklyn.s@example.com
               </Typography>
             </Box>
