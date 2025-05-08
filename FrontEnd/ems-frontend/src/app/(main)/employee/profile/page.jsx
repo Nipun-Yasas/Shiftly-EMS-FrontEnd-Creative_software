@@ -1,64 +1,112 @@
+"use client";
 
-import Image from 'next/image'
-import EmailIcon from "@mui/icons-material/Email";
-import FolderIcon from "@mui/icons-material/Folder";
-import EditIcon from "@mui/icons-material/Edit";
-import { Paper } from '@mui/material';
-
-import TabBar from "./components/TabBar";
+import Image from 'next/image';
+import EmailIcon from '@mui/icons-material/Email';
+import FolderIcon from '@mui/icons-material/Folder';
+import { Box, Typography, IconButton, Paper, Avatar } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import TabBar from './components/TabBar';
+import { useTheme } from '@mui/material/styles';
 
 const Employee = () => {
+  const theme = useTheme();
+
   return (
-    <Paper elevation={10}
-      sx={{
-        height: '100%',
-        width: '100%',
-      }}>
-      <div className="profile-basic   w-auto flex item-center justify-between  mt-5 shadow  bg-white rounded-xl">
-        <div className="flex items-center">
-           <Image  src="/profilePic.jpg" 
-            alt='Employee Profile Picture'
-            className='rounded-8xl pb-3 pl-0 pt-5 pr-4 ml-10 mt-4 '
-            width={93} height={93}
-           />
-           <EditIcon className=" cursor-pointer  w-4 h-4 text-gray-500 ml-1 mt-20" />
-         
-            <div className=" emp-name text-2xl font-semibold pl-0 pt-5 ml-5 " style={{color :'var(--blueDark)', fontFamily: 'var(--font-poppins)'}}>Brooklyn Simmons</div>
+    <Box sx={{ p: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          p: 2,
+          borderRadius: 3,
+          backgroundColor: theme.palette.background, // Dynamically switch background color
+        }}
+      >
+        <Box display="flex" alignItems="center">
+          <Avatar
+            src="/profilePic.jpg"
+            alt="Employee Profile Picture"
+            sx={{ width: 93, height: 93, ml: 2, mt: 1 }}
+          />
+          <IconButton sx={{ mt: 5, ml: 1 }} aria-label="edit">
+            <EditIcon
+              sx={{
+                color: theme.palette.text, // Use the correct text color for dark and light mode
+                width: 20,
+                height: 20,
+              }}
+            />
+          </IconButton>
+          <Typography
+            variant="h5"
+            sx={{
+              color: 'black', // Set the color of the employee name to black
+              fontFamily: 'var(--font-poppins)',
+              fontWeight: 600,
+              ml: 3,
+              mt: 2,
+            }}
+          >
+            Brooklyn Simmons
+          </Typography>
+        </Box>
 
-           </div>
-           
-           
+        <Box
+          className="right-container pr-5 pt-5 flex flex-col items-start"
+          sx={{
+            color: theme.palette.text, // Make sure text color adapts to the theme mode
+            fontFamily: 'var(--font-lexend)',
+          }}
+        >
+          <Box className="emp-id text-m font-semibold">
+            <Box
+              display="flex"
+              alignItems="center"
+              sx={{ color: theme.palette.text }}
+            >
+              <FolderIcon
+                sx={{
+                  width: 24,
+                  height: 24,
+                  mr: 1,
+                  color: theme.palette.text, // Use theme-based color for icons
+                }}
+              />
+              <Typography variant="body1" sx={{ fontWeight: 'light' }}>
+                Software Engineer
+              </Typography>
+            </Box>
+          </Box>
+          <Box className="emp-department text-m font-semibold mt-5">
+            <Box
+              display="flex"
+              alignItems="center"
+              sx={{ color: theme.palette.text }}
+            >
+              <EmailIcon
+                sx={{
+                  width: 24,
+                  height: 24,
+                  mr: 1,
+                  color: theme.palette.text, // Ensure icons are using correct colors
+                }}
+              />
+              <Typography variant="body1" sx={{ fontWeight: 'light' }}>
+                brooklyn.s@example.com
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Paper>
 
-            <div className="right-container pr-5 pt-5   flex flex-col items-start" style={{color: 'var(--grayLight2)',fontFamily: 'var(--font-lexend)'}}>
-              <div className="emp-id text-m font-semibold" style={{color: 'var(--grayLight2)'}}>
-                        <span className='font-light' style={{color: 'var(--grayLight2)'}}>
-                          <FolderIcon className="w-6 h-6 mr-2" style={{color: 'var(--grayLight2)'}} /> 
-                          Software Engineer
-                        </span>
-
-              </div>
-              <div className="emp-department  text-m font-semibold mt-5">
-                <span className='font-light' style={{color: 'var(--grayLight2)'}}>
-                  <EmailIcon className="w-6 h-6  mr-2 " /> 
-                  brooklyn.s@example.com
-
-                </span>
-
-              </div>
-            </div>
-          
-    </div>
-
-    <div className="tabs-container shadow bg-white rounded-xl">
-      <TabBar/>
-      
-
-    </div>
-
-
-
-    </Paper>
-  )
-}
+      <Box className="tabs-container shadow bg-white rounded-xl" sx={{ mt: 3 }}>
+        {/* Make sure TabBar responds to the theme */}
+        <TabBar theme={theme} />
+      </Box>
+    </Box>
+  );
+};
 
 export default Employee;
