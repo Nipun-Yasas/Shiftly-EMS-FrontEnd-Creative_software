@@ -91,7 +91,13 @@ const TabBar = () => {
   return (
     <Box sx={{ width: '100%', typography: 'body1', mt: 4 }}>
       <TabContext value={value}>
-        <Paper elevation={3} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Paper elevation={3}
+         sx={{ borderBottom: 1,
+          borderColor: 'divider',
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,}}>
           <TabList onChange={handleChange} aria-label="Profile Tabs" variant="scrollable" scrollButtons="auto">
             {tabs.map((tab) => (
               <Tab key={tab.value} label={tab.label} value={tab.value} />
@@ -99,7 +105,7 @@ const TabBar = () => {
           </TabList>
         </Paper>
 
-        <Paper elevation={10} sx={{ p: 5 }}>
+        <Paper elevation={7} sx={{ p: 3 ,borderRadius:0 }}>
           {tabs.map((tab) => {
             const Component = tab.component;
             const isVisible = value === tab.value;

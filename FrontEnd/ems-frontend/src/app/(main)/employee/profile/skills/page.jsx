@@ -117,7 +117,7 @@ const Skills = () => {
 
       {/* Table */}
       {skills.length > 0 && (
-        <Box sx={{ mt: 6 }}>
+        <Box sx={{ mt: 1 }}>
           <Typography variant="h5" gutterBottom>
             Skills List
           </Typography>
