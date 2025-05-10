@@ -1,9 +1,28 @@
+'use client';
+
 import React, { useState } from 'react';
-import PlusIcon from "@mui/icons-material/Add";
-import { Modal, Box, Snackbar, Alert } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import {
+  Box,
+  Modal,
+  Snackbar,
+  Alert,
+  Typography,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  useTheme
+} from '@mui/material';
 import EducationForm from '../components/EducationForm';
 
 const Education = () => {
+  const theme = useTheme();
+
   const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [formData, setFormData] = useState({
@@ -13,43 +32,47 @@ const Education = () => {
   });
   const [educations, setEducations] = useState([]);
 
-  // Handle modal open/close
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add new education to the list
     setEducations((prev) => [...prev, formData]);
-    console.log('Form submitted:', formData);
     setOpenModal(false);
     setOpenSnackbar(true);
-    // Reset form
     setFormData({ degree: '', institution: '', duration: '' });
   };
 
-  // Handle snackbar close
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') return;
     setOpenSnackbar(false);
   };
 
   return (
-    <div className="relative min-h-screen p-4 sm:p-6">
-      <PlusIcon
-        className="cursor-pointer w-6 h-6 scale-130 border rounded-2xl absolute top-0 right-0 m-4"
-        style={{ color: 'var(--primary)' }}
+    <Box sx={{ position: 'relative', minHeight: '100vh', p: { xs: 2, sm: 4 } }}>
+      <IconButton
+        color="primary"
         onClick={handleOpenModal}
-      />
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          bgcolor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          '&:hover': {
+            bgcolor: theme.palette.action.hover,
+          },
+        }}
+      >
+        <AddIcon />
+      </IconButton>
 
-      {/* Modal for the form */}
+      {/* Modal */}
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -69,9 +92,9 @@ const Education = () => {
             borderRadius: 2,
           }}
         >
-          <h2 id="education-form-modal" className="text-lg font-semibold mb-4">
+          <Typography variant="h6" gutterBottom>
             Add Education
-          </h2>
+          </Typography>
           <EducationForm
             formData={formData}
             handleInputChange={handleInputChange}
@@ -81,7 +104,7 @@ const Education = () => {
         </Box>
       </Modal>
 
-      {/* Success Snackbar */}
+      {/* Snackbar */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -93,35 +116,35 @@ const Education = () => {
         </Alert>
       </Snackbar>
 
-      {/* Education Table */}
+      {/* Table */}
       {educations.length > 0 && (
-        <div className=" w-full max-w-4xl">
-          <h3 className="text-xl font-semibold mb-4" style={{ fontFamily: 'var(--font-poppins)' }}>
+        <Box sx={{ mt: 6 }}>
+          <Typography variant="h5" gutterBottom>
             Education List
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse shadow rounded-lg">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Degree</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Institution</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Duration</th>
-                </tr>
-              </thead>
-              <tbody>
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Degree</strong></TableCell>
+                  <TableCell><strong>Institution</strong></TableCell>
+                  <TableCell><strong>Duration</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {educations.map((edu, index) => (
-                  <tr key={index} className="border-t">
-                    <td className="px-4 py-2 text-sm text-gray-900">{edu.degree}</td>
-                    <td className="px-4 py-2 text-sm text-gray-900">{edu.institution}</td>
-                    <td className="px-4 py-2 text-sm text-gray-900">{edu.duration}</td>
-                  </tr>
+                  <TableRow key={index}>
+                    <TableCell>{edu.degree}</TableCell>
+                    <TableCell>{edu.institution}</TableCell>
+                    <TableCell>{edu.duration}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

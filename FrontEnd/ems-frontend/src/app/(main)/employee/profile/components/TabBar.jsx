@@ -6,7 +6,7 @@ import {
   Tab,
   Paper
 } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { TabContext, TabList } from '@mui/lab';
 
 import BasicInfoForm from '../basic-info/BasicInfoForm';
 import PersonalInfoForm from '../personal-info/PersonalInfoForm';
@@ -88,41 +88,6 @@ const TabBar = () => {
     return true;
   };
 
-  const renderTabPanel = (tab) => {
-    const Component = tab.component;
-
-    if (tab.label === "Experience") {
-      return (
-        <Component
-          formData={experienceFormData}
-          handleInputChange={handleExperienceInputChange}
-          handleSubmit={handleExperienceSubmit}
-          experiences={experiences}
-        />
-      );
-    } else if (tab.label === "Education") {
-      return (
-        <Component
-          formData={educationFormData}
-          handleInputChange={handleEducationInputChange}
-          handleSubmit={handleEducationSubmit}
-          educations={educations}
-        />
-      );
-    } else if (tab.label === "Skills") {
-      return (
-        <Component
-          formData={skillsFormData}
-          handleInputChange={handleSkillsInputChange}
-          handleSubmit={handleSkillsSubmit}
-          skills={skills}
-        />
-      );
-    } else {
-      return <Component />;
-    }
-  };
-
   return (
     <Box sx={{ width: '100%', typography: 'body1', mt: 4 }}>
       <TabContext value={value}>
@@ -134,12 +99,49 @@ const TabBar = () => {
           </TabList>
         </Paper>
 
-        <Paper elevation={10} sx={{  p: 5 }}>
-          {tabs.map((tab) => (
-            <TabPanel key={tab.value} value={tab.value}>
-              {renderTabPanel(tab)}
-            </TabPanel>
-          ))}
+        <Paper elevation={10} sx={{ p: 5 }}>
+          {tabs.map((tab) => {
+            const Component = tab.component;
+            const isVisible = value === tab.value;
+
+            let content;
+            if (tab.label === "Experience") {
+              content = (
+                <Component
+                  formData={experienceFormData}
+                  handleInputChange={handleExperienceInputChange}
+                  handleSubmit={handleExperienceSubmit}
+                  experiences={experiences}
+                />
+              );
+            } else if (tab.label === "Education") {
+              content = (
+                <Component
+                  formData={educationFormData}
+                  handleInputChange={handleEducationInputChange}
+                  handleSubmit={handleEducationSubmit}
+                  educations={educations}
+                />
+              );
+            } else if (tab.label === "Skills") {
+              content = (
+                <Component
+                  formData={skillsFormData}
+                  handleInputChange={handleSkillsInputChange}
+                  handleSubmit={handleSkillsSubmit}
+                  skills={skills}
+                />
+              );
+            } else {
+              content = <Component />;
+            }
+
+            return (
+              <div key={tab.value} style={{ display: isVisible ? 'block' : 'none' }}>
+                {content}
+              </div>
+            );
+          })}
         </Paper>
       </TabContext>
     </Box>
