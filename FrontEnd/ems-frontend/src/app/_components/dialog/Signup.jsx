@@ -4,10 +4,13 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Eye, EyeOff } from 'lucide-react';
 import { X } from 'lucide-react';
+import axiosInstance from '../../_utils/axiosInstance';
+import { API_PATHS } from '../../_utils/apiPaths';
 
-export default function SignupForm({ onClose }){
+export default function SignupForm({ onClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState(null);
 
   const initialValues = {
     username: '',
@@ -27,37 +30,45 @@ export default function SignupForm({ onClose }){
     terms: Yup.bool().oneOf([true], 'You must accept the terms'),
   });
 
-  const handleSubmit = (values) => {
-    console.log(values);
-    // TODO: handle signup logic
-    onClose();
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      });
+      setError(null);
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div
-        style={{
-          color:'black'
-        }}
-        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
-        <div className="bg-white rounded-xl w-full max-w-md p-6 md:p-10 shadow-xl relative">
-
+      style={{ color: 'black' }}
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4"
+    >
+      <div className="bg-white rounded-xl w-full max-w-md p-6 md:p-10 shadow-xl relative">
         <button
-                  onClick={onClose}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
-               >
-                  <X size={24} />
-              </button>
-
-
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+        >
+          <X size={24} />
+        </button>
 
         <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+
+        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {() => (
+          {({ isSubmitting }) => (
             <Form className="space-y-4">
               <div>
                 <Field
@@ -120,14 +131,17 @@ export default function SignupForm({ onClose }){
 
               <button
                 type="submit"
-                className="w-full bg-black text-white py-3 rounded-full font-semibold hover:opacity-90 transition"
+                disabled={isSubmitting}
+                className="w-full bg-black text-white py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50"
               >
-                Sign Up
+                {isSubmitting ? 'Signing up...' : 'Sign Up'}
               </button>
 
               <div className="text-center text-sm pt-4">
                 Already have an account?{' '}
-                <a href="#" className="text-blue-600 underline">Login</a>
+                <a href="#" className="text-blue-600 underline">
+                  Login
+                </a>
               </div>
             </Form>
           )}

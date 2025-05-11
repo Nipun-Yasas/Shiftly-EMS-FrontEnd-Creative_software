@@ -1,27 +1,58 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Avatar,
   Box,
   Divider,
-  IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
-import NotificationMenu from "./NotificationMenu";
-import CalendarMenu from "./CalendarMenu";
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import axiosInstance from '../../_utils/axiosInstance';
+import { API_PATHS } from '../../_utils/apiPaths';
+
 
 const UserMenu = () => {
+
+   const { user, signOut, loading } = useAuth();
+    const router = useRouter();
+    const [employees, setEmployees] = useState([]);
+    const [error, setError] = useState(null);
+
+
+    useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    } else if (user && user.roles?.includes('ROLE_SUPER_ADMIN')) {
+      const fetchEmployees = async () => {
+        try {
+          const response = await axiosInstance.get(API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES);
+          setEmployees(response.data);
+        } catch (err) {
+          setError(err.message || 'Failed to fetch employees');
+        }
+      };
+      fetchEmployees();
+    }
+  }, [user, loading, router]);
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/');
+  };
+
   // State for managing the dropdown menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -37,8 +68,8 @@ const UserMenu = () => {
   };
 
   // Handle logout action
-  const handleLogout = () => {
-    // Add your logout logic here
+  const handlelogout = () => {
+    handleLogout();
     console.log("Logging out...");
     handleCloseMenu();
     // You could redirect to login page or call an API here
@@ -70,7 +101,7 @@ const UserMenu = () => {
             fontFamily="'Poppins-Medium', Helvetica"
             fontWeight={500}
           >
-            Brooklyn Simson
+            {user?.username}
           </Typography>
           <KeyboardArrowDownIcon
             sx={{ 
@@ -126,7 +157,7 @@ const UserMenu = () => {
         
         <Divider sx={{ my: 1 }} />
         
-        <MenuItem onClick={handleLogout} sx={{ color: "#e80a4d" }}>
+        <MenuItem onClick={handlelogout} sx={{ color: "#e80a4d" }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" sx={{ color: "#e80a4d" }} />
           </ListItemIcon>
