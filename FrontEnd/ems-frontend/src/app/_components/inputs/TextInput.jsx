@@ -18,7 +18,7 @@ export default function TextInput({ name, label, ...props }) {
       fullWidth
       sx={{
         "& label": {
-          color: "inputlabel.main",
+          color: "textblack.main",
         },
       }}
     />

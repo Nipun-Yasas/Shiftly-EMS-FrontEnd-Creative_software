@@ -3,7 +3,10 @@
 import { useRef, useState } from "react";
 
 import { Formik, Form } from "formik";
-import { Stack, Box, Button } from "@mui/material";
+
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
@@ -111,7 +114,7 @@ export default function ReferForm(props) {
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
                 >
                   <Button
-                    color="canclebtn"
+                    color="textblack"
                     type="reset"
                     onClick={() => {
                       resetForm();

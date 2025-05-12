@@ -1,33 +1,51 @@
-'use client';
-import { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { Eye, EyeOff } from 'lucide-react';
-import { X } from 'lucide-react';
-import axiosInstance from '../../_utils/axiosInstance';
-import { API_PATHS } from '../../_utils/apiPaths';
+"use client";
 
-export default function SignupForm({ onClose }) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+import { useState } from "react";
+
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import { X } from "lucide-react";
+import Link from "next/link";
+
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+
+import TextInput from "../inputs/TextInput";
+import PasswordInput from "../inputs/PasswordInput";
+import CustomCheckBox from "../inputs/CustomCheckBox";
+import FormItem from "../landing/FormItem";
+
+import axiosInstance from "../../_utils/axiosInstance";
+import { API_PATHS } from "../../_utils/apiPaths";
+
+export default function SignupForm(props) {
+  const { openSignUp, setOpenSignUp,openLogin } = props;
+  
   const [error, setError] = useState(null);
 
   const initialValues = {
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     terms: false,
   };
 
   const validationSchema = Yup.object({
-    username: Yup.string().required('Username is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().min(6, 'Min 6 characters').required('Password is required'),
+    username: Yup.string().required("Username is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string()
+      .min(6, "Min 6 characters")
+      .required("Password is required"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password')], 'Passwords must match')
-      .required('Confirm your password'),
-    terms: Yup.bool().oneOf([true], 'You must accept the terms'),
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Confirm your password"),
+    terms: Yup.bool().oneOf([true], "You must accept the terms"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -38,115 +56,177 @@ export default function SignupForm({ onClose }) {
         password: values.password,
       });
       setError(null);
-      onClose();
+      setOpenSignUp(false);
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      const message = err.response?.data?.message || err.message || "Registration failed";
+      setError(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div
-      style={{ color: 'black' }}
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4"
-    >
-      <div className="bg-white rounded-xl w-full max-w-md p-6 md:p-10 shadow-xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black transition"
+    <>
+      <Dialog
+        open={openSignUp}
+        onClose={() => setOpenSignUp(false)}
+        fullWidth
+        maxWidth="sm"
+        slotProps={{
+          paper: {
+            sx: {
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              minHeight: "300px",
+              borderRadius: 2,
+            },
+          },
+          backdrop: {
+            sx: {
+              backgroundColor: "rgba(107, 114, 128, 0.75)",
+            },
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 2,
+            p: { xs: 2, sm: 3 },
+            textAlign: "center",
+            maxWidth: "100%",
+          }}
         >
-          <X size={24} />
-        </button>
+          <IconButton
+            onClick={() => setOpenSignUp(false)}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              color: "grey.500",
+              "&:hover": { color: "grey.900" },
+            }}
+          >
+            <X size={24} />
+          </IconButton>
 
-        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+          <Typography variant="h6" id="signup-dialog-title">Sign Up</Typography>
 
-        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+        {error && (
+          <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
+            {error}
+          </Typography>
+        )}
 
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form className="space-y-4">
-              <div>
-                <Field
-                  name="username"
-                  placeholder="Username"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <ErrorMessage name="username" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting }) => (
+              <Form>
+                <Stack spacing={{ xs: 1, sm: 2 }} alignItems="center">
+                  <FormItem>
+                    <TextInput name="username" label="Username" />
+                  </FormItem>
+                  <FormItem>
+                    <TextInput name="email" label="Email" />
+                  </FormItem>
 
-              <div>
-                <Field
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
+                  <FormItem>
+                    <PasswordInput
+                      name="password"
+                      label="Password"
+                      type="password"
+                    />
+                  </FormItem>
+                  <FormItem>
+                    <PasswordInput
+                      name="confirmPassword"
+                      label="Confirm Password"
+                      type="password"
+                    />
+                  </FormItem>
 
-              <div className="relative">
-                <Field
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-                <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      flexDirection: { xs: "column", sm: "row" },
+                      gap: 1,
+                    }}
+                  >
+                    <CustomCheckBox
+                      name="terms"
+                      label="I accept the terms and conditions"
+                    />
 
-              <div className="relative">
-                <Field
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Confirm Password"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
-                >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-                <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
+                    <Link href="/change-password">
+                      <Typography
+                        color="primary.main"
+                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                      >
+                        Forgot Password?
+                      </Typography>
+                    </Link>
+                  </Box>
 
-              <div className="text-sm flex items-center gap-2">
-                <Field type="checkbox" name="terms" />
-                <label htmlFor="terms">I accept the terms and conditions</label>
-              </div>
-              <ErrorMessage name="terms" component="div" className="text-red-500 text-sm mt-1" />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    variant="contained"
+                    sx={{
+                      my: 2,
+                      py: 1,
+                      width: { xs: "100%", sm: "auto" },
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    }}
+                  >
+                    {isSubmitting ? "Signing up..." : "Sign Up"}
+                  </Button>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-black text-white py-3 rounded-full font-semibold hover:opacity-90 transition disabled:opacity-50"
-              >
-                {isSubmitting ? 'Signing up...' : 'Sign Up'}
-              </button>
-
-              <div className="text-center text-sm pt-4">
-                Already have an account?{' '}
-                <a href="#" className="text-blue-600 underline">
-                  Login
-                </a>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography
+                      color="textblack.main"
+                      sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                    >
+                      Already have an account?{" "}
+                    </Typography>
+                    <Button
+                    variant="text"
+                    color="info.main"
+                      onClick={() => {setOpenSignUp(false);
+                        openLogin();
+                      }}
+                      className="hover:cursor-pointer"
+                    >
+                      <Typography
+                        color="info.main"
+                        sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
+                      >
+                        Sign Up
+                      </Typography>
+                    </Button>
+                  </Box>
+                </Stack>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles';
 import { Card } from '@mui/material';
 
-const LandingStyledCard = styled(Card)(({ theme }) => ({
+const LandingCard = styled(Card)(({ theme }) => ({
   background: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.05)',
   backdropFilter: 'blur(16px)',
   border: `2px solid ${theme.palette.primary.main}`,
@@ -20,4 +20,4 @@ const LandingStyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-export default LandingStyledCard;
+export default LandingCard;

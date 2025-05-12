@@ -46,11 +46,7 @@ const theme = createTheme({
           dark: "#1b5e20",
           contrastText: "#fff"
         },
-        canclebtn: {
-          main: '#000000',
-          contrastText: '#ffffff',
-        },
-        inputlabel:{
+        textblack:{
           main: '#000000',
           contrastText: '#ffffff',
         }
@@ -94,11 +90,11 @@ const theme = createTheme({
           dark: "#388e3c",
           contrastText: "rgba(0, 0, 0, 0.87)"
         },
-        canclebtn: {
+        textblack: {
           main: '#ffffff',
           contrastText: '#000000',
         },
-        inputlabel:{
+        textblack:{
           main: '#ffffff',
           contrastText: '#000000',
         }

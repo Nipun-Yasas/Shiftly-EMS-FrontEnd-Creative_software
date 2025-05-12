@@ -80,7 +80,7 @@ export default function FormikFileUpload({
           <Box textAlign="center" mt={2}>
             <label htmlFor={name}>
               <Button
-                color="canclebtn"
+                color="textblack"
                 variant="outlined"
                 component="span"
                 startIcon={

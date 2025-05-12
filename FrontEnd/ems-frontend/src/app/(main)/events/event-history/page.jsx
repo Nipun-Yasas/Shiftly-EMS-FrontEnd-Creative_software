@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
-import { Paper } from "@mui/material";
+import Paper from "@mui/material/Paper";
 
 const columns = [
   { field: "id", headerName: "Event ID", width: 100 },

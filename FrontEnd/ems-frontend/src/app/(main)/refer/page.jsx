@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-import { Paper, Box, Typography } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 import ReferForm from "./_components/ReferForm";
 import SubmitDialog from "../../_components/dialog/SubmitDialog";

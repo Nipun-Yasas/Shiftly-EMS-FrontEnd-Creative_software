@@ -33,7 +33,7 @@ const DateInput = ({ name, label }) => {
             variant: "outlined",
             sx: {
               "& label": {
-                color: "inputlabel.main",
+                color: "textblack.main",
               },
             },
           },

@@ -1,7 +1,7 @@
 "use client";
 
 import { DataGrid } from "@mui/x-data-grid";
-import { Paper } from "@mui/material";
+import Paper from "@mui/material/Paper";
 
 import { PlusIcon } from "@heroicons/react/20/solid";
 

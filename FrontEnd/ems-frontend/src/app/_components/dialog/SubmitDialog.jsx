@@ -54,7 +54,7 @@ export default function SubmitDialog(props) {
             justifyContent: "flex-end",
           }}
         >
-          <Button onClick={() => setOpenSubmit(false)} color="canclebtn">
+          <Button onClick={() => setOpenSubmit(false)} color="textblack">
             Close
           </Button>
         </DialogActions>

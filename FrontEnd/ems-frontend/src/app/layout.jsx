@@ -1,13 +1,17 @@
+import React from 'react';
+
 import { Poppins, Roboto, Lexend, Inter } from 'next/font/google';
+import theme from '../theme';
 import './globals.css';
-import * as React from 'react';
+
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+
 import LinearProgress from '@mui/material/LinearProgress';
-import theme from '../theme';
+
 import NAVIGATION from './_utils/navigation';
+
 import { AuthProvider } from './context/AuthContext';
-import { signIn, signOut } from './context/AuthActions';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -46,10 +50,6 @@ export default function RootLayout({ children }) {
               <NextAppProvider
                 theme={theme}
                 navigation={NAVIGATION}
-                authentication={{
-                  signIn,
-                  signOut,
-                }}
               >
                 {children}
               </NextAppProvider>
