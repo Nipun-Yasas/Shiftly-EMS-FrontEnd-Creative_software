@@ -1,9 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Select,
+  MenuItem,
+  IconButton,
+  Typography,
+  Box,
+} from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Paper } from "@mui/material";
 
 const requests = [
   {
@@ -19,31 +32,31 @@ const requests = [
     type: "Employment Confirmation Letter",
   },
   {
-    id: 567,
-    name: "Brooklyn Simmons",
-    date: "08 OCT 2024",
-    type: "Employment Confirmation Letter",
-  },
-  {
-    id: 567,
-    name: "Brooklyn Simmons",
-    date: "08 OCT 2024",
-    type: "Employment Confirmation Letter",
-  },
-  {
-    id: 567,
-    name: "Brooklyn Simmons",
-    date: "08 OCT 2024",
-    type: "Employment Confirmation Letter",
-  },
-  {
-    id: 567,
-    name: "Brooklyn Simmons",
-    date: "08 OCT 2024",
-    type: "Employment Confirmation Letter",
-  },
-  {
     id: 890,
+    name: "Brooklyn Simmons",
+    date: "01 SEP 2024",
+    type: "Salary Confirmation Letter",
+  },
+  {
+    id: 891,
+    name: "Brooklyn Simmons",
+    date: "01 SEP 2024",
+    type: "Salary Confirmation Letter",
+  },
+  {
+    id: 892,
+    name: "Brooklyn Simmons",
+    date: "01 SEP 2024",
+    type: "Salary Confirmation Letter",
+  },
+  {
+    id: 893,
+    name: "Brooklyn Simmons",
+    date: "01 SEP 2024",
+    type: "Salary Confirmation Letter",
+  },
+  {
+    id: 894,
     name: "Brooklyn Simmons",
     date: "01 SEP 2024",
     type: "Salary Confirmation Letter",
@@ -70,93 +83,97 @@ const RequestHistory = () => {
     currentPage * rowsPerPage,
     (currentPage + 1) * rowsPerPage
   );
+
   return (
-    <>
-      <Paper
-        elevation={10}
-        sx={{
-          height: "100%",
-          width: "100%",
-        }}
+    <Paper elevation={2} 
+          sx={{ width: "100%",
+          overflow: "hidden" ,
+          borderRadius: '10px'
+          }}>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>REQUEST ID</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>REQUEST BY</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>REQUEST ON</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>LETTER TYPE</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentData.map((item, index) => (
+              <TableRow key={index}
+                  sx={{
+                      height: 64, // Adjust height here for more vertical spacing
+                      "& td": {
+                      borderBottom: "none",
+                        },
+                  }}
+              
+              >
+                <TableCell>{item.id}</TableCell>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.date}</TableCell>
+                <TableCell>{item.type}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        px={8}
+        py={1.5}
       >
-        <table className="w-full table-auto text-sm">
-          <thead
-            className=" text-left"
-            style={{
-              color: "#000000",
+        {/* Rows Per Page */}
+        <Box display="flex" alignItems="center">
+          <Typography variant="body2" mr={1}>
+            Rows per page:
+          </Typography>
+          <Select
+            size="small"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(0);
             }}
           >
-            <tr>
-              <th className="px-4 py-3 font-semibold">REQUEST ID</th>
-              <th className="px-4 py-3 font-semibold">REQUEST BY</th>
-              <th className="px-4 py-3 font-semibold">REQUEST ON</th>
-              <th className="px-4 py-3 font-semibold">LETTER TYPE</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentData.map((item, index) => (
-              <tr
-                key={index}
-                className="gap-10 border-gray-200 border-b"
-                style={{
-                  color: "var(--grayDark)",
-                }}
-              >
-                <td className="px-4 py-3">{item.id}</td>
-                <td className="px-4 py-3">{item.name}</td>
-                <td className="px-4 py-3">{item.date}</td>
-                <td className="px-4 py-3">{item.type}</td>
-              </tr>
+            {rowsPerPageOptions.map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
             ))}
-          </tbody>
-        </table>
+          </Select>
+        </Box>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-600">
-          <div className="pb-5">
-            Rows per page:
-            <select
-              className="ml-2 border rounded px-2 py-1"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(0);
-              }}
-            >
-              {rowsPerPageOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>
-              {currentPage * rowsPerPage + 1} -{" "}
-              {Math.min((currentPage + 1) * rowsPerPage, requests.length)} of{" "}
-              {requests.length}
-            </span>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => handleChangePage("prev")}
-                disabled={currentPage === 0}
-                className="p-1 rounded text-gray-700 bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeftIcon fontSize="small" />
-              </button>
-
-              <button
-                onClick={() => handleChangePage("next")}
-                disabled={currentPage >= totalPages - 1}
-                className="p-1 rounded text-gray-700 bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRightIcon fontSize="small" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </Paper>
-    </>
+        {/* Pagination Controls */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2">
+            {currentPage * rowsPerPage + 1} -{" "}
+            {Math.min((currentPage + 1) * rowsPerPage, requests.length)} of{" "}
+            {requests.length}
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={() => handleChangePage("prev")}
+            disabled={currentPage === 0}
+          >
+            <ChevronLeftIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => handleChangePage("next")}
+            disabled={currentPage >= totalPages - 1}
+          >
+            <ChevronRightIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </Box>
+    </Paper>
   );
 };
 
