@@ -1,28 +1,54 @@
 'use client';
 
 import React from 'react'
+import { TextField , Button , Box }  from  '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 
 const SearchField = ({value, onChange,onSearch}) => {
+
+  const theme = useTheme();
   return (
-    <div className='flex items-center gap-2 w-full max-w-md'>
-        <input
-         type='text'
-         placeholder="Search letter type.."
-         value={value}
-         onChange={(e) => onChange(e.target.value)}
-         className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2-pink-500 text-black bg-white'
-        />
-        <button
-            onClick={onSearch}
-            className='px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition'
-        >
-            Search
-        </button>
+    <Box
+      sx={{
+        display: 'flex',
         
+        gap: 2,
+        width: '100%',
+        maxWidth: 'md',
+        justifyContent: 'flex-end',
+      }}
+    >
+      <TextField
+        variant="outlined"
+        placeholder="Search letter type..."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         
-      
-    </div>
+        size="small"
+        sx={{
+          borderRadius: '10px',
+          input: {
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          },
+        }}
+      />
+      <Button
+        onClick={onSearch}
+        variant="contained"
+        sx={{
+          backgroundColor: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+          color: theme.palette.mode === 'dark' ? '#000000' : '#ffffff',
+          '&:hover': {
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#dddddd' : '#333333',
+          },
+        }}
+      >
+        Search
+      </Button>
+    </Box>
   )
 }
 
