@@ -98,10 +98,12 @@ const RequestLetter = () => {
 
       {selectedLetter && (
         <LetterRequestModal
-          letterType={selectedLetter}
-          onClose={() => setSelectedLetter(null)}
-        />
-      )}
+        letterType={selectedLetter}
+        open={Boolean(selectedLetter)}
+        onClose={() => setSelectedLetter(null)}
+      />
+)}
+
     </>
   );
 };
