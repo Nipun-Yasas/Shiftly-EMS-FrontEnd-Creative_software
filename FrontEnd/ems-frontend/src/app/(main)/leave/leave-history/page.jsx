@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-
 import { DataGrid } from "@mui/x-data-grid";
-import { TextField, MenuItem, IconButton,Paper } from "@mui/material";
+import { TextField, MenuItem, IconButton, Paper, Box } from "@mui/material";
 import { FilterList, Settings } from "@mui/icons-material";
-
 
 const columns = [
   { field: "id", headerName: "Leave Id", flex: 1 },
@@ -14,9 +12,7 @@ const columns = [
     headerName: "Leave Type",
     flex: 2,
     renderCell: (params) => (
-      <span className="text-blue-600 underline cursor-pointer">
-        {params.value}
-      </span>
+      <span>{params.value}</span>
     ),
   },
   { field: "requestedOn", headerName: "Requested On", flex: 2 },
@@ -32,11 +28,15 @@ const columns = [
     minWidth: 150,
     renderCell: (params) => (
       <span
-        className={`px-3 py-1 rounded-full text-sm font-medium ${
-          params.value === "Approved"
-            ? "text-green-600 border border-green-400 bg-green-100"
-            : "text-orange-600 border border-orange-400 bg-orange-100"
-        }`}
+        style={{
+          padding: "0.5rem 1rem",
+          borderRadius: "9999px",
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          textAlign: "center",
+          backgroundColor: params.value === "Approved" ? "#dcedc8" : "#fff3e0", 
+          color: params.value === "Approved" ? "#388e3c" : "#f57c00",
+        }}
       >
         {params.value}
       </span>
@@ -47,7 +47,7 @@ const columns = [
     headerName: "Cancel",
     flex: 1,
     renderCell: () => (
-      <span className="text-red-600 cursor-pointer">Cancel</span>
+      <span style={{ color: "#f44336", cursor: "pointer" }}>Cancel</span> 
     ),
   },
 ];
@@ -133,15 +133,10 @@ export default function LeaveHistory() {
   }, [searchText, attribute]);
 
   return (
-    <Paper elevation={10}
-      sx={{
-        height: '100%',
-        width: '100%',
-      }}>
-      <div className="bg-white rounded-2xl p-6">
-       
-        <div className="flex flex-wrap justify-between items-center mb-4 gap-y-4">
-          <div className="flex flex-wrap gap-4 items-center">
+    <Paper elevation={10} sx={{ height: "100%", width: "100%" }}>
+      <Box sx={{  borderRadius: 2, p: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", mb: 2 }}>
+          <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
               label="Search"
               placeholder="Leave Id, Leave Type etc..."
@@ -149,7 +144,7 @@ export default function LeaveHistory() {
               variant="outlined"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              className="w-64 bg-white"
+              sx={{ width: 200 }}
             />
             <TextField
               select
@@ -157,7 +152,7 @@ export default function LeaveHistory() {
               size="small"
               value={attribute}
               onChange={(e) => setAttribute(e.target.value)}
-              className="w-48 bg-white"
+              sx={{ width: 150 }}
             >
               {Object.keys(attributeMap).map((attr) => (
                 <MenuItem key={attr} value={attr}>
@@ -168,31 +163,22 @@ export default function LeaveHistory() {
             <IconButton>
               <FilterList />
             </IconButton>
-          </div>
+          </Box>
           <IconButton>
             <Settings />
           </IconButton>
-        </div>
+        </Box>
 
-       
-        <div style={{ height: 430, width: "100%" }}>
+        <Box sx={{ height: 430, width: "100%" }}>
           <DataGrid
             rows={filteredRows}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
             disableSelectionOnClick
-            sx={{
-              "& .MuiDataGrid-cell": {
-                fontSize: "0.875rem",
-                overflow: "visible",
-                textOverflow: "initial",
-                whiteSpace: "normal",
-              },
-            }}
           />
-        </div>
-      </div>
+        </Box>
+      </Box>
     </Paper>
   );
 }
