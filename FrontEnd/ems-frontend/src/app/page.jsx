@@ -37,15 +37,15 @@ import {
 export default function LandingPage() {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
-  const { user, loading } = useAuth();
+  // const { user, loading } = useAuth();
   const router = useRouter();
   const { width, height } = useWindowSize();
 
-  useEffect(() => {
-    if (!loading && user) {
-      router.push("/dashboard");
-    }
-  }, [user, loading, router]);
+  // useEffect(() => {
+  //   if (!loading && user) {
+  //     router.push("/dashboard");
+  //   }
+  // }, [user, loading, router]);
 
   const cols = Math.ceil(width / PHOTO_WIDTH);
   const rows = Math.ceil(height / PHOTO_HEIGHT);

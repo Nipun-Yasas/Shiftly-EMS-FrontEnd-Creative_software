@@ -46,14 +46,14 @@ export default function RootLayout({ children }) {
       >
         <AppRouterCacheProvider>
           <React.Suspense fallback={<LinearProgress />}>
-            <AuthProvider>
+            {/* <AuthProvider> */}
               <NextAppProvider
                 theme={theme}
                 navigation={NAVIGATION}
               >
                 {children}
               </NextAppProvider>
-            </AuthProvider>
+            {/* </AuthProvider> */}
           </React.Suspense>
         </AppRouterCacheProvider>
       </body>

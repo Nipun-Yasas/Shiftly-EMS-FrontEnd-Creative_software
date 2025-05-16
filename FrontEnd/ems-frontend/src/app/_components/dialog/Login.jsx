@@ -29,7 +29,7 @@ export default function LoginForm(props) {
   const { openLogin, setOpenLogin, openSignUp } = props;
 
   const [error, setError] = useState(null);
-  const { signIn } = useAuth();
+  // const { signIn } = useAuth();
   const router = useRouter();
 
   const initialValues = {

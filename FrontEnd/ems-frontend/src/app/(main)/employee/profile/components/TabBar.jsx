@@ -6,7 +6,8 @@ import {
   Tab,
   Paper
 } from '@mui/material';
-import { TabContext, TabList } from '@mui/lab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
 
 import BasicInfoForm from '../basic-info/BasicInfoForm';
 import PersonalInfoForm from '../personal-info/PersonalInfoForm';

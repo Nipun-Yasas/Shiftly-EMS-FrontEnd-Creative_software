@@ -26,27 +26,27 @@ import { API_PATHS } from '../../_utils/apiPaths';
 
 const UserMenu = () => {
 
-   const { user, signOut, loading } = useAuth();
+  //  const { user, signOut, loading } = useAuth();
     const router = useRouter();
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
 
 
-    useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-    } else if (user && user.roles?.includes('ROLE_SUPER_ADMIN')) {
-      const fetchEmployees = async () => {
-        try {
-          const response = await axiosInstance.get(API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES);
-          setEmployees(response.data);
-        } catch (err) {
-          setError(err.message || 'Failed to fetch employees');
-        }
-      };
-      fetchEmployees();
-    }
-  }, [user, loading, router]);
+  //   useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.push('/');
+  //   } else if (user && user.roles?.includes('ROLE_SUPER_ADMIN')) {
+  //     const fetchEmployees = async () => {
+  //       try {
+  //         const response = await axiosInstance.get(API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES);
+  //         setEmployees(response.data);
+  //       } catch (err) {
+  //         setError(err.message || 'Failed to fetch employees');
+  //       }
+  //     };
+  //     fetchEmployees();
+  //   }
+  // }, [user, loading, router]);
 
   const handleLogout = async () => {
     await signOut();
@@ -101,7 +101,7 @@ const UserMenu = () => {
             fontFamily="'Poppins-Medium', Helvetica"
             fontWeight={500}
           >
-            {user?.username}
+            {/* {user?.username} */} user
           </Typography>
           <KeyboardArrowDownIcon
             sx={{ 
