@@ -1,48 +1,106 @@
-import React from 'react'
-import Image from 'next/image'
-import url from '../../../../../../public/creative_software_logo.png'
-import EditIcon from "@mui/icons-material/Edit";
+import React from 'react';
+import Image from 'next/image';
+import url from '../../../../../../public/creative_software_logo.png';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, Typography, IconButton, Paper } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 const Projects = () => {
+  const theme = useTheme();
+
   return (
-    <div className="mt-5 max-w-auto mx-auto bg-white shadow-lg rounded-2xl p-6 border border-black-200">
-        <div className="flex items-center gap-4">
-            <Image
-                src={url}
-                alt="Creative Software Logo"
-                width={250}
-                height={68.99}
-                className="rounded"
-            />
-            <div>
-                <h2 className="text-xl font-bold" style={{ color: '#000000' }} >Software Engineer</h2>
-                <span>
-                    <div className=" pl-100 pt-0 cursor-pointer text-gray-500 hover:text-gray-700">
-                        <EditIcon size={40} />
-                    </div>
-                </span>
-                <p className="text-gray-600">Creative Technology Solutions (Pvt) Ltd</p>
-                <p className="text-sm text-gray-500">November 2021 - Present</p>
-                
-
-            </div>
-      </div>
-
-      
-      <div className="ml-67 mt-4">
-            
-            <h3 className="text-lg font-roboto font-bold " style={{ color: '#000000' }} >DIPS</h3>
+    <Box
+    sx={{
+      mt: 5,
+      maxWidth: '100%',
+      mx: 'auto',
+      backgroundColor: theme.palette.background, // Use background.default for better theme control
+      boxShadow: 3,
+      borderRadius: 5,
+      p: 3,
+      border: `1px solid ${theme.palette.divider}`,
+    }}
+    
+    >
+      <Box display="flex" alignItems="center" gap={4}>
+        <Image
+          src={url}
+          alt="Creative Software Logo"
+          width={250}
+          height={68.99}
+          className="rounded"
+        />
+        <Box>
+          <Typography
+            variant="h6"
+            sx={{
+              color: theme.palette.text, // Ensure the text color works with dark and light modes
+              fontWeight: 700,
+            }}
+          >
+            Software Engineer
+          </Typography>
+          <Box  >
            
-            <p className="text-gray-700 text-m leading-relaxed">
-            DIPS AS is Norway&apos;s leading provider of E-healthcare solutions for hospitals. The success of an initial
-            collaboration to develop the first mobile applications led to DIPS establishing additional teams to work on
-            other areas of their product.
-            </p>
-            
-      </div>
-      
-    </div>
-  )
-}
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.text, 
+              }}
+            >
+              Creative Technology Solutions (Pvt) Ltd
+            </Typography>
+          </Box>
+          <Typography
+            variant="body2"
+            sx={{
+              color: theme.palette.text,
+              fontSize: '0.875rem',
+            }}
+          >
+            November 2021 - Present
+          </Typography>
+        </Box>
+      </Box>
+      <Box>
+          <IconButton  
+              sx={{
+                
+                ml:100,
+                color: theme.palette.text
+              }}>
+              <EditIcon />
+            </IconButton>
+
+      </Box>
+
+      <Box sx={{ ml: 8}}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: theme.palette.text,
+            fontWeight: 700,
+            fontFamily: 'Roboto, sans-serif',
+          }}
+        >
+          DIPS
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: theme.palette.text,
+            fontSize: '0.875rem',
+            lineHeight: '1.5',
+            mt: 1,
+          }}
+        >
+          DIPS AS is Norway&apos;s leading provider of E-healthcare solutions for hospitals. The success of an initial
+          collaboration to develop the first mobile applications led to DIPS establishing additional teams to work on
+          other areas of their product.
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 export default Projects;

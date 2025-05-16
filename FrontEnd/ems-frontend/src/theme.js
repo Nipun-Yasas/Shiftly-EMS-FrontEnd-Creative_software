@@ -185,6 +185,11 @@ const theme = createTheme({
       fontWeight: 700,
       fontFamily: 'Poppins, sans-serif',
     },
+     h7: {
+      fontSize: '1rem',
+      fontWeight: 600,
+      fontFamily: 'Poppins, sans-serif',
+    },
   },
 });
 

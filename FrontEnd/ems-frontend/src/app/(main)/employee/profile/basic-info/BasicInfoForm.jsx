@@ -1,28 +1,46 @@
+import React from 'react';
+import { Grid, TextField, Box } from '@mui/material';
 
-import Readonlyfield from "../components/Readonlyfield";
+const Readonlyfield = ({ label, value }) => (
+  <TextField
+    label={label}
+    value={value}
+    fullWidth
+    InputProps={{
+      readOnly: true,
+    }}
+    variant="outlined"
+  />
+);
 
 const BasicInfoForm = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-      {/* Left */}
-      <div className="space-y-4">
-        <Readonlyfield label="Full Name" value="Brooklyn Simmons" />
-        <Readonlyfield label="Entity" value="CTS" />
-        <Readonlyfield label="Employee Number" value="12344" />
-        <Readonlyfield label="Designation" value="Software Engineer" />
-        <Readonlyfield label="Birthday" value="01 Nov 1990" />
-      </div>
+    <Box sx={{ flexGrow: 1, padding: 2 }}>
+      <Grid container spacing={10}>
+        {/* Left Column */}
+        <Grid item xs={12} md={6}>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <Readonlyfield label="Full Name" value="Brooklyn Simmons" />
+            <Readonlyfield label="Entity" value="CTS" />
+            <Readonlyfield label="Employee Number" value="12344" />
+            <Readonlyfield label="Designation" value="Software Engineer" />
+            <Readonlyfield label="Birthday" value="01 Nov 1990" />
+          </Box>
+        </Grid>
 
-      {/* Right */}
-      <div className="space-y-4">
-        <Readonlyfield label="Gender" value="Male" />
-        <Readonlyfield label="EPF Number" value="1244" />
-        <Readonlyfield label="Email" value="brooklyn.s@example.com" />
-        <Readonlyfield label="Location" value="Sri-Lanka" />
-        <Readonlyfield label="Reporting Person" value="John Smith" />
-      </div>
-    </div>
+        {/* Right Column */}
+        <Grid item xs={12} md={6}>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <Readonlyfield label="Gender" value="Male" />
+            <Readonlyfield label="EPF Number" value="1244" />
+            <Readonlyfield label="Email" value="brooklyn.s@example.com" />
+            <Readonlyfield label="Location" value="Sri-Lanka" />
+            <Readonlyfield label="Reporting Person" value="John Smith" />
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
-}
+};
 
 export default BasicInfoForm;

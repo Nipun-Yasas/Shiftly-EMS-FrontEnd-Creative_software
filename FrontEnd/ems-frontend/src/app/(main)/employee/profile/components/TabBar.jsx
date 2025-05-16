@@ -1,6 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from 'react';
+import {
+  Box,
+  Tab,
+  Paper
+} from '@mui/material';
+import { TabContext, TabList } from '@mui/lab';
+
 import BasicInfoForm from '../basic-info/BasicInfoForm';
 import PersonalInfoForm from '../personal-info/PersonalInfoForm';
 import ProjectContent from '../project/page';
@@ -8,20 +15,19 @@ import Experience from '../experience/page';
 import Education from '../education/page';
 import Skills from '../skills/page';
 
-// Tab configuration for easier maintenance
 const tabs = [
-  { name: "Basic Info", component: BasicInfoForm },
-  { name: "Personal Info", component: PersonalInfoForm },
-  { name: "Projects", component: ProjectContent },
-  { name: "Experience", component: Experience },
-  { name: "Education", component: Education },
-  { name: "Skills", component: Skills },
+  { label: "Basic Info", value: "1", component: BasicInfoForm },
+  { label: "Personal Info", value: "2", component: PersonalInfoForm },
+  { label: "Projects", value: "3", component: ProjectContent },
+  { label: "Experience", value: "4", component: Experience },
+  { label: "Education", value: "5", component: Education },
+  { label: "Skills", value: "6", component: Skills },
 ];
 
 const TabBar = () => {
-  const [activeTab, setActiveTab] = useState("Basic Info");
+  const [value, setValue] = useState("1");
 
-  // State for Experience
+  // Form states
   const [experienceFormData, setExperienceFormData] = useState({
     jobTitle: '',
     company: '',
@@ -29,7 +35,6 @@ const TabBar = () => {
   });
   const [experiences, setExperiences] = useState([]);
 
-  // State for Education
   const [educationFormData, setEducationFormData] = useState({
     degree: '',
     institution: '',
@@ -37,19 +42,16 @@ const TabBar = () => {
   });
   const [educations, setEducations] = useState([]);
 
-  // State for Skills
   const [skillsFormData, setSkillsFormData] = useState({
     skillName: '',
     proficiency: '',
   });
   const [skills, setSkills] = useState([]);
 
-  // Memoize the tab change handler
-  const handleTabChange = useCallback((tabName) => {
-    setActiveTab(tabName);
-  }, []);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
-  // Handlers for Experience
   const handleExperienceInputChange = (e) => {
     const { name, value } = e.target;
     setExperienceFormData((prev) => ({ ...prev, [name]: value }));
@@ -58,12 +60,10 @@ const TabBar = () => {
   const handleExperienceSubmit = (e) => {
     e.preventDefault();
     setExperiences((prev) => [...prev, experienceFormData]);
-    console.log('Experience submitted:', experienceFormData);
     setExperienceFormData({ jobTitle: '', company: '', duration: '' });
-    return true; // Signal success for snackbar
+    return true;
   };
 
-  // Handlers for Education
   const handleEducationInputChange = (e) => {
     const { name, value } = e.target;
     setEducationFormData((prev) => ({ ...prev, [name]: value }));
@@ -72,12 +72,10 @@ const TabBar = () => {
   const handleEducationSubmit = (e) => {
     e.preventDefault();
     setEducations((prev) => [...prev, educationFormData]);
-    console.log('Education submitted:', educationFormData);
     setEducationFormData({ degree: '', institution: '', duration: '' });
-    return true; // Signal success for snackbar
+    return true;
   };
 
-  // Handlers for Skills
   const handleSkillsInputChange = (e) => {
     const { name, value } = e.target;
     setSkillsFormData((prev) => ({ ...prev, [name]: value }));
@@ -86,73 +84,74 @@ const TabBar = () => {
   const handleSkillsSubmit = (e) => {
     e.preventDefault();
     setSkills((prev) => [...prev, skillsFormData]);
-    console.log('Skill submitted:', skillsFormData);
     setSkillsFormData({ skillName: '', proficiency: '' });
-    return true; // Signal success for snackbar
+    return true;
   };
 
   return (
-    <div className="container mx-auto p-6 mt-10 ml-10 h-auto">
-      {/* Tab Navigation */}
-      <nav className="flex space-x-4 mb-5" role="tablist">
-        {tabs.map((tab) => (
-          <button
-            key={tab.name}
-            onClick={() => handleTabChange(tab.name)}
-            className={`py-2 px-4 text-sm font-medium uppercase transition duration-300 ease-in-out  ${
-              activeTab === tab.name
-                ? "border-b-2 border-[#E90A4D] text-[#E90A4D]"
-                : "border-transparent text-gray-500 hover:text-[#E90A4D]"
-            }`}
-            role="tab"
-            aria-selected={activeTab === tab.name}
-            aria-controls={`panel-${tab.name}`}
-            id={`tab-${tab.name}`}
-          >
-            {tab.name}
-          </button>
-        ))}
-      </nav>
+    <Box sx={{ width: '100%', typography: 'body1', mt: 4 }}>
+      <TabContext value={value}>
+        <Paper elevation={3}
+         sx={{ borderBottom: 1,
+          borderColor: 'divider',
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,}}>
+          <TabList onChange={handleChange} aria-label="Profile Tabs" variant="scrollable" scrollButtons="auto">
+            {tabs.map((tab) => (
+              <Tab key={tab.value} label={tab.label} value={tab.value} />
+            ))}
+          </TabList>
+        </Paper>
 
-      {/* Tab Contents */}
-      <div className="tab-content transition-opacity duration-300 ease-in-out">
-        {tabs.map((tab) => (
-          <div
-            key={tab.name}
-            id={`panel-${tab.name}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${tab.name}`}
-            className={`p-4 ${activeTab === tab.name ? "block" : "hidden"}`}
-          >
-            {tab.name === "Experience" ? (
-              <tab.component
-                formData={experienceFormData}
-                handleInputChange={handleExperienceInputChange}
-                handleSubmit={handleExperienceSubmit}
-                experiences={experiences}
-              />
-            ) : tab.name === "Education" ? (
-              <tab.component
-                formData={educationFormData}
-                handleInputChange={handleEducationInputChange}
-                handleSubmit={handleEducationSubmit}
-                educations={educations}
-              />
-            ) : tab.name === "Skills" ? (
-              <tab.component
-                formData={skillsFormData}
-                handleInputChange={handleSkillsInputChange}
-                handleSubmit={handleSkillsSubmit}
-                skills={skills}
-              />
-            ) : (
-              <tab.component />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+        <Paper elevation={7} sx={{ p: 3 ,borderRadius:0 }}>
+          {tabs.map((tab) => {
+            const Component = tab.component;
+            const isVisible = value === tab.value;
+
+            let content;
+            if (tab.label === "Experience") {
+              content = (
+                <Component
+                  formData={experienceFormData}
+                  handleInputChange={handleExperienceInputChange}
+                  handleSubmit={handleExperienceSubmit}
+                  experiences={experiences}
+                />
+              );
+            } else if (tab.label === "Education") {
+              content = (
+                <Component
+                  formData={educationFormData}
+                  handleInputChange={handleEducationInputChange}
+                  handleSubmit={handleEducationSubmit}
+                  educations={educations}
+                />
+              );
+            } else if (tab.label === "Skills") {
+              content = (
+                <Component
+                  formData={skillsFormData}
+                  handleInputChange={handleSkillsInputChange}
+                  handleSubmit={handleSkillsSubmit}
+                  skills={skills}
+                />
+              );
+            } else {
+              content = <Component />;
+            }
+
+            return (
+              <div key={tab.value} style={{ display: isVisible ? 'block' : 'none' }}>
+                {content}
+              </div>
+            );
+          })}
+        </Paper>
+      </TabContext>
+    </Box>
   );
 };
 
-export default React.memo(TabBar);
+export default TabBar;

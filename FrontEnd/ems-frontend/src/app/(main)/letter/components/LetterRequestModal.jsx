@@ -1,4 +1,22 @@
-const LetterRequestModal = ({ letterType, onClose }) => {
+'use client';
+import React, { useEffect, useState } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Button,
+  IconButton,
+  Box,
+  Typography,
+  useTheme
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+
+const LetterRequestModal = ({ letterType, onClose, open }) => {
+  const theme = useTheme();
 
   const letterTypes = [
     "EPF/ETF Name Change Letter",
@@ -8,86 +26,160 @@ const LetterRequestModal = ({ letterType, onClose }) => {
     "Employment Confirmation Letter",
   ];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center ">
 
-       
-      <div className=" rounded-lg shadow-lg p-6 w-full max-w-lg relative pointer-events-auto"
-        style={{
-          backgroundColor:'var(--inputFieldColor)',
-          border: '1px solid black',
-        }}
-      >
-        <h2 className="text-xl font-semibold mb-4"
-          style={{
-            color: 'var(--primary)',
+  const [selectedLetterType, setSelectedLetterType] = useState(letterType || '');
+
+  // Update selected letter type when modal opens or when letterType changes
+  useEffect(() => {
+    if (letterType) {
+      setSelectedLetterType(letterType);
+    }
+  }, [letterType]);
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          backgroundColor: theme.palette.background.default,
+          border: theme.palette.divider,
+          p: 3,
+        },
+      }}
+    >
+      <Box sx={{ position: 'relative' }}>
+        <DialogTitle
+          sx={{
+            fontWeight: 'bold',
+            fontSize: '1.25rem',
+            color: theme.palette.primary.main,
+            pr: 5,
           }}
         >
           {letterType}
-        </h2>
-        <form className="space-y-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Letter Type</label>
-            <select
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black-300"
-            >
-              {letterTypes.map((type, index) => (
-                <option key={index} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Recipient Name</label>
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black-300"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Additional Details</label>
-            <textarea
-              placeholder="Your reason..."
-              className="w-full border border-gray-300 rounded px-3 py-2 h-24 focus:outline-none focus:ring-1 focus:ring-black-300"
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded border-none"
-              style={{
-                color: 'var(--primary)',
-                cursor: 'pointer',
-              }}
-            >
-              RESET
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 border-none"
-              style={{
-                color:'black',
-                cursor: 'pointer',
-                
-              }}
-            >
-              GENERATE
-            </button>
-          </div>
-        </form>
-        <button
+        </DialogTitle>
+
+        <IconButton
           onClick={onClose}
-          className="absolute top-2 right-4 text-xl text-gray-500 hover:text-gray-700"
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            color: theme.palette.text.secondary,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <TextField
+          label="Letter Type"
+          select
+          fullWidth
+          value={selectedLetterType}
+          onChange={(e) => setSelectedLetterType(e.target.value)}
+          variant="outlined"
+          InputLabelProps={{ style: { color: theme.palette.text.primary } }}
+          InputProps={{
+            style: {
+              color: theme.palette.text.primary,
+            },
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: theme.palette.divider, // Default border
+              },
+              '&:hover fieldset': {
+                borderColor: theme.palette.primary.main, // Hover border
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: theme.palette.primary.main, // Focus border
+              },
+            },
+        }}
           
         >
-          &times;
-        </button>
-      </div>
-    </div>
+              {letterTypes.map((type, index) => (
+                <MenuItem key={index} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+      </TextField>
+
+
+        <TextField
+          label="Recipient Name"
+          fullWidth
+          placeholder="Enter your full name"
+          variant="outlined"
+          InputLabelProps={{ style: { color: theme.palette.text.primary } }}
+          InputProps={{
+            style: {
+              color: theme.palette.text.primary,
+            },
+          }}
+
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: theme.palette.divider, // Default border
+              },
+              '&:hover fieldset': {
+                borderColor: theme.palette.primary.main, // Hover border
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: theme.palette.primary.main, // Focus border
+              },
+            },
+        }}
+        />
+
+        <TextField
+          label="Additional Details"
+          placeholder="Your reason..."
+          multiline
+          rows={4}
+          fullWidth
+          variant="outlined"
+          InputLabelProps={{ style: { color: theme.palette.text.primary } }}
+          InputProps={{
+            style: {
+              color: theme.palette.text.primary,
+            },
+          }}
+
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: theme.palette.divider, // Default border
+              },
+              '&:hover fieldset': {
+                borderColor: theme.palette.primary.main, // Hover border
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: theme.palette.primary.main, // Focus border
+              },
+            },
+        }}
+        />
+      </DialogContent>
+
+      <DialogActions sx={{ justifyContent: 'flex-end' }}>
+        <Button onClick={onClose} sx={{ color: theme.palette.primary.main }}>
+          RESET
+        </Button>
+        <Button variant="contained" color="primary">
+          GENERATE
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-}
+};
 
 export default LetterRequestModal;
