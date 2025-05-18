@@ -50,6 +50,16 @@ const theme = createTheme({
           main: '#000000',
           contrastText: '#ffffff',
         }
+        ,
+        avatarname:{
+          main: '#1A3C5E',
+          contrastText: '#ffffff',
+        }
+        ,
+        viewButton:{
+          main: '#FFF1F2',
+          contrastText: '#ffffff',
+        }
       }
     },
     dark: {
@@ -97,6 +107,15 @@ const theme = createTheme({
         textblack:{
           main: '#ffffff',
           contrastText: '#000000',
+        },
+        avatarname:{
+          main: '#F5F7FA',
+          contrastText: '#ffffff',
+        }
+        ,
+        viewButton:{
+          main: 'FFC1DA',
+          contrastText: '#ffffff',
         }
       },
     },

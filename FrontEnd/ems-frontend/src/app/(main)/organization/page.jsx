@@ -4,6 +4,8 @@ import React from 'react';
 import { Box, Typography, Avatar, Card, CardContent, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import Link from 'next/link';
+import StyledCard from './_components/StyledCard';
+import Paper from '@mui/material/Paper';
 
 const teamData = [
   {
@@ -74,17 +76,7 @@ const teamData = [
   },
 ];
 
-const StyledCard = styled(Card)({
-  margin: '10px',
-  borderRadius: '12px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-  backgroundColor: '#F9FAFB',
-  transition: 'transform 0.2s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.1)',
-  },
-});
+
 
 const OrgChartContainer = styled(Box)({
   display: 'flex',
@@ -112,20 +104,20 @@ const OrgMember = styled(Box)({
 });
 
 const OrgChart = () => (
-  <OrgChartContainer>
+  <Box>
     <OrgMember>
       <Avatar sx={{ width: 90, height: 90, marginBottom: 1, border: '3px solid #FF2D55' }} />
-      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '1.25rem', color: '#1A3C5E' }}>
+      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '1.25rem', color: 'avatarname.main' }}>
         Sushena Ranatunga
       </Typography>
-      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
+      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem' , color: '#6B7280'  }}>
         CEO
       </Typography>
     </OrgMember>
     <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px' }}>
       <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1, border: '2px solid #E5E7EB' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: '#1A3C5E' }}>
+        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55' }} />
+        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
           Channa De Silva
         </Typography>
         <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
@@ -133,8 +125,8 @@ const OrgChart = () => (
         </Typography>
       </OrgMember>
       <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1, border: '2px solid #E5E7EB' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: '#1A3C5E' }}>
+        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55'}} />
+        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
           Damitha Liyanage
         </Typography>
         <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
@@ -142,8 +134,8 @@ const OrgChart = () => (
         </Typography>
       </OrgMember>
       <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1, border: '2px solid #E5E7EB' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: '#1A3C5E' }}>
+        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55' }} />
+        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
           Asma Cader
         </Typography>
         <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
@@ -151,8 +143,8 @@ const OrgChart = () => (
         </Typography>
       </OrgMember>
       <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1, border: '2px solid #E5E7EB' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: '#1A3C5E' }}>
+        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55'}} />
+        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
           Dinithi Abeygunawardena
         </Typography>
         <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
@@ -160,7 +152,7 @@ const OrgChart = () => (
         </Typography>
       </OrgMember>
     </Box>
-  </OrgChartContainer>
+  </Box>
 );
 
 const TeamCard = ({ team }) => (
@@ -171,7 +163,7 @@ const TeamCard = ({ team }) => (
           fontFamily: 'Inter, sans-serif',
           fontWeight: 600,
           fontSize: '1.125rem',
-          color: '#1A3C5E',
+          color: 'avatarname.main',
           marginBottom: '8px',
         }}
       >
@@ -182,7 +174,7 @@ const TeamCard = ({ team }) => (
           fontFamily: 'Inter, sans-serif',
           fontWeight: 400,
           fontSize: '0.875rem',
-          color: '#6B7280',
+          color: 'avatarname.main',
           marginBottom: '12px',
         }}
       >
@@ -197,7 +189,7 @@ const TeamCard = ({ team }) => (
                 fontFamily: 'Inter, sans-serif',
                 fontWeight: 500,
                 fontSize: '0.9375rem',
-                color: '#1A3C5E',
+                color: 'avatarname.main',
               }}
             >
               {member.name}
@@ -229,7 +221,7 @@ const TeamCard = ({ team }) => (
               textTransform: 'none',
               padding: '4px 16px',
               '&:hover': {
-                backgroundColor: '#FFF1F2',
+                backgroundColor: 'viewButton.main',
                 borderColor: '#FECDD3',
               },
             }}
@@ -244,24 +236,19 @@ const TeamCard = ({ team }) => (
 
 export default function Organization(){
   return (
-    <Box sx={{ padding: '20px', backgroundColor: '#F3F4F6', minHeight: '100vh' }}>
-      <Typography
-        sx={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 700,
-          fontSize: '1.875rem',
-          color: '#FF2D55',
-          marginBottom: '20px',
-        }}
-      >
-        ORGANIZATION
-      </Typography>
-      <OrgChart />
+    <Paper elevation={2} square={false}
+      sx={{
+        height: '100%',
+        width: '100%',
+      }}>
+
+        <OrgChart />
       <TeamContainer>
         {teamData.map((team, index) => (
           <TeamCard key={index} team={team} />
         ))}
       </TeamContainer>
-    </Box>
+        
+    </Paper>
   );
 }
