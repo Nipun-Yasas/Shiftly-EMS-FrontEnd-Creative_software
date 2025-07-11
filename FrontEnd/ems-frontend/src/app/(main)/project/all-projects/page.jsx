@@ -1,6 +1,6 @@
 "use client";
 
-import { Paper } from "@mui/material";
+import { Paper ,Box } from "@mui/material";
 
 const demoProjects = [
   {
@@ -67,38 +67,38 @@ export default function AllProjects() {
         width: '100%',
       }}>
       {/* Project Cards */}
-      <div className="bg-white rounded-2xl shadow-md p-6">
-        <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-8">
+      <Box className=" rounded-2xl shadow-md p-6">
+        <Box className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-8">
           {demoProjects.map((project) => (
-            <div
+            <Box
               key={project.id}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition duration-200 overflow-hidden"
+              className=" rounded-xl shadow hover:shadow-lg transition duration-200 overflow-hidden"
             >
               <img
                 src={project.imageUrl}
                 alt="Project"
                 className="w-full h-40 object-cover"
               />
-              <div className="p-4 space-y-2">
+              <Box className="p-4 space-y-2 ">
                 <div className="flex items-center space-x-2">
                   <img src={project.logo} alt="Logo" className="h-5" />
                 </div>
                 <h3 className="text-sm font-semibold">{project.title}</h3>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-500">
                   <strong>Created:</strong> {project.createdDate}
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-500">
                   <strong>Project Status:</strong>{" "}
                   <span className="text-green-600 font-medium">{project.status}</span>
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-gray-500">
                   <strong>Software Engineering Director:</strong> {project.director}
                 </p>
-              </div>
-            </div>
+              </Box>
+            </Box>
           ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </Paper>
   );
 }

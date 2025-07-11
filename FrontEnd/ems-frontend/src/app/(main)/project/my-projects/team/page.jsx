@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead,
@@ -69,9 +70,9 @@ function ProjectTableSection({ title, columns, rows, searchLabel }) {
   });
 
   return (
-    <Box className="bg-white rounded-2xl shadow-md p-6 mb-6 overflow-x-auto">
+    <Box className=" rounded-2xl shadow-md p-6 mb-6 overflow-x-auto">
       <Box className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-        <Typography variant="h6" className="font-semibold text-gray-800">
+        <Typography variant="h6" className="font-semibold ">
           {title}
         </Typography>
         <Box className="flex flex-col sm:flex-row gap-2">
@@ -151,7 +152,7 @@ export default function MyProjectTeam() {
         height: '100%',
         width: '100%',
       }}>
-      <Box className="bg-white rounded-2xl shadow-md p-6">
+      <Box className=" rounded-2xl shadow-md p-6">
         <Box className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
           <div className="flex items-center gap-2">
             <Image
@@ -162,15 +163,15 @@ export default function MyProjectTeam() {
               className="object-contain"
             />
           </div>
-          <div className="flex gap-6 border-b border-gray-200 overflow-x-auto">
-            {[{ name: "BASIC INFO", href: "/dashboard/projects/my-projects/basic-info" },
-              { name: "TEAM", href: "/dashboard/projects/my-projects/team" }].map((tab) => {
+          <div className="flex gap-6 overflow-x-auto">
+            {[{ name: "BASIC INFO", href: "/project/my-projects/basic-info" },
+              { name: "TEAM", href: "/project/my-projects/team" }].map((tab) => {
               const isActive = pathname === tab.href;
               return (
                 <Link
                   key={tab.name}
                   href={tab.href}
-                  className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"}`}
+                  className={`pb-2 text-sm font-medium ${isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : " hover:text-[#E90A4D]"}`}
                 >
                   {tab.name}
                 </Link>

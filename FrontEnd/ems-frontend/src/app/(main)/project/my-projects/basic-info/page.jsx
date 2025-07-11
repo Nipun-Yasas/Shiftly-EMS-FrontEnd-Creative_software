@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { Paper } from '@mui/material';
+import { Paper , Box} from '@mui/material';
 
 export default function MyProject() {
   const pathname = usePathname();
@@ -33,7 +33,7 @@ export default function MyProject() {
         height: '100%',
         width: '100%',
       }}>
-      <div className="bg-white rounded-2xl shadow-md p-6">
+      <Box className="rounded-2xl shadow-md p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-y-4">
           <Image
             src={project.logo}
@@ -43,16 +43,16 @@ export default function MyProject() {
             className="object-contain"
           />
 
-          <div className="flex gap-6 border-b border-gray-200 overflow-x-auto">
-            {[{ name: "BASIC INFO", href: "/dashboard/projects/my-projects/basic-info" },
-              { name: "TEAM", href: "/dashboard/projects/my-projects/team" }].map((tab) => {
+          <div className="flex gap-6 overflow-x-auto">
+            {[{ name: "BASIC INFO", href: "/project/my-projects/basic-info" },
+              { name: "TEAM", href: "/project/my-projects/team" }].map((tab) => {
               const isActive = pathname === tab.href;
               return (
                 <Link
                   key={tab.name}
                   href={tab.href}
                   className={`pb-2 text-sm font-medium whitespace-nowrap ${
-                    isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : "text-gray-600 hover:text-[#E90A4D]"
+                    isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : " hover:text-[#E90A4D]"
                   }`}
                 >
                   {tab.name}
@@ -62,8 +62,8 @@ export default function MyProject() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6">
+        <div className=" rounded-xl p-6 shadow mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm  mb-6">
             <div>
               <p><span className="font-semibold">Project Dates:</span> {project.projectDates}</p>
               <p><span className="font-semibold">Client:</span> {project.client}</p>
@@ -74,14 +74,14 @@ export default function MyProject() {
               <p><span className="font-semibold">Client:</span> {project.client}</p>
             </div>
           </div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm">
             <span className="font-semibold">Project Description:</span> {project.description}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow mb-6">
-          <h3 className="font-semibold mb-4 text-gray-800">Software Engineering Director:</h3>
-          <div className="flex items-center gap-4 mb-6 bg-gray-100 px-6 py-3 rounded-lg max-w-sm">
+        <Box className=" rounded-xl p-6 shadow mb-6  ">
+          <h3 className="font-semibold mb-4">Software Engineering Director:</h3>
+          <Box className="flex items-center gap-4 mb-6 px-6 py-3 rounded-lg max-w-sm shadow ">
             <Image
               src={project.director.image}
               alt={project.director.name}
@@ -89,15 +89,15 @@ export default function MyProject() {
               height={50}
               className="rounded-full object-cover"
             />
-            <p className="text-gray-800">{project.director.name}</p>
-          </div>
+            <p className="">{project.director.name}</p>
+          </Box>
 
-          <h3 className="font-semibold mb-4 text-gray-800">Team Leads:</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <h3 className="font-semibold mb-4 ">Team Leads:</h3>
+          <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
             {project.teamLeads.map((lead, idx) => (
-              <div
+              <Box
                 key={idx}
-                className="flex items-center gap-4 bg-gray-100 px-6 py-3 rounded-lg"
+                className="flex items-center gap-4  px-6 py-3 rounded-lg shadow"
               >
                 <Image
                   src={lead.image}
@@ -106,12 +106,12 @@ export default function MyProject() {
                   height={50}
                   className="rounded-full object-cover"
                 />
-                <p className="text-gray-800">{lead.name}</p>
-              </div>
+                <p className="">{lead.name}</p>
+              </Box>
             ))}
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </Paper>
   );
 }
