@@ -229,46 +229,46 @@ export const getDashboardCalendarData = async () => {
 };
 
 // Get current month calendar grid data
-export const getCurrentMonthCalendar = () => {
+export const getCurrentMonthCalendar = (year, month) => {
   const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
+  const currentYear = typeof year === 'number' ? year : today.getFullYear();
+  const currentMonth = typeof month === 'number' ? month : today.getMonth();
   const currentDate = today.getDate();
-  
+
   // Get first day of month and total days
   const firstDay = new Date(currentYear, currentMonth, 1);
   const lastDay = new Date(currentYear, currentMonth + 1, 0);
   const daysInMonth = lastDay.getDate();
   const startingDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
-  
+
   // Create calendar grid - always 42 cells (6 rows × 7 columns)
   const calendarDays = [];
-  
+
   // Add empty cells for days before the first day of the month
   for (let i = 0; i < startingDayOfWeek; i++) {
     calendarDays.push({ day: null, isCurrentMonth: false });
   }
-  
+
   // Add days of the month
   for (let day = 1; day <= daysInMonth; day++) {
     calendarDays.push({ 
       day, 
       isCurrentMonth: true,
-      isToday: day === currentDate
+      isToday: day === currentDate && currentMonth === today.getMonth() && currentYear === today.getFullYear()
     });
   }
-  
+
   // Fill remaining cells to complete 6 rows (42 total cells)
   const totalCells = 42;
   const remainingCells = totalCells - calendarDays.length;
   for (let i = 0; i < remainingCells; i++) {
     calendarDays.push({ day: null, isCurrentMonth: false });
   }
-  
+
   return {
     year: currentYear,
     month: currentMonth + 1,
-    monthName: today.toLocaleDateString("en-US", { month: "long" }),
+    monthName: new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long" }),
     calendarDays,
     currentDate
   };
