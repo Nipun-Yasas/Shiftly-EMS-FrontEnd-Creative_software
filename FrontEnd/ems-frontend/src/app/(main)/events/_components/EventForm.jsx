@@ -121,7 +121,12 @@ export default function EventForm(props){
         {({ validateForm, resetForm }) => (
           <Form>
             <Stack>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box sx={{ 
+                display: "flex", 
+                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 0, sm: 2 }
+              }}>
                 <InputItem>
                   <TextInput name="title" label="Title" />
                 </InputItem>
@@ -136,7 +141,12 @@ export default function EventForm(props){
                 label="Show title on the event banner"
               />
 
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box sx={{ 
+                display: "flex", 
+                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 0, sm: 2 }
+              }}>
                 <InputItem>
                   <TextInput
                     name="formUrl"
@@ -152,7 +162,12 @@ export default function EventForm(props){
                 </InputItem>
               </Box>
 
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box sx={{ 
+                display: "flex", 
+                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 0, sm: 2 }
+              }}>
                 <InputItem>
                   <SelectInput
                     name="audience"
@@ -177,12 +192,18 @@ export default function EventForm(props){
               </InputItem>
 
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", m: 2 }}
+                sx={{ 
+                  display: "flex", 
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                  m: 2 
+                }}
               >
-                <DateInput name="enableDate" label="Start Date" />
+                <DateInput name="enableDate" label="Start Date"/>
                 <DateInput name="expireDate" label="Expire Date" />
               </Box>
-
+                
               <FileUpload
                 name="banner"
                 label="Upload Banner"

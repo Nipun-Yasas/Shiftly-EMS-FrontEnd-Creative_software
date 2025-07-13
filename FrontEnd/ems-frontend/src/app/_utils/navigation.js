@@ -1,22 +1,86 @@
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import DateRangeIcon from "@mui/icons-material/DateRange";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import EmailIcon from '@mui/icons-material/Email';
+import MarkAsUnreadOutlinedIcon from '@mui/icons-material/MarkAsUnreadOutlined';
+import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
+import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import WorkIcon from "@mui/icons-material/Work";
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
+import EngineeringIcon from '@mui/icons-material/Engineering';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import UpdateIcon from '@mui/icons-material/Update';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import ApprovalIcon from '@mui/icons-material/Approval';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import FreeCancellationOutlinedIcon from '@mui/icons-material/FreeCancellationOutlined';
 
 const  NAVIGATION = [
   {
     kind: 'header',
     title: 'Main items',
+  },
+  {
+    segment: 'admin-portal',
+    title: 'Admin Portal',
+    icon: <AdminPanelSettingsIcon/>,
+    children: [
+      {
+        segment: 'user-management',
+        title: 'User Management',
+        icon: <ManageAccountsOutlinedIcon/>,
+      },
+      {
+        segment: 'project-management',
+        title: 'Project Management',
+        icon: <WorkOutlineIcon/>,
+      },
+       {
+        segment: 'timesheet-management',
+        title: 'Timesheet Management',
+        icon: <WorkHistoryOutlinedIcon/>,
+      },
+      {
+        segment: 'leaves',
+        title: 'Leaves',
+        icon: <FreeCancellationOutlinedIcon/>,
+      },
+      {
+        segment: 'letters',
+        title: 'Letters',
+        icon: <MarkAsUnreadOutlinedIcon/>,
+      },
+      {
+        segment: 'claims',
+        title: 'Claims',
+        icon: <ReceiptLongOutlinedIcon/>,
+      },
+      {
+        segment: 'events',
+        title: 'Events',
+        icon: <EditCalendarOutlinedIcon/>,
+      },
+       {
+        segment: 'candidates',
+        title: 'Candidates',
+        icon: <GroupAddOutlinedIcon/>,
+      }
+    ]
   },
   {
     segment: 'dashboard',
@@ -32,8 +96,8 @@ const  NAVIGATION = [
         segment: 'profile',
         title: 'Profile',
         icon: <PersonIcon/>,
-      },
-    ],
+      }
+    ]
   },
   {
     segment: 'organization',
@@ -55,7 +119,7 @@ const  NAVIGATION = [
       {
         segment: 'all-projects',
         title: 'All Projects',
-        icon: <PersonIcon />,
+        icon: <WorkHistoryIcon/>,
       },
       {
         segment: 'my-projects',
@@ -70,28 +134,28 @@ const  NAVIGATION = [
           {
             segment: 'team',
             title: 'Team',
-            icon: <PersonIcon />,
-          },
-        ],
-      },
-    ],
+            icon: <EngineeringIcon />,
+          }
+        ]
+      }
+    ]
   },
   {
     segment: 'timesheet',
     title: 'Timesheet',
-    icon: <AccessTimeIcon/>,
+    icon: <AccessTimeFilledIcon/>,
     children: [
       {
         segment: 'update-timesheet',
         title: 'Update Timesheet',
-        icon: <PersonIcon />,
+        icon: <UpdateIcon />,
       },
       {
         segment: 'review-timesheet',
         title: 'Review Timesheet',
-        icon: <PersonIcon />,
-      },
-    ],
+        icon: <ManageHistoryIcon />,
+      }
+    ]
   },
   {
     kind: 'divider',
@@ -103,36 +167,36 @@ const  NAVIGATION = [
   {
     segment: 'letter',
     title: 'Letter',
-    icon: <MailOutlineIcon/>,
+    icon: <EmailIcon/>,
     children: [
       {
         segment: 'request-letter',
         title: 'Request Letter',
-        icon: <PersonIcon />,
+        icon: <HistoryEduOutlinedIcon />,
       },
       {
         segment: 'request-history',
         title: 'Request History',
-        icon: <PersonIcon />,
-      },
-    ],
+        icon: <MarkAsUnreadOutlinedIcon />,
+      }
+    ]
   },
   {
     segment: 'leave',
     title: 'Leave',
-    icon: <OpenInNewIcon/>,
+    icon: <DirectionsRunIcon/>,
     children: [
       {
         segment: 'request-leave',
         title: 'Apply Leave',
-        icon: <PersonIcon />,
+        icon: <ApprovalIcon />,
       },
       {
         segment: 'leave-history',
-        title: 'Leave Histor',
-        icon: <PersonIcon />,
-      },
-    ],
+        title: 'Leave History',
+        icon: <HistoryOutlinedIcon />,
+      }
+    ]
   },
   {
     segment: 'claim',
@@ -148,8 +212,8 @@ const  NAVIGATION = [
         segment: 'claim-history',
         title: 'Claim History',
         icon: <PendingActionsIcon />,
-      },
-    ],
+      }
+    ]
   },
   {
     kind: 'divider',
@@ -172,13 +236,13 @@ const  NAVIGATION = [
         segment: 'event-history',
         title: 'Event History',
         icon: <HistoryEduIcon />,
-      },
-    ],
+      }
+    ]
   },
   {
     segment: 'refer',
     title: 'Refer Candidate',
-    icon: <PersonIcon/>,
+    icon: <SupervisorAccountIcon />,
   },
   
 ];

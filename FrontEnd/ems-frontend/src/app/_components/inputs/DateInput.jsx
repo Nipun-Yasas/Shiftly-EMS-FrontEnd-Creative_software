@@ -35,6 +35,7 @@ const DateInput = ({ name, label }) => {
               "& label": {
                 color: "textblack.main",
               },
+              my:1
             },
           },
         }}
