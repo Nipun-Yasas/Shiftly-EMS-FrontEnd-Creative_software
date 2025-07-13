@@ -23,4 +23,12 @@ export const API_PATHS = {
     ADMIN_DASHBOARD: '/api/admin/dashboard',
     USER_PROFILE: '/api/user/profile',
   },
+  CALENDAR: {
+    GET_EVENTS: '/api/calendar/events',
+    GET_MONTH_EVENTS: '/api/calendar/month',
+    GET_UPCOMING_EVENTS: '/api/calendar/upcoming',
+    ADD_EVENT: '/api/calendar/events',
+    UPDATE_EVENT: '/api/calendar/events',
+    DELETE_EVENT: '/api/calendar/events',
+  },
 };
