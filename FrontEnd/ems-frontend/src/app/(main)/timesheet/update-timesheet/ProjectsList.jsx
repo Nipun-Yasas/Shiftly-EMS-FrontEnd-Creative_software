@@ -22,7 +22,7 @@ const ProjectsList = () => {
   ]);
   
   const [isExpanded, setIsExpanded] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchTerm] = useState("");
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -34,7 +34,7 @@ const ProjectsList = () => {
 
   // Filter projects based on search term
   const filteredProjects = projects.filter(project => 
-    project.name.toLowerCase().includes(searchTerm.toLowerCase())
+    project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -53,7 +53,7 @@ const ProjectsList = () => {
             <input
               type="text"
               placeholder="Search projects..."
-              value={searchTerm}
+              value={searchQuery}
               onChange={handleSearch}
               className="pl-9 pr-3 py-2 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

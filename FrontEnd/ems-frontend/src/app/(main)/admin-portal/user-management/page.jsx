@@ -15,13 +15,13 @@ import AllUserTab from "./_components/AllUserTab";
 import AddUserTab from "./_components/AddUserTab";
 import EditUserDialog from "./_components/EditUserDialog";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
-import TabPanel from "./_components/TabPanel";
+import TabPanel from "../_components/TabPanel";
 
 export default function UserManagementPage() {
   const [tabValue, setTabValue] = useState(0);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [editDialogOpen, setOpenDialog] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -115,7 +115,7 @@ export default function UserManagementPage() {
       } else {
         await axiosInstance.post(API_PATHS.ADMIN_USER.ADD_USER, userData);
         showSnackbar("User added successfully", "success");
-        setTabValue(0); // Switch back to All Users tab after successful addition
+        setTabValue(0);
       }
 
       resetForm();
@@ -166,7 +166,7 @@ export default function UserManagementPage() {
   };
 
   const handleAddUserClick = () => {
-    setTabValue(1); // Switch to Add User tab
+    setTabValue(1); 
   };
 
   const filteredUsers = users.filter(
@@ -215,12 +215,11 @@ export default function UserManagementPage() {
         </TabPanel>
 
         <EditUserDialog
-          openDialog={openDialog}
+          editDialogOpen={editDialogOpen}
           setOpenDialog={setOpenDialog}
           editingUser={editingUser}
           setEditingUser={setEditingUser}
           handleSubmit={handleSubmit}
-          initialFormValues={initialFormValues}
         />
 
         <DeleteConfirmDialog

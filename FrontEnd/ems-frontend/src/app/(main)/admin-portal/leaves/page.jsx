@@ -77,7 +77,7 @@ export default function LeavesManagementPage() {
   const [tabValue, setTabValue] = useState(0);
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, pending, approved, rejected
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
@@ -336,11 +336,11 @@ export default function LeavesManagementPage() {
 
   const filteredLeaves = leaves.filter(leave => {
     const matchesSearch = 
-      leave.leaveId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.leaveType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      leave.reason.toLowerCase().includes(searchTerm.toLowerCase());
+      leave.leaveId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      leave.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      leave.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      leave.leaveType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      leave.reason.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesFilter = 
       filterStatus === 'all' || 
@@ -462,211 +462,181 @@ export default function LeavesManagementPage() {
   ];
 
   return (
-    <Box sx={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Leave Management
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Review and manage employee leave requests
-        </Typography>
-      </Paper>
+      <><Paper levation={2} sx={{ height: "100%", width: "100%" }}>
+      <Box sx={{ p: 3 }}>
+        <Tabs value={tabValue} onChange={handleTabChange}>
+          <Tab
+            label={<Badge badgeContent={pendingCount} color="error">
+              Pending Leaves
+            </Badge>} />
+          <Tab
+            label={<Badge badgeContent={approvedCount} color="success">
+              Approved Leaves
+            </Badge>} />
+          <Tab
+            label={<Badge badgeContent={rejectedCount} color="error">
+              Rejected Leaves
+            </Badge>} />
+          <Tab label="All Leaves" />
+        </Tabs>
+      </Box>
 
-      <Paper elevation={3} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleTabChange}>
-            <Tab 
-              label={
-                <Badge badgeContent={pendingCount} color="error">
-                  Pending Leaves
-                </Badge>
-              } 
-            />
-            <Tab 
-              label={
-                <Badge badgeContent={approvedCount} color="success">
-                  Approved Leaves
-                </Badge>
-              } 
-            />
-            <Tab 
-              label={
-                <Badge badgeContent={rejectedCount} color="error">
-                  Rejected Leaves
-                </Badge>
-              } 
-            />
-            <Tab label="All Leaves" />
-          </Tabs>
+      <TabPanel value={tabValue} index={0}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <TextField
+            placeholder="Search leaves..."
+            value={searchQuery}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+            sx={{ minWidth: 300 }} />
+          <Button
+            variant="outlined"
+            startIcon={<FilterIcon />}
+            onClick={() => setFilterStatus(filterStatus === 'pending' ? 'all' : 'pending')}
+          >
+            {filterStatus === 'pending' ? 'Show All' : 'Pending Only'}
+          </Button>
         </Box>
 
-        <TabPanel value={tabValue} index={0}>
-          <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <TextField
-              placeholder="Search leaves..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
-              }}
-              sx={{ minWidth: 300 }}
-            />
-            <Button
-              variant="outlined"
-              startIcon={<FilterIcon />}
-              onClick={() => setFilterStatus(filterStatus === 'pending' ? 'all' : 'pending')}
-            >
-              {filterStatus === 'pending' ? 'Show All' : 'Pending Only'}
-            </Button>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
           </Box>
-          
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box sx={{ height: 400, width: '100%' }}>
-              <DataGrid
-                rows={filteredLeaves.filter(l => l.status === 'pending')}
-                columns={leaveColumns}
-                pageSize={10}
-                rowsPerPageOptions={[10]}
-                disableSelectionOnClick
-                autoHeight={false}
-              />
-            </Box>
-          )}
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <TextField
-              placeholder="Search approved leaves..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
-              }}
-              sx={{ minWidth: 300 }}
-            />
+        ) : (
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={filteredLeaves.filter(l => l.status === 'pending')}
+              columns={leaveColumns}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              disableSelectionOnClick
+              autoHeight={false} />
           </Box>
-          
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box sx={{ height: 400, width: '100%' }}>
-              <DataGrid
-                rows={filteredLeaves.filter(l => l.status === 'approved')}
-                columns={leaveColumns}
-                pageSize={10}
-                rowsPerPageOptions={[10]}
-                disableSelectionOnClick
-                autoHeight={false}
-              />
-            </Box>
-          )}
-        </TabPanel>
+        )}
+      </TabPanel>
 
-        <TabPanel value={tabValue} index={2}>
-          <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <TextField
-              placeholder="Search rejected leaves..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
-              }}
-              sx={{ minWidth: 300 }}
-            />
+      <TabPanel value={tabValue} index={1}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <TextField
+            placeholder="Search approved leaves..."
+            value={searchQuery}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+            sx={{ minWidth: 300 }} />
+        </Box>
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
           </Box>
-          
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box sx={{ height: 400, width: '100%' }}>
-              <DataGrid
-                rows={filteredLeaves.filter(l => l.status === 'rejected')}
-                columns={leaveColumns}
-                pageSize={10}
-                rowsPerPageOptions={[10]}
-                disableSelectionOnClick
-                autoHeight={false}
-              />
-            </Box>
-          )}
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={3}>
-          <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <TextField
-              placeholder="Search all leaves..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
-              }}
-              sx={{ minWidth: 300 }}
-            />
-            <Button
-              variant="outlined"
-              startIcon={<FilterIcon />}
-              onClick={() => {
-                const nextFilter = filterStatus === 'all' ? 'pending' : 
-                                  filterStatus === 'pending' ? 'approved' :
-                                  filterStatus === 'approved' ? 'rejected' : 'all';
-                setFilterStatus(nextFilter);
-              }}
-            >
-              Filter: {filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
-            </Button>
+        ) : (
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={filteredLeaves.filter(l => l.status === 'approved')}
+              columns={leaveColumns}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              disableSelectionOnClick
+              autoHeight={false} />
           </Box>
-          
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box sx={{ height: 400, width: '100%' }}>
-              <DataGrid
-                rows={filteredLeaves}
-                columns={leaveColumns}
-                pageSize={10}
-                rowsPerPageOptions={[10]}
-                disableSelectionOnClick
-                autoHeight={false}
-              />
-            </Box>
-          )}
-        </TabPanel>
-      </Paper>
+        )}
+      </TabPanel>
 
-      {/* Leave Details Dialog */}
-      <Dialog 
-        open={openDetailDialog} 
-        onClose={() => setOpenDetailDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <TabPanel value={tabValue} index={2}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <TextField
+            placeholder="Search rejected leaves..."
+            value={searchQuery}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+            sx={{ minWidth: 300 }} />
+        </Box>
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={filteredLeaves.filter(l => l.status === 'rejected')}
+              columns={leaveColumns}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              disableSelectionOnClick
+              autoHeight={false} />
+          </Box>
+        )}
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={3}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <TextField
+            placeholder="Search all leaves..."
+            value={searchQuery}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+            sx={{ minWidth: 300 }} />
+          <Button
+            variant="outlined"
+            startIcon={<FilterIcon />}
+            onClick={() => {
+              const nextFilter = filterStatus === 'all' ? 'pending' :
+                filterStatus === 'pending' ? 'approved' :
+                  filterStatus === 'approved' ? 'rejected' : 'all';
+              setFilterStatus(nextFilter);
+            } }
+          >
+            Filter: {filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
+          </Button>
+        </Box>
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={filteredLeaves}
+              columns={leaveColumns}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              disableSelectionOnClick
+              autoHeight={false} />
+          </Box>
+        )}
+      </TabPanel>
+    </Paper><Dialog
+      open={openDetailDialog}
+      onClose={() => setOpenDetailDialog(false)}
+      maxWidth="md"
+      fullWidth
+    >
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <LeaveIcon />
@@ -704,7 +674,7 @@ export default function LeavesManagementPage() {
                   </CardContent>
                 </Card>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Card variant="outlined">
                   <CardContent>
@@ -715,12 +685,11 @@ export default function LeavesManagementPage() {
                       <Typography variant="body2" color="text.secondary">Type:</Typography>
                       <Chip
                         label={selectedLeave.leaveType}
-                        style={{ 
+                        style={{
                           backgroundColor: getLeaveTypeColor(selectedLeave.leaveType),
                           color: 'white'
                         }}
-                        size="small"
-                      />
+                        size="small" />
                     </Box>
                     <Box sx={{ mb: 1 }}>
                       <Typography variant="body2" color="text.secondary">Duration:</Typography>
@@ -734,8 +703,7 @@ export default function LeavesManagementPage() {
                         icon={getStatusIcon(selectedLeave.status)}
                         label={selectedLeave.status.charAt(0).toUpperCase() + selectedLeave.status.slice(1)}
                         color={getStatusColor(selectedLeave.status)}
-                        size="small"
-                      />
+                        size="small" />
                     </Box>
                   </CardContent>
                 </Card>
@@ -993,6 +961,6 @@ export default function LeavesManagementPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 }

@@ -7,17 +7,13 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 
-import TextInput from '../../../../_components/inputs/TextInput';
-import SelectInput from '../../../../_components/inputs/SelectInput';
-import InputItem from '../../../../_components/inputs/InputItem';
+import UserForm, { userEditValidationSchema } from './UserForm';
 
 const roles = [
   { id: 1, name: 'Admin', label: 'Administrator' },
@@ -28,43 +24,35 @@ const roles = [
   { id: 6, name: 'Supervisor', label: 'Supervisor' },
 ];
 
-const userValidationSchema = Yup.object({
-  userId: Yup.string()
-    .min(3, 'User ID must be at least 3 characters')
-    .required('User ID is required'),
-  username: Yup.string()
-    .min(3, 'Username must be at least 3 characters')
-    .required('Username is required'),
-  email: Yup.string()
-    .email('Invalid email format')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(8, 'Password must be at least 8 characters')
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-    )
-    .required('Password is required'),
-  roleId: Yup.object().required('Role is required'),
-  isActive: Yup.boolean().required('Active status is required'),
-});
-
 export default function EditUserDialog({ 
-  openDialog, 
+  editDialogOpen, 
   setOpenDialog, 
   editingUser, 
   setEditingUser, 
-  handleSubmit, 
-  initialFormValues 
+  handleSubmit
 }) {
   const handleClose = () => {
     setOpenDialog(false);
     setEditingUser(null);
   };
 
+  const getInitialValues = () => {
+    if (editingUser) {
+      return {
+        userId: editingUser.userId,
+        username: editingUser.username,
+        email: editingUser.email,
+        password: '',
+        roleId: roles.find((r) => r.name === editingUser.roleId?.name) || null,
+        isActive: editingUser.isActive,
+      };
+    }
+    return {};
+  };
+
   return (
     <Dialog
-      open={openDialog}
+      open={editDialogOpen}
       onClose={handleClose}
       maxWidth="md"
       fullWidth
@@ -77,7 +65,7 @@ export default function EditUserDialog({
             alignItems: 'center',
           }}
         >
-          {editingUser ? 'Edit User' : 'Add New User'}
+          Edit User
           <IconButton onClick={handleClose}>
             <CloseIcon />
           </IconButton>
@@ -85,120 +73,30 @@ export default function EditUserDialog({
       </DialogTitle>
       <DialogContent>
         <Formik
-          initialValues={
-            editingUser
-              ? {
-                  userId: editingUser.userId,
-                  username: editingUser.username,
-                  email: editingUser.email,
-                  password: '',
-                  roleId:
-                    roles.find(
-                      (r) => r.name === editingUser.roleId?.name
-                    ) || null,
-                  isActive: editingUser.isActive,
-                }
-              : initialFormValues
-          }
-          validationSchema={
-           userValidationSchema
-          }
+          initialValues={getInitialValues()}
+          validationSchema={userEditValidationSchema}
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ isSubmitting, values, setFieldValue }) => (
+          {({ isSubmitting }) => (
             <Form>
-              <Stack spacing={2}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: { xs: 0, sm: 2 },
-                  m: 2,
-                }}
-              >
-                <InputItem>
-                  <TextInput name="userId" label="User ID" />
-                </InputItem>
-
-                <InputItem>
-                  <TextInput name="username" label="Username" />
-                </InputItem>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: { xs: 0, sm: 2 },
-                  m: 2,
-                }}
-              >
-                <InputItem>
-                  <TextInput name="email" label="Email" type="email" />
-                </InputItem>
-
-                <InputItem>
-                  <TextInput
-                    name="password"
-                    label="Password"
-                    type="password"
-                  />
-                </InputItem>
-              </Box>
-              
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: { xs: 0, sm: 2 },
-                  m: 2,
-                }}
-              >
-                <InputItem>
-                  <SelectInput
-                    name="roleId"
-                    label="User Role"
-                    options={roles}
-                    getOptionLabel={(option) => option.label}
-                  />
-                </InputItem>
-              </Box>
-
-              <InputItem>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: 2,
-                  }}
-                >
-                  <DialogActions sx={{ mt: 3 }}>
-                <Button color='textblack' onClick={handleClose}>
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={isSubmitting}
-                  startIcon={
-                    isSubmitting ? <CircularProgress size={20} /> : null
-                  }
-                >
-                  {isSubmitting
-                    ? 'Saving...'
-                    : editingUser
-                      ? 'Update'
-                      : 'Add'}
-                </Button>
-              </DialogActions>
-                </Box>
-              </InputItem>
-            </Stack>
-              
+              <UserForm isEdit={true}>
+                <DialogActions sx={{ mt: 3 }}>
+                  <Button color='textblack' onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isSubmitting}
+                    startIcon={
+                      isSubmitting ? <CircularProgress size={20} /> : null
+                    }
+                  >
+                    {isSubmitting ? 'Updating...' : 'Update User'}
+                  </Button>
+                </DialogActions>
+              </UserForm>
             </Form>
           )}
         </Formik>

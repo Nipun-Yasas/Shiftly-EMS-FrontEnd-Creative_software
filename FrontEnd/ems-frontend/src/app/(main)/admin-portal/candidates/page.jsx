@@ -79,7 +79,7 @@ export default function CandidateSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
@@ -286,11 +286,11 @@ export default function CandidateSubmissionPage() {
 
   const filteredCandidates = candidates.filter(candidate => {
     const matchesSearch = 
-      candidate.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.department.toLowerCase().includes(searchTerm.toLowerCase());
+      candidate.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidate.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidate.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidate.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidate.department.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesFilter = 
       filterStatus === 'all' || 
@@ -416,7 +416,7 @@ export default function CandidateSubmissionPage() {
         <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             placeholder="Search candidates..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -456,7 +456,7 @@ export default function CandidateSubmissionPage() {
         <Box sx={{ mb: 2 }}>
           <TextField
             placeholder="Search unread candidates..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -484,7 +484,7 @@ export default function CandidateSubmissionPage() {
         <Box sx={{ mb: 2 }}>
           <TextField
             placeholder="Search read candidates..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (

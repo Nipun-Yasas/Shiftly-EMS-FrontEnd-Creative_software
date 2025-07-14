@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -10,26 +8,27 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { Formik, Form } from "formik";
 
-import UserForm, { userValidationSchema } from "./UserForm";
+import ProjectForm, { projectValidationSchema } from "./ProjectForm";
 import InputItem from "../../../../_components/inputs/InputItem";
 
-export default function AddUserTab({
-  handleSubmit,
+export default function AddProjectTab({
+  onSubmit,
+  projectStatuses,
   initialFormValues,
 }) {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
-        Add New User
+        Add New Project
       </Typography>
       <Formik
         initialValues={initialFormValues}
-        validationSchema={userValidationSchema}
-        onSubmit={handleSubmit}
+        validationSchema={projectValidationSchema}
+        onSubmit={onSubmit}
       >
         {({ isSubmitting, resetForm }) => (
           <Form>
-            <UserForm>
+            <ProjectForm projectStatuses={projectStatuses}>
               <InputItem>
                 <Box
                   sx={{
@@ -57,11 +56,11 @@ export default function AddUserTab({
                       )
                     }
                   >
-                    {isSubmitting ? "Adding..." : "Add User"}
+                    {isSubmitting ? "Adding..." : "Add Project"}
                   </Button>
                 </Box>
               </InputItem>
-            </UserForm>
+            </ProjectForm>
           </Form>
         )}
       </Formik>

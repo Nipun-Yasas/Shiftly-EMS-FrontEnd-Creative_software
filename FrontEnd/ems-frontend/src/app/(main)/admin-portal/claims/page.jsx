@@ -77,7 +77,7 @@ export default function ClaimsManagementPage() {
   const [tabValue, setTabValue] = useState(0);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, pending, approved, rejected
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
@@ -315,11 +315,11 @@ export default function ClaimsManagementPage() {
 
   const filteredClaims = claims.filter(claim => {
     const matchesSearch = 
-      claim.claimId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      claim.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      claim.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      claim.claimType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      claim.description.toLowerCase().includes(searchTerm.toLowerCase());
+      claim.claimId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      claim.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      claim.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      claim.claimType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      claim.description.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesFilter = 
       filterStatus === 'all' || 
@@ -463,7 +463,7 @@ export default function ClaimsManagementPage() {
           <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search claims..."
-              value={searchTerm}
+              value={searchQuery}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
@@ -505,7 +505,7 @@ export default function ClaimsManagementPage() {
           <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search approved claims..."
-              value={searchTerm}
+              value={searchQuery}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
@@ -540,7 +540,7 @@ export default function ClaimsManagementPage() {
           <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search rejected claims..."
-              value={searchTerm}
+              value={searchQuery}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
@@ -575,7 +575,7 @@ export default function ClaimsManagementPage() {
           <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField
               placeholder="Search all claims..."
-              value={searchTerm}
+              value={searchQuery}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (

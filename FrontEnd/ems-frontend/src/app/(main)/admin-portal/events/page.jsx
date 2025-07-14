@@ -78,7 +78,7 @@ export default function EventSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, pending, approved, rejected
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
@@ -311,11 +311,11 @@ export default function EventSubmissionPage() {
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = 
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.organizer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.eventType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase());
+      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.eventType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesFilter = 
       filterStatus === 'all' || 
@@ -459,7 +459,7 @@ export default function EventSubmissionPage() {
         <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             placeholder="Search events..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -499,7 +499,7 @@ export default function EventSubmissionPage() {
         <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             placeholder="Search event history..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (

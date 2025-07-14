@@ -84,7 +84,7 @@ export default function LetterSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
   const [letters, setLetters] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
   const [filterType, setFilterType] = useState('all'); // all, specific letter types
   const [selectedLetter, setSelectedLetter] = useState(null);
@@ -351,11 +351,11 @@ export default function LetterSubmissionPage() {
 
   const filteredLetters = letters.filter(letter => {
     const matchesSearch = 
-      letter.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      letter.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      letter.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      letter.letterType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      letter.department.toLowerCase().includes(searchTerm.toLowerCase());
+      letter.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      letter.employeeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      letter.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      letter.letterType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      letter.department.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesStatusFilter = 
       filterStatus === 'all' || 
@@ -545,7 +545,7 @@ export default function LetterSubmissionPage() {
         <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <TextField
             placeholder="Search letters..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -603,7 +603,7 @@ export default function LetterSubmissionPage() {
         <Box sx={{ mb: 2 }}>
           <TextField
             placeholder="Search unread letters..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -631,7 +631,7 @@ export default function LetterSubmissionPage() {
         <Box sx={{ mb: 2 }}>
           <TextField
             placeholder="Search read letters..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -659,7 +659,7 @@ export default function LetterSubmissionPage() {
         <Box sx={{ mb: 2 }}>
           <TextField
             placeholder="Search high priority letters..."
-            value={searchTerm}
+            value={searchQuery}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (

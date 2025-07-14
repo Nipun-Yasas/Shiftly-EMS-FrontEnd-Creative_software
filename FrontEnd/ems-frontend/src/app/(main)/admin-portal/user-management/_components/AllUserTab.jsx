@@ -8,15 +8,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
 
 import { DataGrid } from "@mui/x-data-grid";
+import SearchField from "../../_components/SearchField";
 
 export default function AllUserTab({
   loading,
@@ -99,43 +96,21 @@ export default function AllUserTab({
       >
         <Typography variant="h6">User List</Typography>
 
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          alignItems: { xs: 'stretch', sm: 'center' }
-        }}>
-          <TextField
-            placeholder="Search users..."
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            alignItems: { xs: "stretch", sm: "center" },
+          }}
+        >
+          <SearchField
+            placeholder="Search ..."
             value={searchQuery}
             onChange={handleSearchChange}
-            variant="outlined"
-            size="small"
-            sx={{ minWidth: { xs: 'auto', sm: 200 } }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  
-                    <IconButton type="button" aria-label="search" size="small">
-                      <SearchIcon />
-                    </IconButton>
-                ),
-                endAdornment: searchQuery && (
-                  <InputAdornment position="end">
-                    <IconButton
-                      size="small"
-                      onClick={() =>
-                        handleSearchChange({ target: { value: "" } })
-                      }
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
+            sx={{ minWidth: { xs: "auto", sm: 200 } }}
           />
-          
+
           <Button
             variant="contained"
             startIcon={<AddIcon />}
