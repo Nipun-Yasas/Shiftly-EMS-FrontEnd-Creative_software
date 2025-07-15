@@ -229,7 +229,7 @@ export default function ProjectManagementPage() {
 
   return (
     <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Tabs
           value={tabValue}
           onChange={handleTabChange}

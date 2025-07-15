@@ -70,7 +70,7 @@ export default function AllProjectTab({
       renderCell: (params) => {
         const progress = calculateProgress(params.row);
         return (
-          <Box sx={{ width: "100%" }}>
+          <Box sx={{ width: "100%", mt: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Box sx={{ width: "100%", mr: 1 }}>
                 <LinearProgress
@@ -160,20 +160,21 @@ export default function AllProjectTab({
           <CircularProgress />
         </Box>
       ) : (
-        <div style={{ height: 400, width: "100%" }}>
+        <Box sx={{ height: 400, width: "100%" }}>
           <DataGrid
             rows={projects}
             columns={columns}
             pageSize={5}
-            rowsPerPageOptions={[5]}
+            rowsPerPageOptions={[10]}
             disableSelectionOnClick
-            sx={{
-              "& .MuiDataGrid-cell:hover": {
-                color: "primary.main",
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
               },
             }}
+            pageSizeOptions={[10, 50, 100]}
           />
-        </div>
+        </Box>
       )}
     </Box>
   );

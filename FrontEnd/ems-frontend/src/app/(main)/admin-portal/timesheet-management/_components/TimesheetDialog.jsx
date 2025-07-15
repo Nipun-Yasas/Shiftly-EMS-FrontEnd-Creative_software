@@ -214,8 +214,10 @@ export default function TimesheetDialog({
               />
             </Box>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Close</Button>
+          <DialogActions sx={{ p: 2 }}>
+            <Button color="textblack" onClick={onClose}>
+              Close
+            </Button>
           </DialogActions>
         </>
       )}

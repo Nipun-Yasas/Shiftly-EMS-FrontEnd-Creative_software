@@ -22,7 +22,7 @@ export default function TeamViewTab({
     {
       field: "employee",
       headerName: "Employee",
-      width: 350,
+      width: 360,
       renderCell: (params) => (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box
@@ -39,9 +39,7 @@ export default function TeamViewTab({
             <PersonIcon />
           </Box>
           <Box>
-            <Typography variant="subtitle2">
-              {params.row.name}
-            </Typography>
+            <Typography variant="subtitle2">{params.row.name}</Typography>
             <Typography variant="body2" color="textSecondary">
               {params.row.email}
             </Typography>
@@ -52,13 +50,13 @@ export default function TeamViewTab({
     {
       field: "project",
       headerName: "Project",
-      width: 220,
+      width: 200,
     },
     {
       field: "pendingSubmissions",
       headerName: "Pending Submissions",
       width: 210,
-      renderCell: (params) => (
+      renderCell: (params) =>
         params.value > 0 ? (
           <Chip
             label={`${params.value} Pending`}
@@ -67,13 +65,12 @@ export default function TeamViewTab({
           />
         ) : (
           <Chip label="None" color="success" size="small" />
-        )
-      ),
+        ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 210,
+      width: 190,
       sortable: false,
       renderCell: (params) => (
         <Button
@@ -82,14 +79,14 @@ export default function TeamViewTab({
           startIcon={<VisibilityIcon />}
           onClick={() => onViewTimesheets(params.row)}
         >
-          View 
+          View
         </Button>
       ),
     },
   ];
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Box
         sx={{
           display: "flex",
@@ -129,7 +126,7 @@ export default function TeamViewTab({
               pending timesheet(s)
             </Typography>
           </Box>
-          <Box >
+          <Box>
             <DataGrid
               rows={teamEmployees}
               columns={columns}

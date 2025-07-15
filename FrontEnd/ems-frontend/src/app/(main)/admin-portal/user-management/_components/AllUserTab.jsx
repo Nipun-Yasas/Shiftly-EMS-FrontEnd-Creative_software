@@ -7,7 +7,6 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import Chip from "@mui/material/Chip";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,34 +25,20 @@ export default function AllUserTab({
   handleAddUserClick,
 }) {
   const columns = [
-    { field: "userId", headerName: "User ID", width: 80 },
-    { field: "username", headerName: "Username", width: 130 },
-    { field: "email", headerName: "Email", width: 200 },
+    { field: "employeeNumber", headerName: "Employee Number", width: 150 },
+    { field: "username", headerName: "Username", width: 160 },
+    { field: "email", headerName: "Email", width: 250 },
     {
       field: "roleId",
       headerName: "Role",
-      width: 100,
+      width: 130,
       renderCell: (params) => params.value?.name || params.value,
     },
-    {
-      field: "isActive",
-      headerName: "Status",
-      width: 100,
-      renderCell: (params) => (
-        <Chip
-          label={params.value ? "Active" : "Inactive"}
-          color={params.value ? "success" : "error"}
-          size="small"
-        />
-      ),
-    },
-    { field: "employeeId", headerName: "Employee ID", width: 120 },
-    { field: "accountStatus", headerName: "Status", width: 100 },
-    { field: "createdBy", headerName: "Created By", width: 130 },
+    { field: "createdBy", headerName: "Created By", width: 140 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 140,
       renderCell: (params) => (
         <Box>
           <Tooltip title="Edit">
@@ -116,7 +101,7 @@ export default function AllUserTab({
             startIcon={<AddIcon />}
             onClick={handleAddUserClick}
           >
-            Add User
+            Assign User
           </Button>
         </Box>
       </Box>
@@ -130,12 +115,14 @@ export default function AllUserTab({
           <DataGrid
             rows={filteredUsers}
             columns={columns}
+            rowsPerPageOptions={[10]}
             disableSelectionOnClick
-            sx={{
-              "& .MuiDataGrid-cell:hover": {
-                color: "primary.main",
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
               },
             }}
+            pageSizeOptions={[10, 50, 100]}
           />
         </div>
       )}

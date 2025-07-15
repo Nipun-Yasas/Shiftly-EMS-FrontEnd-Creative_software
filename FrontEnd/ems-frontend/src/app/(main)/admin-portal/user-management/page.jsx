@@ -12,34 +12,30 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 
 import AllUserTab from "./_components/AllUserTab";
-import AddUserTab from "./_components/AddUserTab";
-import EditUserDialog from "./_components/EditUserDialog";
+import AssignUserTab from "./_components/AssignUserTab";
+import EditRoleDialog from "./_components/EditRoleDialog";
+import AssignUserDialog from "./_components/AssignUserDialog";
 import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
 import TabPanel from "../_components/TabPanel";
 
 export default function UserManagementPage() {
   const [tabValue, setTabValue] = useState(0);
   const [users, setUsers] = useState([]);
+  const [unassignedUsers, setUnassignedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editDialogOpen, setOpenDialog] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [assigningUser, setAssigningUser] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [assignSearchQuery, setAssignSearchQuery] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-
-  const initialFormValues = {
-    userId: "",
-    username: "",
-    email: "",
-    password: "",
-    roleId: null,
-    isActive: true,
-  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -52,40 +48,32 @@ export default function UserManagementPage() {
       console.error("Error fetching users:", error);
       showSnackbar("Error fetching users", "error");
 
+      // Mock data for assigned users
       setUsers([
         {
           id: 1,
-          userId: "USR001",
+          employeeNumber: "EMP001",
           username: "johndoe",
           email: "john.doe@company.com",
           roleId: { id: 1, name: "Admin" },
-          isActive: true,
-          employeeId: "EMP001",
-          accountStatus: "Active",
           createdBy: "System Admin",
           createdAt: "2023-01-15",
         },
         {
           id: 2,
-          userId: "USR002",
+          employeeNumber: "EMP002",
           username: "janesmith",
           email: "jane.smith@company.com",
           roleId: { id: 2, name: "Manager" },
-          isActive: true,
-          employeeId: "EMP002",
-          accountStatus: "Active",
           createdBy: "System Admin",
           createdAt: "2023-03-22",
         },
         {
           id: 3,
-          userId: "USR003",
+          employeeNumber: "EMP003",
           username: "mikejohnson",
           email: "mike.johnson@company.com",
           roleId: { id: 3, name: "Employee" },
-          isActive: false,
-          employeeId: "EMP003",
-          accountStatus: "Inactive",
           createdBy: "HR Manager",
           createdAt: "2023-05-10",
         },
@@ -95,36 +83,82 @@ export default function UserManagementPage() {
     }
   };
 
+  const fetchUnassignedUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.ADMIN_USER.GET_UNASSIGNED_USERS
+      );
+      setUnassignedUsers(response.data || []);
+    } catch (error) {
+      console.error("Error fetching unassigned users:", error);
+      showSnackbar("Error fetching unassigned users", "error");
+
+      // Mock data for unassigned users
+      setUnassignedUsers([
+        {
+          id: 4,
+          username: "newuser1",
+          email: "newuser1@company.com",
+          createdAt: "2023-07-15",
+        },
+        {
+          id: 5,
+          username: "newuser2",
+          email: "newuser2@company.com",
+          createdAt: "2023-07-16",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const userData = {
-        ...values,
+      const roleData = {
         roleId: values.roleId?.id || values.roleId,
       };
 
-      if (editingUser && !values.password) {
-        delete userData.password;
-      }
+      await axiosInstance.put(
+        API_PATHS.ADMIN_USER.UPDATE_USER_ROLE(editingUser.id),
+        roleData
+      );
+      showSnackbar("User role updated successfully", "success");
 
-      if (editingUser) {
-        await axiosInstance.put(
-          API_PATHS.ADMIN_USER.UPDATE_USER(editingUser.id),
-          userData
-        );
-        showSnackbar("User updated successfully", "success");
-      } else {
-        await axiosInstance.post(API_PATHS.ADMIN_USER.ADD_USER, userData);
-        showSnackbar("User added successfully", "success");
-        setTabValue(0);
-      }
-
-      resetForm();
       setOpenDialog(false);
       setEditingUser(null);
       fetchUsers();
     } catch (error) {
-      console.error("Error saving user:", error);
-      showSnackbar("Error saving user", "error");
+      console.error("Error updating user role:", error);
+      showSnackbar("Error updating user role", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAssignSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      const assignData = {
+        employeeNumber: values.employeeNumber,
+        roleId: values.roleId?.id || values.roleId,
+        userId: assigningUser.id,
+      };
+
+      await axiosInstance.post(
+        API_PATHS.ADMIN_USER.ASSIGN_USER,
+        assignData
+      );
+      showSnackbar("User assigned successfully", "success");
+
+      setAssignDialogOpen(false);
+      setAssigningUser(null);
+      fetchUsers();
+      fetchUnassignedUsers();
+      resetForm();
+    } catch (error) {
+      console.error("Error assigning user:", error);
+      showSnackbar("Error assigning user", "error");
     } finally {
       setSubmitting(false);
     }
@@ -157,12 +191,24 @@ export default function UserManagementPage() {
     setOpenDialog(true);
   };
 
+  const handleAssignUser = (user) => {
+    setAssigningUser(user);
+    setAssignDialogOpen(true);
+  };
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+    if (newValue === 1) {
+      fetchUnassignedUsers();
+    }
   };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const handleAssignSearchChange = (event) => {
+    setAssignSearchQuery(event.target.value);
   };
 
   const handleAddUserClick = () => {
@@ -173,9 +219,14 @@ export default function UserManagementPage() {
     (user) =>
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.roleId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.employeeId.toLowerCase().includes(searchQuery.toLowerCase())
+      user.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.roleId?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredUnassignedUsers = unassignedUsers.filter(
+    (user) =>
+      user.username.toLowerCase().includes(assignSearchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(assignSearchQuery.toLowerCase())
   );
 
   useEffect(() => {
@@ -191,7 +242,7 @@ export default function UserManagementPage() {
           aria-label="user management tabs"
         >
           <Tab label="All Users" />
-          <Tab label="Add User" />
+          <Tab label="Assign Users" />
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
@@ -208,18 +259,29 @@ export default function UserManagementPage() {
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <AddUserTab
-            handleSubmit={handleSubmit}
-            initialFormValues={initialFormValues}
+          <AssignUserTab
+            loading={loading}
+            unassignedUsers={filteredUnassignedUsers}
+            handleAssignUser={handleAssignUser}
+            searchQuery={assignSearchQuery}
+            handleSearchChange={handleAssignSearchChange}
           />
         </TabPanel>
 
-        <EditUserDialog
+        <EditRoleDialog
           editDialogOpen={editDialogOpen}
           setOpenDialog={setOpenDialog}
           editingUser={editingUser}
           setEditingUser={setEditingUser}
           handleSubmit={handleSubmit}
+        />
+
+        <AssignUserDialog
+          assignDialogOpen={assignDialogOpen}
+          setAssignDialogOpen={setAssignDialogOpen}
+          assigningUser={assigningUser}
+          setAssigningUser={setAssigningUser}
+          handleAssignSubmit={handleAssignSubmit}
         />
 
         <DeleteConfirmDialog

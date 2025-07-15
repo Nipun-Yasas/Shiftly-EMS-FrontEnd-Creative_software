@@ -9,7 +9,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Formik, Form } from "formik";
 
 import ProjectForm, { projectValidationSchema } from "./ProjectForm";
-import InputItem from "../../../../_components/inputs/InputItem";
 
 export default function AddProjectTab({
   onSubmit,
@@ -28,39 +27,35 @@ export default function AddProjectTab({
       >
         {({ isSubmitting, resetForm }) => (
           <Form>
-            <ProjectForm projectStatuses={projectStatuses}>
-              <InputItem>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: 2,
-                  }}
-                >
-                  <Button
-                    type="button"
-                    color="textblack"
-                    onClick={() => resetForm()}
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting}
-                    startIcon={
-                      isSubmitting ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <AddIcon />
-                      )
-                    }
-                  >
-                    {isSubmitting ? "Adding..." : "Add Project"}
-                  </Button>
-                </Box>
-              </InputItem>
-            </ProjectForm>
+            <ProjectForm projectStatuses={projectStatuses}></ProjectForm>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: 2,
+                mt:2,
+                pt:2,
+                width: "100%",
+              }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isSubmitting}
+                startIcon={
+                  isSubmitting ? <CircularProgress size={20} /> : <AddIcon />
+                }
+              >
+                {isSubmitting ? "Adding..." : "Add Project"}
+              </Button>
+              <Button
+                type="button"
+                color="textblack"
+                onClick={() => resetForm()}
+              >
+                Reset
+              </Button>
+            </Box>
           </Form>
         )}
       </Formik>

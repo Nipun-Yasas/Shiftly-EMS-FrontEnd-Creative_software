@@ -55,7 +55,7 @@ export default function EditProjectDialog({
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <Formik
           initialValues={getInitialValues()}
           validationSchema={projectValidationSchema}
@@ -64,11 +64,16 @@ export default function EditProjectDialog({
         >
           {({ isSubmitting }) => (
             <Form>
-              <ProjectForm projectStatuses={projectStatuses}>
-                <DialogActions sx={{ mt: 3 }}>
-                  <Button color="textblack" onClick={onClose}>
-                    Cancel
-                  </Button>
+              <ProjectForm projectStatuses={projectStatuses}></ProjectForm>
+              <DialogActions  sx={{ p:2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: { xs: "center", sm: "flex-end" },
+                    gap: 2,
+                    width: "100%",
+                  }}
+                >
                   <Button
                     type="submit"
                     variant="contained"
@@ -79,8 +84,11 @@ export default function EditProjectDialog({
                   >
                     {isSubmitting ? "Updating..." : "Update"}
                   </Button>
-                </DialogActions>
-              </ProjectForm>
+                  <Button color="textblack" onClick={onClose}>
+                    Cancel
+                  </Button>
+                </Box>
+              </DialogActions>
             </Form>
           )}
         </Formik>

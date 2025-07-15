@@ -62,7 +62,7 @@ export default function EmployeeViewTab({
     {
       field: "pendingSubmissions",
       headerName: "Pending Submissions",
-      width: 180,
+      width: 150,
       renderCell: (params) =>
         params.value > 0 ? (
           <Chip
@@ -77,7 +77,7 @@ export default function EmployeeViewTab({
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 140,
       sortable: false,
       renderCell: (params) => (
         <Button
@@ -93,7 +93,7 @@ export default function EmployeeViewTab({
   ];
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Box
         sx={{
           display: "flex",
@@ -120,24 +120,21 @@ export default function EmployeeViewTab({
         />
       </Box>
 
-      <div style={{ height: 400, width: "100%" }}>
+      <Box sx={{ height: 400, width: "100%" }}>
         <DataGrid
           rows={employees}
           columns={columns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
           disableSelectionOnClick
-          sx={{
-            "& .MuiDataGrid-cell:hover": {
-              color: "primary.main",
-            },
-          }}
           initialState={{
             pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
+              paginationModel: { page: 0, pageSize: 10 },
             },
           }}
-          pageSizeOptions={[5, 10, 25]}
+          pageSizeOptions={[10, 50, 100]}
         />
-      </div>
+      </Box>
     </Box>
   );
 }

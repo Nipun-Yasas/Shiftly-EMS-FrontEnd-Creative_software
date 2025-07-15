@@ -40,9 +40,7 @@ export default function ProjectViewTab({
             <PersonIcon />
           </Box>
           <Box>
-            <Typography variant="subtitle2">
-              {params.row.name}
-            </Typography>
+            <Typography variant="subtitle2">{params.row.name}</Typography>
             <Typography variant="body2" color="textSecondary">
               {params.row.email}
             </Typography>
@@ -53,13 +51,13 @@ export default function ProjectViewTab({
     {
       field: "team",
       headerName: "Team",
-      width: 220,
+      width: 210,
     },
     {
       field: "pendingSubmissions",
       headerName: "Pending Submissions",
       width: 210,
-      renderCell: (params) => (
+      renderCell: (params) =>
         params.value > 0 ? (
           <Chip
             label={`${params.value} Pending`}
@@ -68,13 +66,12 @@ export default function ProjectViewTab({
           />
         ) : (
           <Chip label="None" color="success" size="small" />
-        )
-      ),
+        ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 210,
+      width: 190,
       sortable: false,
       renderCell: (params) => (
         <Button
@@ -90,7 +87,7 @@ export default function ProjectViewTab({
   ];
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Box
         sx={{
           display: "flex",

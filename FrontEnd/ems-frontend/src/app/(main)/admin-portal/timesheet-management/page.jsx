@@ -6,6 +6,7 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import Paper from "@mui/material/Paper";
 
 import EmployeeViewTab from "./_components/EmployeeViewTab";
 import TeamViewTab from "./_components/TeamViewTab";
@@ -19,17 +20,17 @@ const TimesheetAdminReview = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewTab, setViewTab] = useState(0);
-  
+
   // State for timesheet details
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [timesheetDialogOpen, setTimesheetDialogOpen] = useState(false);
   const [employeeTimesheets, setEmployeeTimesheets] = useState([]);
-  
+
   // State for notifications
   const [notification, setNotification] = useState({
     open: false,
     message: "",
-    severity: "success"
+    severity: "success",
   });
 
   // Mock data
@@ -42,7 +43,7 @@ const TimesheetAdminReview = () => {
         team: "Development",
         project: "Web Platform",
         pendingSubmissions: 2,
-        profileImage: "/images/avatars/1.jpg"
+        profileImage: "/images/avatars/1.jpg",
       },
       {
         id: 2,
@@ -51,7 +52,7 @@ const TimesheetAdminReview = () => {
         team: "Design",
         project: "Mobile App",
         pendingSubmissions: 1,
-        profileImage: "/images/avatars/2.jpg"
+        profileImage: "/images/avatars/2.jpg",
       },
       {
         id: 3,
@@ -60,7 +61,7 @@ const TimesheetAdminReview = () => {
         team: "Development",
         project: "Web Platform",
         pendingSubmissions: 0,
-        profileImage: "/images/avatars/3.jpg"
+        profileImage: "/images/avatars/3.jpg",
       },
       {
         id: 4,
@@ -69,7 +70,7 @@ const TimesheetAdminReview = () => {
         team: "QA",
         project: "Mobile App",
         pendingSubmissions: 3,
-        profileImage: "/images/avatars/4.jpg"
+        profileImage: "/images/avatars/4.jpg",
       },
       {
         id: 5,
@@ -78,10 +79,10 @@ const TimesheetAdminReview = () => {
         team: "Design",
         project: "Web Platform",
         pendingSubmissions: 1,
-        profileImage: "/images/avatars/5.jpg"
-      }
+        profileImage: "/images/avatars/5.jpg",
+      },
     ];
-    
+
     setEmployees(mockEmployees);
     setFilteredEmployees(mockEmployees);
   }, []);
@@ -96,7 +97,7 @@ const TimesheetAdminReview = () => {
         workMode: "Online",
         activity: "Development",
         hours: "8.00",
-        status: "Pending"
+        status: "Pending",
       },
       {
         id: 102,
@@ -105,7 +106,7 @@ const TimesheetAdminReview = () => {
         workMode: "On-site",
         activity: "Development",
         hours: "7.50",
-        status: "Pending"
+        status: "Pending",
       },
       {
         id: 103,
@@ -114,7 +115,7 @@ const TimesheetAdminReview = () => {
         workMode: "Online",
         activity: "Training",
         hours: "6.00",
-        status: "Pending"
+        status: "Pending",
       },
       {
         id: 104,
@@ -123,8 +124,8 @@ const TimesheetAdminReview = () => {
         workMode: "On-site",
         activity: "Meeting",
         hours: "8.00",
-        status: "Pending"
-      }
+        status: "Pending",
+      },
     ];
   };
 
@@ -180,11 +181,11 @@ const TimesheetAdminReview = () => {
           : timesheet
       )
     );
-    
+
     setNotification({
       open: true,
       message: "Timesheet entry approved successfully",
-      severity: "success"
+      severity: "success",
     });
   };
 
@@ -197,26 +198,26 @@ const TimesheetAdminReview = () => {
           : timesheet
       )
     );
-    
+
     setNotification({
       open: true,
       message: "Timesheet entry rejected",
-      severity: "error"
+      severity: "error",
     });
   };
 
   // Close notification
   const handleCloseNotification = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setNotification({ ...notification, open: false });
   };
 
-  // Group employees by team
+  // Group employees by team (using filtered employees)
   const getTeamGroupedEmployees = () => {
     const teams = {};
-    employees.forEach((employee) => {
+    filteredEmployees.forEach((employee) => {
       if (!teams[employee.team]) {
         teams[employee.team] = [];
       }
@@ -225,10 +226,10 @@ const TimesheetAdminReview = () => {
     return teams;
   };
 
-  // Group employees by project
+  // Group employees by project (using filtered employees)
   const getProjectGroupedEmployees = () => {
     const projects = {};
-    employees.forEach((employee) => {
+    filteredEmployees.forEach((employee) => {
       if (!projects[employee.project]) {
         projects[employee.project] = [];
       }
@@ -238,8 +239,8 @@ const TimesheetAdminReview = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+      <Box sx={{ p: 2 }}>
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
@@ -250,68 +251,68 @@ const TimesheetAdminReview = () => {
           <Tab label="Project View" />
           <Tab label="Reports" />
         </Tabs>
-      </Box>
 
-      <TabPanel value={tabValue} index={0}>
-        <EmployeeViewTab
-          employees={filteredEmployees}
-          searchQuery={searchQuery}
-          handleSearchChange={handleSearchChange}
-          onViewTimesheets={handleViewTimesheets}
+        <TabPanel value={tabValue} index={0}>
+          <EmployeeViewTab
+            employees={filteredEmployees}
+            searchQuery={searchQuery}
+            handleSearchChange={handleSearchChange}
+            onViewTimesheets={handleViewTimesheets}
+          />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          <TeamViewTab
+            teamGroupedEmployees={getTeamGroupedEmployees()}
+            searchQuery={searchQuery}
+            handleSearchChange={handleSearchChange}
+            onViewTimesheets={handleViewTimesheets}
+          />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          <ProjectViewTab
+            projectGroupedEmployees={getProjectGroupedEmployees()}
+            searchQuery={searchQuery}
+            handleSearchChange={handleSearchChange}
+            onViewTimesheets={handleViewTimesheets}
+          />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={3}>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6">Timesheet Reports</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reports functionality coming soon...
+            </Typography>
+          </Box>
+        </TabPanel>
+
+        <TimesheetDialog
+          open={timesheetDialogOpen}
+          onClose={handleCloseTimesheetDialog}
+          selectedEmployee={selectedEmployee}
+          employeeTimesheets={employeeTimesheets}
+          onApprove={handleApproveTimesheet}
+          onReject={handleRejectTimesheet}
         />
-      </TabPanel>
 
-      <TabPanel value={tabValue} index={1}>
-        <TeamViewTab
-          teamGroupedEmployees={getTeamGroupedEmployees()}
-          searchQuery={searchQuery}
-          handleSearchChange={handleSearchChange}
-          onViewTimesheets={handleViewTimesheets}
-        />
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={2}>
-        <ProjectViewTab
-          projectGroupedEmployees={getProjectGroupedEmployees()}
-          searchQuery={searchQuery}
-          handleSearchChange={handleSearchChange}
-          onViewTimesheets={handleViewTimesheets}
-        />
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={3}>
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h6">Timesheet Reports</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Reports functionality coming soon...
-          </Typography>
-        </Box>
-      </TabPanel>
-
-      <TimesheetDialog
-        open={timesheetDialogOpen}
-        onClose={handleCloseTimesheetDialog}
-        selectedEmployee={selectedEmployee}
-        employeeTimesheets={employeeTimesheets}
-        onApprove={handleApproveTimesheet}
-        onReject={handleRejectTimesheet}
-      />
-
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={5000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseNotification} 
-          severity={notification.severity}
-          variant="filled"
+        <Snackbar
+          open={notification.open}
+          autoHideDuration={5000}
+          onClose={handleCloseNotification}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={handleCloseNotification}
+            severity={notification.severity}
+            variant="filled"
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Paper>
   );
 };
 
