@@ -83,7 +83,7 @@ export default function EventSubmissionPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
-  const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
+  const [openApprovalDialog, setApprovalDialogOpen] = useState(false);
   const [approvalAction, setApprovalAction] = useState(''); // 'approve' or 'reject'
   const [approvalReason, setApprovalReason] = useState('');
   const [actionHistory, setActionHistory] = useState([]);
@@ -217,7 +217,7 @@ export default function EventSubmissionPage() {
     setSelectedEvent(event);
     setApprovalAction(action);
     setApprovalReason('');
-    setOpenApprovalDialog(true);
+    setApprovalDialogOpen(true);
   };
 
   const submitApprovalAction = async () => {
@@ -249,7 +249,7 @@ export default function EventSubmissionPage() {
         `Event ${approvalAction === 'approve' ? 'approved' : 'rejected'} successfully`, 
         'success'
       );
-      setOpenApprovalDialog(false);
+      setApprovalDialogOpen(false);
       setOpenDetailDialog(false);
     } catch (error) {
       console.error(`Error ${approvalAction}ing event:`, error);
@@ -715,7 +715,7 @@ export default function EventSubmissionPage() {
       {/* Approval/Rejection Dialog */}
       <Dialog
         open={openApprovalDialog}
-        onClose={() => setOpenApprovalDialog(false)}
+        onClose={() => setApprovalDialogOpen(false)}
         maxWidth="sm"
         fullWidth
       >
@@ -754,7 +754,7 @@ export default function EventSubmissionPage() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenApprovalDialog(false)}>
+          <Button onClick={() => setApprovalDialogOpen(false)}>
             Cancel
           </Button>
           <Button

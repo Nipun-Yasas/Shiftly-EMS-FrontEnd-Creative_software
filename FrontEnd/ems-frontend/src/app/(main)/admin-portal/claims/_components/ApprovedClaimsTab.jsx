@@ -10,28 +10,9 @@ export default function ApprovedClaimsTab({
   claims,
   loading,
   searchQuery,
-  onSearchChange,
+  handleSearchChange,
   onViewClaim,
 }) {
-  const filteredClaims = claims.filter((claim) => {
-    const matchesSearch =
-      !searchQuery ||
-      claim.employee_name
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.department
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.type?.toLowerCase().includes(String(searchQuery).toLowerCase()) ||
-      claim.description
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase());
-
-    const matchesStatus = claim.status === "approved";
-
-    return matchesSearch && matchesStatus;
-  });
-
   return (
     <Box sx={{ p: 3 }}>
       <Box
@@ -47,12 +28,12 @@ export default function ApprovedClaimsTab({
         <SearchField
           placeholder="Search approved claims..."
           value={searchQuery}
-          onChange={onSearchChange}
+          onChange={handleSearchChange}
           sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
       <ClaimsDataGrid
-        claims={filteredClaims}
+        claims={claims}
         loading={loading}
         onViewClaim={onViewClaim}
       />

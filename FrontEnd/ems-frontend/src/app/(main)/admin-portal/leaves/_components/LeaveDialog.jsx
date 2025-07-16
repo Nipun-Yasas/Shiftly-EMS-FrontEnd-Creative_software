@@ -15,32 +15,23 @@ import Close from "@mui/icons-material/Close";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import Cancel from "@mui/icons-material/Cancel";
 
-export default function ClaimApprovalDialog({
+export default function LeaveDialog({
   open,
   onClose,
-  selectedClaim,
-  action,
-  onApprove,
-  onReject,
+  selectedLeave,
+  approvalAction,
+  approvalReason,
+  setApprovalReason,
+  onSubmit,
 }) {
-  const [reason, setReason] = useState("");
-
-  const handleApprove = () => {
-    if (onApprove) {
-      onApprove(reason);
+  const handleSubmit = () => {
+    if (onSubmit) {
+      onSubmit();
     }
-    setReason("");
-  };
-
-  const handleReject = () => {
-    if (onReject) {
-      onReject(reason);
-    }
-    setReason("");
   };
 
   const handleClose = () => {
-    setReason("");
+    setApprovalReason("");
     onClose();
   };
 
@@ -55,7 +46,7 @@ export default function ClaimApprovalDialog({
           }}
         >
           <Typography variant="h6">
-            {action === "approve" ? "Approve Claim" : "Reject Claim"}
+            {approvalAction === "approve" ? "Approve Leave" : "Reject Leave"}
           </Typography>
           <IconButton onClick={handleClose}>
             <Close />
@@ -63,31 +54,32 @@ export default function ClaimApprovalDialog({
         </Box>
       </DialogTitle>
       <DialogContent dividers>
-        {selectedClaim && (
+        {selectedLeave && (
           <Box>
             <Typography variant="h6" gutterBottom>
-              {selectedClaim.employee_name} - {selectedClaim.type}
+              {selectedLeave.employeeName} - {selectedLeave.leaveType}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              Amount: ${selectedClaim.amount?.toFixed(2)}
+              Duration: {selectedLeave.leaveDuration} day
+              {selectedLeave.leaveDuration > 1 ? "s" : ""}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {selectedClaim.description}
+              {selectedLeave.reason}
             </Typography>
             <TextField
               fullWidth
               multiline
               rows={4}
               label={
-                action === "approve"
+                approvalAction === "approve"
                   ? "Approval Notes (optional)"
-                  : "Rejection Reason (optional)"
+                  : "Rejection Reason (required)"
               }
               variant="outlined"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              value={approvalReason}
+              onChange={(e) => setApprovalReason(e.target.value)}
               placeholder={
-                action === "approve"
+                approvalAction === "approve"
                   ? "Any additional notes..."
                   : "Please provide a reason for rejection..."
               }
@@ -96,7 +88,7 @@ export default function ClaimApprovalDialog({
           </Box>
         )}
       </DialogContent>
-      <DialogActions sx={{p:2}}>
+      <DialogActions sx={{ p: 2 }}>
         <Box
           sx={{
             justifyContent: { xs: "center", md: "flex-end" },
@@ -105,12 +97,12 @@ export default function ClaimApprovalDialog({
             width: "100%",
           }}
         >
-          {action === "approve" ? (
+          {approvalAction === "approve" ? (
             <Button
               color="success"
               variant="contained"
               startIcon={<CheckCircle />}
-              onClick={handleApprove}
+              onClick={handleSubmit}
             >
               Approve
             </Button>
@@ -119,7 +111,7 @@ export default function ClaimApprovalDialog({
               color="error"
               variant="contained"
               startIcon={<Cancel />}
-              onClick={handleReject}
+              onClick={handleSubmit}
             >
               Reject
             </Button>

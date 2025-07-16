@@ -21,21 +21,21 @@ import ClaimDialog from "./_components/ClaimDialog";
 import TabPanel from "../_components/TabPanel";
 
 export default function ClaimsManagementPage() {
+  const [tabValue, setTabValue] = useState(0);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedClaim, setSelectedClaim] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
-  const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState("");
-  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterCategory, setFilterCategory] = useState("all");
+  const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const [openApprovalDialog, setApprovalDialogOpen] = useState(false);
   const [approvalAction, setApprovalAction] = useState("");
+  const [approvalReason, setApprovalReason] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   // Sample claims data - replace with actual API calls
   const sampleClaims = [
@@ -105,127 +105,120 @@ export default function ClaimsManagementPage() {
       // const response = await axiosInstance.get(API_PATHS.CLAIMS);
       // setClaims(response.data.data || []);
       setClaims(sampleClaims);
-      setError(null);
     } catch (err) {
       console.error("Error fetching claims:", err);
-      setError(err.response?.data?.message || "Failed to fetch claims");
     } finally {
       setLoading(false);
     }
   };
 
   // Handle claim action
-  const handleClaimAction = async (claimId, action, reason = "") => {
+  const submitApprovalAction = async () => {
+    if (!selectedClaim || !approvalAction) return;
+
     try {
-      // For demo purposes, update local state
+      // Replace with actual API call
+      // await axiosInstance.put(`/api/claims/${selectedClaim.id}/${approvalAction}`, {
+      //   reason: approvalReason
+      // });
+
+      const updatedStatus =
+        approvalAction === "approve" ? "approved" : "rejected";
+
       setClaims((prev) =>
         prev.map((claim) =>
-          claim.id === claimId
+          claim.id === selectedClaim.id
             ? {
                 ...claim,
-                status: action,
-                rejectionReason: action === "rejected" ? reason : null,
+                status: updatedStatus,
+                approvedBy:
+                  approvalAction === "approve" ? "Current Admin" : null,
+                approvedAt:
+                  approvalAction === "approve"
+                    ? new Date().toISOString()
+                    : null,
+                rejectionReason:
+                  approvalAction === "reject" ? approvalReason : null,
               }
             : claim
         )
       );
 
-      // const response = await axiosInstance.put(`${API_PATHS.CLAIMS}/${claimId}/status`, {
-      //   status: action,
-      //   reason: reason
-      // });
-
-      setSnackbarMessage(`Claim ${action} successfully`);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-
-      // Refresh claims data
-      // await fetchClaims();
-    } catch (err) {
-      console.error("Error updating claim:", err);
-      setSnackbarMessage(
-        err.response?.data?.message || "Failed to update claim"
+      showSnackbar(
+        `Claim ${approvalAction === "approve" ? "approved" : "rejected"} successfully`,
+        "success"
       );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      setApprovalDialogOpen(false);
+      setOpenDetailDialog(false);
+    } catch (error) {
+      console.error(`Error ${approvalAction}ing claim:`, error);
+      showSnackbar(`Error ${approvalAction}ing claim`, "error");
     }
   };
 
-  // Handle view claim
-  const handleViewClaim = (claim) => {
-    setSelectedClaim(claim);
-    setDialogOpen(true);
-    setDialogType("view");
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
   };
 
-  // Handle approve/reject
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleViewDetails = (claim) => {
+    setSelectedClaim(claim);
+    setOpenDetailDialog(true);
+  };
+
   const handleApprovalAction = (claim, action) => {
     setSelectedClaim(claim);
     setApprovalAction(action);
+    setApprovalReason("");
     setApprovalDialogOpen(true);
   };
 
-  // Get filtered claims
-  const getFilteredClaims = (status = "all") => {
-    return claims.filter((claim) => {
-      const matchesStatus = status === "all" || claim.status === status;
-      const matchesSearch =
-        !searchQuery ||
-        claim.employee_name
-          ?.toLowerCase()
-          .includes(String(searchQuery).toLowerCase()) ||
-        claim.type?.toLowerCase().includes(String(searchQuery).toLowerCase()) ||
-        claim.description
-          ?.toLowerCase()
-          .includes(String(searchQuery).toLowerCase());
-      const matchesCategory =
-        filterCategory === "all" || claim.category === filterCategory;
+  const filteredClaims = claims.filter((claim) => {
+    const matchesSearch =
+      claim.employee_name
+        ?.toLowerCase()
+        .includes(String(searchQuery).toLowerCase()) ||
+      claim.type?.toLowerCase().includes(String(searchQuery).toLowerCase()) ||
+      claim.description
+        ?.toLowerCase()
+        .includes(String(searchQuery).toLowerCase()) ||
+      claim.department
+        ?.toLowerCase()
+        .includes(String(searchQuery).toLowerCase());
 
-      return matchesStatus && matchesSearch && matchesCategory;
-    });
+    const matchesFilter =
+      filterStatus === "all" || claim.status === filterStatus;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const getFilteredClaims = (status) => {
+    if (status === "all") {
+      return filteredClaims;
+    }
+    return filteredClaims.filter((claim) => claim.status === status);
   };
 
-  // Get counts for badges
-  const getCounts = () => {
-    return {
-      all: claims.length,
-      pending: claims.filter((c) => c.status === "pending").length,
-    };
-  };
-
-  const counts = getCounts();
-
-  // Handle tab change
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  // Handle snackbar close
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  // Handle dialog close
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setSelectedClaim(null);
-    setDialogType("");
-  };
-
-  // Handle approval dialog close
-  const handleApprovalDialogClose = () => {
-    setApprovalDialogOpen(false);
-    setSelectedClaim(null);
-    setApprovalAction("");
-  };
+  const pendingCount = claims.filter((l) => l.status === "pending").length;
 
   const tabProps = {
     claims: getFilteredClaims(),
     loading,
-    onViewClaim: handleViewClaim,
+    onViewClaim: handleViewDetails,
     onApprovalAction: handleApprovalAction,
     searchQuery,
-    onSearchChange: (event) => setSearchQuery(event.target.value),
+    handleSearchChange,
     filterStatus,
     setFilterStatus,
   };
@@ -234,14 +227,14 @@ export default function ClaimsManagementPage() {
     <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs
-          value={activeTab}
+          value={tabValue}
           onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
         >
           <Tab
             label={
-              <Badge badgeContent={counts.pending} color="warning">
+              <Badge badgeContent={pendingCount} color="warning">
                 <Box sx={{ px: 1 }}>Pending</Box>
               </Badge>
             }
@@ -252,63 +245,62 @@ export default function ClaimsManagementPage() {
         </Tabs>
       </Box>
 
-      <TabPanel value={activeTab} index={0}>
+      <TabPanel value={tabValue} index={0}>
         <PendingClaimsTab {...tabProps} claims={getFilteredClaims("pending")} />
       </TabPanel>
 
-      <TabPanel value={activeTab} index={1}>
+      <TabPanel value={tabValue} index={1}>
         <ApprovedClaimsTab
           {...tabProps}
           claims={getFilteredClaims("approved")}
         />
       </TabPanel>
 
-      <TabPanel value={activeTab} index={2}>
+      <TabPanel value={tabValue} index={2}>
         <RejectedClaimsTab
           {...tabProps}
           claims={getFilteredClaims("rejected")}
         />
       </TabPanel>
-      <TabPanel value={activeTab} index={3}>
+      <TabPanel value={tabValue} index={3}>
         <AllClaimsTab {...tabProps} claims={getFilteredClaims("all")} />
       </TabPanel>
 
       {/* Claim Details Dialog */}
       <ClaimDetailsDialog
-        open={dialogOpen}
-        claim={selectedClaim}
-        onClose={handleDialogClose}
+        open={openDetailDialog}
+        selectedClaim={selectedClaim}
+        onClose={() => setOpenDetailDialog(false)}
+        onApprovalAction={handleApprovalAction}
       />
 
       {/* Claim Dialog */}
       <ClaimDialog
-        open={approvalDialogOpen}
-        claim={selectedClaim}
+        open={openApprovalDialog}
+        selectedClaim={selectedClaim}
         action={approvalAction}
-        onClose={handleApprovalDialogClose}
+        onClose={() => setApprovalDialogOpen(false)}
         onApprove={(reason) => {
-          handleClaimAction(selectedClaim?.id, "approved", reason);
-          handleApprovalDialogClose();
+          submitApprovalAction();
         }}
         onReject={(reason) => {
-          handleClaimAction(selectedClaim?.id, "rejected", reason);
-          handleApprovalDialogClose();
+          submitApprovalAction();
         }}
       />
 
       {/* Snackbar for notifications */}
       <Snackbar
-        open={snackbarOpen}
+        open={snackbar.open}
         autoHideDuration={6000}
-        onClose={handleSnackbarClose}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
           sx={{ width: "100%" }}
         >
-          {snackbarMessage}
+          {snackbar.message}
         </Alert>
       </Snackbar>
     </Paper>

@@ -4,39 +4,32 @@ import React from "react";
 import Box from "@mui/material/Box";
 
 import SearchField from "../../_components/SearchField";
-import ClaimsDataGrid from "./ClaimsDataGrid";
+import LeavesDataGrid from "./LeavesDataGrid";
 
-export default function PendingClaimsTab({
-  claims,
+export default function PendingLeavesTab({
+  leaves,
   loading,
   searchQuery,
   handleSearchChange,
-  onViewClaim,
+  onViewDetails,
   onApprovalAction,
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          mb: 3,
-        }}
-      >
+      <Box sx={{ pb: 2, display: "flex", alignItems: "center" }}>
         <SearchField
-          placeholder="Search claims..."
+          placeholder="Search pending leaves..."
           value={searchQuery}
           onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
+          sx={{ minWidth: 300 }}
         />
       </Box>
 
-      <ClaimsDataGrid
-        claims={claims}
+      <LeavesDataGrid
         loading={loading}
-        onViewClaim={onViewClaim}
+        leaves={leaves}
+        onViewDetails={onViewDetails}
         onApprovalAction={onApprovalAction}
-        showApprovalActions={true}
       />
     </Box>
   );

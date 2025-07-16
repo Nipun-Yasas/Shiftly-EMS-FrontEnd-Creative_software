@@ -9,28 +9,25 @@ import Badge from "@mui/material/Badge";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-import PendingTab from "./_components/PendingTab";
-import ApprovedTab from "./_components/ApprovedTab";
-import RejectedTab from "./_components/RejectedTab";
+import PendingLeavesTab from "./_components/PendingLeavesTab";
+import ApprovedLeavesTab from "./_components/ApprovedLeavesTab";
+import RejectedLeavesTab from "./_components/RejectedLeavesTab";
 import AllLeavesTab from "./_components/AllLeavesTab";
-import DetailsDialog from "./_components/DetailsDialog";
-import HistoryDialog from "./_components/HistoryDialog";
-import ApprovalDialog from "./_components/ApprovalDialog";
+import LeaveDetailsDialog from "./_components/LeaveDetailsDialog";
+import LeaveDialog from "./_components/LeaveDialog";
 import TabPanel from "../_components/TabPanel";
 
 export default function LeavesManagementPage() {
   const [tabValue, setTabValue] = useState(0);
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedLeave, setSelectedLeave] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
-  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
-  const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
+  const [openApprovalDialog, setApprovalDialogOpen] = useState(false);
   const [approvalAction, setApprovalAction] = useState("");
   const [approvalReason, setApprovalReason] = useState("");
-  const [actionHistory, setActionHistory] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -41,11 +38,10 @@ export default function LeavesManagementPage() {
   const sampleLeaves = [
     {
       id: 1,
-      leaveId: "LV-2025-001",
       employeeName: "John Smith",
       employeeEmail: "john.smith@company.com",
       department: "Engineering",
-      leaveType: "Annual Leave",
+      leaveType: "Annual",
       leaveFrom: "2025-07-15T00:00:00",
       leaveTo: "2025-07-19T00:00:00",
       leaveDuration: 5,
@@ -60,11 +56,10 @@ export default function LeavesManagementPage() {
     },
     {
       id: 2,
-      leaveId: "LV-2025-002",
       employeeName: "Sarah Johnson",
       employeeEmail: "sarah.johnson@company.com",
       department: "Marketing",
-      leaveType: "Sick Leave",
+      leaveType: "Sick",
       leaveFrom: "2025-07-14T00:00:00",
       leaveTo: "2025-07-16T00:00:00",
       leaveDuration: 3,
@@ -79,11 +74,10 @@ export default function LeavesManagementPage() {
     },
     {
       id: 3,
-      leaveId: "LV-2025-003",
       employeeName: "Mike Chen",
       employeeEmail: "mike.chen@company.com",
       department: "Sales",
-      leaveType: "Casual Leave",
+      leaveType: "Casual",
       leaveFrom: "2025-07-20T00:00:00",
       leaveTo: "2025-07-20T00:00:00",
       leaveDuration: 1,
@@ -98,11 +92,10 @@ export default function LeavesManagementPage() {
     },
     {
       id: 4,
-      leaveId: "LV-2025-004",
       employeeName: "Emma Davis",
       employeeEmail: "emma.davis@company.com",
       department: "HR",
-      leaveType: "Maternity Leave",
+      leaveType: "Maternity",
       leaveFrom: "2025-08-01T00:00:00",
       leaveTo: "2025-11-01T00:00:00",
       leaveDuration: 92,
@@ -117,11 +110,10 @@ export default function LeavesManagementPage() {
     },
     {
       id: 5,
-      leaveId: "LV-2025-005",
       employeeName: "Alex Rodriguez",
       employeeEmail: "alex.rodriguez@company.com",
       department: "IT",
-      leaveType: "Vacation Leave",
+      leaveType: "Vacation",
       leaveFrom: "2025-07-25T00:00:00",
       leaveTo: "2025-07-26T00:00:00",
       leaveDuration: 2,
@@ -159,34 +151,6 @@ export default function LeavesManagementPage() {
     }
   };
 
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleViewDetails = (leave) => {
-    setSelectedLeave(leave);
-    setOpenDetailDialog(true);
-  };
-
-  const handleApprovalAction = (leave, action) => {
-    setSelectedLeave(leave);
-    setApprovalAction(action);
-    setApprovalReason("");
-    setOpenApprovalDialog(true);
-  };
-
   const submitApprovalAction = async () => {
     if (!selectedLeave || !approvalAction) return;
 
@@ -222,7 +186,7 @@ export default function LeavesManagementPage() {
         `Leave ${approvalAction === "approve" ? "approved" : "rejected"} successfully`,
         "success"
       );
-      setOpenApprovalDialog(false);
+      setApprovalDialogOpen(false);
       setOpenDetailDialog(false);
     } catch (error) {
       console.error(`Error ${approvalAction}ing leave:`, error);
@@ -230,86 +194,36 @@ export default function LeavesManagementPage() {
     }
   };
 
-  const handleViewHistory = async (leaveId) => {
-    try {
-      // Replace with actual API call
-      // const response = await axiosInstance.get(`/api/leaves/${leaveId}/action-history`);
-      // setActionHistory(response.data || []);
-
-      // Sample action history data
-      const sampleHistory = [
-        {
-          id: 1,
-          adminName: "John Doe",
-          adminEmail: "john.doe@company.com",
-          action: "viewed details",
-          timestamp: "2025-07-12T10:30:00",
-          notes: "Initial review",
-        },
-        {
-          id: 2,
-          adminName: "Jane Smith",
-          adminEmail: "jane.smith@company.com",
-          action: "approved",
-          timestamp: "2025-07-12T14:15:00",
-          notes: "Approved after verifying leave balance",
-        },
-      ];
-
-      setActionHistory(sampleHistory);
-      setOpenHistoryDialog(true);
-    } catch (error) {
-      console.error("Error fetching action history:", error);
-      showSnackbar("Error fetching action history", "error");
-    }
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "approved":
-        return "success";
-      case "rejected":
-        return "error";
-      case "pending":
-        return "warning";
-      default:
-        return "default";
-    }
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "approved":
-        return "CheckCircle";
-      case "rejected":
-        return "Cancel";
-      case "pending":
-        return "AccessTime";
-      default:
-        return "EventAvailable";
-    }
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
-  const getLeaveTypeColor = (leaveType) => {
-    switch (leaveType) {
-      case "Annual Leave":
-        return "#D81B60";
-      case "Casual Leave":
-        return "#2563EB";
-      case "Sick Leave":
-        return "#DC2626";
-      case "Maternity Leave":
-        return "#059669";
-      case "Vacation Leave":
-        return "#7C3AED";
-      default:
-        return "#6B7280";
-    }
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleViewDetails = (leave) => {
+    setSelectedLeave(leave);
+    setOpenDetailDialog(true);
+  };
+
+  const handleApprovalAction = (leave, action) => {
+    setSelectedLeave(leave);
+    setApprovalAction(action);
+    setApprovalReason("");
+    setApprovalDialogOpen(true);
   };
 
   const filteredLeaves = leaves.filter((leave) => {
     const matchesSearch =
-      leave.leaveId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       leave.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       leave.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
       leave.leaveType.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -321,18 +235,24 @@ export default function LeavesManagementPage() {
     return matchesSearch && matchesFilter;
   });
 
+  const getFilteredLeaves = (status) => {
+    if (status === "all") {
+      return filteredLeaves;
+    }
+    return filteredLeaves.filter((leave) => leave.status === status);
+  };
+
   const pendingCount = leaves.filter((l) => l.status === "pending").length;
 
-  const commonProps = {
+  const tabProps = {
+    leaves: getFilteredLeaves(),
     loading,
-    searchQuery,
-    handleSearchChange,
     onViewDetails: handleViewDetails,
     onApprovalAction: handleApprovalAction,
-    onViewHistory: handleViewHistory,
-    getStatusColor,
-    getStatusIcon,
-    getLeaveTypeColor,
+    searchQuery,
+    handleSearchChange,
+    filterStatus,
+    setFilterStatus,
   };
 
   return (
@@ -352,57 +272,31 @@ export default function LeavesManagementPage() {
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <PendingTab
-            leaves={filteredLeaves.filter((l) => l.status === "pending")}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            {...commonProps}
-          />
+          <PendingLeavesTab {...tabProps} leaves={getFilteredLeaves("pending")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <ApprovedTab
-            leaves={filteredLeaves.filter((l) => l.status === "approved")}
-            {...commonProps}
-          />
+          <ApprovedLeavesTab {...tabProps} leaves={getFilteredLeaves("approved")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={2}>
-          <RejectedTab
-            leaves={filteredLeaves.filter((l) => l.status === "rejected")}
-            {...commonProps}
-          />
+          <RejectedLeavesTab {...tabProps} leaves={getFilteredLeaves("rejected")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={3}>
-          <AllLeavesTab
-            leaves={filteredLeaves}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            {...commonProps}
-          />
+          <AllLeavesTab {...tabProps} leaves={getFilteredLeaves("all")} />
         </TabPanel>
 
-        <DetailsDialog
+        <LeaveDetailsDialog
           open={openDetailDialog}
           onClose={() => setOpenDetailDialog(false)}
           selectedLeave={selectedLeave}
           onApprovalAction={handleApprovalAction}
-          onViewHistory={handleViewHistory}
-          getStatusColor={getStatusColor}
-          getStatusIcon={getStatusIcon}
-          getLeaveTypeColor={getLeaveTypeColor}
         />
 
-        <HistoryDialog
-          open={openHistoryDialog}
-          onClose={() => setOpenHistoryDialog(false)}
-          actionHistory={actionHistory}
-        />
-
-        <ApprovalDialog
+        <LeaveDialog
           open={openApprovalDialog}
-          onClose={() => setOpenApprovalDialog(false)}
+          onClose={() => setApprovalDialogOpen(false)}
           selectedLeave={selectedLeave}
           approvalAction={approvalAction}
           approvalReason={approvalReason}

@@ -14,10 +14,7 @@ import CheckCircle from "@mui/icons-material/CheckCircle";
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 
-import {
-  getStatusColor,
-  getStatusIcon,
-} from "../../_helpers/StatusHelper";
+import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
 
 export default function ClaimsDataGrid({
   claims,

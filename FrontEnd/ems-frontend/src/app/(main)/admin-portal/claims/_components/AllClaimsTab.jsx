@@ -12,32 +12,12 @@ export default function AllClaimsTab({
   claims,
   loading,
   searchQuery,
-  onSearchChange,
-  filterStatus = "all",
+  handleSearchChange,
+  filterStatus,
   setFilterStatus,
   onViewClaim,
   onApprovalAction,
 }) {
-  const filteredClaims = claims.filter((claim) => {
-    const matchesSearch =
-      !searchQuery ||
-      claim.employee_name
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.department
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.type?.toLowerCase().includes(String(searchQuery).toLowerCase()) ||
-      claim.description
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase());
-
-    const matchesFilter =
-      filterStatus === "all" || claim.status === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
-
   return (
     <Box sx={{ p: 3 }}>
       <Box
@@ -53,7 +33,7 @@ export default function AllClaimsTab({
         <SearchField
           placeholder="Search all claims..."
           value={searchQuery}
-          onChange={onSearchChange}
+          onChange={handleSearchChange}
           sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
 
@@ -80,7 +60,7 @@ export default function AllClaimsTab({
       </Box>
 
       <ClaimsDataGrid
-        claims={filteredClaims}
+        claims={claims}
         loading={loading}
         onViewClaim={onViewClaim}
         onApprovalAction={onApprovalAction}
