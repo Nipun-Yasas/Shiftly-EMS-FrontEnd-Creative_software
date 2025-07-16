@@ -24,7 +24,7 @@ const roles = [
 ];
 
 const roleValidationSchema = Yup.object({
-  roleId: Yup.object().required('Role is required'),
+  roleId: Yup.object().required("Role is required"),
 });
 
 export default function EditRoleDialog({
@@ -76,7 +76,7 @@ export default function EditRoleDialog({
             <strong>Employee Number:</strong> {editingUser?.employeeNumber}
           </Typography>
         </Box>
-        
+
         <Formik
           initialValues={getInitialValues()}
           validationSchema={roleValidationSchema}
@@ -95,7 +95,7 @@ export default function EditRoleDialog({
                   />
                 </InputItem>
               </Form>
-              <DialogActions dividers>
+              <DialogActions dividers sx={{ p: 2 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -114,7 +114,7 @@ export default function EditRoleDialog({
                   >
                     {isSubmitting ? "Updating..." : "Update Role"}
                   </Button>
-                  <Button color="textblack" onClick={handleClose}>
+                  <Button color="text.primary" onClick={handleClose}>
                     Cancel
                   </Button>
                 </Box>

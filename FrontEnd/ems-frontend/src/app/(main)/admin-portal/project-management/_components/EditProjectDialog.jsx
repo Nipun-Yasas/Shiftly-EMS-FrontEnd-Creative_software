@@ -84,7 +84,7 @@ export default function EditProjectDialog({
                   >
                     {isSubmitting ? "Updating..." : "Update"}
                   </Button>
-                  <Button color="textblack" onClick={onClose}>
+                  <Button color="text.primary" onClick={onClose}>
                     Cancel
                   </Button>
                 </Box>

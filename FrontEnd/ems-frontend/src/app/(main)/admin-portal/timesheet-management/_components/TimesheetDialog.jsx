@@ -6,16 +6,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
 import PersonIcon from "@mui/icons-material/Person";
 
-import { DataGrid } from "@mui/x-data-grid";
+import TimesheetDataGrid from "./TimesheetDataGrid";
 
 export default function TimesheetDialog({
   open,
@@ -25,86 +21,6 @@ export default function TimesheetDialog({
   onApprove,
   onReject,
 }) {
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "success";
-      case "pending":
-        return "warning";
-      case "rejected":
-        return "error";
-      default:
-        return "default";
-    }
-  };
-
-  const columns = [
-    {
-      field: "date",
-      headerName: "Date",
-      width: 100,
-    },
-    {
-      field: "projectTask",
-      headerName: "Project Task",
-      width: 150,
-    },
-    {
-      field: "workMode",
-      headerName: "Work Mode",
-      width: 120,
-    },
-    {
-      field: "activity",
-      headerName: "Activity",
-      width: 130,
-    },
-    {
-      field: "hours",
-      headerName: "Hours",
-      width: 90,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          color={getStatusColor(params.value)}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 120,
-      sortable: false,
-      renderCell: (params) =>
-        params.row.status === "Pending" ? (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton
-              size="small"
-              color="success"
-              onClick={() => onApprove(params.row.id)}
-              title="Approve"
-            >
-              <CheckCircleIcon />
-            </IconButton>
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => onReject(params.row.id)}
-              title="Reject"
-            >
-              <CancelIcon />
-            </IconButton>
-          </Box>
-        ) : null,
-    },
-  ];
-
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       {selectedEmployee && (
@@ -195,27 +111,17 @@ export default function TimesheetDialog({
               Timesheet Entries
             </Typography>
 
-            <Box>
-              <DataGrid
-                rows={employeeTimesheets}
-                columns={columns}
-                disableSelectionOnClick
-                sx={{
-                  "& .MuiDataGrid-cell:hover": {
-                    color: "primary.main",
-                  },
-                }}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 5 },
-                  },
-                }}
-                pageSizeOptions={[5, 10]}
-              />
-            </Box>
+            <TimesheetDataGrid
+              data={employeeTimesheets}
+              type="timesheet"
+              onApprove={onApprove}
+              onReject={onReject}
+              initialPageSize={5}
+              pageSizeOptions={[5, 10]}
+            />
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
-            <Button color="textblack" onClick={onClose}>
+            <Button color="text.primary" onClick={onClose}>
               Close
             </Button>
           </DialogActions>

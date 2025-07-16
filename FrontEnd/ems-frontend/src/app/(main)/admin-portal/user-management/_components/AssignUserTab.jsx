@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
-import { DataGrid } from "@mui/x-data-grid";
 import SearchField from "../../_components/SearchField";
+import UserDataGrid from "./UserDataGrid";
 
 export default function AssignUserTab({
   loading,
@@ -68,26 +66,11 @@ export default function AssignUserTab({
         />
       </Box>
 
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Box style={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={unassignedUsers}
-            columns={columns}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 50, 100]}
-          />
-        </Box>
-      )}
+      <UserDataGrid
+        loading={loading}
+        rows={unassignedUsers}
+        columns={columns}
+      />
     </Box>
   );
 }

@@ -27,9 +27,9 @@ const roles = [
 
 const assignValidationSchema = Yup.object({
   employeeNumber: Yup.string()
-    .min(3, 'Employee Number must be at least 3 characters')
-    .required('Employee Number is required'),
-  roleId: Yup.object().required('Role is required'),
+    .min(3, "Employee Number must be at least 3 characters")
+    .required("Employee Number is required"),
+  roleId: Yup.object().required("Role is required"),
 });
 
 export default function AssignUserDialog({
@@ -52,7 +52,12 @@ export default function AssignUserDialog({
   };
 
   return (
-    <Dialog open={assignDialogOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={assignDialogOpen}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+    >
       <DialogTitle>
         <Box
           sx={{
@@ -76,7 +81,7 @@ export default function AssignUserDialog({
             <strong>Email:</strong> {assigningUser?.email}
           </Typography>
         </Box>
-        
+
         <Formik
           initialValues={getInitialValues()}
           validationSchema={assignValidationSchema}
@@ -88,13 +93,13 @@ export default function AssignUserDialog({
               <Form id="assign-user-form">
                 <Stack spacing={2}>
                   <InputItem>
-                    <TextInput 
-                      name="employeeNumber" 
-                      label="Employee Number" 
+                    <TextInput
+                      name="employeeNumber"
+                      label="Employee Number"
                       placeholder="Enter employee number"
                     />
                   </InputItem>
-                  
+
                   <InputItem>
                     <SelectInput
                       name="roleId"
@@ -105,7 +110,7 @@ export default function AssignUserDialog({
                   </InputItem>
                 </Stack>
               </Form>
-              <DialogActions dividers>
+              <DialogActions dividers sx={{ p: 2 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -124,7 +129,7 @@ export default function AssignUserDialog({
                   >
                     {isSubmitting ? "Assigning..." : "Assign User"}
                   </Button>
-                  <Button color="textblack" onClick={handleClose}>
+                  <Button color="text.primary" onClick={handleClose}>
                     Cancel
                   </Button>
                 </Box>

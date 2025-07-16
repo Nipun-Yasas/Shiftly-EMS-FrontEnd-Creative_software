@@ -22,7 +22,7 @@ export default function DeleteConfirmDialog({
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="textblack">
+        <Button onClick={onClose} color="text.primary">
           Cancel
         </Button>
         <Button onClick={onConfirm} color="error" variant="contained">

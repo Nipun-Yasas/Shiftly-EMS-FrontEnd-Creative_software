@@ -145,10 +145,7 @@ export default function UserManagementPage() {
         userId: assigningUser.id,
       };
 
-      await axiosInstance.post(
-        API_PATHS.ADMIN_USER.ASSIGN_USER,
-        assignData
-      );
+      await axiosInstance.post(API_PATHS.ADMIN_USER.ASSIGN_USER, assignData);
       showSnackbar("User assigned successfully", "success");
 
       setAssignDialogOpen(false);
@@ -212,7 +209,7 @@ export default function UserManagementPage() {
   };
 
   const handleAddUserClick = () => {
-    setTabValue(1); 
+    setTabValue(1);
   };
 
   const filteredUsers = users.filter(

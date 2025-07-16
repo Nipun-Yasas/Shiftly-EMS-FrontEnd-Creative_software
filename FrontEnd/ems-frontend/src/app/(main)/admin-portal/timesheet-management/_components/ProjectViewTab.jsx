@@ -4,13 +4,9 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import PersonIcon from "@mui/icons-material/Person";
 
-import { DataGrid } from "@mui/x-data-grid";
 import SearchField from "../../_components/SearchField";
+import TimesheetDataGrid from "./TimesheetDataGrid";
 
 export default function ProjectViewTab({
   projectGroupedEmployees,
@@ -18,74 +14,6 @@ export default function ProjectViewTab({
   handleSearchChange,
   onViewTimesheets,
 }) {
-  const columns = [
-    {
-      field: "employee",
-      headerName: "Employee",
-      width: 350,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              backgroundColor: "#e0e0e0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mr: 2,
-            }}
-          >
-            <PersonIcon />
-          </Box>
-          <Box>
-            <Typography variant="subtitle2">{params.row.name}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {params.row.email}
-            </Typography>
-          </Box>
-        </Box>
-      ),
-    },
-    {
-      field: "team",
-      headerName: "Team",
-      width: 210,
-    },
-    {
-      field: "pendingSubmissions",
-      headerName: "Pending Submissions",
-      width: 210,
-      renderCell: (params) =>
-        params.value > 0 ? (
-          <Chip
-            label={`${params.value} Pending`}
-            color="warning"
-            size="small"
-          />
-        ) : (
-          <Chip label="None" color="success" size="small" />
-        ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 190,
-      sortable: false,
-      renderCell: (params) => (
-        <Button
-          variant="text"
-          size="small"
-          startIcon={<VisibilityIcon />}
-          onClick={() => onViewTimesheets(params.row)}
-        >
-          View
-        </Button>
-      ),
-    },
-  ];
-
   return (
     <Box sx={{ p: 3 }}>
       <Box
@@ -128,29 +56,20 @@ export default function ProjectViewTab({
                 pending timesheet(s)
               </Typography>
             </Box>
-            <Box>
-              <DataGrid
-                rows={projectEmployees}
-                columns={columns}
-                disableSelectionOnClick
-                hideFooter={projectEmployees.length <= 5}
-                sx={{
-                  "& .MuiDataGrid-cell:hover": {
-                    color: "primary.main",
-                  },
-                  border: 0,
-                }}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 5 },
-                  },
-                }}
-                pageSizeOptions={[5, 10]}
-              />
-            </Box>
+            <TimesheetDataGrid
+              data={projectEmployees}
+              type="employee"
+              onViewTimesheets={onViewTimesheets}
+              showTeamColumn={true}
+              showProjectColumn={false}
+              hideFooter={projectEmployees.length <= 5}
+              initialPageSize={5}
+              pageSizeOptions={[5, 10]}
+            />
           </Paper>
         )
       )}
     </Box>
   );
 }
+
