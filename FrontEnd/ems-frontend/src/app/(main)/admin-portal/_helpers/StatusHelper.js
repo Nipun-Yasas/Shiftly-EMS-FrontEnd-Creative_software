@@ -18,7 +18,7 @@ export const getStatusColor = (status) => {
   }
 };
 
-export const getStatusIconComponent = (status) => {
+export const getStatusIcon = (status) => {
   switch (status) {
     case "approved":
       return <CheckCircle />;

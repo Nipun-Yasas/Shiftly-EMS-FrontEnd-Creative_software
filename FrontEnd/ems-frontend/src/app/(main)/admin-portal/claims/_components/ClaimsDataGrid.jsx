@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 
 import {
   getStatusColor,
-  getStatusIconComponent,
+  getStatusIcon,
 } from "../../_helpers/StatusHelper";
 
 export default function ClaimsDataGrid({
@@ -55,7 +55,7 @@ export default function ClaimsDataGrid({
       width: 130,
       renderCell: (params) => (
         <Chip
-          icon={getStatusIconComponent(params.value)}
+          icon={getStatusIcon(params.value)}
           label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
           color={getStatusColor(params.value)}
           size="small"

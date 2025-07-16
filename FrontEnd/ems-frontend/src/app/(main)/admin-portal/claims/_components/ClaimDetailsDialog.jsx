@@ -32,7 +32,7 @@ import AttachFile from "@mui/icons-material/AttachFile";
 import Visibility from "@mui/icons-material/Visibility";
 
 import dayjs from "dayjs";
-import { getStatusColor, getStatusIconComponent } from "../../_helpers/StatusHelper";
+import { getStatusColor, getStatusIcon } from "../../_helpers/StatusHelper";
 
 export default function ClaimDetailsDialog({
   open,
@@ -117,7 +117,7 @@ export default function ClaimDetailsDialog({
                       Status:
                     </Typography>
                     <Chip
-                      icon={getStatusIconComponent(claim.status)}
+                      icon={getStatusIcon(claim.status)}
                       label={
                         claim.status.charAt(0).toUpperCase() +
                         claim.status.slice(1)
