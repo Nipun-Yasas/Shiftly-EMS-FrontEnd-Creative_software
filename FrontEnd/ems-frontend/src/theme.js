@@ -161,7 +161,7 @@ const theme = createTheme({
     }
   },
   typography: {
-    fontFamily: 'Lexend, sans-serif',
+    fontFamily: 'Lexend,sans-serif',
     fontSize: 14,
     h1: {
       fontSize: '2.5rem',

@@ -13,7 +13,6 @@ import ReadTab from "./_components/ReadTab";
 import UnReadTab from "./_components/UnReadTab";
 import AllLettersTab from "./_components/AllLettersTab";
 import LetterDetailDialog from "./_components/LetterDetailDialog";
-import ReadHistoryDialog from "./_components/ReadHistoryDialog";
 import TabPanel from "../_components/TabPanel";
 
 export default function LetterSubmissionPage() {
@@ -25,8 +24,6 @@ export default function LetterSubmissionPage() {
   const [filterType, setFilterType] = useState("all");
   const [selectedLetter, setSelectedLetter] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
-  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
-  const [readHistory, setReadHistory] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -196,40 +193,6 @@ export default function LetterSubmissionPage() {
     }
   };
 
-  const handleViewHistory = async (letterId) => {
-    try {
-      const sampleHistory = [
-        {
-          id: 1,
-          adminName: "John Doe",
-          adminEmail: "john.doe@company.com",
-          readAt: "2025-07-11T10:30:00",
-          action: "marked as read",
-        },
-        {
-          id: 2,
-          adminName: "Jane Smith",
-          adminEmail: "jane.smith@company.com",
-          readAt: "2025-07-11T14:15:00",
-          action: "viewed details",
-        },
-        {
-          id: 3,
-          adminName: "HR Manager",
-          adminEmail: "hr.manager@company.com",
-          readAt: "2025-07-11T15:45:00",
-          action: "processed letter",
-        },
-      ];
-
-      setReadHistory(sampleHistory);
-      setOpenHistoryDialog(true);
-    } catch (error) {
-      console.error("Error fetching read history:", error);
-      showSnackbar("Error fetching read history", "error");
-    }
-  };
-
   const generateLetter = async (letterId) => {
     try {
       setLetters((prev) =>
@@ -285,7 +248,6 @@ export default function LetterSubmissionPage() {
     searchQuery,
     handleSearchChange,
     onViewDetails: handleViewDetails,
-    onViewHistory: handleViewHistory,
     onMarkAsRead: markAsRead,
     onMarkAsUnread: markAsUnread,
     onGenerateLetter: generateLetter,
@@ -338,15 +300,8 @@ export default function LetterSubmissionPage() {
         open={openDetailDialog}
         onClose={() => setOpenDetailDialog(false)}
         selectedLetter={selectedLetter}
-        onViewHistory={handleViewHistory}
         onGenerateLetter={generateLetter}
         onDownloadLetter={downloadLetter}
-      />
-
-      <ReadHistoryDialog
-        open={openHistoryDialog}
-        onClose={() => setOpenHistoryDialog(false)}
-        readHistory={readHistory}
       />
 
       <Snackbar

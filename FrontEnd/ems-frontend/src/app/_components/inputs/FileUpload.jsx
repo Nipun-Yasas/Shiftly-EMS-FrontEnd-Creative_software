@@ -11,8 +11,8 @@ export default function FormikFileUpload({
   setFileName,
   preview,
   setPreview,
-  fileTypes = ".pdf,.doc,.docx,.jpg,.jpeg,.png", // default
-  showPreview = true, // toggle preview
+  fileTypes = ".pdf,.doc,.docx,.jpg,.jpeg,.png", 
+  showPreview = true,
 }) {
   const { setFieldValue, setFieldTouched, touched, errors, values } =
     useFormikContext();
@@ -80,7 +80,7 @@ export default function FormikFileUpload({
           <Box textAlign="center" mt={2}>
             <label htmlFor={name}>
               <Button
-                color="textblack"
+                color="text.secondary"
                 variant="outlined"
                 component="span"
                 startIcon={

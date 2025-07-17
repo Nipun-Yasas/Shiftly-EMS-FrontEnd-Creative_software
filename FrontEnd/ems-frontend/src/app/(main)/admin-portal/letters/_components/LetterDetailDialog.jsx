@@ -21,7 +21,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DownloadIcon from "@mui/icons-material/Download";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import HistoryIcon from "@mui/icons-material/History";
 
 import dayjs from "dayjs";
 
@@ -33,19 +32,6 @@ export default function LetterDetailDialog({
   onGenerateLetter,
   onDownloadLetter,
 }) {
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
-    }
-  };
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle
@@ -55,11 +41,7 @@ export default function LetterDetailDialog({
           alignItems: "center",
         }}
       >
-        <Typography variant="h6">
-          {selectedLetter
-            ? `Letter Request - ${selectedLetter.employeeName}`
-            : ""}
-        </Typography>
+        <Typography variant="h6">Letter Request</Typography>
         <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
@@ -223,14 +205,7 @@ export default function LetterDetailDialog({
               justifyContent: "center",
             }}
           >
-            <Button
-              variant="text"
-              startIcon={<HistoryIcon />}
-              onClick={() => onViewHistory(selectedLetter?.id)}
-            >
-              View
-            </Button>
-            <Button color="textblack" variant="text" onClick={onClose}>
+            <Button color="tex.primary" variant="text" onClick={onClose}>
               Close
             </Button>
           </Box>

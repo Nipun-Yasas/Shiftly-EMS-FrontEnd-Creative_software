@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 
 export default function TabPanel({ children, value, index, ...other }) {
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`admin-tabpanel-${index}`}
@@ -17,6 +17,6 @@ export default function TabPanel({ children, value, index, ...other }) {
           {children}
         </Box>
       )}
-    </div>
+    </Box>
   );
 }
