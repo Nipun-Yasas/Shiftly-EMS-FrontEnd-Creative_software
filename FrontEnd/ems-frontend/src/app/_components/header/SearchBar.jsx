@@ -1,44 +1,32 @@
 "use client";
 
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import SearchIcon from '@mui/icons-material/Search';
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import SearchIcon from "@mui/icons-material/Search";
 
-
-export default function SearchBar() {
+export default function SearchBar({ label }) {
   return (
-    <Stack direction="row">
-      <Tooltip title="Search" enterDelay={1000}>
-        <div>
-          <IconButton
-            type="button"
-            aria-label="search"
-            sx={{
-              display: { xs: 'inline', md: 'none' },
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-        </div>
-      </Tooltip>
+    <Box sx={{ display: { xs: "none", sm: "inline", md: "inline" } }}>
+      <Tooltip title="Search" enterDelay={1000}></Tooltip>
       <TextField
-        label="Search"
+        label={label}
         size="small"
-        color="primary" 
+        color="primary"
         slotProps={{
           input: {
             endAdornment: (
-              <IconButton type="button" aria-label="search" size="small">
-                <SearchIcon />
-              </IconButton>
+              <Box sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
+                <IconButton type="button" aria-label="search" size="small">
+                  <SearchIcon />
+                </IconButton>
+              </Box>
             ),
             sx: { pr: 0.5 },
           },
         }}
-        sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1, }}
       />
-    </Stack>
+    </Box>
   );
 }

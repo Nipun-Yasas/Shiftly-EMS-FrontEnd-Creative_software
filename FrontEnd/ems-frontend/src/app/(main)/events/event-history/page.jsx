@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
+import { Box } from "@mui/material";
 
 const columns = [
   { field: "id", headerName: "Event ID", width: 100 },
@@ -21,25 +22,29 @@ export default function Event() {
   const [events, setEvents] = useState([]);
 
   return (
-    <>
-      <Paper
-        elevation={3}
-        sx={{
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        <div className="flex flex-col items-center">
-          <div className="w-5/6 rounded-xl">
-            <div className="flex justify-end m-3"></div>
-            <div className="flex justify-center mt-2 m-3">
-              <div style={{ height: 300, width: "100%" }}>
-                <DataGrid rows={events} columns={columns} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Paper>
-    </>
+    <Paper
+      elevation={3}
+      sx={{
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <Box sx={{ width: "100%", p: 5 }}>
+        <DataGrid
+          rows={events}
+          columns={columns}
+          height="auto"
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          disableSelectionOnClick
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[10, 50, 100]}
+        />
+      </Box>
+    </Paper>
   );
 }

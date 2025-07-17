@@ -24,7 +24,7 @@ const eventTypeOptions = [
   { id: 2, name: "Managers only" },
 ];
 
-export default function EventForm(props){
+export default function EventForm(props) {
   const { setOpenSubmit } = props;
 
   const bannerRef = useRef(null);
@@ -121,46 +121,32 @@ export default function EventForm(props){
         {({ validateForm, resetForm }) => (
           <Form>
             <Stack>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                }}
+              >
                 <InputItem>
                   <TextInput name="title" label="Title" />
                 </InputItem>
 
-                <InputItem>
-                  <TextInput name="actionbtn" label="Action Button Text" />
-                </InputItem>
+                
               </Box>
 
-              <CustomCheckBox
-                name="showTitle"
-                label="Show title on the event banner"
-              />
+              
 
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <InputItem>
-                  <TextInput
-                    name="formUrl"
-                    label="URL of the form(Eg: Google form)"
-                  />
-                </InputItem>
-
-                <InputItem>
-                  <TextInput
-                    name="responseUrl"
-                    label="Response URL of the form"
-                  />
-                </InputItem>
-              </Box>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <InputItem>
-                  <SelectInput
-                    name="audience"
-                    label="Select a audience"
-                    options={audienceOptions}
-                    getOptionLabel={(option) => option.name || ""}
-                  />
-                </InputItem>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                }}
+              >
+                
 
                 <InputItem>
                   <SelectInput
@@ -172,12 +158,15 @@ export default function EventForm(props){
                 </InputItem>
               </Box>
 
-              <InputItem>
-                <TextInput name="projects" label="Project" />
-              </InputItem>
-
+              
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", m: 2 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                  m: 2,
+                }}
               >
                 <DateInput name="enableDate" label="Start Date" />
                 <DateInput name="expireDate" label="Expire Date" />
@@ -193,40 +182,43 @@ export default function EventForm(props){
                 setPreview={setPreview}
               />
 
-              <InputItem>
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: { xs: "center", md: "flex-end" },
+                  pb: 2,
+                  gap: 2,
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  onClick={() => {
+                    validateForm();
+                  }}
                 >
-                  <Button
-                    color="textblack"
-                    type="reset"
-                    onClick={() => {
-                      resetForm();
-                      setFileName("");
-                      setPreview(null);
-                      if (bannerRef.current) {
-                        bannerRef.current.value = "";
-                      }
-                    }}
-                  >
-                    Cancel
-                  </Button>
+                  Add
+                </Button>
 
-                  <Button
-                    type="submit"
-                    onClick={() => {
-                      validateForm();
-                    }}
-                  >
-                    Add
-                  </Button>
-                </Box>
-              </InputItem>
+                <Button
+                  color="text.primary"
+                  type="reset"
+                  onClick={() => {
+                    resetForm();
+                    setFileName("");
+                    setPreview(null);
+                    if (bannerRef.current) {
+                      bannerRef.current.value = "";
+                    }
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Box>
             </Stack>
           </Form>
         )}
       </Formik>
     </>
   );
-};
-
+}

@@ -30,7 +30,7 @@ export default function SelectInput({ name, options, getOptionLabel, label, ...p
           fullWidth
           sx={{
             "& label": {
-              color: "textblack.main",
+              color: "text.secondary",
             },
           }}
         />

@@ -23,15 +23,15 @@ const letterTypes = [
 ];
 
 const RequestLetter = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchTerm] = useState('');
   const [selectedLetter, setSelectedLetter] = useState(null);
 
   const filteredLetters = letterTypes.filter((letter) =>
-    letter.toLowerCase().includes(searchTerm.toLowerCase())
+    letter.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSearch = () => {
-    console.log('User searched for:', searchTerm);
+    console.log('User searched for:', searchQuery);
   };
 
   return (
@@ -42,7 +42,7 @@ const RequestLetter = () => {
       >
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', pb: 3 }}>
           <SearchField
-            value={searchTerm}
+            value={searchQuery}
             onChange={setSearchTerm}
             onSearch={handleSearch}
           />

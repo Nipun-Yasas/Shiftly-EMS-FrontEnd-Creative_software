@@ -19,6 +19,14 @@ export const API_PATHS = {
     UPDATE_USER: (id) => `/api/v1/shiftly/ems/admin/user/update/${id}`,
     DELETE_USER: (id) => `/api/v1/shiftly/ems/admin/user/delete/${id}`,
   },
+  CANDIDATES: {
+    GET_ALL_SUBMISSIONS: '/api/v1/shiftly/ems/admin/candidates/submissions',
+    GET_SUBMISSION_BY_ID: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}`,
+    MARK_AS_READ: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/mark-read`,
+    MARK_AS_UNREAD: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/mark-unread`,
+    GET_READ_HISTORY: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/read-history`,
+    DOWNLOAD_RESUME: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/resume`,
+  },
   SAMPLE: {
     ADMIN_DASHBOARD: '/api/admin/dashboard',
     USER_PROFILE: '/api/user/profile',

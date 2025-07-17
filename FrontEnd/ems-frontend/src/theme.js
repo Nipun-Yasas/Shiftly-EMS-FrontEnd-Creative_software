@@ -46,9 +46,15 @@ const theme = createTheme({
           dark: "#1b5e20",
           contrastText: "#fff"
         },
-        textblack:{
+        textblack: {
           main: '#000000',
+          light: '#000000',
+          dark: '#000000',
           contrastText: '#ffffff',
+        },
+        text: {
+          primary: '#1A1A1A',
+          secondary: '#4D4D4D',
         }
         ,
         avatarname:{
@@ -102,6 +108,8 @@ const theme = createTheme({
         },
         textblack: {
           main: '#ffffff',
+          light: '#ffffff',
+          dark: '#ffffff',
           contrastText: '#000000',
         },
         textblack:{
@@ -116,59 +124,63 @@ const theme = createTheme({
         viewButton:{
           main: 'FFC1DA',
           contrastText: '#ffffff',
+        },
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#B0B0B0',
         }
-      },
+      }
     },
   },
   components: {
-      MuiTextField: {
-        styleOverrides: {
-          root: {
-            '--TextField-borderColor': '#E0E3E7',
-            '--TextField-borderHoverColor': '#E90A4D',
-          }
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '--TextField-borderColor': '#E0E3E7',
+          '--TextField-borderHoverColor': '#E90A4D',
         }
-      },
-      MuiOutlinedInput: {
-        styleOverrides: {
-          notchedOutline: {
-            borderColor: 'var(--TextField-borderColor)',
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          borderColor: 'var(--TextField-borderColor)',
+        },
+        root: {
+          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: 'var(--TextField-borderHoverColor)',
           },
-          root: {
-            [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-              borderColor: 'var(--TextField-borderHoverColor)',
-            },
-            
-          }
+
         }
-      },
-      MuiFilledInput: {
-        styleOverrides: {
-          root: {
-            '&::before, &::after': {
-              borderBottom: '2px solid var(--TextField-borderColor)',
-            },
-            '&:hover:not(.Mui-disabled, .Mui-error):before': {
-              borderBottom: '2px solid var(--TextField-borderHoverColor)',
-            }
-          }
-        }
-      },
-      MuiInput: {
-        styleOverrides: {
-          root: {
-            '&::before': {
-              borderBottom: '2px solid var(--TextField-borderColor)',
-            },
-            '&:hover:not(.Mui-disabled, .Mui-error):before': {
-              borderBottom: '2px solid var(--TextField-borderHoverColor)',
-            }
+      }
+    },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          '&::before, &::after': {
+            borderBottom: '2px solid var(--TextField-borderColor)',
+          },
+          '&:hover:not(.Mui-disabled, .Mui-error):before': {
+            borderBottom: '2px solid var(--TextField-borderHoverColor)',
           }
         }
       }
     },
+    MuiInput: {
+      styleOverrides: {
+        root: {
+          '&::before': {
+            borderBottom: '2px solid var(--TextField-borderColor)',
+          },
+          '&:hover:not(.Mui-disabled, .Mui-error):before': {
+            borderBottom: '2px solid var(--TextField-borderHoverColor)',
+          }
+        }
+      }
+    }
+  },
   typography: {
-    fontFamily: 'Lexend, sans-serif',
+    fontFamily: 'Lexend,sans-serif',
     fontSize: 14,
     h1: {
       fontSize: '2.5rem',
@@ -204,7 +216,7 @@ const theme = createTheme({
       fontWeight: 700,
       fontFamily: 'Poppins, sans-serif',
     },
-     h7: {
+    h7: {
       fontSize: '1rem',
       fontWeight: 600,
       fontFamily: 'Poppins, sans-serif',
