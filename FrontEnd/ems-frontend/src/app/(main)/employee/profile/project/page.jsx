@@ -10,17 +10,17 @@ const Projects = () => {
 
   return (
     <Box
-    sx={{
-      mt: 5,
-      maxWidth: '100%',
-      mx: 'auto',
-      backgroundColor: theme.palette.background, // Use background.default for better theme control
-      boxShadow: 3,
-      borderRadius: 5,
-      p: 3,
-      border: `1px solid ${theme.palette.divider}`,
-    }}
-    
+      sx={{
+        mt: 5,
+        maxWidth: '100%',
+        mx: 'auto',
+        backgroundColor: theme.palette.background,
+        boxShadow: 3,
+        borderRadius: 5,
+        p: 3,
+        border: `1px solid ${theme.palette.divider}`,
+        position: 'relative',
+      }}
     >
       <Box display="flex" alignItems="center" gap={4}>
         <Image
@@ -34,18 +34,17 @@ const Projects = () => {
           <Typography
             variant="h6"
             sx={{
-              color: theme.palette.text, // Ensure the text color works with dark and light modes
+              color: theme.palette.text,
               fontWeight: 700,
             }}
           >
             Software Engineer
           </Typography>
-          <Box  >
-           
+          <Box>
             <Typography
               variant="body2"
               sx={{
-                color: theme.palette.text, 
+                color: theme.palette.text,
               }}
             >
               Creative Technology Solutions (Pvt) Ltd
@@ -62,19 +61,24 @@ const Projects = () => {
           </Typography>
         </Box>
       </Box>
-      <Box>
-          <IconButton  
-              sx={{
-                
-                ml:100,
-                color: theme.palette.text
-              }}>
-              <EditIcon />
-            </IconButton>
-
+      
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+        }}
+      >
+        <IconButton
+          sx={{
+            color: theme.palette.text,
+          }}
+        >
+          <EditIcon />
+        </IconButton>
       </Box>
 
-      <Box sx={{ ml: 8}}>
+      <Box sx={{ ml: 8, mt: 3 }}>
         <Typography
           variant="h6"
           sx={{

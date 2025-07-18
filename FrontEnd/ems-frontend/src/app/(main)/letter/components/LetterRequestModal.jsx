@@ -18,6 +18,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
+import theme from '@/theme';
 
 const LetterRequestModal = ({ letterType, onClose, open }) => {
   const theme = useTheme();
@@ -172,6 +173,21 @@ const LetterRequestModal = ({ letterType, onClose, open }) => {
                   }}
                 >
                   <Button
+                   color='text.primary'
+                    type="reset"
+                    onClick={() => {
+                      resetForm();
+                      onClose();
+                    }}
+                  >
+                    RESET
+                  </Button>
+
+
+                  <Button
+                    sx={{
+                      color:'white'
+                    }}
                     type="submit"
                     variant="contained"
                     onClick={() => {
@@ -181,16 +197,7 @@ const LetterRequestModal = ({ letterType, onClose, open }) => {
                     GENERATE
                   </Button>
 
-                  <Button
-                    color="text.primary"
-                    type="reset"
-                    onClick={() => {
-                      resetForm();
-                      onClose();
-                    }}
-                  >
-                    RESET
-                  </Button>
+                  
                 </Box>
               </Stack>
             </Form>

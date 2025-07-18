@@ -33,7 +33,7 @@ const Employee = () => {
           <IconButton sx={{ mt: 8, ml: 0 }} aria-label="edit">
             <EditIcon
               sx={{
-                color: theme.palette.text, // Use the correct text color for dark and light mode
+                color: theme.palette.text, 
                 width: 20,
                 height: 20,
               }}
