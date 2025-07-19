@@ -13,26 +13,26 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import ExperienceForm from '../components/ExperienceForm';
+import EducationForm from '../_components/EducationForm';
 
 const columns = [
   { field: "id", headerName: "ID", flex:1 },
-  { field: "jobTitle", headerName: "Job Title", flex:1 },
-  { field: "company", headerName: "Company", flex:1 },
+  { field: "degree", headerName: "Degree", flex:1 },
+  { field: "institution", headerName: "Institution", flex:1 },
   { field: "duration", headerName: "Duration", flex:1 },
 ];
 
-const Experience = () => {
+const Education = () => {
   const theme = useTheme();
 
   const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [formData, setFormData] = useState({
-    jobTitle: '',
-    company: '',
+    degree: '',
+    institution: '',
     duration: '',
   });
-  const [experiences, setExperiences] = useState([]);
+  const [educations, setEducations] = useState([]);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -44,14 +44,14 @@ const Experience = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newExperience = {
-      id: experiences.length + 1,
+    const newEducation = {
+      id: educations.length + 1,
       ...formData
     };
-    setExperiences((prev) => [...prev, newExperience]);
+    setEducations((prev) => [...prev, newEducation]);
     setOpenModal(false);
     setOpenSnackbar(true);
-    setFormData({ jobTitle: '', company: '', duration: '' });
+    setFormData({ degree: '', institution: '', duration: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -60,18 +60,26 @@ const Experience = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', p: { xs: 2, sm: 4 } }}>
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: { xs: '60vh', sm: '70vh' }, 
+      p: { xs: 1, sm: 2, md: 3 },
+      maxWidth: '100%',
+      overflow: 'hidden'
+    }}>
       <IconButton
         color="primary"
         onClick={handleOpenModal}
         sx={{
           position: 'absolute',
-          top: 16,
-          right: 16,
+          top: { xs: 8, sm: 16 },
+          right: { xs: 8, sm: 16 },
           bgcolor: theme.palette.background.paper,
           border: `1px solid ${theme.palette.divider}`,
+          zIndex: 1,
           '&:hover': {
-            bgcolor: theme.palette.action.hover,
+            bgcolor: theme.palette.primary.light,
+            color: 'white'
           },
         }}
       >
@@ -82,8 +90,8 @@ const Experience = () => {
       <Modal
         open={openModal}
         onClose={handleCloseModal}
-        aria-labelledby="experience-form-modal"
-        aria-describedby="form-to-add-experience"
+        aria-labelledby="education-form-modal"
+        aria-describedby="form-to-add-education"
       >
         <Box
           sx={{
@@ -99,9 +107,9 @@ const Experience = () => {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Add Experience
+            Add Education
           </Typography>
-          <ExperienceForm
+          <EducationForm
             formData={formData}
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
@@ -124,11 +132,15 @@ const Experience = () => {
 
       {/* DataGrid */}
       
-        <Box sx={{ width: "100%", p: 3 }}>
+        <Box sx={{ 
+          width: "100%", 
+          p: { xs: 1, sm: 2, md: 3 },
+          mt: { xs: 4, sm: 6 }
+        }}>
           <DataGrid
-            rows={experiences}
+            rows={educations}
             columns={columns}
-            height="auto"
+            height={400}
             pageSize={10}
             rowsPerPageOptions={[10]}
             disableSelectionOnClick
@@ -138,6 +150,15 @@ const Experience = () => {
               },
             }}
             pageSizeOptions={[10, 50, 100]}
+            sx={{
+              '& .MuiDataGrid-cell': {
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              },
+              '& .MuiDataGrid-columnHeader': {
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                fontWeight: 600
+              }
+            }}
           />
         </Box>
       
@@ -145,4 +166,4 @@ const Experience = () => {
   );
 };
 
-export default Experience;
+export default Education; 

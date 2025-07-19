@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import url from '../../../../../../public/creative_software_logo.png';
+import url from '../../../../../public/creative_software_logo.png';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Typography, IconButton, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -11,15 +11,15 @@ const Projects = () => {
   return (
     <Box
       sx={{
-        mt: { xs: 3, sm: 4, md: 5 },
         maxWidth: '100%',
         mx: 'auto',
         backgroundColor: theme.palette.background,
-        boxShadow: 3,
-        borderRadius: { xs: 3, sm: 4, md: 5 },
-        p: { xs: 2, sm: 2.5, md: 3 },
+        boxShadow: 2,
+        borderRadius: { xs: 2, sm: 3 },
+        p: { xs: 2, sm: 3, md: 4 },
         border: `1px solid ${theme.palette.divider}`,
         position: 'relative',
+        overflow: 'hidden'
       }}
     >
       <Box 
@@ -35,7 +35,7 @@ const Projects = () => {
           sx={{
             flexShrink: 0,
             width: { xs: '100%', sm: 'auto' },
-            maxWidth: { xs: '180px', sm: '220px', md: '250px' },
+            maxWidth: { xs: '150px', sm: '200px', md: '250px' },
             display: 'flex',
             justifyContent: 'center',
           }}
@@ -58,7 +58,7 @@ const Projects = () => {
             variant="h6"
             sx={{
               fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-              fontWeight: 600,
+              fontWeight: 500,
               color: theme.palette.text,
               wordBreak: 'break-word',
               lineHeight: { xs: 1.3, sm: 1.4 },
@@ -103,8 +103,14 @@ const Projects = () => {
       >
         <IconButton
           sx={{
-            color: theme.palette.text,
-            padding: { xs: '4px', sm: '8px' },
+            color: theme.palette.primary.main,
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            padding: { xs: '6px', sm: '8px' },
+            '&:hover': {
+              bgcolor: theme.palette.primary.light,
+              color: 'white'
+            }
           }}
           size="small"
         >
@@ -160,4 +166,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default Projects; 
