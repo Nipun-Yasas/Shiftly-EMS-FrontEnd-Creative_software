@@ -16,21 +16,38 @@ export default function RequestLeave() {
   ];
 
   return (
-    <Paper
-      elevation={10}
-      sx={{
-        height: "100%",
-        width: "100%",
-        p: 3,
-        bgcolor: "background.default",
-        color: "text.primary",
-      }}
-    >
-      <Box display="flex" flexDirection="column" gap={4}>
-      <AvailableLeaves leaves={mockLeaves} />
-      <LeaveForm onSubmitSuccess={() => setModalOpen(true)} />
-      </Box>  
+  <Box>
+
+      <Paper
+        elevation={3}
+        square={false}
+        sx={{
+          justifyItems: "center",
+          alignContent: "center",
+          width: "100%",
+          marginBottom: 2,
+        }}
+      >
+        <AvailableLeaves leaves={mockLeaves} />
+      </Paper>
+
+       <Paper
+        elevation={3}
+        square={false}
+        sx={{
+          justifyItems: "center",
+          alignContent: "center",
+          width: "100%"
+        }}
+      >
+        <Box sx={{ width: "100%", px: 5 ,py: 5}}>
+        <LeaveForm onSubmitSuccess={() => setModalOpen(true)} />
+          </Box>
+     
       <SuccessModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-    </Paper>
+        </Paper>
+
+
+    </Box>
   );
 }

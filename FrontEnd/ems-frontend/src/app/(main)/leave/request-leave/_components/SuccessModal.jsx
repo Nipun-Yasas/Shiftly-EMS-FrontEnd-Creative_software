@@ -32,7 +32,7 @@ const SuccessModal = ({ isOpen, onClose }) => {
               <Box className="flex justify-end">
                 <Button
                   onClick={onClose}
-                  variant="outlined"
+                  variant="contained"
                   sx={{
                     color: 'text.primary',
                     borderColor: 'divider',
