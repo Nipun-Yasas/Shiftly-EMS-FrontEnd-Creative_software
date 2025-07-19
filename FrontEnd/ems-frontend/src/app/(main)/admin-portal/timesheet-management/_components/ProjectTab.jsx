@@ -4,7 +4,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import TimesheetDataGrid from "./TimesheetDataGrid";
 
 export default function ProjectTab({

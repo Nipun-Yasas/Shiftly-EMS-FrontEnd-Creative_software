@@ -7,7 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import UserDataGrid from "./UserDataGrid";
 
 export default function VerifyTab({

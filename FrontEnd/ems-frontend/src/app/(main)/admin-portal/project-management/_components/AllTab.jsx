@@ -9,7 +9,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import dayjs from "dayjs";
 
 import { DataGrid } from "@mui/x-data-grid";

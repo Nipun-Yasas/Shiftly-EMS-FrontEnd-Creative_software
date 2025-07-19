@@ -14,7 +14,7 @@ import AllTab from "./_components/AllTab";
 import AddTab from "./_components/AddTab";
 import EditDialog from "./_components/EditDialog";
 import DeleteDialog from "./_components/DeleteDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 const projectStatuses = [
   { id: 1, name: "Planning", label: "Planning", color: "info" },

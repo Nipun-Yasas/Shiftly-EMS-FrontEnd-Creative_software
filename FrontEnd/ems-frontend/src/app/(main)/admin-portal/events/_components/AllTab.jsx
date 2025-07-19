@@ -2,7 +2,7 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import EventDataGrid from "./EventDataGrid";
 
 export default function AllTab({

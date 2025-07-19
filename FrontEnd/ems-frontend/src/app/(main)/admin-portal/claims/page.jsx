@@ -18,7 +18,7 @@ import RejectedTab from "./_components/RejectedTab";
 import AllTab from "./_components/AllTab";
 import DetailsDialog from "./_components/DetailsDialog";
 import ClaimDialog from "./_components/ClaimDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function ClaimsManagementPage() {
   const [tabValue, setTabValue] = useState(0);

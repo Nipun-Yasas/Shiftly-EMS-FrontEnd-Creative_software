@@ -13,7 +13,7 @@ import ReadTab from "./_components/ReadTab";
 import UnReadTab from "./_components/UnReadTab";
 import AllLettersTab from "./_components/AllLettersTab";
 import LetterDetailDialog from "./_components/LetterDetailDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function LetterSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);

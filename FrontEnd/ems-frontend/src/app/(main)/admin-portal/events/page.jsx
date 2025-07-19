@@ -12,7 +12,7 @@ import Alert from "@mui/material/Alert";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 import NewTab from "./_components/NewTab";
 import AllTab from "./_components/AllTab";
 import DetailsDialog from "./_components/DetailsDialog";

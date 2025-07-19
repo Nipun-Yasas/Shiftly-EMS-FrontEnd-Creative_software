@@ -15,11 +15,11 @@ import dayjs from 'dayjs';
 import { API_PATHS } from '../../../_utils/apiPaths';
 import axiosInstance from '../../../_utils/axiosInstance';
 
-import TabPanel from '../_components/TabPanel';
+import TabPanel from '../../../_components/main/TabPanel';
 import UnReadTab from './_components/UnReadTab';
 import ReadTab from './_components/ReadTab';
-import AllRefers from './_components/AllRefers';
-import ReferDetailsDialog from './_components/ReferDetailsDialog';
+import AllTab from './_components/AllTab';
+import DetailsDialog from './_components/DetailsDialog';
 import ReferDialog from './_components/ReferDialog';
 
 export default function CandidateSubmissionPage() {
@@ -314,7 +314,7 @@ export default function CandidateSubmissionPage() {
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        <AllRefers
+        <AllTab
           searchQuery={searchQuery}
           onSearchChange={(e) => setSearchTerm(e.target.value)}
           filteredCandidates={filteredCandidates}
@@ -327,7 +327,7 @@ export default function CandidateSubmissionPage() {
         />
       </TabPanel>
 
-      <ReferDetailsDialog
+      <DetailsDialog
         open={openDetailDialog}
         onClose={() => setOpenDetailDialog(false)}
         selectedCandidate={selectedCandidate}

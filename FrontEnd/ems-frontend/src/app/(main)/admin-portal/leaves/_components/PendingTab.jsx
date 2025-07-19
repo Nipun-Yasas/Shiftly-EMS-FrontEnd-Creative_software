@@ -3,7 +3,7 @@
 import React from "react";
 import Box from "@mui/material/Box";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import LeavesDataGrid from "./LeavesDataGrid";
 
 export default function LeavesTab({

@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FilterList from "@mui/icons-material/FilterList";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import ClaimsDataGrid from "./ClaimsDataGrid";
 
 export default function AllTab({

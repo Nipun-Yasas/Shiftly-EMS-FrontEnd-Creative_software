@@ -8,8 +8,8 @@ export default function TabPanel({ children, value, index, ...other }) {
     <Box
       role="tabpanel"
       hidden={value !== index}
-      id={`admin-tabpanel-${index}`}
-      aria-labelledby={`admin-tab-${index}`}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
       {...other}
     >
       {value === index && (

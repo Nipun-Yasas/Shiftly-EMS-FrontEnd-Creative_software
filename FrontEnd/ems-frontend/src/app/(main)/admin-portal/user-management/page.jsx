@@ -16,7 +16,7 @@ import VerifyTab from "./_components/VerifyTab";
 import EditDialog from "./_components/EditDialog";
 import VerifyDialog from "./_components/VerifyDialog";
 import DeleteDialog from "./_components/DeleteDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function UserManagementPage() {
   const [tabValue, setTabValue] = useState(0);

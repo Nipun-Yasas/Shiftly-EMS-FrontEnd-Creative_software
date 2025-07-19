@@ -15,7 +15,7 @@ import RejectedTab from "./_components/RejectedTab";
 import AllTab from "./_components/AllTab";
 import DetailsDialog from "./_components/DetailsDialog";
 import LeaveDialog from "./_components/LeaveDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function LeavesManagementPage() {
   const [tabValue, setTabValue] = useState(0);

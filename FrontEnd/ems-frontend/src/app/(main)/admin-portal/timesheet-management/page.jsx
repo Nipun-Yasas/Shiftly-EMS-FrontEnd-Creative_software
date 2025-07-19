@@ -10,7 +10,7 @@ import Paper from "@mui/material/Paper";
 import EmployeeTab from "./_components/EmployeeTab";
 import TeamTab from "./_components/TeamTab";
 import ProjectTab from "./_components/ProjectTab";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 import TimesheetDialog from "./_components/TimesheetDialog";
 
 // Constants for mock data
