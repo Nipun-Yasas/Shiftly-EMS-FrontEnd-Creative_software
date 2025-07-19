@@ -3,8 +3,14 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { Listbox } from '@headlessui/react';
-import { ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import InputItem from '../../../../_components/inputs/InputItem';
+import TextInput from '../../../../_components/inputs/TextInput';
+import SelectInput from '../../../../_components/inputs/SelectInput';
+import DateInput from '../../../../_components/inputs/DateInput';
 
 const leaveOptions = [
   { id: 1, name: 'Casual Leave', value: 'casual' },
@@ -19,24 +25,24 @@ const LeaveForm = ({ onSubmitSuccess }) => {
   const [selectedLeave, setSelectedLeave] = useState(leaveOptions[0]);
 
   const initialValues = {
-    leaveType: leaveOptions[0].value,
-    leaveFrom: '',
-    leaveTo: '',
-    leaveDuration: '',
-    coverPerson: '',
-    reportPerson: '',
+    leave_type: leaveOptions[0].value,
+    leave_from: '',
+    leave_to: '',
+    duration: '',
+    cover_person: '',
+    report_to: '',
     reason: '',
   };
 
   const validationSchema = Yup.object({
-    leaveType: Yup.string().required('Leave Type is required'),
-    leaveFrom: Yup.date().required('Start date is required'),
-    leaveTo: Yup.date()
-      .min(Yup.ref('leaveFrom'), 'End date must be after start date')
+    leave_type: Yup.string().required('Leave Type is required'),
+    leave_from: Yup.date().required('Start date is required'),
+    leave_to: Yup.date()
+      .min(Yup.ref('leave_from'), 'End date must be after start date')
       .required('End date is required'),
-    leaveDuration: Yup.number().typeError('Must be a number').required('Duration is required'),
-    coverPerson: Yup.string().required('Cover person is required'),
-    reportPerson: Yup.string().required('Report person is required'),
+    duration: Yup.number().typeError('Must be a number').required('Duration is required'),
+    cover_person: Yup.string().required('Cover person is required'),
+    report_to: Yup.string().required('Report person is required'),
     reason: Yup.string().required('Leave reason is required'),
   });
 
@@ -52,9 +58,8 @@ const LeaveForm = ({ onSubmitSuccess }) => {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-xl p-10 w-full">
-
-      <h2 className="!text-lg !font-bold mb-6  text-gray-800 ">Request Leave</h2>
+    <Box>
+      <h2 className="!text-lg !font-bold mb-6 text-gray-800">Request Leave</h2>
 
       <Formik
         initialValues={initialValues}
@@ -62,12 +67,12 @@ const LeaveForm = ({ onSubmitSuccess }) => {
         onSubmit={async (values, { resetForm }) => {
           try {
             setIsSubmitting(true);
-            values.leaveType = selectedLeave.value;
+            values.leave_type = selectedLeave.value;
             console.log('Submitted:', values);
             await new Promise((res) => setTimeout(res, 1000));
             resetForm();
             setSelectedLeave(leaveOptions[0]);
-            onSubmitSuccess(); 
+            onSubmitSuccess();
           } catch (error) {
             console.error('Submit error:', error);
           } finally {
@@ -77,127 +82,126 @@ const LeaveForm = ({ onSubmitSuccess }) => {
       >
         {({ values, setFieldValue }) => {
           useEffect(() => {
-            const duration = calculateDuration(values.leaveFrom, values.leaveTo);
+            const duration = calculateDuration(values.leave_from, values.leave_to);
             if (duration !== '') {
-              setFieldValue('leaveDuration', duration);
+              setFieldValue('duration', duration);
             }
-          }, [values.leaveFrom, values.leaveTo, setFieldValue]);
+          }, [values.leave_from, values.leave_to, setFieldValue]);
 
           return (
-            <Form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Leave Type</label>
-                  <Listbox value={selectedLeave} onChange={setSelectedLeave}>
-                    <div className="relative">
-                      <Listbox.Button className="w-full rounded-lg border border-gray-300 bg-white p-2 text-left shadow-sm focus:ring-2 focus:ring-pink-500">
-                        <span className="block truncate">{selectedLeave.name}</span>
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                          <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
-                        </span>
-                      </Listbox.Button>
-                      <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {leaveOptions.map((option) => (
-                          <Listbox.Option
-                            key={option.id}
-                            value={option}
-                            className={({ active }) =>
-                              `cursor-pointer select-none px-4 py-2 ${
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                              }`
-                            }
-                          >
-                            {option.name}
-                          </Listbox.Option>
-                        ))}
-                      </Listbox.Options>
-                    </div>
-                  </Listbox>
-                </div>
-
-              
-                <div>
-                  <label className="block text-sm font-medium mb-1">Leave From</label>
-                  <Field
-                    name="leaveFrom"
-                    type="date"
-                    className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-pink-500"
-                  />
-                  <ErrorMessage name="leaveFrom" className="text-red-500 text-sm" component="div" />
-                </div>
-
-               
-                <div>
-                  <label className="block text-sm font-medium mb-1">Leave To</label>
-                  <Field
-                    name="leaveTo"
-                    type="date"
-                    className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-pink-500"
-                  />
-                  <ErrorMessage name="leaveTo" className="text-red-500 text-sm" component="div" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Leave Duration</label>
-                  <Field
-                    name="leaveDuration"
-                    disabled
-                    className="w-full rounded-lg border border-gray-200 p-2 bg-gray-100 text-gray-700 cursor-not-allowed"
-                  />
-                  <ErrorMessage name="leaveDuration" className="text-red-500 text-sm" component="div" />
-                </div>
-
-               
-                <div>
-                  <label className="block text-sm font-medium mb-1">Cover Person</label>
-                  <Field
-                    name="coverPerson"
-                    className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-pink-500"
-                  />
-                  <ErrorMessage name="coverPerson" className="text-red-500 text-sm" component="div" />
-                </div>
-
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Report to Person</label>
-                  <Field
-                    name="reportPerson"
-                    className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-pink-500"
-                  />
-                  <ErrorMessage name="reportPerson" className="text-red-500 text-sm" component="div" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Leave Reason</label>
-                <Field
-                  as="textarea"
-                  name="reason"
-                  rows="3"
-                  className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-pink-500"
-                />
-                <ErrorMessage name="reason" className="text-red-500 text-sm" component="div" />
-              </div>
-
-             
-              <div className="flex justify-end gap-4">
-                <button
-                  type="submit"
-                  className="bg-[#E80A4D] text-white px-5 py-2 rounded-lg hover:bg-[#c40844] transition"
-                  disabled={isSubmitting}
+            <Form>
+              <Stack spacing={2}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 0, sm: 2 },
+                  }}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Request Leave'}
-                </button>
-                <button type="reset" className="text-gray-600 hover:underline">
-                  Cancel
-                </button>
-              </div>
+                  <InputItem>
+                    <SelectInput
+                      name="leave_type"
+                      label="Leave Type"
+                      options={leaveOptions}
+                      getOptionLabel={(option) => option.name || ""}
+                    />
+                  </InputItem>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 0, sm: 2 },
+                  }}
+                >
+                  <InputItem>
+                    <DateInput name="leave_from" label="Leave From" />
+                  </InputItem>
+                  <InputItem>
+                    <DateInput name="leave_to" label="Leave To" />
+                  </InputItem>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 0, sm: 2 },
+                  }}
+                >
+                  <InputItem>
+                    <TextInput
+                      name="duration"
+                      label="Leave Duration"
+                      disabled
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </InputItem>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 0, sm: 2 },
+                  }}
+                >
+                  <InputItem>
+                    <TextInput name="cover_person" label="Cover Person" />
+                  </InputItem>
+                  <InputItem>
+                    <TextInput name="report_to" label="Report to Person" />
+                  </InputItem>
+                </Box>
+
+                <InputItem>
+                  <TextInput
+                    name="reason"
+                    label="Leave Reason"
+                    multiline
+                    rows={3}
+                  />
+                </InputItem>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: { xs: "center", md: "flex-end" },
+                    gap: 2,
+                    pt: 2,
+                  }}
+                >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Request Leave"}
+                  </Button>
+
+                  <Button
+                    type="reset"
+                    color="text.primary"
+                    onClick={() => {
+                      resetForm();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Stack>
             </Form>
           );
         }}
       </Formik>
-    </div>
+    </Box>
   );
 };
 
