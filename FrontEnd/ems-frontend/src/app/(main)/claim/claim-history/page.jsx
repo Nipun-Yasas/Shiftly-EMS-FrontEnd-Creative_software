@@ -2,8 +2,7 @@
 
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-
-import { PlusIcon } from "@heroicons/react/20/solid";
+import { Box } from "@mui/material";
 
 import {
     renderEditStatus,
@@ -47,45 +46,44 @@ const columns = [
   { field: "col3", headerName: "Type", width: 150 },
   { field: "col4", headerName: "Amount", width: 150 },
   { field: "col5", headerName: "Status", width: 150 },
-  { field: 'col6',
-    headerName: 'Status',
+  {
+    field: "col6",
+    headerName: "Status",
     renderCell: renderStatus,
     renderEditCell: renderEditStatus,
-    type: 'singleSelect',
+    type: "singleSelect",
     valueOptions: STATUS_OPTIONS,
     width: 150,
-    editable: true, },
+    editable: true,
+  },
 ];
 
 export default function ClaimHistory(){
   
   return (
     <>
-      <Paper elevation={10}
+      <Paper elevation={3}
       sx={{
         height: '100%',
         width: '100%',
-      }}>
-        <div className="flex flex-col items-center">
-          <div className="w-5/6 rounded-xl">
-            <div className="flex justify-end m-3">
-              <button
-               
-                className="mx-2 bg-(color:--primary) shadow-xl rounded-full w-8 h-8 text-white"
-              >
-                <PlusIcon
-                  aria-hidden="true"
-                  className="m-2 text-white sm:size-4 "
-                />
-              </button>
-            </div>
-            <div className="flex justify-center mt-2 m-3">
-              <div style={{ height: 300, width: "100%" }}>
-                <DataGrid rows={rows} columns={columns} />
-              </div>
-            </div>
-          </div>
-        </div>
+      }}
+      >
+      <Box sx={{ width: "100%", p: 5 }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          height="auto"
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          disableSelectionOnClick
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[10, 50, 100]}
+        />
+      </Box>
       </Paper>
     </>
   );

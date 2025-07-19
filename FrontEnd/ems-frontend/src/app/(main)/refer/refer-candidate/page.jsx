@@ -6,8 +6,8 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import ReferForm from "./_components/ReferForm";
-import SubmitDialog from "../../_components/dialog/SubmitDialog";
+import ReferForm from "../_components/ReferForm";
+import SubmitDialog from "../../../_components/dialog/SubmitDialog";
 
 export default function Refer() {
   const [openSubmit, setOpenSubmit] = useState(false);
@@ -24,11 +24,8 @@ export default function Refer() {
           width: "100%",
         }}
       >
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h5">Refer Candidates Form</Typography>
-        </Box>
-
-        <Box sx={{ width: "100%", maxWidth: 1000, mt: 3, px: 2 }}>
+       
+        <Box sx={{ width: "100%", maxWidth: 1000, px: 3 }}>
           <ReferForm setOpenSubmit={setOpenSubmit} />
         </Box>
         
