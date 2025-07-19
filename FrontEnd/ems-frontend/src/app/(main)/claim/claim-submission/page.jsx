@@ -24,9 +24,7 @@ export default function ClaimSubmission() {
           width: "100%",
         }}
       >
-        {/* <Box sx={{ mt: 3 }}>
-          <Typography variant="h5">Claim Form</Typography>
-        </Box> */}
+      
 
         <Box sx={{ width: "100%", maxWidth: 1000, mt: 3, px: 2 }}>
           <ClaimForm setOpenSubmit={setOpenSubmit} />

@@ -63,25 +63,25 @@ export default function ClaimForm(props){
         {({ validateForm, resetForm }) => (
           <Form>
             <Stack>
-              {/* <Box
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   mx: 1,
                   my: 2,
                 }}
-              > */}
+              >
                 <DateInput name="claimdate" label="Claim Date" />
-              {/* </Box> */}
+              </Box>
 
-              {/* <Box
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   flexDirection: { xs: "column", sm: "row" },
                   gap: { xs: 0, sm: 2 },
                 }}
-              > */}
+              >
                 <InputItem>
                   <SelectInput
                     name="claimtype"
@@ -90,16 +90,16 @@ export default function ClaimForm(props){
                     label="Claim type"
                   />
                 </InputItem>
-              {/* </Box> */}
+              </Box>
 
-              {/* <Box
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   flexDirection: { xs: "column", sm: "row" },
                   gap: { xs: 0, sm: 2 },
                 }}
-              > */}
+              >
                 <InputItem>
                   <TextInput
                     name="description"
@@ -110,7 +110,7 @@ export default function ClaimForm(props){
                     fullWidth
                   />
                 </InputItem>
-              {/* </Box> */}
+              </Box>
 
               <InputItem>
                 <FileUpload
@@ -123,14 +123,14 @@ export default function ClaimForm(props){
                 />
               </InputItem>
 
-              {/* <Box
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: { xs: "center", md: "flex-end" },
                   pb: 2,
                   gap: 2,
                 }}
-              > */}
+              >
                 <Button
                   color="text.primary"
                   type="reset"
@@ -155,7 +155,7 @@ export default function ClaimForm(props){
                 >
                   Add
                 </Button>
-              {/* </Box> */}
+              </Box>
             </Stack>
           </Form>
         )}

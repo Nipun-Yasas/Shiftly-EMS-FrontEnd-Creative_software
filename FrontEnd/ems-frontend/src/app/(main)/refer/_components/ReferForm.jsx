@@ -69,14 +69,14 @@ export default function ReferForm(props) {
           <Form>
             <Stack>
 
-            {/* <Box
+            <Box
                 sx={{
                         display: "flex",
                         justifyContent: "space-between",
                         flexDirection: { xs: "column", sm: "row" },
                         gap: { xs: 0, sm: 2 },
                     }}
-            > */}
+            >
                <InputItem> 
                 <SelectInput
                   name="vacancy"
@@ -85,46 +85,46 @@ export default function ReferForm(props) {
                   label="Vacancy"
                 />
                </InputItem>
-           {/* </Box> */}
-           {/* <Box
+           </Box>
+           <Box
                sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     flexDirection: { xs: "column", sm: "row" },
                     gap: { xs: 0, sm: 2 },
                  }}
-            > */}
+            >
               <InputItem>
                 <TextInput name="applicantName" label="Enter applicant name" />
               </InputItem>
 
-            {/* </Box> */}
+            </Box>
             
-            {/* <Box
+            <Box
                sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     flexDirection: { xs: "column", sm: "row" },
                     gap: { xs: 0, sm: 2 },
                  }}
-            > */}
+            >
               <InputItem>
                 <TextInput
                   name="applicantEmail"
                   label="Enter applicant email"
                 />
               </InputItem>
-            {/* </Box> */}
+            </Box>
 
           
-            {/* <Box
+            <Box
                sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     flexDirection: { xs: "column", sm: "row" },
                     gap: { xs: 0, sm: 2 },
                  }}
-            > */}
+            >
               <InputItem>
                 <TextInput
                   name="message"
@@ -134,16 +134,16 @@ export default function ReferForm(props) {
                   maxRows={4}
                 />
               </InputItem>
-            {/* </Box> */}
+            </Box>
 
-            {/* <Box
+            <Box
                sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     flexDirection: { xs: "column", sm: "row" },
                     gap: { xs: 0, sm: 2 },
                  }}
-            > */}
+            >
               <InputItem>
                 <FileUpload
                   name="resume"
@@ -154,7 +154,7 @@ export default function ReferForm(props) {
                   setPreview={setPreview}
                 />
               </InputItem>
-            {/* </Box> */}
+            </Box>
 
               <InputItem>
                 <Box
