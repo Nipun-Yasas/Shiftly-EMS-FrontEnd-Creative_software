@@ -27,7 +27,6 @@ import {
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect, useRef } from "react";
-import { getDashboardCalendarData, getCurrentMonthCalendar } from "../../_utils/calendarService";
 import AddToDoDialog from './AddToDoDialog';
 import ToDoTableDialog from './ToDoTableDialog';
 import AddGoalDialog from './AddGoalDialog';
@@ -37,9 +36,9 @@ import { TrendingUp, Edit, Delete, ChevronLeft, ChevronRight, Person, Event, Che
 import GreetingHeader from './_components/GreetingHeader';
 import ProgressCard from './_components/ProgressCard';
 import ToDoCard from './_components/ToDoCard';
-import CalendarEventsCard from './_components/CalendarEventsCard';
-import EventsList from './_components/EventsList';
+import EventsCard from './_components/EventsCard';
 import StarPointsCard from './_components/StarPointsCard';
+import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import { getGreeting, getPriorityColor, getEventTypeColor } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
 
@@ -146,15 +145,10 @@ const Dashboard = () => {
   const [tableDialogOpen, setTableDialogOpen] = useState(false);
   const [addGoalDialogOpen, setAddGoalDialogOpen] = useState(false);
   const [goalTableDialogOpen, setGoalTableDialogOpen] = useState(false);
-  const [schedule, setSchedule] = useState({});
-  const [calendarData, setCalendarData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editTodo, setEditTodo] = useState(null);
   const [editGoalDialogOpen, setEditGoalDialogOpen] = useState(false);
   const [editGoal, setEditGoal] = useState(null);
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [filter, setFilter] = useState('all');
   const [quickAddValue, setQuickAddValue] = useState('');
   const motivationalQuote = "The only way to do great work is to love what you do. - Steve Jobs";
@@ -163,6 +157,7 @@ const Dashboard = () => {
   const [starDialogOpen, setStarDialogOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(null); // null for SSR, set after mount
   const [goalStreak, setGoalStreak] = useState(0);
+  const [demoEventsState, setDemoEventsState] = useState(demoEvents);
 
   // Handlers (unchanged)
   const handleAddToDo = (todo) => setToDoItems(prev => [todo, ...prev]);
@@ -188,7 +183,7 @@ const Dashboard = () => {
   };
 
   const handleToggleEvent = (eventId) => {
-    setDemoEvents(prev => prev.map(event => event.id === eventId ? { ...event, joined: !event.joined } : event));
+    setDemoEventsState(prev => prev.map(event => event.id === eventId ? { ...event, joined: !event.joined } : event));
   };
 
   // Calculate progress based on goals
@@ -197,43 +192,6 @@ const Dashboard = () => {
     const totalGoals = goals.length;
     setProgress(totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0);
   }, [goals]);
-
-  // Update calendar and events
-  useEffect(() => {
-    const fetchCalendarData = async () => {
-      try {
-        setLoading(true);
-        const startOfMonth = new Date(currentYear, currentMonth, 1);
-        const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
-        const [scheduleData, calendarInfo] = await Promise.all([
-          getDashboardCalendarData(startOfMonth, endOfMonth),
-          getCurrentMonthCalendar(currentYear, currentMonth)
-        ]);
-        setSchedule(scheduleData || {});
-        setCalendarData(calendarInfo || { calendarDays: [] });
-      } catch (error) {
-        console.error("Failed to fetch calendar data:", error);
-        setSchedule({});
-        setCalendarData({ calendarDays: [] });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCalendarData();
-
-    const refreshInterval = setInterval(fetchCalendarData, 1800000);
-    return () => { clearInterval(refreshInterval); };
-  }, [currentMonth, currentYear]);
-
-  // Month navigation
-  const handlePrevMonth = () => {
-    setCurrentMonth(prev => (prev === 0 ? (setCurrentYear(y => y - 1), 11) : prev - 1));
-  };
-  const handleNextMonth = () => {
-    setCurrentMonth(prev => (prev === 11 ? (setCurrentYear(y => y + 1), 0) : prev + 1));
-  };
-
-  // Remove local starPoints increment; should only be updated by backend/admin
 
   const getPriorityColor = (priority) => ({
     high: theme.palette.error.main,
@@ -256,7 +214,7 @@ const Dashboard = () => {
     default: <Event fontSize="small" />,
   })[type] || <Event fontSize="small" />;
 
-  const [demoEventsState, setDemoEvents] = useState(demoEvents);
+
 
   const filteredGoals = goals.filter(goal => {
     if (filter === 'all') return true;
@@ -308,7 +266,9 @@ const Dashboard = () => {
   return (
     <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh', width: '100%', position: 'relative' }}>
       <GreetingHeader greeting={greeting} />
-      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 } }}>
+      
+      {/* Performance and ToDo Cards - Side by Side at Top */}
+      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
         <Grid item xs={12} md={6}>
           <ProgressCard
             progress={progress}
@@ -317,7 +277,7 @@ const Dashboard = () => {
             setAddGoalDialogOpen={setAddGoalDialogOpen}
           />
         </Grid>
-        <Grid item xs={12} md={12} ref={rightCardRef}>
+        <Grid item xs={12} md={6} ref={rightCardRef}>
           <ToDoCard
             toDoItems={toDoItems}
             handleAddToDo={handleAddToDo}
@@ -333,23 +293,22 @@ const Dashboard = () => {
             setTableDialogOpen={setTableDialogOpen}
           />
         </Grid>
-        <Grid item xs={12} md={12}>
-          <CalendarEventsCard
-            currentMonth={currentMonth}
-            currentYear={currentYear}
-            loading={loading}
-            calendarData={calendarData}
-            schedule={schedule}
-            handlePrevMonth={handlePrevMonth}
-            handleNextMonth={handleNextMonth}
-            getEventTypeColor={type => getEventTypeColor(type, useTheme())}
-          />
+      </Grid>
+
+      {/* Quick Actions Tools - Full Width Below */}
+      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
+        <Grid item xs={12}>
+          <PerformanceAnalyticsCard />
         </Grid>
       </Grid>
-      <Grid container spacing={3} sx={{ mt: 2 }}>
+
+      {/* Events and Star Points Cards - Side by Side */}
+      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
         <Grid item xs={12} lg={9}>
-          <Typography variant="h6" sx={{ mb: 3, fontFamily: 'var(--font-poppins)', fontWeight: 600, color: 'text.primary' }}>Events</Typography>
-          <EventsList demoEventsState={demoEventsState} handleToggleEvent={handleToggleEvent} />
+          <EventsCard 
+            events={demoEventsState} 
+            onViewAll={() => router.push('/events')}
+          />
         </Grid>
         <Grid item xs={12} lg={3}>
           <StarPointsCard starPoints={starPoints} starDialogOpen={starDialogOpen} setStarDialogOpen={setStarDialogOpen} />
@@ -401,9 +360,9 @@ const Dashboard = () => {
               transform: 'scale(1.04)'
             }
           }}
-          onClick={() => router.push('/refer')}
+          onClick={() => router.push('/timesheet/submit')}
         >
-          Take Appraisal
+          Submit Timesheet
         </Button>
         <Button 
           variant="outlined" 
@@ -425,9 +384,9 @@ const Dashboard = () => {
               transform: 'scale(1.04)'
             }
           }}
-          onClick={() => router.push('/employee/profile')}
+          onClick={() => router.push('/claim/submit')}
         >
-          Update Profile
+          Submit Claim
         </Button>
         <Button 
           variant="outlined" 
