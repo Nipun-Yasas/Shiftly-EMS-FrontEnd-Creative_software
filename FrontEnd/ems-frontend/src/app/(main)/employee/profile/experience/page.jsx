@@ -8,17 +8,19 @@ import {
   Alert,
   Typography,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   useTheme
 } from '@mui/material';
+import { DataGrid } from "@mui/x-data-grid";
+import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
 import ExperienceForm from '../components/ExperienceForm';
+
+const columns = [
+  { field: "id", headerName: "ID", flex:1 },
+  { field: "jobTitle", headerName: "Job Title", flex:1 },
+  { field: "company", headerName: "Company", flex:1 },
+  { field: "duration", headerName: "Duration", flex:1 },
+];
 
 const Experience = () => {
   const theme = useTheme();
@@ -42,7 +44,11 @@ const Experience = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setExperiences((prev) => [...prev, formData]);
+    const newExperience = {
+      id: experiences.length + 1,
+      ...formData
+    };
+    setExperiences((prev) => [...prev, newExperience]);
     setOpenModal(false);
     setOpenSnackbar(true);
     setFormData({ jobTitle: '', company: '', duration: '' });
@@ -116,34 +122,25 @@ const Experience = () => {
         </Alert>
       </Snackbar>
 
-      {/* Table */}
-      {experiences.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="h5" gutterBottom>
-            Experience List
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Job Title</strong></TableCell>
-                  <TableCell><strong>Company</strong></TableCell>
-                  <TableCell><strong>Duration</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {experiences.map((exp, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{exp.jobTitle}</TableCell>
-                    <TableCell>{exp.company}</TableCell>
-                    <TableCell>{exp.duration}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+      {/* DataGrid */}
+      
+        <Box sx={{ width: "100%", p: 3 }}>
+          <DataGrid
+            rows={experiences}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+          />
         </Box>
-      )}
+      
     </Box>
   );
 };

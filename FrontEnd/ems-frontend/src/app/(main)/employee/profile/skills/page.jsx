@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Modal,
@@ -9,16 +8,18 @@ import {
   Alert,
   Typography,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   useTheme
 } from '@mui/material';
+import { DataGrid } from "@mui/x-data-grid";
+import Paper from "@mui/material/Paper";
+import AddIcon from '@mui/icons-material/Add';
 import SkillsForm from '../components/SkillsForm';
+
+const columns = [
+  { field: "id", headerName: "ID", flex:1 },
+  { field: "skillName", headerName: "Skill Name",flex:1 },
+  { field: "proficiency", headerName: "Proficiency", flex:1 },
+];
 
 const Skills = () => {
   const theme = useTheme();
@@ -41,7 +42,11 @@ const Skills = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSkills((prev) => [...prev, formData]);
+    const newSkill = {
+      id: skills.length + 1,
+      ...formData
+    };
+    setSkills((prev) => [...prev, newSkill]);
     setOpenModal(false);
     setOpenSnackbar(true);
     setFormData({ skillName: '', proficiency: '' });
@@ -61,7 +66,7 @@ const Skills = () => {
           position: 'absolute',
           top: 16,
           right: 16,
-          bgcolor: theme.palette.background.paper,
+          
           border: `1px solid ${theme.palette.divider}`,
           '&:hover': {
             bgcolor: theme.palette.action.hover,
@@ -115,32 +120,25 @@ const Skills = () => {
         </Alert>
       </Snackbar>
 
-      {/* Table */}
-      {skills.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="h5" gutterBottom>
-            Skills List
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Skill Name</strong></TableCell>
-                  <TableCell><strong>Proficiency</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {skills.map((skill, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{skill.skillName}</TableCell>
-                    <TableCell>{skill.proficiency}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+      {/* DataGrid */}
+     
+        <Box sx={{ width: "100%", p: 3 }}>
+          <DataGrid
+            rows={skills}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+          />
         </Box>
-      )}
+      
     </Box>
   );
 };

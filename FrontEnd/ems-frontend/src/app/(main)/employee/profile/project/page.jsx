@@ -10,42 +10,70 @@ const Projects = () => {
 
   return (
     <Box
-    sx={{
-      mt: 5,
-      maxWidth: '100%',
-      mx: 'auto',
-      backgroundColor: theme.palette.background, // Use background.default for better theme control
-      boxShadow: 3,
-      borderRadius: 5,
-      p: 3,
-      border: `1px solid ${theme.palette.divider}`,
-    }}
-    
+      sx={{
+        mt: { xs: 3, sm: 4, md: 5 },
+        maxWidth: '100%',
+        mx: 'auto',
+        backgroundColor: theme.palette.background,
+        boxShadow: 3,
+        borderRadius: { xs: 3, sm: 4, md: 5 },
+        p: { xs: 2, sm: 2.5, md: 3 },
+        border: `1px solid ${theme.palette.divider}`,
+        position: 'relative',
+      }}
     >
-      <Box display="flex" alignItems="center" gap={4}>
-        <Image
-          src={url}
-          alt="Creative Software Logo"
-          width={250}
-          height={68.99}
-          className="rounded"
-        />
-        <Box>
+      <Box 
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'center', sm: 'flex-start' },
+          gap: { xs: 2, sm: 3, md: 4 },
+          textAlign: { xs: 'center', sm: 'left' },
+        }}
+      >
+        <Box
+          sx={{
+            flexShrink: 0,
+            width: { xs: '100%', sm: 'auto' },
+            maxWidth: { xs: '180px', sm: '220px', md: '250px' },
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Image
+            src={url}
+            alt="Creative Software Logo"
+            width={250}
+            height={68.99}
+            className="rounded"
+            style={{
+              width: '100%',
+              height: 'auto',
+              maxWidth: '250px',
+            }}
+          />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
           <Typography
             variant="h6"
             sx={{
-              color: theme.palette.text, // Ensure the text color works with dark and light modes
-              fontWeight: 700,
+              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+              fontWeight: 600,
+              color: theme.palette.text,
+              wordBreak: 'break-word',
+              lineHeight: { xs: 1.3, sm: 1.4 },
             }}
           >
             Software Engineer
           </Typography>
-          <Box  >
-           
+          <Box sx={{ mt: { xs: 0.5, sm: 0 } }}>
             <Typography
               variant="body2"
               sx={{
-                color: theme.palette.text, 
+                fontSize: { xs: '0.8rem', sm: '0.875rem', md: '0.9rem' },
+                color: theme.palette.text,
+                wordBreak: 'break-word',
+                lineHeight: { xs: 1.3, sm: 1.4 },
               }}
             >
               Creative Technology Solutions (Pvt) Ltd
@@ -54,33 +82,57 @@ const Projects = () => {
           <Typography
             variant="body2"
             sx={{
+              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
               color: theme.palette.text,
-              fontSize: '0.875rem',
+              mt: { xs: 0.5, sm: 0.25 },
+              lineHeight: { xs: 1.3, sm: 1.4 },
             }}
           >
             November 2021 - Present
           </Typography>
         </Box>
       </Box>
-      <Box>
-          <IconButton  
-              sx={{
-                
-                ml:100,
-                color: theme.palette.text
-              }}>
-              <EditIcon />
-            </IconButton>
-
+      
+      <Box
+        sx={{
+          position: 'absolute',
+          top: { xs: 8, sm: 12, md: 16 },
+          right: { xs: 8, sm: 12, md: 16 },
+          zIndex: 1,
+        }}
+      >
+        <IconButton
+          sx={{
+            color: theme.palette.text,
+            padding: { xs: '4px', sm: '8px' },
+          }}
+          size="small"
+        >
+          <EditIcon 
+            sx={{ 
+              fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } 
+            }} 
+          />
+        </IconButton>
       </Box>
 
-      <Box sx={{ ml: 8}}>
+      <Box 
+        sx={{ 
+          ml: { xs: 0, sm: 4, md: 8 }, 
+          mt: { xs: 2.5, sm: 2.5, md: 3 },
+          px: { xs: 0, sm: 0 },
+          width: '100%',
+        }}
+      >
         <Typography
           variant="h6"
           sx={{
-            color: theme.palette.text,
+            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
             fontWeight: 700,
             fontFamily: 'Roboto, sans-serif',
+            color: theme.palette.text,
+            textAlign: { xs: 'center', sm: 'left' },
+            lineHeight: { xs: 1.3, sm: 1.4 },
           }}
         >
           DIPS
@@ -88,14 +140,19 @@ const Projects = () => {
         <Typography
           variant="body1"
           sx={{
+            fontSize: { xs: '0.8rem', sm: '0.825rem', md: '0.875rem' },
+            lineHeight: { xs: '1.4', sm: '1.45', md: '1.5' },
             color: theme.palette.text,
-            fontSize: '0.875rem',
-            lineHeight: '1.5',
-            mt: 1,
+            mt: { xs: 1, sm: 1 },
+            textAlign: { xs: 'center', sm: 'left' },
+            wordBreak: 'break-word',
+            hyphens: 'auto',
+            maxWidth: '100%',
           }}
         >
-          DIPS AS is Norway&apos;s leading provider of E-healthcare solutions for hospitals. The success of an initial
-          collaboration to develop the first mobile applications led to DIPS establishing additional teams to work on
+          DIPS AS is Norway&apos;s leading provider of E-healthcare solutions for hospitals.
+          <br/> The success of an initial
+          collaboration to develop the first mobile applications led to<br/> DIPS establishing additional teams to work on
           other areas of their product.
         </Typography>
       </Box>

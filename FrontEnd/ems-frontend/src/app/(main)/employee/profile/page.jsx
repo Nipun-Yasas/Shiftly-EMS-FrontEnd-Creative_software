@@ -21,7 +21,7 @@ const Employee = () => {
           alignItems: 'center',
           p: 2,
           borderRadius: 3,
-          backgroundColor: theme.palette.background, // Dynamically switch background color
+          backgroundColor: theme.palette.background, 
         }}
       >
         <Box display="flex" alignItems="center">
@@ -33,7 +33,7 @@ const Employee = () => {
           <IconButton sx={{ mt: 8, ml: 0 }} aria-label="edit">
             <EditIcon
               sx={{
-                color: theme.palette.text, // Use the correct text color for dark and light mode
+                color: theme.palette.text, 
                 width: 20,
                 height: 20,
               }}
@@ -56,7 +56,7 @@ const Employee = () => {
         <Box
           className="right-container pr-5 pt-5 flex flex-col items-start"
           sx={{
-            color: theme.palette.text, // Make sure text color adapts to the theme mode
+            color: theme.palette.text, 
             fontFamily: 'var(--font-lexend)',
           }}
         >
@@ -71,7 +71,7 @@ const Employee = () => {
                   width: 24,
                   height: 24,
                   mr: 1,
-                  color: theme.palette.text, // Use theme-based color for icons
+                  color: theme.palette.text, 
                 }}
               />
               <Typography variant="body1" sx={{ fontWeight: 'light' }}>
@@ -90,7 +90,7 @@ const Employee = () => {
                   width: 24,
                   height: 24,
                   mr: 1,
-                  color: theme.palette.text // Ensure icons are using correct colors
+                  color: theme.palette.text 
                 }}
               />
               <Typography variant="body1" sx={{ fontWeight: 'light',
@@ -104,7 +104,7 @@ const Employee = () => {
       </Paper>
 
       <Box className="tabs-container shadow bg-white rounded-xl" sx={{ mt: 3 }}>
-        {/* Make sure TabBar responds to the theme */}
+       
         <TabBar theme={theme} />
       </Box>
     </Box>

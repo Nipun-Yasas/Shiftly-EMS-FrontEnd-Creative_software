@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Modal,
@@ -9,16 +8,19 @@ import {
   Alert,
   Typography,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   useTheme
 } from '@mui/material';
+import { DataGrid } from "@mui/x-data-grid";
+import Paper from "@mui/material/Paper";
+import AddIcon from '@mui/icons-material/Add';
 import EducationForm from '../components/EducationForm';
+
+const columns = [
+  { field: "id", headerName: "ID",flex:1 },
+  { field: "degree", headerName: "Degree", flex:1 },
+  { field: "institution", headerName: "Institution", flex:1 },
+  { field: "duration", headerName: "Duration", flex:1 },
+];
 
 const Education = () => {
   const theme = useTheme();
@@ -42,7 +44,11 @@ const Education = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setEducations((prev) => [...prev, formData]);
+    const newEducation = {
+      id: educations.length + 1,
+      ...formData
+    };
+    setEducations((prev) => [...prev, newEducation]);
     setOpenModal(false);
     setOpenSnackbar(true);
     setFormData({ degree: '', institution: '', duration: '' });
@@ -62,7 +68,7 @@ const Education = () => {
           position: 'absolute',
           top: 16,
           right: 16,
-          bgcolor: theme.palette.background.paper,
+          bgcolor: theme.palette.background,
           border: `1px solid ${theme.palette.divider}`,
           '&:hover': {
             bgcolor: theme.palette.action.hover,
@@ -116,34 +122,25 @@ const Education = () => {
         </Alert>
       </Snackbar>
 
-      {/* Table */}
-      {educations.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="h5" gutterBottom>
-            Education List
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Degree</strong></TableCell>
-                  <TableCell><strong>Institution</strong></TableCell>
-                  <TableCell><strong>Duration</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {educations.map((edu, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{edu.degree}</TableCell>
-                    <TableCell>{edu.institution}</TableCell>
-                    <TableCell>{edu.duration}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+      {/* DataGrid */}
+     
+        <Box sx={{ width: "100%", p: 3 }}>
+          <DataGrid
+            rows={educations}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+          />
         </Box>
-      )}
+     
     </Box>
   );
 };
