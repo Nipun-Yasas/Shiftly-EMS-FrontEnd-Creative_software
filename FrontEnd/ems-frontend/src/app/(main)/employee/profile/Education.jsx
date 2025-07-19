@@ -133,9 +133,9 @@ const Education = () => {
       {/* DataGrid */}
       
         <Box sx={{ 
-          width: "100%", 
-          p: { xs: 1, sm: 2, md: 3 },
-          mt: { xs: 4, sm: 6 }
+        width: "100%", 
+        p: { xs: 0.5, sm: 1, md: 1.5 },
+        mt: { xs: 2, sm: 3 }
         }}>
           <DataGrid
             rows={educations}
