@@ -3,10 +3,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import ClaimsDataGrid from "./ClaimsDataGrid";
 
-export default function RejectedClaimsTab({
+export default function ApprovedTab({
   claims,
   loading,
   searchQuery,
@@ -17,22 +17,16 @@ export default function RejectedClaimsTab({
     <Box sx={{ p: 3 }}>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          gap: 2,
           mb: 3,
         }}
       >
         <SearchField
-          placeholder="Search rejected claims..."
+          placeholder="Search approved claims..."
           value={searchQuery}
           onChange={handleSearchChange}
           sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
-
       <ClaimsDataGrid
         claims={claims}
         loading={loading}

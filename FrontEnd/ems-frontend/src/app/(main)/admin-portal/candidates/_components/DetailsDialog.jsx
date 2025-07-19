@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 
-export default function ReferDetailsDialog({ 
+export default function DetailsDialog({ 
   open, 
   onClose, 
   selectedCandidate, 

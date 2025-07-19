@@ -10,11 +10,11 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
-import AllProjectTab from "./_components/AllProjectTab";
-import AddProjectTab from "./_components/AddProjectTab";
-import EditProjectDialog from "./_components/EditProjectDialog";
-import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
-import TabPanel from "../_components/TabPanel";
+import AllTab from "./_components/AllTab";
+import AddTab from "./_components/AddTab";
+import EditDialog from "./_components/EditDialog";
+import DeleteDialog from "./_components/DeleteDialog";
+import TabPanel from "../../../_components/main/TabPanel";
 
 const projectStatuses = [
   { id: 1, name: "Planning", label: "Planning", color: "info" },
@@ -42,12 +42,27 @@ export default function ProjectManagementPage() {
   const initialFormValues = {
     projectName: "",
     description: "",
-    client: "",
-    projectManager: "",
-    status: null,
-    startDate: "",
-    endDate: "",
-    teamSize: "",
+    department: null,
+    teamName: null,
+    startDate: null,
+    deadline: null,
+    progress: 0,
+  };
+
+  const getEditInitialValues = (project) => {
+    if (project) {
+      return {
+        projectName: project.projectName || "",
+        description: project.description || "",
+        department:
+          departments.find((d) => d.name === project.department) || null,
+        teamName: teams.find((t) => t.name === project.teamName) || null,
+        startDate: project.startDate || null,
+        deadline: project.deadline || null,
+        progress: project.progress || 0,
+      };
+    }
+    return initialFormValues;
   };
 
   // Fetch projects
@@ -64,49 +79,63 @@ export default function ProjectManagementPage() {
       setProjects([
         {
           id: 1,
-          projectName: "E-Com Platform",
+          projectName: "E-Commerce Platform",
           description:
-            "Development of a modern e-commerce platform with advanced features",
-          client: "TechCorp Inc.",
-          projectManager: "John Smith",
-          status: { name: "In Progress", color: "primary" },
+            "Development of a modern e-commerce platform with advanced features including payment gateway, inventory management, and user analytics",
+          teamName: "Alpha Team",
           startDate: "2024-01-15",
-          endDate: "2024-06-30",
-          teamSize: 8,
+          deadline: "2024-06-30",
+          progress: 65,
         },
         {
           id: 2,
-          projectName: "Mobile Bank App",
-          description: "Secure mobile banking application for iOS and Android",
-          client: "National Bank",
-          projectManager: "Sarah Johnson",
-          status: { name: "Planning", color: "info" },
+          projectName: "Mobile Banking App",
+          description:
+            "Secure mobile banking application for iOS and Android with biometric authentication and real-time transaction monitoring",
+          teamName: "Beta Team",
           startDate: "2024-03-01",
-          endDate: "2024-09-15",
-          teamSize: 12,
+          deadline: "2024-09-15",
+          progress: 25,
         },
         {
           id: 3,
-          projectName: "Inventory Mgt System",
-          description: "Web-based inventory tracking and management system",
-          client: "RetailMax Ltd.",
-          projectManager: "Mike Davis",
-          status: { name: "Completed", color: "success" },
+          projectName: "Inventory Management System",
+          description:
+            "Web-based inventory tracking and management system with barcode scanning and automated reorder alerts",
+          teamName: "Gamma Team",
           startDate: "2023-08-01",
-          endDate: "2023-12-31",
-          teamSize: 5,
+          deadline: "2023-12-31",
+          progress: 100,
         },
         {
           id: 4,
-          projectName: "Learning Mgt System",
+          projectName: "Learning Management System",
           description:
-            "Online learning platform with video streaming capabilities",
-          client: "EduTech Solutions",
-          projectManager: "Emma Wilson",
-          status: { name: "On Hold", color: "warning" },
+            "Online learning platform with video streaming capabilities, quiz engine, and progress tracking for educational institutions",
+          teamName: "Delta Team",
           startDate: "2024-02-01",
-          endDate: "2024-08-30",
-          teamSize: 6,
+          deadline: "2024-08-30",
+          progress: 45,
+        },
+        {
+          id: 5,
+          projectName: "CRM Dashboard",
+          description:
+            "Customer relationship management dashboard with sales pipeline tracking, lead management, and reporting analytics",
+          teamName: "Epsilon Team",
+          startDate: "2024-04-01",
+          deadline: "2024-10-15",
+          progress: 30,
+        },
+        {
+          id: 6,
+          projectName: "Healthcare Portal",
+          description:
+            "Patient management portal with appointment scheduling, medical records access, and telemedicine integration",
+          teamName: "Zeta Team",
+          startDate: "2024-01-01",
+          deadline: "2024-07-31",
+          progress: 80,
         },
       ]);
     } finally {
@@ -215,12 +244,8 @@ export default function ProjectManagementPage() {
   const filteredProjects = projects.filter(
     (project) =>
       project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.projectManager
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      project.status?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.priority?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.teamName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => {
@@ -228,7 +253,10 @@ export default function ProjectManagementPage() {
   }, []);
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper
+      elevation={3}
+      sx={{ height: "100%", width: "100%"}}
+    >
       <Box sx={{ p: 2 }}>
         <Tabs
           value={tabValue}
@@ -240,7 +268,7 @@ export default function ProjectManagementPage() {
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <AllProjectTab
+          <AllTab
             projects={filteredProjects}
             loading={loading}
             searchQuery={searchQuery}
@@ -252,15 +280,14 @@ export default function ProjectManagementPage() {
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <AddProjectTab
+          <AddTab
             onSubmit={handleAddSubmit}
             projectStatuses={projectStatuses}
             initialFormValues={initialFormValues}
           />
         </TabPanel>
 
-        {/* Edit Project Dialog */}
-        <EditProjectDialog
+        <EditDialog
           open={editDialogOpen}
           onClose={() => {
             setEditDialogOpen(false);
@@ -271,15 +298,13 @@ export default function ProjectManagementPage() {
           projectStatuses={projectStatuses}
         />
 
-        {/* Delete Confirmation Dialog */}
-        <DeleteConfirmDialog
+        <DeleteDialog
           open={deleteConfirmOpen}
           onClose={() => setDeleteConfirmOpen(false)}
           onConfirm={handleDelete}
           projectName={projectToDelete?.projectName}
         />
 
-        {/* Snackbar for notifications */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}

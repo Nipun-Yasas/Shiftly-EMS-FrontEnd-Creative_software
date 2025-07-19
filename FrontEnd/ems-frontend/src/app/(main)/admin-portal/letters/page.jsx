@@ -13,7 +13,7 @@ import ReadTab from "./_components/ReadTab";
 import UnReadTab from "./_components/UnReadTab";
 import AllLettersTab from "./_components/AllLettersTab";
 import LetterDetailDialog from "./_components/LetterDetailDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function LetterSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
@@ -255,7 +255,7 @@ export default function LetterSubmissionPage() {
   };
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab
@@ -294,7 +294,6 @@ export default function LetterSubmissionPage() {
             {...commonProps}
           />
         </TabPanel>
-      </Box>
 
       <LetterDetailDialog
         open={openDetailDialog}
@@ -318,6 +317,7 @@ export default function LetterSubmissionPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      </Box>
     </Paper>
   );
 }

@@ -2,34 +2,34 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
+import SearchField from "../../../../_components/main/SearchField";
+import EventDataGrid from "./EventDataGrid";
 
-import SearchField from "../../_components/SearchField";
-import LeavesDataGrid from "./LeavesDataGrid";
-
-export default function PendingLeavesTab({
-  leaves,
+export default function AllTab({
   loading,
+  events,
   searchQuery,
-  handleSearchChange,
+  onSearchChange,
   onViewDetails,
   onApprovalAction,
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ pb: 2, display: "flex", alignItems: "center" }}>
+      <Box sx={{ mb: 3 }}>
         <SearchField
-          placeholder="Search pending leaves..."
+          placeholder="Search event history..."
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={onSearchChange}
           sx={{ minWidth: 300 }}
         />
       </Box>
 
-      <LeavesDataGrid
+      <EventDataGrid
         loading={loading}
-        leaves={leaves}
+        events={events.filter((e) => e.status !== "pending")}
         onViewDetails={onViewDetails}
         onApprovalAction={onApprovalAction}
+        showApprovalActions={false}
       />
     </Box>
   );

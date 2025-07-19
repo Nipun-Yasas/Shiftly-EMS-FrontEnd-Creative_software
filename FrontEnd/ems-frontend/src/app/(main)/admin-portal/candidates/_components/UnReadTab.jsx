@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import SearchField from '../../_components/SearchField';
+import SearchField from '../../../../_components/main/SearchField';
 import ReferDataGrid from './ReferDataGrid';
 
 export default function UnReadTab({ 
@@ -14,12 +14,12 @@ export default function UnReadTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{mb:2}}>
+      <Box sx={{mb:3}}>
         <SearchField
           placeholder="Search unread candidates..."
           value={searchQuery}
           onChange={onSearchChange}
-          sx={{ minWidth: 300 }}
+          sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
       

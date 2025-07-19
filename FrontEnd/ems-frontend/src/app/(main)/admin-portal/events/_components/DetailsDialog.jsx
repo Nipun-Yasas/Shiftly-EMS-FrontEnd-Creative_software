@@ -31,7 +31,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import dayjs from "dayjs";
 import { getStatusIcon, getStatusColor } from "../../_helpers/colorhelper";
 
-export default function EventDetailsDialog({
+export default function DetailsDialog({
   open,
   onClose,
   selectedEvent,

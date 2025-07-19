@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import { FilterList as FilterIcon } from '@mui/icons-material';
-import SearchField from '../../_components/SearchField';
+import SearchField from '../../../../_components/main/SearchField';
 import ReferDataGrid from './ReferDataGrid';
 
-export default function AllRefers({ 
+export default function AllTab({ 
   searchQuery, 
   onSearchChange, 
   filteredCandidates, 
@@ -19,7 +19,7 @@ export default function AllRefers({
     <Box sx={{ p: 3 }}>
           <Box
             sx={{
-              pb: 2,
+              mb: 3,
               display: "flex",
               justifyContent: "space-between",
               flexDirection: { xs: "column", sm: "row" },
@@ -31,7 +31,7 @@ export default function AllRefers({
           placeholder="Search candidates..."
           value={searchQuery}
           onChange={onSearchChange}
-          sx={{ minWidth: 300 }}
+          sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
         <Button
           variant="outlined"

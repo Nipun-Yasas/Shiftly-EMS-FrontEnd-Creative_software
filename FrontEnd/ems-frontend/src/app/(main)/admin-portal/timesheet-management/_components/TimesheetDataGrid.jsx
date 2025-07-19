@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
-import CircularProgress from "@mui/material/CircularProgress";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import PersonIcon from "@mui/icons-material/Person";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -21,56 +18,27 @@ export default function TimesheetDataGrid({
   onViewTimesheets,
   onApprove,
   onReject,
-  showTeamColumn = true,
-  showProjectColumn = true,
-  hideFooter = false,
-  initialPageSize = 10,
-  pageSizeOptions = [5, 10, 50, 100],
+  showTeamColumn = false,
+  showProjectColumn = false,
 }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   // Employee data grid columns
   const employeeColumns = [
     {
-      field: "employee",
+      field: "name",
       headerName: "Employee",
-      width: 350,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              backgroundColor: "#e0e0e0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mr: 2,
-            }}
-          >
-            <PersonIcon />
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="textPrimary">
-              {params.row.name}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              {params.row.email}
-            </Typography>
-          </Box>
-        </Box>
-      ),
+      width: 150,
+    },
+    {
+      field: "department",
+      headerName: "Department",
+      width: 170,
     },
     ...(showTeamColumn
       ? [
           {
             field: "team",
             headerName: "Team",
-            width: showProjectColumn ? 150 : 210,
+            width: 150,
           },
         ]
       : []),
@@ -79,39 +47,36 @@ export default function TimesheetDataGrid({
           {
             field: "project",
             headerName: "Project",
-            width: showTeamColumn ? 180 : 200,
+            width: 200,
           },
         ]
       : []),
-    {
-      field: "pendingSubmissions",
-      headerName: "Pending Submissions",
-      width: 200,
-      renderCell: (params) =>
-        params.value > 0 ? (
-          <Chip
-            label={`${params.value} Pending`}
-            color="warning"
-            size="small"
-          />
-        ) : (
-          <Chip label="None" color="success" size="small" />
-        ),
-    },
+
     {
       field: "actions",
       headerName: "Actions",
-      width: 140,
-      sortable: false,
+      width: 100,
+      headerClassName: "last-column",
+      align: "center",
       renderCell: (params) => (
-        <Button
-          variant="text"
-          size="small"
-          startIcon={<VisibilityIcon />}
-          onClick={() => onViewTimesheets(params.row)}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
         >
-          View
-        </Button>
+          <Button
+            variant="text"
+            size="small"
+            startIcon={<VisibilityIcon />}
+            onClick={() => onViewTimesheets(params.row)}
+          >
+            View
+          </Button>
+        </Box>
       ),
     },
   ];
@@ -120,32 +85,27 @@ export default function TimesheetDataGrid({
     {
       field: "date",
       headerName: "Date",
-      width: 100,
-    },
-    {
-      field: "projectTask",
-      headerName: "Project Task",
-      width: 150,
+      width: 120,
     },
     {
       field: "workMode",
       headerName: "Work Mode",
-      width: 120,
+      width: 100,
     },
     {
       field: "activity",
       headerName: "Activity",
-      width: 130,
+      width: 350,
     },
     {
       field: "hours",
       headerName: "Hours",
-      width: 90,
+      width: 80,
     },
     {
       field: "status",
       headerName: "Status",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -157,11 +117,20 @@ export default function TimesheetDataGrid({
     {
       field: "actions",
       headerName: "Actions",
-      width: 120,
+      headerClassName: "last-column",
+      align: "center",
       sortable: false,
       renderCell: (params) =>
         params.row.status === "Pending" ? (
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              mt: 1,
+              width: "100%",
+              justifyContent: "center",
+            }}
+          >
             <IconButton
               size="small"
               color="success"
@@ -185,39 +154,20 @@ export default function TimesheetDataGrid({
 
   const columns = type === "employee" ? employeeColumns : timesheetColumns;
 
-  // Don't render the DataGrid until the component is mounted
-  if (!mounted) {
-    return (
-      <Box
-        sx={{
-          height: "auto",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "200px",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ height: "auto", width: "100%" }}>
       <DataGrid
         rows={data}
         columns={columns}
+        rowsPerPageOptions={[10]}
         disableSelectionOnClick
-        hideFooter={hideFooter}
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: initialPageSize },
+            paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        pageSizeOptions={pageSizeOptions}
+        pageSizeOptions={[10, 50, 100]}
       />
     </Box>
   );
 }
-

@@ -7,10 +7,10 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import UserDataGrid from "./UserDataGrid";
 
-export default function AssignUserTab({
+export default function VerifyTab({
   loading,
   unassignedUsers,
   handleAssignUser,
@@ -18,13 +18,26 @@ export default function AssignUserTab({
   handleSearchChange,
 }) {
   const columns = [
-    { field: "username", headerName: "Username", width: 150 },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 170,
+      disableColumnSeparator: true,
+    },
     { field: "email", headerName: "Email", width: 250 },
-    { field: "createdAt", headerName: "Registered Date", width: 150 },
+    {
+      field: "createdAt",
+      headerName: "Created Date",
+      width: 170,
+      align: "center",
+    },
     {
       field: "actions",
       headerName: "Actions",
-      width: 120,
+      align: "center",
+
+      headerClassName: "last-column",
+      width: 100,
       renderCell: (params) => (
         <Tooltip title="Assign Role & Employee Number">
           <IconButton
@@ -52,10 +65,7 @@ export default function AssignUserTab({
         }}
       >
         <Box>
-          <Typography variant="h6">Assign Users</Typography>
-          <Typography variant="body2" color="text.secondary">
-            New users waiting for role assignment
-          </Typography>
+          <Typography variant="h6">Unverified Users</Typography>
         </Box>
 
         <SearchField
@@ -66,11 +76,21 @@ export default function AssignUserTab({
         />
       </Box>
 
-      <UserDataGrid
-        loading={loading}
-        rows={unassignedUsers}
-        columns={columns}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ width: { xs: "100%", lg: "700px" } }}>
+          <UserDataGrid
+            loading={loading}
+            rows={unassignedUsers}
+            columns={columns}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 }

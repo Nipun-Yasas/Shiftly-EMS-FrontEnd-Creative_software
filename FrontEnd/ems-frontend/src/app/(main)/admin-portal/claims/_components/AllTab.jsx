@@ -3,46 +3,44 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import FilterList from "@mui/icons-material/FilterList";
 
-import FilterListIcon from "@mui/icons-material/FilterList";
+import SearchField from "../../../../_components/main/SearchField";
+import ClaimsDataGrid from "./ClaimsDataGrid";
 
-import SearchField from "../../_components/SearchField";
-import LeavesDataGrid from "./LeavesDataGrid";
-
-export default function AllLeavesTab({
-  leaves,
+export default function AllTab({
+  claims,
   loading,
   searchQuery,
   handleSearchChange,
   filterStatus,
   setFilterStatus,
-  onViewDetails,
+  onViewClaim,
   onApprovalAction,
 }) {
   return (
     <Box sx={{ p: 3 }}>
       <Box
         sx={{
-          pb: 2,
           display: "flex",
           justifyContent: "space-between",
           flexDirection: { xs: "column", sm: "row" },
-          gap: { xs: 1, sm: 2 },
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
+          mb: 3,
         }}
       >
-        <Box>
-          <SearchField
-            placeholder="Search all leaves..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            sx={{ minWidth: 300 }}
-          />
-        </Box>
-        <Box>
+        <SearchField
+          placeholder="Search all claims..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          sx={{ minWidth: { xs: "auto", sm: 200 } }}
+        />
+
+        {setFilterStatus && (
           <Button
             variant="outlined"
-            startIcon={<FilterListIcon />}
+            startIcon={<FilterList />}
             onClick={() => {
               const nextFilter =
                 filterStatus === "all"
@@ -58,14 +56,15 @@ export default function AllLeavesTab({
             Filter:{" "}
             {filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
           </Button>
-        </Box>
+        )}
       </Box>
 
-      <LeavesDataGrid
+      <ClaimsDataGrid
+        claims={claims}
         loading={loading}
-        leaves={leaves}
-        onViewDetails={onViewDetails}
+        onViewClaim={onViewClaim}
         onApprovalAction={onApprovalAction}
+        showApprovalActions={true}
       />
     </Box>
   );

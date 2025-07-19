@@ -3,10 +3,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
 
-import SearchField from "../../_components/SearchField";
+import SearchField from "../../../../_components/main/SearchField";
 import LeavesDataGrid from "./LeavesDataGrid";
 
-export default function ApprovedLeavesTab({
+export default function LeavesTab({
   leaves,
   loading,
   searchQuery,
@@ -16,12 +16,12 @@ export default function ApprovedLeavesTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ pb: 2, display: "flex", alignItems: "center" }}>
+      <Box sx={{ mb: 3}}>
         <SearchField
-          placeholder="Search approved leaves..."
+          placeholder="Search pending leaves..."
           value={searchQuery}
           onChange={handleSearchChange}
-          sx={{ minWidth: 300 }}
+          sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
 

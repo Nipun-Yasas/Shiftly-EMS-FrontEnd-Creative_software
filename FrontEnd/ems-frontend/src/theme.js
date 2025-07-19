@@ -57,12 +57,12 @@ const theme = createTheme({
           secondary: '#4D4D4D',
         }
         ,
-        avatarname:{
+        avatarname: {
           main: '#1A3C5E',
           contrastText: '#ffffff',
         }
         ,
-        viewButton:{
+        viewButton: {
           main: '#FFF1F2',
           contrastText: '#ffffff',
         }
@@ -112,16 +112,16 @@ const theme = createTheme({
           dark: '#ffffff',
           contrastText: '#000000',
         },
-        textblack:{
+        textblack: {
           main: '#ffffff',
           contrastText: '#000000',
         },
-        avatarname:{
+        avatarname: {
           main: '#F5F7FA',
           contrastText: '#ffffff',
         }
         ,
-        viewButton:{
+        viewButton: {
           main: 'FFC1DA',
           contrastText: '#ffffff',
         },
@@ -133,6 +133,57 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiButton: {
+    styleOverrides: {
+      root: {
+        fontWeight: 600,
+      }
+    }
+  },
+  MuiTab: {
+    styleOverrides: {
+      root: {
+        fontFamily: 'var(--font-lexend)',
+        fontWeight: 500,
+        textTransform: 'none',
+        '&.Mui-selected': {
+          fontWeight: 600,
+        }
+      }
+    }
+  },
+    MuiDataGrid: {
+      styleOverrides: {
+        root: {
+          '--DataGrid-borderColor': '#000000',
+          '[data-toolpad-color-scheme="dark"] &': {
+            '--DataGrid-borderColor': '#E0E3E7', 
+          },
+          border: '1px solid var(--DataGrid-borderColor)',
+          borderRadius: '10px',
+        },
+        columnHeaders: {
+          borderBottom: '1px solid var(--DataGrid-borderColor)',
+           '& .MuiDataGrid-columnHeader.last-column .MuiDataGrid-columnSeparator': {
+            display: 'none',
+          },
+        },
+        cell: {
+          borderBottom: '1px solid var(--DataGrid-borderColor)',
+        },
+        columnSeparator: {
+          color: 'var(--DataGrid-borderColor)',
+        },
+        iconSeparator: {
+          color: 'var(--DataGrid-borderColor)',
+        },
+        footerContainer: {
+          '& .MuiSvgIcon-root': {
+            color: 'var(--DataGrid-borderColor)'
+          },
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -180,47 +231,42 @@ const theme = createTheme({
     }
   },
   typography: {
-    fontFamily: 'Lexend,sans-serif',
+    fontFamily: 'var(--font-roboto)',
     fontSize: 14,
     h1: {
       fontSize: '2.5rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'var(--font-poppins)',
       color: '#E90A4D',
     },
     h2: {
       fontSize: '2rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'var(--font-poppins)',
       color: '#E90A4D',
     },
     h3: {
       fontSize: '1.75rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'var(--font-poppins)',
       color: '#E90A4D',
     },
     h4: {
       fontSize: '1.5rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'var(--font-poppins)',
       color: '#E90A4D',
     },
     h5: {
       fontSize: '1.25rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
+      fontFamily: 'var(--font-poppins)',
     },
     h6: {
       fontSize: '1rem',
       fontWeight: 700,
-      fontFamily: 'Poppins, sans-serif',
-    },
-    h7: {
-      fontSize: '1rem',
-      fontWeight: 600,
-      fontFamily: 'Poppins, sans-serif',
-    },
+      fontFamily: 'var(--font-poppins)',
+    }
   },
 });
 

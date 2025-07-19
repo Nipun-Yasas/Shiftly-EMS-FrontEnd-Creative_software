@@ -9,13 +9,13 @@ import Badge from "@mui/material/Badge";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-import PendingLeavesTab from "./_components/PendingLeavesTab";
-import ApprovedLeavesTab from "./_components/ApprovedLeavesTab";
-import RejectedLeavesTab from "./_components/RejectedLeavesTab";
-import AllLeavesTab from "./_components/AllLeavesTab";
-import LeaveDetailsDialog from "./_components/LeaveDetailsDialog";
+import LeavesTab from "./_components/PendingTab";
+import ApprovedTab from "./_components/ApprovedTab";
+import RejectedTab from "./_components/RejectedTab";
+import AllTab from "./_components/AllTab";
+import DetailsDialog from "./_components/DetailsDialog";
 import LeaveDialog from "./_components/LeaveDialog";
-import TabPanel from "../_components/TabPanel";
+import TabPanel from "../../../_components/main/TabPanel";
 
 export default function LeavesManagementPage() {
   const [tabValue, setTabValue] = useState(0);
@@ -256,7 +256,7 @@ export default function LeavesManagementPage() {
   };
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab
@@ -272,22 +272,22 @@ export default function LeavesManagementPage() {
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <PendingLeavesTab {...tabProps} leaves={getFilteredLeaves("pending")} />
+          <LeavesTab {...tabProps} leaves={getFilteredLeaves("pending")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <ApprovedLeavesTab {...tabProps} leaves={getFilteredLeaves("approved")} />
+          <ApprovedTab {...tabProps} leaves={getFilteredLeaves("approved")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={2}>
-          <RejectedLeavesTab {...tabProps} leaves={getFilteredLeaves("rejected")} />
+          <RejectedTab {...tabProps} leaves={getFilteredLeaves("rejected")} />
         </TabPanel>
 
         <TabPanel value={tabValue} index={3}>
-          <AllLeavesTab {...tabProps} leaves={getFilteredLeaves("all")} />
+          <AllTab {...tabProps} leaves={getFilteredLeaves("all")} />
         </TabPanel>
 
-        <LeaveDetailsDialog
+        <DetailsDialog
           open={openDetailDialog}
           onClose={() => setOpenDetailDialog(false)}
           selectedLeave={selectedLeave}

@@ -63,9 +63,10 @@ export default function EventDataGrid({
       field: "actions",
       headerName: "Actions",
       width: 200,
-      sortable: false,
+      headerClassName: "actions-header",
+      align: "center",
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1, mt:1 }}>
+        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
           <Tooltip title="View Details">
             <IconButton
               size="small"

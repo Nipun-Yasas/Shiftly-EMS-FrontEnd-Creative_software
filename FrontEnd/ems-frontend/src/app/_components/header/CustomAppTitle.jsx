@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import Image from "next/image";
 import SearchBar from "./SearchBar";
+import SearchField from "../main/SearchField";
 
 export default function CustomAppTitle() {
   return (
@@ -17,9 +18,9 @@ export default function CustomAppTitle() {
         src="/shiftly-logo.png"
         alt="Company Logo"
         width={75}
-        height={75}
+        height={50}
       />
-      <SearchBar label="Search" />
+      <SearchField placeholder="Search"/>
     </Box>
   );
 }
