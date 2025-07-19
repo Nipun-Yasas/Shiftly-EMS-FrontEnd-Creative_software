@@ -86,9 +86,10 @@ export default function LeavesDataGrid({
       field: "actions",
       headerName: "Actions",
       width: 120,
-      sortable: false,
+      headerClassName: "last-column",
+      align: "center",
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, pt: 1 }}>
+        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
           <Tooltip title="View Details">
             <IconButton
               size="small"
@@ -131,7 +132,7 @@ export default function LeavesDataGrid({
           <CircularProgress />
         </Box>
       ) : (
-        <Box sx={{ height: 400, width: "100%" }}>
+        <Box sx={{ height: "auto", width: "100%" }}>
           <DataGrid
             rows={leaves}
             columns={leaveColumns}

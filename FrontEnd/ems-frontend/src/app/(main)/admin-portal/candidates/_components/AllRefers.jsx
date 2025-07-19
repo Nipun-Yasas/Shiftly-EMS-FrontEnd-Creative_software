@@ -19,7 +19,7 @@ export default function AllRefers({
     <Box sx={{ p: 3 }}>
           <Box
             sx={{
-              pb: 2,
+              mb: 3,
               display: "flex",
               justifyContent: "space-between",
               flexDirection: { xs: "column", sm: "row" },

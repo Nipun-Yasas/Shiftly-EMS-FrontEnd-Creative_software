@@ -50,9 +50,10 @@ export default function ReferDataGrid({
       field: 'actions',
       headerName: 'Actions',
       width: 100,
-      sortable: false,
+      headerClassName: 'last-column',
+      align: 'center',
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
           <Tooltip title="View Details">
             <IconButton 
               size="small" 

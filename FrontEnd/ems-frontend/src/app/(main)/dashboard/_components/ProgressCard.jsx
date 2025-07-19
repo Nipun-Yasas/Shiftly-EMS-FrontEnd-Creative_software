@@ -2,7 +2,6 @@ import { Paper, Box, Typography, Button, useTheme, Fade } from '@mui/material';
 import WaterFill from './WaterFill';
 import AnimatedCount from './AnimatedCount';
 import { useEffect, useRef, useState } from 'react';
-import confetti from 'canvas-confetti';
 
 export default function ProgressCard({ progress, goals, setGoalTableDialogOpen, setAddGoalDialogOpen }) {
   const theme = useTheme();

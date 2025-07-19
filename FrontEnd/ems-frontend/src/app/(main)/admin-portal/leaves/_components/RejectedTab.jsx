@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import SearchField from "../../_components/SearchField";
 import LeavesDataGrid from "./LeavesDataGrid";
 
-export default function PendingLeavesTab({
+export default function RejectedTab({
   leaves,
   loading,
   searchQuery,
@@ -16,12 +16,12 @@ export default function PendingLeavesTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ pb: 2, display: "flex", alignItems: "center" }}>
+      <Box sx={{ mb: 3,}}>
         <SearchField
-          placeholder="Search pending leaves..."
+          placeholder="Search rejected leaves..."
           value={searchQuery}
           onChange={handleSearchChange}
-          sx={{ minWidth: 300 }}
+          sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
 

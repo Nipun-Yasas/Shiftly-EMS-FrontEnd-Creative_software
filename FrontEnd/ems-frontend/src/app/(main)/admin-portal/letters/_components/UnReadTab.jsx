@@ -18,12 +18,12 @@ export default function UnreadTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 3 }}>
         <SearchField
           placeholder="Search unread letters..."
           value={searchQuery}
           onChange={handleSearchChange}
-          sx={{ minWidth: 300 }}
+            sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
 

@@ -255,7 +255,7 @@ export default function LetterSubmissionPage() {
   };
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab
@@ -294,7 +294,6 @@ export default function LetterSubmissionPage() {
             {...commonProps}
           />
         </TabPanel>
-      </Box>
 
       <LetterDetailDialog
         open={openDetailDialog}
@@ -318,6 +317,7 @@ export default function LetterSubmissionPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      </Box>
     </Paper>
   );
 }

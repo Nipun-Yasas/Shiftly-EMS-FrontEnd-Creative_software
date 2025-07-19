@@ -12,11 +12,11 @@ import Alert from "@mui/material/Alert";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 
-import PendingClaimsTab from "./_components/PendingClaimsTab";
-import ApprovedClaimsTab from "./_components/ApprovedClaimsTab";
-import RejectedClaimsTab from "./_components/RejectedClaimsTab";
-import AllClaimsTab from "./_components/AllClaimsTab";
-import ClaimDetailsDialog from "./_components/ClaimDetailsDialog";
+import PendingTab from "./_components/PendingTab";
+import ApprovedTab from "./_components/ApprovedTab";
+import RejectedTab from "./_components/RejectedTab";
+import AllTab from "./_components/AllTab";
+import DetailsDialog from "./_components/DetailsDialog";
 import ClaimDialog from "./_components/ClaimDialog";
 import TabPanel from "../_components/TabPanel";
 
@@ -229,13 +229,11 @@ export default function ClaimsManagementPage() {
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
         >
           <Tab
             label={
               <Badge badgeContent={pendingCount} color="warning">
-                <Box sx={{ px: 1 }}>Pending</Box>
+                Pending
               </Badge>
             }
           />
@@ -243,31 +241,30 @@ export default function ClaimsManagementPage() {
           <Tab label="Rejected" />
           <Tab label="All Claims" />
         </Tabs>
-      </Box>
 
       <TabPanel value={tabValue} index={0}>
-        <PendingClaimsTab {...tabProps} claims={getFilteredClaims("pending")} />
+        <PendingTab {...tabProps} claims={getFilteredClaims("pending")} />
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <ApprovedClaimsTab
+        <ApprovedTab
           {...tabProps}
           claims={getFilteredClaims("approved")}
         />
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        <RejectedClaimsTab
+        <RejectedTab
           {...tabProps}
           claims={getFilteredClaims("rejected")}
         />
       </TabPanel>
       <TabPanel value={tabValue} index={3}>
-        <AllClaimsTab {...tabProps} claims={getFilteredClaims("all")} />
+        <AllTab {...tabProps} claims={getFilteredClaims("all")} />
       </TabPanel>
 
       {/* Claim Details Dialog */}
-      <ClaimDetailsDialog
+      <DetailsDialog
         open={openDetailDialog}
         selectedClaim={selectedClaim}
         onClose={() => setOpenDetailDialog(false)}
@@ -303,6 +300,7 @@ export default function ClaimsManagementPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      </Box>
     </Paper>
   );
 }

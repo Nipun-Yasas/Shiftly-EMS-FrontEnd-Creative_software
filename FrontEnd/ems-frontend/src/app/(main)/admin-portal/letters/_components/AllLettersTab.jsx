@@ -30,7 +30,7 @@ export default function AllLettersTab({
     <Box sx={{ p: 3 }}>
       <Box
         sx={{
-          mb: 2,
+          mb: 3,
           display: "flex",
           gap: 2,
           alignItems: "center",
@@ -41,7 +41,7 @@ export default function AllLettersTab({
           placeholder="Search letters..."
           value={searchQuery}
           onChange={handleSearchChange}
-          sx={{ minWidth: 300 }}
+            sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Filter by Status</InputLabel>

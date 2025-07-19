@@ -17,7 +17,7 @@ export default function CustomAppTitle() {
         src="/shiftly-logo.png"
         alt="Company Logo"
         width={75}
-        height={75}
+        height={50}
       />
       <SearchBar label="Search" />
     </Box>

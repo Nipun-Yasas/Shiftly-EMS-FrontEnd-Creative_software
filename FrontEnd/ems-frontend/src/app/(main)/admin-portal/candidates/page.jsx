@@ -267,7 +267,7 @@ export default function CandidateSubmissionPage() {
   const unreadCount = candidates.filter(c => c.status === 'unread').length;
 
   return (
-    <Paper elevation={2} sx={{ height: '100%', width: '100%', }}>
+    <Paper elevation={3} sx={{ height: '100%', width: '100%', }}>
 
       <Box sx={{ p: 2 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
@@ -286,7 +286,6 @@ export default function CandidateSubmissionPage() {
             label='All Submissions'
           />
         </Tabs>
-      </Box>
 
       
 
@@ -355,6 +354,7 @@ export default function CandidateSubmissionPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      </Box>
     </Paper>
   );
 }

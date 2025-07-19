@@ -8,7 +8,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
-export default function DeleteConfirmDialog({
+export default function DeleteDialog({
   deleteConfirmOpen,
   setDeleteConfirmOpen,
   userToDelete,

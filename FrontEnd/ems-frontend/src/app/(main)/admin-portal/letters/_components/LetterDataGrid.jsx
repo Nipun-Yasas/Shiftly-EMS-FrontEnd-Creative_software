@@ -68,6 +68,8 @@ export default function LetterDataGrid({
       field: "actions",
       headerName: "Actions",
       width: 140,
+      headerClassName: "last-column",
+      align: "center",
       sortable: false,
       renderCell: (params) => {
         const buttons = [

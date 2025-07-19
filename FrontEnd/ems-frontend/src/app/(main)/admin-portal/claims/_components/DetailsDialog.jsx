@@ -15,27 +15,25 @@ import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import Alert from "@mui/material/Alert";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
 
-import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import PersonIcon from "@mui/icons-material/Person";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import PeopleIcon from "@mui/icons-material/People";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-
-import {
-  getStatusColor,
-  getStatusIcon,
-  getLeaveTypeColor,
-} from "../../_helpers/colorhelper";
+import Receipt from "@mui/icons-material/Receipt";
+import Person from "@mui/icons-material/Person";
+import Close from "@mui/icons-material/Close";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Cancel from "@mui/icons-material/Cancel";
+import AttachFile from "@mui/icons-material/AttachFile";
 
 import dayjs from "dayjs";
+import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
 
-export default function LeaveDetailsDialog({
+export default function DetailsDialog({
   open,
   onClose,
-  selectedLeave,
+  selectedClaim,
   onApprovalAction,
 }) {
   return (
@@ -48,15 +46,15 @@ export default function LeaveDetailsDialog({
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <EventAvailableIcon />
-          <Typography variant="h6">Leave Details</Typography>
+          <Receipt />
+          <Typography variant="h6">Claim Details</Typography>
         </Box>
         <IconButton onClick={onClose}>
-          <CloseIcon />
+          <Close />
         </IconButton>
       </DialogTitle>
       <DialogContent dividers>
-        {selectedLeave && (
+        {selectedClaim && (
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Card variant="outlined">
@@ -66,17 +64,17 @@ export default function LeaveDetailsDialog({
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Avatar sx={{ mr: 2 }}>
-                      <PersonIcon />
+                      <Person />
                     </Avatar>
                     <Box>
                       <Typography variant="subtitle1">
-                        {selectedLeave.employeeName}
+                        {selectedClaim.employee_name}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {selectedLeave.employeeEmail}
+                        {selectedClaim.employeeEmail}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {selectedLeave.department}
+                        {selectedClaim.department}
                       </Typography>
                     </Box>
                   </Box>
@@ -88,62 +86,22 @@ export default function LeaveDetailsDialog({
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
-                    Coverage Details
-                  </Typography>
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Cover Person:
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <PeopleIcon fontSize="small" />
-                      <Typography variant="body1">
-                        {selectedLeave.coverPerson}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Report to Person:
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <ReportProblemIcon fontSize="small" />
-                      <Typography variant="body1">
-                        {selectedLeave.reportPerson}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h6" gutterBottom color="primary">
-                    Leave Information
+                    Claim Information
                   </Typography>
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                       Type:
                     </Typography>
-                    <Chip
-                      label={selectedLeave.leaveType}
-                      style={{
-                        backgroundColor: getLeaveTypeColor(
-                          selectedLeave.leaveType
-                        ),
-                        color: "white",
-                      }}
-                      size="small"
-                    />
+                    <Typography variant="body1">
+                      {selectedClaim.type}
+                    </Typography>
                   </Box>
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">
-                      Duration:
+                      Amount:
                     </Typography>
                     <Typography variant="h6" color="primary">
-                      {selectedLeave.leaveDuration} day
-                      {selectedLeave.leaveDuration > 1 ? "s" : ""}
+                      ${selectedClaim.amount?.toFixed(2)}
                     </Typography>
                   </Box>
                   <Box sx={{ mb: 1 }}>
@@ -151,12 +109,12 @@ export default function LeaveDetailsDialog({
                       Status:
                     </Typography>
                     <Chip
-                      icon={getStatusIcon(selectedLeave.status)}
+                      icon={getStatusIcon(selectedClaim.status)}
                       label={
-                        selectedLeave.status.charAt(0).toUpperCase() +
-                        selectedLeave.status.slice(1)
+                        selectedClaim.status.charAt(0).toUpperCase() +
+                        selectedClaim.status.slice(1)
                       }
-                      color={getStatusColor(selectedLeave.status)}
+                      color={getStatusColor(selectedClaim.status)}
                       size="small"
                     />
                   </Box>
@@ -168,22 +126,16 @@ export default function LeaveDetailsDialog({
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
-                    Leave Period
+                    Important Dates
                   </Typography>
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">
-                      From:
+                      Claim Date:
                     </Typography>
                     <Typography variant="body1">
-                      {dayjs(selectedLeave.leaveFrom).format("MMMM DD, YYYY")}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      To:
-                    </Typography>
-                    <Typography variant="body1">
-                      {dayjs(selectedLeave.leaveTo).format("MMMM DD, YYYY")}
+                      {dayjs(selectedClaim.selectedClaimDate).format(
+                        "MMMM DD, YYYY"
+                      )}
                     </Typography>
                   </Box>
                   <Box sx={{ mb: 1 }}>
@@ -191,18 +143,18 @@ export default function LeaveDetailsDialog({
                       Submission Date:
                     </Typography>
                     <Typography variant="body1">
-                      {dayjs(selectedLeave.submissionDate).format(
+                      {dayjs(selectedClaim.submission_date).format(
                         "MMMM DD, YYYY HH:mm"
                       )}
                     </Typography>
                   </Box>
-                  {selectedLeave.approvedAt && (
+                  {selectedClaim.approvedAt && (
                     <Box sx={{ mb: 1 }}>
                       <Typography variant="body2" color="text.secondary">
                         Approved Date:
                       </Typography>
                       <Typography variant="body1">
-                        {dayjs(selectedLeave.approvedAt).format(
+                        {dayjs(selectedClaim.approvedAt).format(
                           "MMMM DD, YYYY HH:mm"
                         )}
                       </Typography>
@@ -216,29 +168,60 @@ export default function LeaveDetailsDialog({
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
-                    Leave Reason
+                    Attachments
                   </Typography>
-                  <Typography variant="body1">
-                    {selectedLeave.reason}
-                  </Typography>
+                  {selectedClaim.attachments?.length > 0 ? (
+                    <List dense>
+                      {selectedClaim.attachments.map((file, index) => (
+                        <ListItem key={index} sx={{ px: 0 }}>
+                          <ListItemAvatar>
+                            <Avatar>
+                              <AttachFile />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText primary={file} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No attachments
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
 
-            {selectedLeave.rejectionReason && (
+            {selectedClaim.rejectionReason && (
               <Grid item xs={12}>
                 <Alert severity="error">
                   <Typography variant="subtitle2">Rejection Reason:</Typography>
                   <Typography variant="body2">
-                    {selectedLeave.rejectionReason}
+                    {selectedClaim.rejectionReason}
                   </Typography>
                 </Alert>
               </Grid>
             )}
+            <Grid item xs={12}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary">
+                    Description
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedClaim.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
         )}
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
+      <DialogActions
+        sx={{
+          p: 2,
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -249,7 +232,7 @@ export default function LeaveDetailsDialog({
             width: "100%",
           }}
         >
-          {selectedLeave?.status === "pending" && (
+          {selectedClaim?.status === "pending" && (
             <Box
               sx={{
                 display: "flex",
@@ -260,16 +243,16 @@ export default function LeaveDetailsDialog({
               <Button
                 variant="contained"
                 color="success"
-                startIcon={<CheckCircleIcon />}
-                onClick={() => onApprovalAction(selectedLeave, "approve")}
+                startIcon={<CheckCircle />}
+                onClick={() => onApprovalAction(selectedClaim, "approve")}
               >
                 Approve
               </Button>
               <Button
                 variant="contained"
                 color="error"
-                startIcon={<CancelIcon />}
-                onClick={() => onApprovalAction(selectedLeave, "reject")}
+                startIcon={<Cancel />}
+                onClick={() => onApprovalAction(selectedClaim, "reject")}
               >
                 Reject
               </Button>
@@ -283,7 +266,7 @@ export default function LeaveDetailsDialog({
               mt: { xs: 1, sm: 0 },
             }}
           >
-            <Button color="text.primary" variant="text" onClick={onClose}>
+            <Button color="text.primary" onClick={onClose}>
               Close
             </Button>
           </Box>

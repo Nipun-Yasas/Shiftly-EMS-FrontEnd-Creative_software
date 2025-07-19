@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect,useMemo,useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -7,9 +7,9 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Paper from "@mui/material/Paper";
 
-import EmployeeViewTab from "./_components/EmployeeViewTab";
-import TeamViewTab from "./_components/TeamViewTab";
-import ProjectViewTab from "./_components/ProjectViewTab";
+import EmployeeTab from "./_components/EmployeeTab";
+import TeamTab from "./_components/TeamTab";
+import ProjectTab from "./_components/ProjectTab";
 import TabPanel from "../_components/TabPanel";
 import TimesheetDialog from "./_components/TimesheetDialog";
 
@@ -21,8 +21,7 @@ const MOCK_EMPLOYEES = [
     email: "john.doe@company.com",
     team: "Development",
     project: "Web Platform",
-    pendingSubmissions: 2,
-    profileImage: "/images/avatars/1.jpg",
+    department: "Engineering",
   },
   {
     id: 2,
@@ -30,8 +29,7 @@ const MOCK_EMPLOYEES = [
     email: "jane.smith@company.com",
     team: "Design",
     project: "Mobile App",
-    pendingSubmissions: 1,
-    profileImage: "/images/avatars/2.jpg",
+    department: "Design",
   },
   {
     id: 3,
@@ -39,8 +37,7 @@ const MOCK_EMPLOYEES = [
     email: "robert.johnson@company.com",
     team: "Development",
     project: "Web Platform",
-    pendingSubmissions: 0,
-    profileImage: "/images/avatars/3.jpg",
+    department: "Engineering",
   },
   {
     id: 4,
@@ -48,8 +45,7 @@ const MOCK_EMPLOYEES = [
     email: "emily.davis@company.com",
     team: "QA",
     project: "Mobile App",
-    pendingSubmissions: 3,
-    profileImage: "/images/avatars/4.jpg",
+    department: "Quality Assurance",
   },
   {
     id: 5,
@@ -57,15 +53,14 @@ const MOCK_EMPLOYEES = [
     email: "michael.wilson@company.com",
     team: "Design",
     project: "Web Platform",
-    pendingSubmissions: 1,
-    profileImage: "/images/avatars/5.jpg",
+    department: "Design",
   },
 ];
 
 const MOCK_TIMESHEETS = [
   {
     id: 101,
-    date: "15 Jan",
+    date: "2024-08-31",
     projectTask: "E_Interview",
     workMode: "Online",
     activity: "Development",
@@ -74,7 +69,7 @@ const MOCK_TIMESHEETS = [
   },
   {
     id: 102,
-    date: "16 Jan",
+    date: "2024-08-30",
     projectTask: "Web_Platform",
     workMode: "On-site",
     activity: "Development",
@@ -83,7 +78,7 @@ const MOCK_TIMESHEETS = [
   },
   {
     id: 103,
-    date: "17 Jan",
+    date: "2024-10-03",
     projectTask: "Bench_Engineering",
     workMode: "Online",
     activity: "Training",
@@ -92,7 +87,7 @@ const MOCK_TIMESHEETS = [
   },
   {
     id: 104,
-    date: "18 Jan",
+    date: "2024-09-20",
     projectTask: "Web_Platform",
     workMode: "On-site",
     activity: "Meeting",
@@ -118,13 +113,13 @@ export default function TimesheetAdminReview(){
     severity: "success",
   });
 
-  // Mock data initialization
+  // Initialize employees with mock data on component mount
   useEffect(() => {
     setEmployees(MOCK_EMPLOYEES);
   }, []);
 
-  // Memoized filtered employees
-  const filteredEmployees = useMemo(() => {
+  // Filter employees based on search query
+  const getFilteredEmployees = () => {
     if (searchQuery.trim() === "") {
       return employees;
     }
@@ -133,15 +128,17 @@ export default function TimesheetAdminReview(){
     return employees.filter(
       (employee) =>
         employee.name.toLowerCase().includes(query) ||
-        employee.email.toLowerCase().includes(query) ||
+        employee.department.toLowerCase().includes(query) ||
         employee.team.toLowerCase().includes(query) ||
         employee.project.toLowerCase().includes(query)
     );
-  }, [searchQuery, employees]);
+  };
 
-  // Memoized grouped employees
-  const teamGroupedEmployees = useMemo(() => {
+  // Group employees by team
+  const getTeamGroupedEmployees = () => {
     const teams = {};
+    const filteredEmployees = getFilteredEmployees();
+    
     filteredEmployees.forEach((employee) => {
       if (!teams[employee.team]) {
         teams[employee.team] = [];
@@ -149,10 +146,13 @@ export default function TimesheetAdminReview(){
       teams[employee.team].push(employee);
     });
     return teams;
-  }, [filteredEmployees]);
+  };
 
-  const projectGroupedEmployees = useMemo(() => {
+  // Group employees by project
+  const getProjectGroupedEmployees = () => {
     const projects = {};
+    const filteredEmployees = getFilteredEmployees();
+    
     filteredEmployees.forEach((employee) => {
       if (!projects[employee.project]) {
         projects[employee.project] = [];
@@ -160,28 +160,28 @@ export default function TimesheetAdminReview(){
       projects[employee.project].push(employee);
     });
     return projects;
-  }, [filteredEmployees]);
+  };
 
-  // Optimized event handlers with useCallback
-  const handleTabChange = useCallback((event, newValue) => {
+  // Event handlers without useCallback
+  const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-  }, []);
+  };
 
-  const handleSearchChange = useCallback((event) => {
+  const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-  }, []);
+  };
 
-  const handleViewTimesheets = useCallback((employee) => {
+  const handleViewTimesheets = (employee) => {
     setSelectedEmployee(employee);
     setEmployeeTimesheets(MOCK_TIMESHEETS);
     setTimesheetDialogOpen(true);
-  }, []);
+  };
 
-  const handleCloseTimesheetDialog = useCallback(() => {
+  const handleCloseTimesheetDialog = () => {
     setTimesheetDialogOpen(false);
-  }, []);
+  };
 
-  const handleApproveTimesheet = useCallback((timesheetId) => {
+  const handleApproveTimesheet = (timesheetId) => {
     setEmployeeTimesheets((prevTimesheets) =>
       prevTimesheets.map((timesheet) =>
         timesheet.id === timesheetId
@@ -195,9 +195,9 @@ export default function TimesheetAdminReview(){
       message: "Timesheet entry approved successfully",
       severity: "success",
     });
-  }, []);
+  };
 
-  const handleRejectTimesheet = useCallback((timesheetId) => {
+  const handleRejectTimesheet = (timesheetId) => {
     setEmployeeTimesheets((prevTimesheets) =>
       prevTimesheets.map((timesheet) =>
         timesheet.id === timesheetId
@@ -211,17 +211,17 @@ export default function TimesheetAdminReview(){
       message: "Timesheet entry rejected",
       severity: "error",
     });
-  }, []);
+  };
 
-  const handleCloseNotification = useCallback((event, reason) => {
+  const handleCloseNotification = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setNotification((prev) => ({ ...prev, open: false }));
-  }, []);
+  };
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs
           value={tabValue}
@@ -234,8 +234,8 @@ export default function TimesheetAdminReview(){
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <EmployeeViewTab
-            employees={filteredEmployees}
+          <EmployeeTab
+            employees={getFilteredEmployees()}
             searchQuery={searchQuery}
             handleSearchChange={handleSearchChange}
             onViewTimesheets={handleViewTimesheets}
@@ -243,8 +243,8 @@ export default function TimesheetAdminReview(){
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <TeamViewTab
-            teamGroupedEmployees={teamGroupedEmployees}
+          <TeamTab
+            teamGroupedEmployees={getTeamGroupedEmployees()}
             searchQuery={searchQuery}
             handleSearchChange={handleSearchChange}
             onViewTimesheets={handleViewTimesheets}
@@ -252,8 +252,8 @@ export default function TimesheetAdminReview(){
         </TabPanel>
 
         <TabPanel value={tabValue} index={2}>
-          <ProjectViewTab
-            projectGroupedEmployees={projectGroupedEmployees}
+          <ProjectTab
+            projectGroupedEmployees={getProjectGroupedEmployees()}
             searchQuery={searchQuery}
             handleSearchChange={handleSearchChange}
             onViewTimesheets={handleViewTimesheets}
@@ -287,4 +287,3 @@ export default function TimesheetAdminReview(){
     </Paper>
   );
 };
-

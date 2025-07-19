@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import SearchField from "../../_components/SearchField";
 import EventDataGrid from "./EventDataGrid";
 
-export default function AllEventsTab({
+export default function AllTab({
   loading,
   events,
   searchQuery,
@@ -15,17 +15,13 @@ export default function AllEventsTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ 
-          pb: 2, display: "flex", gap: 2, alignItems: "center" }}>
-            <Box>
-              <SearchField
+      <Box sx={{ mb: 3 }}>
+        <SearchField
           placeholder="Search event history..."
           value={searchQuery}
           onChange={onSearchChange}
           sx={{ minWidth: 300 }}
         />
-            </Box>
-        
       </Box>
 
       <EventDataGrid

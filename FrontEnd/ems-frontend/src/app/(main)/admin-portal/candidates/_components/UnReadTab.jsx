@@ -14,7 +14,7 @@ export default function UnReadTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{mb:2}}>
+      <Box sx={{mb:3}}>
         <SearchField
           placeholder="Search unread candidates..."
           value={searchQuery}

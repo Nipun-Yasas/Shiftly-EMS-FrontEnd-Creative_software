@@ -11,11 +11,11 @@ import Snackbar from "@mui/material/Snackbar";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 
-import AllUserTab from "./_components/AllUserTab";
-import AssignUserTab from "./_components/AssignUserTab";
-import EditRoleDialog from "./_components/EditRoleDialog";
-import AssignUserDialog from "./_components/AssignUserDialog";
-import DeleteConfirmDialog from "./_components/DeleteConfirmDialog";
+import AllTab from "./_components/AllTab";
+import VerifyTab from "./_components/VerifyTab";
+import EditDialog from "./_components/EditDialog";
+import VerifyDialog from "./_components/VerifyDialog";
+import DeleteDialog from "./_components/DeleteDialog";
 import TabPanel from "../_components/TabPanel";
 
 export default function UserManagementPage() {
@@ -52,30 +52,33 @@ export default function UserManagementPage() {
       setUsers([
         {
           id: 1,
-          employeeNumber: "EMP001",
           username: "johndoe",
           email: "john.doe@company.com",
           roleId: { id: 1, name: "Admin" },
-          createdBy: "System Admin",
-          createdAt: "2023-01-15",
+          designation: "Software Engineer",
+          department: "Engineering",
+          reporting_person: "Jane Smith",
+          verifiedBy: "System Admin",
         },
         {
           id: 2,
-          employeeNumber: "EMP002",
           username: "janesmith",
           email: "jane.smith@company.com",
           roleId: { id: 2, name: "Manager" },
-          createdBy: "System Admin",
-          createdAt: "2023-03-22",
+          designation: "Project Manager",
+          department: "Project Management",
+          reporting_person: "John Doe",
+          verifiedBy: "System Admin",
         },
         {
           id: 3,
-          employeeNumber: "EMP003",
           username: "mikejohnson",
           email: "mike.johnson@company.com",
           roleId: { id: 3, name: "Employee" },
-          createdBy: "HR Manager",
-          createdAt: "2023-05-10",
+          designation: "HR Specialist",
+          department: "Human Resources",
+          reporting_person: "Sarah Connor",
+          verifiedBy: "HR Manager",
         },
       ]);
     } finally {
@@ -208,16 +211,14 @@ export default function UserManagementPage() {
     setAssignSearchQuery(event.target.value);
   };
 
-  const handleAddUserClick = () => {
-    setTabValue(1);
-  };
-
   const filteredUsers = users.filter(
     (user) =>
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.roleId?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      user.roleId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.designation?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.reporting_person?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredUnassignedUsers = unassignedUsers.filter(
@@ -231,7 +232,7 @@ export default function UserManagementPage() {
   }, []);
 
   return (
-    <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
         <Tabs
           value={tabValue}
@@ -239,11 +240,11 @@ export default function UserManagementPage() {
           aria-label="user management tabs"
         >
           <Tab label="All Users" />
-          <Tab label="Assign Users" />
+          <Tab label="Verify Users" />
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <AllUserTab
+          <AllTab
             loading={loading}
             filteredUsers={filteredUsers}
             handleEdit={handleEdit}
@@ -251,12 +252,11 @@ export default function UserManagementPage() {
             setDeleteConfirmOpen={setDeleteConfirmOpen}
             searchQuery={searchQuery}
             handleSearchChange={handleSearchChange}
-            handleAddUserClick={handleAddUserClick}
           />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <AssignUserTab
+          <VerifyTab
             loading={loading}
             unassignedUsers={filteredUnassignedUsers}
             handleAssignUser={handleAssignUser}
@@ -265,7 +265,7 @@ export default function UserManagementPage() {
           />
         </TabPanel>
 
-        <EditRoleDialog
+        <EditDialog
           editDialogOpen={editDialogOpen}
           setOpenDialog={setOpenDialog}
           editingUser={editingUser}
@@ -273,7 +273,7 @@ export default function UserManagementPage() {
           handleSubmit={handleSubmit}
         />
 
-        <AssignUserDialog
+        <VerifyDialog
           assignDialogOpen={assignDialogOpen}
           setAssignDialogOpen={setAssignDialogOpen}
           assigningUser={assigningUser}
@@ -281,7 +281,7 @@ export default function UserManagementPage() {
           handleAssignSubmit={handleAssignSubmit}
         />
 
-        <DeleteConfirmDialog
+        <DeleteDialog
           deleteConfirmOpen={deleteConfirmOpen}
           setDeleteConfirmOpen={setDeleteConfirmOpen}
           userToDelete={userToDelete}

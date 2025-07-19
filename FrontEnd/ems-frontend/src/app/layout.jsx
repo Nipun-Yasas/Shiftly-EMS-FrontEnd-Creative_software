@@ -41,7 +41,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
+    <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
       <body
       >
         <AppRouterCacheProvider>

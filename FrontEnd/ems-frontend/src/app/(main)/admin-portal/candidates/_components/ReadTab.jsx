@@ -14,7 +14,7 @@ export default function ReadTab({
 }) {
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 3 }}>
         <SearchField
           placeholder="Search read candidates..."
           value={searchQuery}

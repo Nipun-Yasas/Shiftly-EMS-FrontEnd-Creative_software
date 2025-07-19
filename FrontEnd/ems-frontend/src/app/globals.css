@@ -1,28 +1,7 @@
-@import "tailwindcss";
-
-:root {
-  --font-poppins: 'Poppins', sans-serif;
-  --font-roboto: 'Roboto', sans-serif;
-  --font-lexend: 'Lexend', sans-serif;
-  --primary: #E90A4D;
-  --secondary: #E80A4D;
-  --closebtn:#6C6C6C;
-  --graylight:#0000004D;
-  --grayLight2:#737791;
-  --grayDark:#00000080;
-  --blueDark:#05004E;
-  --labelColor:#000000A3;
-  --valueColor:#16151CCC;
-  --inputFieldColor:#E6E7E7;
-  --requestBtn:#FD3571;
-  --requestBtnHover:#d90056;
-  --requestBackground:#0000000F;
-
-}
-
 body {
   line-height: normal;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+

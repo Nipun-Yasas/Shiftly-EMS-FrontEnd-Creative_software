@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import SearchField from "../../_components/SearchField";
 import ClaimsDataGrid from "./ClaimsDataGrid";
 
-export default function ApprovedClaimsTab({
+export default function RejectedTab({
   claims,
   loading,
   searchQuery,
@@ -17,21 +17,17 @@ export default function ApprovedClaimsTab({
     <Box sx={{ p: 3 }}>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          gap: 2,
           mb: 3,
         }}
       >
         <SearchField
-          placeholder="Search approved claims..."
+          placeholder="Search rejected claims..."
           value={searchQuery}
           onChange={handleSearchChange}
           sx={{ minWidth: { xs: "auto", sm: 200 } }}
         />
       </Box>
+
       <ClaimsDataGrid
         claims={claims}
         loading={loading}
