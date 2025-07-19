@@ -1,16 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditReferDialog from "../_components/EditReferDialog";
@@ -52,8 +47,6 @@ export default function ReferHistory() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  // Remove the mounting check since it's causing issues
-
   const handleEdit = (record) => {
     setSelectedRecord(record);
     setEditDialogOpen(true);
@@ -78,66 +71,81 @@ export default function ReferHistory() {
     );
   };
 
-  // Remove the columns definition since we're using a regular table now
+  const renderActions = (params) => {
+    return (
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <Tooltip title="Edit">
+          <IconButton
+            size="small"
+            onClick={() => handleEdit(params.row)}
+            sx={{ color: "primary.main" }}
+          >
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton
+            size="small"
+            onClick={() => handleDelete(params.row)}
+            sx={{ color: "error.main" }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    );
+  };
+
+  const columns = [
+    { field: "vacancy", headerName: "Vacancy", width: 200 },
+    { field: "applicant_name", headerName: "Candidate Name", width: 180 },
+    { field: "applicant_email", headerName: "Candidate Email", width: 220 },
+    { 
+      field: "message", 
+      headerName: "Message", 
+      width: 300,
+      renderCell: (params) => (
+        <Box sx={{ 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          whiteSpace: 'nowrap',
+          maxWidth: '100%'
+        }}>
+          {params.value}
+        </Box>
+      )
+    },
+    { field: "resume_file_path", headerName: "Uploaded Resume", width: 180 },
+    { field: "status", headerName: "Referral State", width: 150 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: renderActions,
+    },
+  ];
 
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
-        <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-          <Table stickyHeader aria-label="referral history table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Vacancy</TableCell>
-                <TableCell>Candidate Name</TableCell>
-                <TableCell>Candidate Email</TableCell>
-                <TableCell>Message</TableCell>
-                <TableCell>Uploaded Resume</TableCell>
-                <TableCell>Referral State</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {referData.map((row) => (
-                <TableRow key={row.id} hover>
-                  <TableCell>{row.vacancy}</TableCell>
-                  <TableCell>{row.applicant_name}</TableCell>
-                  <TableCell>{row.applicant_email}</TableCell>
-                  <TableCell>{row.message}</TableCell>
-                  <TableCell>{row.resume_file_path}</TableCell>
-                  <TableCell>{row.status}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Tooltip title="Edit">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEdit(row)}
-                          sx={{ color: "primary.main" }}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(row)}
-                          sx={{ color: "error.main" }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        {/* Hello World text below the table */}
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <h2>Hello World</h2>
-        </Box>
+        <DataGrid
+          rows={referData}
+          columns={columns}
+          height="auto"
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          disableSelectionOnClick
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[10, 50, 100]}
+        />
       </Box>
+      
       <EditReferDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
@@ -150,7 +158,6 @@ export default function ReferHistory() {
         record={selectedRecord}
         onDelete={handleDeleteRecord}
       />
-      
     </Paper>
   );
 }
