@@ -118,17 +118,17 @@ const  NAVIGATION = [
     icon: <WorkIcon/>,
     children: [
       {
-        segment: 'all-projects',
+        segment: 'all',
         title: 'All Projects',
         icon: <WorkHistoryIcon/>,
       },
       {
-        segment: 'my-projects',
+        segment: 'my',
         title: 'My Project',
         icon: <PersonIcon />,
         children: [
           {
-            segment: 'basic-info',
+            segment: 'basic',
             title: 'Basic Information',
             icon: <PersonIcon />,
           },
@@ -147,13 +147,13 @@ const  NAVIGATION = [
     icon: <AccessTimeFilledIcon/>,
     children: [
       {
-        segment: 'update-timesheet',
+        segment: 'submit',
         title: 'Update Timesheet',
         icon: <UpdateIcon />,
       },
       {
-        segment: 'review-timesheet',
-        title: 'Review Timesheet',
+        segment: 'history',
+        title: 'Timesheet History',
         icon: <ManageHistoryIcon />,
       }
     ]
@@ -171,12 +171,12 @@ const  NAVIGATION = [
     icon: <EmailIcon/>,
     children: [
       {
-        segment: 'request-letter',
+        segment: 'request',
         title: 'Request Letter',
         icon: <HistoryEduOutlinedIcon />,
       },
       {
-        segment: 'request-history',
+        segment: 'history',
         title: 'Request History',
         icon: <MarkAsUnreadOutlinedIcon />,
       }
@@ -188,12 +188,12 @@ const  NAVIGATION = [
     icon: <DirectionsRunIcon/>,
     children: [
       {
-        segment: 'request-leave',
+        segment: 'submit',
         title: 'Apply Leave',
         icon: <ApprovalIcon />,
       },
       {
-        segment: 'leave-history',
+        segment: 'history',
         title: 'Leave History',
         icon: <HistoryOutlinedIcon />,
       }
@@ -205,12 +205,12 @@ const  NAVIGATION = [
     icon: <ReceiptIcon/>,
     children: [
       {
-        segment: 'claim-submission',
+        segment: 'submit',
         title: 'Claim Submission',
         icon: <ContentPasteIcon />,
       },
       {
-        segment: 'claim-history',
+        segment: 'history',
         title: 'Claim History',
         icon: <PendingActionsIcon />,
       }
@@ -229,12 +229,12 @@ const  NAVIGATION = [
     icon: <DateRangeIcon/>,
     children: [
       {
-        segment: 'add-event',
+        segment: 'submit',
         title: 'Add Event',
         icon: <AddCircleOutlineIcon />,
       },
       {
-        segment: 'event-history',
+        segment: 'history',
         title: 'Event History',
         icon: <HistoryEduIcon />,
       }
@@ -246,12 +246,12 @@ const  NAVIGATION = [
     icon: <SupervisorAccountIcon/>,
     children: [
       {
-        segment: 'refer-candidate',
+        segment: 'submit',
         title: 'Refer Candidate',
         icon: <PersonAddOutlined />,
       },
       {
-        segment: 'refer-history',
+        segment: 'history',
         title: 'Refer History',
         icon: <HistoryOutlined/>,
       }
