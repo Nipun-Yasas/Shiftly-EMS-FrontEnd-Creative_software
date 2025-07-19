@@ -191,16 +191,6 @@ export default function EventForm(props) {
                 }}
               >
                 <Button
-                  type="submit"
-                  variant="contained"
-                  onClick={() => {
-                    validateForm();
-                  }}
-                >
-                  Add
-                </Button>
-
-                <Button
                   color="text.primary"
                   type="reset"
                   onClick={() => {
@@ -214,6 +204,17 @@ export default function EventForm(props) {
                 >
                   Cancel
                 </Button>
+                
+                <Button
+                  type="submit"
+                  variant="contained"
+                  onClick={() => {
+                    validateForm();
+                  }}
+                >
+                  Add
+                </Button>
+
               </Box>
             </Stack>
           </Form>

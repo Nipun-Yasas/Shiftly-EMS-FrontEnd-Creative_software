@@ -29,6 +29,7 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import FreeCancellationOutlinedIcon from '@mui/icons-material/FreeCancellationOutlined';
+import { HistoryOutlined, PersonAddOutlined } from '@mui/icons-material';
 
 const  NAVIGATION = [
   {
@@ -241,8 +242,20 @@ const  NAVIGATION = [
   },
   {
     segment: 'refer',
-    title: 'Refer Candidate',
-    icon: <SupervisorAccountIcon />,
+    title: 'Refer',
+    icon: <SupervisorAccountIcon/>,
+    children: [
+      {
+        segment: 'refer-candidate',
+        title: 'Refer Candidate',
+        icon: <PersonAddOutlined />,
+      },
+      {
+        segment: 'refer-history',
+        title: 'Refer History',
+        icon: <HistoryOutlined/>,
+      }
+    ]
   },
   
 ];

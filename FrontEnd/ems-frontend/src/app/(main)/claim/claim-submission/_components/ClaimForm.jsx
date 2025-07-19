@@ -63,30 +63,54 @@ export default function ClaimForm(props){
         {({ validateForm, resetForm }) => (
           <Form>
             <Stack>
-
-              <InputItem>
-                <SelectInput
-                  name="claimtype"
-                  options={claimtypeOptions}
-                  getOptionLabel={(option) => option.name || ""}
-                  label="Claim type"
-                />
-              </InputItem>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between", mx: 1,my:2 }}>
+              {/* <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mx: 1,
+                  my: 2,
+                }}
+              > */}
                 <DateInput name="claimdate" label="Claim Date" />
-              </Box>
-              
-              
-                
-              <InputItem>
-                <TextInput
-                  name="description"
-                  label="Write a description"
-                  multiline
-                  rows={4}
-                />
-              </InputItem>
+              {/* </Box> */}
+
+              {/* <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                }}
+              > */}
+                <InputItem>
+                  <SelectInput
+                    name="claimtype"
+                    options={claimtypeOptions}
+                    getOptionLabel={(option) => option.name || ""}
+                    label="Claim type"
+                  />
+                </InputItem>
+              {/* </Box> */}
+
+              {/* <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                }}
+              > */}
+                <InputItem>
+                  <TextInput
+                    name="description"
+                    label="Write a description"
+                    multiline
+                    minRows={1}
+                    maxRows={3}
+                    fullWidth
+                  />
+                </InputItem>
+              {/* </Box> */}
 
               <InputItem>
                 <FileUpload
@@ -99,35 +123,39 @@ export default function ClaimForm(props){
                 />
               </InputItem>
 
-              <InputItem>
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+              {/* <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: { xs: "center", md: "flex-end" },
+                  pb: 2,
+                  gap: 2,
+                }}
+              > */}
+                <Button
+                  color="text.primary"
+                  type="reset"
+                  onClick={() => {
+                    resetForm();
+                    setFileName("");
+                    setPreview(null);
+                    if (bannerRef.current) {
+                      bannerRef.current.value = "";
+                    }
+                  }}
                 >
-                  <Button
-                    color="textblack"
-                    type="reset"
-                    onClick={() => {
-                      resetForm();
-                      setFileName("");
-                      setPreview(null);
-                      if (claimfileRef.current) {
-                        claimfileRef.current.value = "";
-                      }
-                    }}
-                  >
-                    Cancel
-                  </Button>
+                  Cancel
+                </Button>
 
-                  <Button
-                    type="submit"
-                    onClick={() => {
-                      validateForm();
-                    }}
-                  >
-                    Add
-                  </Button>
-                </Box>
-              </InputItem>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  onClick={() => {
+                    validateForm();
+                  }}
+                >
+                  Add
+                </Button>
+              {/* </Box> */}
             </Stack>
           </Form>
         )}
