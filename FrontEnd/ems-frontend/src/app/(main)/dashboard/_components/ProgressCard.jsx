@@ -88,9 +88,7 @@ export default function ProgressCard({ progress, goals, setGoalTableDialogOpen, 
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: theme.palette.mode === 'dark'
-          ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)'
-          : 'background.paper',
+        background: 'background.paper',
       }}>
         <Box sx={{ 
           position: 'relative', 

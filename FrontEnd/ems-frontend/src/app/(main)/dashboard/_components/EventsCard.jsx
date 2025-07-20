@@ -21,11 +21,18 @@ import {
   TrendingUp,
   EmojiEvents
 } from '@mui/icons-material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function EventsCard({ events, onViewAll }) {
   const theme = useTheme();
+  const router = useRouter();
   const [hoveredEvent, setHoveredEvent] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get event type color
   const getEventTypeColor = (category) => {
@@ -52,6 +59,31 @@ export default function EventsCard({ events, onViewAll }) {
     };
     return icons[category] || icons.default;
   };
+
+  if (!mounted) {
+    return (
+      <Paper elevation={4} sx={{
+        p: 0,
+        borderRadius: 3,
+        height: '100%',
+        minHeight: 480,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'background.paper',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Event sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h6" sx={{ fontFamily: 'var(--font-poppins)', fontWeight: 700 }}>
+            Loading Events...
+          </Typography>
+        </Box>
+      </Paper>
+    );
+  }
 
   return (
     <Paper elevation={4} sx={{
@@ -112,9 +144,9 @@ export default function EventsCard({ events, onViewAll }) {
             </Typography>
           </Box>
         </Box>
-        <Tooltip title="View All Events">
+        <Tooltip title="Add New Event">
           <IconButton 
-            onClick={onViewAll}
+            onClick={() => router.push('/events/submit')}
             sx={{
               bgcolor: theme.palette.mode === 'dark' 
                 ? 'rgba(255,255,255,0.1)' 
@@ -236,7 +268,7 @@ export default function EventsCard({ events, onViewAll }) {
             <Button
               variant="outlined"
               size="medium"
-              onClick={onViewAll}
+              onClick={() => router.push('/events/history')}
               sx={{
                 borderColor: 'primary.main',
                 color: 'primary.main',

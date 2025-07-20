@@ -1,25 +1,112 @@
-import { Paper, Box, Typography, Button, Chip, LinearProgress } from '@mui/material';
+import { Paper, Box, Typography, Button, Chip, LinearProgress, useTheme } from '@mui/material';
 import { Star } from '@mui/icons-material';
 import StarDetailsDialog from './StarDetailsDialog';
+import { useState, useEffect } from 'react';
 
 export default function StarPointsCard({ starPoints, starDialogOpen, setStarDialogOpen }) {
+  const theme = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Paper elevation={4} sx={{
+        p: 0,
+        borderRadius: 3,
+        height: '100%',
+        minHeight: 480,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'background.paper',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Star sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+          <Typography variant="h6" sx={{ fontFamily: 'var(--font-poppins)', fontWeight: 700 }}>
+            Loading Star Points...
+          </Typography>
+        </Box>
+      </Paper>
+    );
+  }
+
   return (
-    <Paper elevation={8} sx={{
-      p: 4,
-      borderRadius: 4,
-      height: 'fit-content',
-      textAlign: 'center',
+    <Paper elevation={4} sx={{
+      p: 0,
+      borderRadius: 3,
+      height: '100%',
+      minHeight: 480,
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      gap: 2,
-      background: theme => theme.palette.mode === 'dark'
+      position: 'relative',
+      overflow: 'hidden',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: theme.palette.mode === 'dark' 
+          ? '0 12px 40px rgba(0, 0, 0, 0.4)' 
+          : '0 12px 40px rgba(0, 0, 0, 0.1)',
+      },
+      background: theme.palette.mode === 'dark'
         ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)'
-        : 'rgba(255,255,255,0.85)',
-      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid',
-      borderColor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(200,200,255,0.18)'
+        : 'background.paper',
+    }}>
+      {/* Header */}
+      <Box sx={{
+        p: 3,
+        pb: 2,
+        borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: theme.palette.mode === 'dark' 
+              ? 'rgba(255, 193, 7, 0.2)' 
+              : 'rgba(255, 193, 7, 0.1)',
+            color: 'warning.main'
+          }}>
+            <Star sx={{ fontSize: 24 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ 
+              fontFamily: 'var(--font-poppins)', 
+              fontWeight: 700, 
+              color: 'text.primary',
+              mb: 0.5
+            }}>
+              Star Points
+            </Typography>
+            <Typography variant="body2" sx={{ 
+              color: 'text.secondary', 
+              fontFamily: 'var(--font-lexend)',
+              fontWeight: 500
+            }}>
+              {starPoints > 0 ? `${starPoints} stars earned` : 'No stars yet'}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{ 
+        flex: 1, 
+        p: 3, 
+        pt: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2
     }}>
       <Box sx={{ mb: 2, position: 'relative', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Star sx={{ fontSize: 64, color: 'warning.main', filter: 'drop-shadow(0 0 16px #FFD60088)', animation: 'starGlow 1.5s infinite alternate' }} />
@@ -42,13 +129,15 @@ export default function StarPointsCard({ starPoints, starDialogOpen, setStarDial
           }
         `}</style>
       </Box>
-      <Typography variant="h6" sx={{ mb: 1, fontFamily: 'var(--font-poppins)', fontWeight: 700, color: theme => theme.palette.mode === 'dark' ? '#fff' : 'text.primary' }}>Star Points</Typography>
+        
       <Typography variant="h2" sx={{ mb: 2, fontWeight: 900, color: 'warning.main', fontFamily: 'var(--font-poppins)', textShadow: '0 2px 12px #FFD60044' }}>
         {starPoints > 0 ? `${starPoints}` : 'No stars yet'}
       </Typography>
-      <Typography variant="body2" sx={{ mb: 2, color: theme => theme.palette.mode === 'dark' ? '#fff' : 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 500 }}>
+        
+        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 500, textAlign: 'center' }}>
         Stars are awarded by admins for outstanding performance.<br />Earn more stars to unlock special rewards!
       </Typography>
+        
       <Box sx={{ width: '100%', mb: 2 }}>
         <LinearProgress
           variant="determinate"
@@ -56,14 +145,14 @@ export default function StarPointsCard({ starPoints, starDialogOpen, setStarDial
           sx={{
             height: 10,
             borderRadius: 5,
-            bgcolor: theme => theme.palette.mode === 'dark' ? '#23263a' : 'grey.200',
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'grey.200',
             '& .MuiLinearProgress-bar': {
               bgcolor: 'warning.main',
               transition: 'width 0.5s',
             },
           }}
         />
-        <Typography variant="caption" sx={{ color: theme => theme.palette.mode === 'dark' ? '#fff' : 'text.secondary', fontFamily: 'var(--font-lexend)', mt: 0.5, display: 'block' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)', mt: 0.5, display: 'block', textAlign: 'center' }}>
           {starPoints < 1 && 'Earn your first star!'}
           {starPoints >= 1 && starPoints < 3 && 'Bronze tier'}
           {starPoints >= 3 && starPoints < 5 && 'Silver tier'}
@@ -71,22 +160,25 @@ export default function StarPointsCard({ starPoints, starDialogOpen, setStarDial
           {starPoints >= 10 && 'Platinum tier'}
         </Typography>
       </Box>
+        
       <Button variant="outlined" sx={{
-        borderColor: theme => theme.palette.mode === 'dark' ? '#FFD600' : 'primary.main',
-        color: theme => theme.palette.mode === 'dark' ? '#FFD600' : 'primary.main',
-        fontWeight: 700,
-        px: 4,
-        py: 1.2,
+          borderColor: 'primary.main',
+          color: 'primary.main',
         borderRadius: 2,
-        fontFamily: 'var(--font-lexend)',
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          px: 3,
+          py: 1,
+          transition: 'all 0.2s ease',
         '&:hover': {
-          borderColor: theme => theme.palette.mode === 'dark' ? '#fff' : 'primary.dark',
-          color: theme => theme.palette.mode === 'dark' ? '#fff' : 'primary.dark',
-          bgcolor: theme => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : undefined
-        }
+            bgcolor: 'primary.main',
+            color: 'white',
+            transform: 'translateY(-1px)',
+          },
       }} onClick={() => setStarDialogOpen(true)}>
         Learn More
       </Button>
+      </Box>
       <StarDetailsDialog open={starDialogOpen} onClose={() => setStarDialogOpen(false)} />
     </Paper>
   );

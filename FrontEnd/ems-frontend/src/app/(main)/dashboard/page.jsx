@@ -39,17 +39,65 @@ import ToDoCard from './_components/ToDoCard';
 import EventsCard from './_components/EventsCard';
 import StarPointsCard from './_components/StarPointsCard';
 import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
+import UserDataStatus from '../../_components/UserDataStatus';
 import { getGreeting, getPriorityColor, getEventTypeColor } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
+import { 
+  saveUserData, 
+  getUserData, 
+  migrateUserData, 
+  cleanupOldBackups,
+  initializeUserSession,
+  getCurrentUserId
+} from '../../_utils/localStorageUtils';
+import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
+import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 
 // Note: Ensure --font-poppins and --font-lexend are defined in global CSS
 
-// Static initial data to avoid SSR/client mismatch
-const initialToDoItems = [
-  { id: 1, text: "Complete this project by Jul 21, 2025", completed: false, highlighted: true, priority: "high" },
-  { id: 2, text: "Latest finished to do: Complete this project by Jul 21, 2025", completed: true, highlighted: false, priority: "medium" },
-  { id: 3, text: "Complete this project by Jul 21, 2025", completed: false, highlighted: false, priority: "low" },
-  { id: 4, text: "Complete this project by Jul 21, 2025", completed: false, highlighted: false, priority: "medium" },
+// Realistic initial ToDo data for first-time users
+const getInitialToDoItems = () => [
+  { 
+    id: Date.now() - 4, 
+    text: "Complete project documentation", 
+    completed: false, 
+    highlighted: true, 
+    priority: "high",
+    dueDate: dayjs().add(2, 'day').format('YYYY-MM-DD'),
+    createdAt: dayjs().subtract(3, 'day').toISOString(),
+    category: "work"
+  },
+  { 
+    id: Date.now() - 3, 
+    text: "Review team performance reports", 
+    completed: true, 
+    highlighted: false, 
+    priority: "medium",
+    dueDate: dayjs().subtract(1, 'day').format('YYYY-MM-DD'),
+    createdAt: dayjs().subtract(5, 'day').toISOString(),
+    completedAt: dayjs().subtract(1, 'day').toISOString(),
+    category: "work"
+  },
+  { 
+    id: Date.now() - 2, 
+    text: "Schedule client meeting", 
+    completed: false, 
+    highlighted: false, 
+    priority: "high",
+    dueDate: dayjs().add(1, 'day').format('YYYY-MM-DD'),
+    createdAt: dayjs().subtract(2, 'day').toISOString(),
+    category: "meeting"
+  },
+  { 
+    id: Date.now() - 1, 
+    text: "Update personal development plan", 
+    completed: false, 
+    highlighted: false, 
+    priority: "low",
+    dueDate: dayjs().add(7, 'day').format('YYYY-MM-DD'),
+    createdAt: dayjs().subtract(1, 'day').toISOString(),
+    category: "personal"
+  },
 ];
 
 const initialGoals = [
@@ -62,6 +110,7 @@ const initialGoals = [
     priority: "high",
     category: "work",
     createdAt: "2025-07-01T12:00:00Z",
+    completedAt: "2025-07-10T12:00:00Z",
   },
   {
     id: 2,
@@ -137,10 +186,10 @@ const FlipDigit = ({ value }) => {
 const Dashboard = () => {
   const theme = useTheme();
   const router = useRouter();
-  const [progress, setProgress] = useState(75); // Initial static value
+  const [progress, setProgress] = useState(25); // Initial static value - will be calculated from goals
   const [starPoints, setStarPoints] = useState(1); // Initial static value
-  const [toDoItems, setToDoItems] = useState(initialToDoItems);
-  const [goals, setGoals] = useState(initialGoals);
+  const [toDoItems, setToDoItems] = useState([]); // Start empty, will be loaded from localStorage
+  const [goals, setGoals] = useState([]); // Start empty, will be loaded from localStorage
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [tableDialogOpen, setTableDialogOpen] = useState(false);
   const [addGoalDialogOpen, setAddGoalDialogOpen] = useState(false);
@@ -158,28 +207,225 @@ const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(null); // null for SSR, set after mount
   const [goalStreak, setGoalStreak] = useState(0);
   const [demoEventsState, setDemoEventsState] = useState(demoEvents);
+  const [mounted, setMounted] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [scheduleMeetingOpen, setScheduleMeetingOpen] = useState(false);
 
-  // Handlers (unchanged)
-  const handleAddToDo = (todo) => setToDoItems(prev => [todo, ...prev]);
-  const handleDeleteToDo = (id) => setToDoItems(prev => prev.filter(t => t.id !== id));
-  const handleEditToDo = (todo) => { setEditTodo(todo); setEditDialogOpen(true); };
-  const handleUpdateToDo = (updated) => setToDoItems(prev => prev.map(t => t.id === updated.id ? updated : t));
+  // Initialize user session and load data on component mount
+  useEffect(() => {
+    setMounted(true);
+    
+    try {
+      // Initialize user session first
+      const currentUserId = initializeUserSession();
+      setUserId(currentUserId);
+      console.log('User session initialized:', currentUserId);
+      
+      // Load ToDo items from localStorage with user-specific persistence
+      loadToDoData(currentUserId);
+      
+      // Load Goals from localStorage with user-specific persistence
+      loadGoalsData(currentUserId);
+      
+      // Clean up old backups
+      cleanupOldBackups();
+    } catch (error) {
+      console.error('Error initializing dashboard:', error);
+      // Fallback to initial data if initialization fails
+      const initialToDos = getInitialToDoItems();
+      setToDoItems(initialToDos);
+      setGoals(initialGoals);
+    }
+  }, []);
 
-  const handleAddGoal = (goal) => setGoals(prev => [goal, ...prev]);
-  const handleDeleteGoal = (id) => setGoals(prev => prev.filter(g => g.id !== id));
-  const handleEditGoal = (goal) => { setEditGoal(goal); setEditGoalDialogOpen(true); };
-  const handleUpdateGoal = (updated) => {
-    setGoals(prev => prev.map(g => {
-      if (g.id === updated.id) {
-        if (updated.completed && !g.completedAt) return { ...updated, completedAt: dayjs().toISOString() };
-        if (!updated.completed) {
+  // Function to load ToDo data with proper error handling
+  const loadToDoData = (currentUserId) => {
+    try {
+      // First try to migrate old data format
+      const migratedData = migrateUserData('todos', null);
+      
+      // Then try to get current user data
+      let savedToDos = getUserData('todos', null, currentUserId);
+      
+      if (migratedData) {
+        // Use migrated data
+        setToDoItems(migratedData);
+        saveUserData('todos', migratedData, currentUserId);
+        console.log('Successfully migrated ToDo data to new format for user:', currentUserId);
+      } else if (savedToDos) {
+        // Use existing user data
+        setToDoItems(savedToDos);
+        console.log('Loaded existing ToDo data for user:', currentUserId);
+      } else {
+        // First time user - set initial realistic data
+        const initialToDos = getInitialToDoItems();
+        setToDoItems(initialToDos);
+        saveUserData('todos', initialToDos, currentUserId);
+        console.log('Created initial ToDo data for new user:', currentUserId);
+      }
+    } catch (error) {
+      console.error('Error loading ToDo items from localStorage:', error);
+      // Fallback to initial data if localStorage fails
+      const initialToDos = getInitialToDoItems();
+      setToDoItems(initialToDos);
+    }
+  };
+
+  // Function to load Goals data with proper error handling
+  const loadGoalsData = (currentUserId) => {
+    try {
+      // First try to migrate old data format
+      const migratedData = migrateUserData('goals', null);
+      
+      // Then try to get current user data
+      let savedGoals = getUserData('goals', null, currentUserId);
+      
+      if (migratedData) {
+        // Use migrated data
+        setGoals(migratedData);
+        saveUserData('goals', migratedData, currentUserId);
+        console.log('Successfully migrated Goals data to new format for user:', currentUserId);
+      } else if (savedGoals) {
+        // Use existing user data
+        setGoals(savedGoals);
+        console.log('Loaded existing Goals data for user:', currentUserId);
+      } else {
+        // First time user - set initial realistic data
+        setGoals(initialGoals);
+        saveUserData('goals', initialGoals, currentUserId);
+        console.log('Created initial Goals data for new user:', currentUserId);
+      }
+    } catch (error) {
+      console.error('Error loading Goals from localStorage:', error);
+      // Fallback to initial data if localStorage fails
+      setGoals(initialGoals);
+    }
+  };
+
+  // Save ToDo items to localStorage whenever they change
+  useEffect(() => {
+    if (mounted && toDoItems.length > 0 && userId) {
+      try {
+        saveUserData('todos', toDoItems, userId);
+        console.log('ToDo items saved for user:', userId);
+      } catch (error) {
+        console.error('Error saving ToDo items to localStorage:', error);
+      }
+    }
+  }, [toDoItems, mounted, userId]);
+
+  // Save Goals to localStorage whenever they change
+  useEffect(() => {
+    if (mounted && goals.length > 0 && userId) {
+      try {
+        saveUserData('goals', goals, userId);
+        console.log('Goals saved for user:', userId);
+      } catch (error) {
+        console.error('Error saving Goals to localStorage:', error);
+      }
+    }
+  }, [goals, mounted, userId]);
+
+  // Enhanced ToDo handlers with proper state management
+  const handleAddToDo = (todo) => {
+    const newTodo = {
+      ...todo,
+      id: Date.now(),
+      createdAt: dayjs().toISOString(),
+      completed: false,
+      highlighted: false
+    };
+    setToDoItems(prev => [newTodo, ...prev]);
+    console.log('New ToDo added:', newTodo);
+  };
+
+  const handleDeleteToDo = (id) => {
+    setToDoItems(prev => prev.filter(t => t.id !== id));
+    console.log('ToDo deleted:', id);
+  };
+
+  const handleEditToDo = (todo) => { 
+    setEditTodo(todo); 
+    setEditDialogOpen(true); 
+  };
+
+  const handleUpdateToDo = (updated) => {
+    setToDoItems(prev => prev.map(t => {
+      if (t.id === updated.id) {
+        const updatedTodo = { ...updated };
+        // If marking as completed, add completion timestamp
+        if (updated.completed && !t.completed) {
+          updatedTodo.completedAt = dayjs().toISOString();
+        }
+        // If unmarking as completed, remove completion timestamp
+        if (!updated.completed && t.completed) {
+          const { completedAt, ...rest } = updatedTodo;
+          return rest;
+        }
+        return updatedTodo;
+      }
+      return t;
+    }));
+    console.log('ToDo updated:', updated);
+  };
+
+  // Toggle ToDo completion status
+  const handleToggleToDo = (id) => {
+    setToDoItems(prev => prev.map(t => {
+      if (t.id === id) {
+        const updated = { ...t, completed: !t.completed };
+        if (updated.completed && !t.completed) {
+          updated.completedAt = dayjs().toISOString();
+        } else if (!updated.completed && t.completed) {
           const { completedAt, ...rest } = updated;
           return rest;
         }
         return updated;
       }
+      return t;
+    }));
+  };
+
+  // Enhanced Goals handlers with proper state management
+  const handleAddGoal = (goal) => {
+    const newGoal = {
+      ...goal,
+      id: Date.now(),
+      createdAt: dayjs().toISOString(),
+      completed: false
+    };
+    setGoals(prev => [newGoal, ...prev]);
+    console.log('New Goal added:', newGoal);
+  };
+
+  const handleDeleteGoal = (id) => {
+    setGoals(prev => prev.filter(g => g.id !== id));
+    console.log('Goal deleted:', id);
+  };
+
+  const handleEditGoal = (goal) => { 
+    setEditGoal(goal); 
+    setEditGoalDialogOpen(true); 
+  };
+
+  const handleUpdateGoal = (updated) => {
+    setGoals(prev => prev.map(g => {
+      if (g.id === updated.id) {
+        const updatedGoal = { ...updated };
+        // If marking as completed, add completion timestamp
+        if (updated.completed && !g.completed) {
+          updatedGoal.completedAt = dayjs().toISOString();
+        }
+        // If unmarking as completed, remove completion timestamp
+        if (!updated.completed && g.completed) {
+          const { completedAt, ...rest } = updatedGoal;
+          return rest;
+        }
+        return updatedGoal;
+      }
       return g;
     }));
+    console.log('Goal updated:', updated);
   };
 
   const handleToggleEvent = (eventId) => {
@@ -190,7 +436,9 @@ const Dashboard = () => {
   useEffect(() => {
     const completedGoals = goals.filter(goal => goal.completed).length;
     const totalGoals = goals.length;
-    setProgress(totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0);
+    const calculatedProgress = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+    setProgress(calculatedProgress);
+    console.log(`Progress updated: ${completedGoals}/${totalGoals} = ${calculatedProgress}%`);
   }, [goals]);
 
   const getPriorityColor = (priority) => ({
@@ -213,8 +461,6 @@ const Dashboard = () => {
     review: <CheckCircle fontSize="small" />,
     default: <Event fontSize="small" />,
   })[type] || <Event fontSize="small" />;
-
-
 
   const filteredGoals = goals.filter(goal => {
     if (filter === 'all') return true;
@@ -284,6 +530,7 @@ const Dashboard = () => {
             handleEditToDo={handleEditToDo}
             handleDeleteToDo={handleDeleteToDo}
             handleUpdateToDo={handleUpdateToDo}
+            handleToggleToDo={handleToggleToDo}
             addDialogOpen={addDialogOpen}
             setAddDialogOpen={setAddDialogOpen}
             editDialogOpen={editDialogOpen}
@@ -315,117 +562,51 @@ const Dashboard = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Button 
-          variant="outlined" 
-          sx={{ 
-            borderColor: 'grey.300', 
-            color: 'text.primary', 
-            bgcolor: 'transparent',
-            fontWeight: 700,
-            fontFamily: 'var(--font-lexend)',
-            borderRadius: 2, 
-            px: 3, 
-            transition: 'all 0.2s',
-            boxShadow: 0,
-            '&:hover': { 
-              borderColor: 'primary.main', 
-              bgcolor: 'primary.main', 
-              color: '#fff',
-              boxShadow: 2,
-              transform: 'scale(1.04)'
-            }
-          }}
-          onClick={() => router.push('/leave/request-leave')}
-        >
-          Apply for Leave
-        </Button>
-        <Button 
-          variant="outlined" 
-          sx={{ 
-            borderColor: 'grey.300', 
-            color: 'text.primary', 
-            bgcolor: 'transparent',
-            fontWeight: 700,
-            fontFamily: 'var(--font-lexend)',
-            borderRadius: 2, 
-            px: 3, 
-            transition: 'all 0.2s',
-            boxShadow: 0,
-            '&:hover': { 
-              borderColor: 'primary.main', 
-              bgcolor: 'primary.main', 
-              color: '#fff',
-              boxShadow: 2,
-              transform: 'scale(1.04)'
-            }
-          }}
-          onClick={() => router.push('/timesheet/submit')}
-        >
-          Submit Timesheet
-        </Button>
-        <Button 
-          variant="outlined" 
-          sx={{ 
-            borderColor: 'grey.300', 
-            color: 'text.primary', 
-            bgcolor: 'transparent',
-            fontWeight: 700,
-            fontFamily: 'var(--font-lexend)',
-            borderRadius: 2, 
-            px: 3, 
-            transition: 'all 0.2s',
-            boxShadow: 0,
-            '&:hover': { 
-              borderColor: 'primary.main', 
-              bgcolor: 'primary.main', 
-              color: '#fff',
-              boxShadow: 2,
-              transform: 'scale(1.04)'
-            }
-          }}
-          onClick={() => router.push('/claim/submit')}
-        >
-          Submit Claim
-        </Button>
-        <Button 
-          variant="outlined" 
-          sx={{ 
-            borderColor: 'grey.300', 
-            color: 'text.primary', 
-            bgcolor: 'transparent',
-            fontWeight: 700,
-            fontFamily: 'var(--font-lexend)',
-            borderRadius: 2, 
-            px: 3, 
-            transition: 'all 0.2s',
-            boxShadow: 0,
-            '&:hover': { 
-              borderColor: 'primary.main', 
-              bgcolor: 'primary.main', 
-              color: '#fff',
-              boxShadow: 2,
-              transform: 'scale(1.04)'
-            }
-          }}
-          onClick={() => router.push('/events/add-event')}
-        >
-          EVENTS
-        </Button>
-      </Box>
+      {/* Meetings History Card - Full Width */}
+      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
+        <Grid item xs={12}>
+          <MeetingsHistoryCard onScheduleMeeting={() => setScheduleMeetingOpen(true)} />
+        </Grid>
+      </Grid>
 
       {/* Goal Dialogs */}
       <GoalTableDialog 
         open={goalTableDialogOpen} 
         onClose={() => setGoalTableDialogOpen(false)} 
         goals={goals} 
-        setGoals={setGoals} 
+        setGoals={setGoals}
+        onEditGoal={handleEditGoal}
+        onDeleteGoal={handleDeleteGoal}
+        onUpdateGoal={handleUpdateGoal}
       />
       <AddGoalDialog 
         open={addGoalDialogOpen} 
         onClose={() => setAddGoalDialogOpen(false)} 
-        onAdd={handleAddGoal} 
+        onAdd={handleAddGoal}
+        onUpdate={handleUpdateGoal}
+        goal={editGoal}
       />
+      
+      {/* Edit Goal Dialog */}
+      <AddGoalDialog 
+        open={editGoalDialogOpen} 
+        onClose={() => {
+          setEditGoalDialogOpen(false);
+          setEditGoal(null);
+        }} 
+        onAdd={handleAddGoal}
+        onUpdate={handleUpdateGoal}
+        goal={editGoal}
+      />
+
+      {/* Schedule Meeting Dialog */}
+      <ScheduleMeetingDialog 
+        open={scheduleMeetingOpen} 
+        onClose={() => setScheduleMeetingOpen(false)} 
+      />
+      
+      {/* User Data Status Component */}
+      <UserDataStatus />
     </Box>
   );
 };

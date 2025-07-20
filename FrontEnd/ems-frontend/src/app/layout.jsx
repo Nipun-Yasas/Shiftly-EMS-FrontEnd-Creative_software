@@ -41,9 +41,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
-      <body
-      >
+    <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`} data-toolpad-color-scheme="light">
+      <body>
         <AppRouterCacheProvider>
           <React.Suspense fallback={<LinearProgress />}>
             {/* <AuthProvider> */}
