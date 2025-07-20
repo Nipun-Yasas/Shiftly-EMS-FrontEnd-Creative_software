@@ -60,26 +60,18 @@ const Experience = () => {
   };
 
   return (
-    <Box sx={{ 
-      position: 'relative', 
-      minHeight: { xs: '60vh', sm: '70vh' }, 
-      p: { xs: 1, sm: 2, md: 3 },
-      maxWidth: '100%',
-      overflow: 'hidden'
-    }}>
+    <Box sx={{ position: 'relative', minHeight: '100vh', p: { xs: 2, sm: 4 } }}>
       <IconButton
         color="primary"
         onClick={handleOpenModal}
         sx={{
           position: 'absolute',
-          top: { xs: 8, sm: 16 },
-          right: { xs: 8, sm: 16 },
+          top: 16,
+          right: 16,
           bgcolor: theme.palette.background.paper,
           border: `1px solid ${theme.palette.divider}`,
-          zIndex: 1,
           '&:hover': {
-            bgcolor: theme.palette.primary.light,
-            color: 'white'
+            bgcolor: theme.palette.action.hover,
           },
         }}
       >
@@ -131,41 +123,33 @@ const Experience = () => {
       </Snackbar>
 
       {/* DataGrid */}
-      <Box sx={{ 
-        width: "100%", 
-        p: { xs: 0.5, sm: 1, md: 1.5 },
-        mt: { xs: 2, sm: 3 }
-      }}>
-        <DataGrid
-          rows={experiences}
-          columns={columns}
-          height={400}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          disableSelectionOnClick
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
-          pageSizeOptions={[10, 50, 100]}
-          sx={{
-            '& .MuiDataGrid-cell': {
-              fontSize: { xs: '0.75rem', sm: '0.875rem' }
-            },
-            '& .MuiDataGrid-columnHeader': {
-              fontSize: { xs: '0.75rem', sm: '0.875rem' },
-              fontWeight: 600
-            },
-            // Fix for positioning "No rows" message
-            '& .MuiDataGrid-overlayWrapperInner': {
-              display: 'flex',
-              justifyContent: 'center',
-              paddingTop: '60px'
-            }
-          }}
-        />
-      </Box>
+      
+        <Box sx={{ width: "100%", p: 5 }}>
+          <DataGrid
+            rows={experiences}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+            sx={{
+              
+              // Fix for positioning "No rows" message
+              '& .MuiDataGrid-overlayWrapperInner': {
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '60px'
+              }
+            }}
+          />
+        </Box>
+      
     </Box>
   );
 };

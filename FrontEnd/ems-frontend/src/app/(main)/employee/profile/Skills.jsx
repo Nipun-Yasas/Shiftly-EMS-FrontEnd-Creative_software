@@ -16,7 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SkillsForm from '../_components/SkillsForm';
 
 const columns = [
-  { field: "id", headerName: "ID", flex:1 },
+  { field: "id", headerName: "ID", flex:1},
   { field: "skillName", headerName: "Skill Name",flex:1 },
   { field: "proficiency", headerName: "Proficiency", flex:1 },
 ];
@@ -130,15 +130,17 @@ const Skills = () => {
 
       {/* DataGrid */}
      
-        <Box sx={{ 
-          width: "100%", 
-          p: { xs: 0.5, sm: 1, md: 1.5 },
-          mt: { xs: 2, sm: 3 }
-        }}>
+        <Box 
+            sx={{ width: "100%", p: 5 ,
+
+             
+            }}
+        
+        >
           <DataGrid
             rows={skills}
             columns={columns}
-            height={400}
+            height="auto"
             pageSize={10}
             rowsPerPageOptions={[10]}
             disableSelectionOnClick
@@ -149,13 +151,7 @@ const Skills = () => {
             }}
             pageSizeOptions={[10, 50, 100]}
             sx={{
-              '& .MuiDataGrid-cell': {
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              },
-              '& .MuiDataGrid-columnHeader': {
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                fontWeight: 600
-              },
+              
               // Fix for positioning "No rows" message
               '& .MuiDataGrid-overlayWrapperInner': {
                 display: 'flex',
