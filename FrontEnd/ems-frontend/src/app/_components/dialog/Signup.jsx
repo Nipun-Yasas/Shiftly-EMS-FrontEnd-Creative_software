@@ -113,8 +113,6 @@ export default function SignupForm(props) {
             <X size={24} />
           </IconButton>
 
-          <Typography variant="h6" id="signup-dialog-title">Sign Up</Typography>
-
         {error && (
           <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
             {error}
@@ -168,8 +166,7 @@ export default function SignupForm(props) {
 
                     <Link href="/change-password">
                       <Typography
-                        color="primary.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem",color: '#E90A4D'} }}
                       >
                         Forgot Password?
                       </Typography>
@@ -185,6 +182,7 @@ export default function SignupForm(props) {
                       py: 1,
                       width: { xs: "100%", sm: "auto" },
                       fontSize: { xs: "0.875rem", sm: "1rem" },
+                      backgroundColor: '#E90A4D', color: '#fff'
                     }}
                   >
                     {isSubmitting ? "Signing up..." : "Sign Up"}
@@ -200,22 +198,19 @@ export default function SignupForm(props) {
                     }}
                   >
                     <Typography
-                      color="textblack.main"
                       sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
                     >
                       Already have an account?{" "}
                     </Typography>
                     <Button
                     variant="text"
-                    color="info.main"
                       onClick={() => {setOpenSignUp(false);
                         openLogin();
                       }}
                       className="hover:cursor-pointer"
                     >
                       <Typography
-                        color="info.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
+                        sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem",},color: '#E90A4D' }}
                       >
                         Sign Up
                       </Typography>

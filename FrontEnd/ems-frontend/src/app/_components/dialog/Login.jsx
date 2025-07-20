@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
@@ -18,19 +16,17 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 
 import { useAuth } from "../../context/AuthContext";
-
 import TextInput from "../inputs/TextInput";
 import PasswordInput from "../inputs/PasswordInput";
 import CustomCheckBox from "../inputs/CustomCheckBox";
-
 import FormItem from "../landing/FormItem";
 
 export default function LoginForm(props) {
   const { openLogin, setOpenLogin, openSignUp } = props;
-
   const [error, setError] = useState(null);
-  // const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialValues = {
     username: "",
@@ -45,174 +41,162 @@ export default function LoginForm(props) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await signIn(values.username, values.password);
+      setIsSubmitting(true);
       setError(null);
-      setOpenLogin(false);
-      router.push("/dashboard");
+      
+      const userData = await signIn(values.username, values.password);
+      if (userData) {
+        setOpenLogin(false);
+        router.replace("/dashboard");
+      }
     } catch (err) {
-      const message =
-        err.response?.data?.message || err.message || "Login failed";
-      setError(message);
+      setError(err.message || "Login failed");
     } finally {
+      setIsSubmitting(false);
       setSubmitting(false);
     }
   };
 
+  const handleClose = () => {
+    if (!isSubmitting) {
+      setError(null);
+      setOpenLogin(false);
+    }
+  };
+
   return (
-    <>
-      <Dialog
-        open={openLogin}
-        onClose={() => setOpenLogin(false)}
-        fullWidth
-        maxWidth="xs"
-        slotProps={{
-          paper: {
-            sx: {
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: "300px",
-              borderRadius: 2,
-            },
-          },
-          backdrop: {
-            sx: {
-              backgroundColor: "rgba(107, 114, 128, 0.75)",
-            },
-          },
-        }}
-        aria-labelledby="login-dialog-title"
-      >
-        <DialogContent
+    <Dialog
+      open={openLogin}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="xs"
+      disableEscapeKeyDown={isSubmitting}
+    >
+      <DialogContent>
+        <IconButton
+          onClick={handleClose}
+          disabled={isSubmitting}
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: 2,
-            p: { xs: 2, sm: 3 },
-            textAlign: "center",
-            maxWidth: "100%",
+            position: "absolute",
+            top: 8,
+            right: 8,
+            color: "grey.500",
+            "&:hover": { color: "grey.900" },
           }}
         >
-          <IconButton
-            onClick={() => setOpenLogin(false)}
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              color: "grey.500",
-              "&:hover": { color: "grey.900" },
-            }}
-            aria-label="Close login dialog"
-          >
-            <X size={24} />
-          </IconButton>
+          <X size={24} />
+        </IconButton>
 
-          <Typography variant="h6" id="login-dialog-title">
-            Log in
-          </Typography>
-
-          {error && (
-            <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
-              {error}
-            </Typography>
-          )}
-
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <Stack spacing={{ xs: 1, sm: 2 }} alignItems="center">
-                  <FormItem>
-                    <TextInput name="username" label="Username" />
-                  </FormItem>
-
-                  <FormItem>
-                    <PasswordInput
-                      name="password"
-                      label="Password"
-                      type="password"
-                    />
-                  </FormItem>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "100%",
-                      flexDirection: { xs: "column", sm: "row" },
-                      gap: 1,
-                    }}
-                  >
-                    <CustomCheckBox name="remember" label="Remember Me" />
-
-                    <Link href="/change-password">
-                      <Typography
-                        color="primary.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
-                      >
-                        Forgot Password?
-                      </Typography>
-                    </Link>
-                  </Box>
-
-                  <Button
-                    type="submit"
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting: formSubmitting }) => (
+            <Form>
+              <Stack spacing={2}>
+                <FormItem>
+                  <TextInput 
+                    name="username" 
+                    label="Username" 
                     disabled={isSubmitting}
-                    variant="contained"
-                    sx={{
-                      my: 2,
-                      py: 1,
-                      width: { xs: "100%", sm: "auto" },
-                      fontSize: { xs: "0.875rem", sm: "1rem" },
-                    }}
-                  >
-                    {isSubmitting ? "Logging in..." : "Login"}
-                  </Button>
+                  />
+                </FormItem>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      gap: 1,
-                    }}
-                  >
+                <FormItem>
+                  <PasswordInput
+                    name="password"
+                    label="Password"
+                    type="password"
+                    disabled={isSubmitting}
+                  />
+                </FormItem>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 1,
+                  }}
+                >
+                  <CustomCheckBox 
+                    name="remember" 
+                    label="Remember Me" 
+                    disabled={isSubmitting}
+                  />
+
+                  <Link href="/change-password">
                     <Typography
-                      color="textblack.main"
-                      sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                      sx={{ 
+                        fontSize: "0.875rem",
+                        color: '#E90A4D',
+                        opacity: isSubmitting ? 0.5 : 1,
+                        pointerEvents: isSubmitting ? 'none' : 'auto'
+                      }}
                     >
-                      Don't have an account?
+                      Forgot Password?
                     </Typography>
+                  </Link>
+                </Box>
+
+                {error && (
+                  <Typography
+                    color="error"
+                    sx={{ fontSize: "0.875rem", textAlign: "center" }}
+                  >
+                    {error}
+                  </Typography>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  variant="contained"
+                  sx={{
+                    py: 1,
+                    backgroundColor: '#E90A4D',
+                    color: '#fff',
+                    '&:hover': {
+                      backgroundColor: '#D00940'
+                    },
+                    '&.Mui-disabled': {
+                      backgroundColor: '#E90A4D',
+                      opacity: 0.5
+                    }
+                  }}
+                >
+                  {isSubmitting ? "Logging in..." : "Login"}
+                </Button>
+
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography sx={{ fontSize: "0.875rem" }}>
+                    Don't have an account?{" "}
                     <Button
                       variant="text"
-                      color="info.main"
                       onClick={() => {
-                        setOpenLogin(false);
+                        handleClose();
                         openSignUp();
                       }}
-                      className="hover:cursor-pointer"
-                      aria-label="Open sign up dialog"
+                      disabled={isSubmitting}
+                      sx={{
+                        fontSize: "0.875rem",
+                        color: '#E90A4D',
+                        opacity: isSubmitting ? 0.5 : 1,
+                        textTransform: 'none'
+                      }}
                     >
-                      <Typography
-                        color="info.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
-                      >
-                        Create account
-                      </Typography>
+                      Create account
                     </Button>
-                  </Box>
-                </Stack>
-              </Form>
-            )}
-          </Formik>
-        </DialogContent>
-      </Dialog>
-    </>
+                  </Typography>
+                </Box>
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+      </DialogContent>
+    </Dialog>
   );
 }

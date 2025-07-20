@@ -1,15 +1,12 @@
 import React from 'react';
 
 import { Poppins, Roboto, Lexend, Inter } from 'next/font/google';
-import theme from '../theme';
+
 import './globals.css';
 
-import { NextAppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 import LinearProgress from '@mui/material/LinearProgress';
-
-import NAVIGATION from './_utils/navigation';
 
 import { AuthProvider } from './context/AuthContext';
 
@@ -46,14 +43,9 @@ export default function RootLayout({ children }) {
       >
         <AppRouterCacheProvider>
           <React.Suspense fallback={<LinearProgress />}>
-            {/* <AuthProvider> */}
-              <NextAppProvider
-                theme={theme}
-                navigation={NAVIGATION}
-              >
+            <AuthProvider>
                 {children}
-              </NextAppProvider>
-            {/* </AuthProvider> */}
+            </AuthProvider>
           </React.Suspense>
         </AppRouterCacheProvider>
       </body>

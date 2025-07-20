@@ -2,10 +2,10 @@ export const BASE_URL = 'http://localhost:8080';
 
 export const API_PATHS = {
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    GET_CURRENT_USER: '/auth/currentuser',
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
+    LOGOUT: '/api/auth/logout',
+    GET_CURRENT_USER: '/api/auth/currentuser',
   },
   SUPER_ADMIN: {
     GET_ALL_EMPLOYEES: '/superadmin/employees',

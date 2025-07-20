@@ -11,43 +11,55 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+// Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    return config;
+    // Always include credentials
+    config.withCredentials = true;
+    
+    // Ensure cookies are sent with every request
+    config.headers = {
+      ...config.headers,
+      'X-Requested-With': 'XMLHttpRequest',
+    };
+    
+    return config;zz
   },
   (error) => {
     return Promise.reject(error);
   }
 );
 
+// Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
     if (error.response) {
       const { status, data } = error.response;
+      
       if (status === 401) {
-        console.warn('Unauthorized: Please log in.');
-        window.dispatchEvent(new Event('unauthorized'));
-        return Promise.reject(new Error('Please log in to continue'));
+        // Clear any local user state
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('unauthorized', {
+            detail: { message: 'Session expired or invalid' }
+          }));
+        }
+        return Promise.reject(new Error(data?.message || 'Please log in to continue'));
       } else if (status === 403) {
-        console.warn('Forbidden: Insufficient permissions.');
-        return Promise.reject(new Error('You do not have permission to perform this action'));
+        return Promise.reject(new Error(data?.message || 'You do not have permission to perform this action'));
       } else if (status === 400) {
-        console.warn('Bad Request:', data);
-        return Promise.reject(new Error(data || 'Invalid request'));
+        return Promise.reject(new Error(data?.message || data || 'Invalid request'));
       } else if (status === 500) {
-        console.error('Server Error:', data);
-        return Promise.reject(new Error('Server error. Please try again later.'));
+        return Promise.reject(new Error(data?.message || 'Server error. Please try again later.'));
       }
     } else if (error.code === 'ECONNABORTED') {
-      console.error('Request Timeout');
       return Promise.reject(new Error('Request timed out. Please try again.'));
     } else {
-      console.error('Network Error:', error.message);
       return Promise.reject(new Error('Network error. Please check your connection.'));
     }
+    return Promise.reject(error);
   }
 );
 

@@ -1,7 +1,16 @@
+@import "tailwindcss";
+
 body {
   line-height: normal;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.MuiInput-root:hover:not(.Mui-disabled):not(.Mui-error)::before {
+  border-bottom: 2px solid #E90A4D;
+}
+.MuiFilledInput-root{
+  border-bottom: 2px solid #E90A4D;
 }
 
