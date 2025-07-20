@@ -178,7 +178,7 @@ export default function DailyTimeEntry({
         sx={{ 
           mb: 3, 
           p: 2, 
-          backgroundColor: theme.palette.mode === 'dark' ? 'transparent' : theme.palette.grey[50], 
+          backgroundColor: 'transparent',
           borderRadius: 1 
         }}
       >
