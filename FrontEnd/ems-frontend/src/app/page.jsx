@@ -149,7 +149,7 @@ export default function LandingPage() {
                   alt="Creative Software Company Logo"
                   width={LOGO_WIDTH}
                   height={LOGO_HEIGHT}
-                  style={{ objectFit: "contain", width: LOGO_WIDTH, height: "auto" }}
+                  style={{ objectFit: "contain", width: "auto", height: "auto" }}
                   priority // Optimize for critical above-the-fold content
                 />
               </Box>
@@ -174,7 +174,7 @@ export default function LandingPage() {
                     alt="Shiftly Application Logo"
                     width={SHIFTLY_LOGO_WIDTH}
                     height={SHIFTLY_LOGO_HEIGHT}
-                    style={{ objectFit: "contain" }}
+                    style={{ objectFit: "contain", width: "auto", height: "auto" }}
                     priority // Optimize for critical above-the-fold content
                   />
                 </motion.div>

@@ -52,11 +52,13 @@ export default function CollagePhoto({
     >
       <Image
         src={`/placeholder/thumb-${(index % 7) + 1}.jpg`}
+        priority
         alt={`Background photo ${index + 1}`}
         fill
+        sizes="(max-width: 600px) 100vw, 33vw"
         style={{ objectFit: "cover" }}
-        loading="lazy"
         onError={() => console.error(`Failed to load image ${index + 1}`)}
+        
       />
     </motion.div>
   );
