@@ -228,7 +228,43 @@ const theme = createTheme({
           }
         }
       }
-    }
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '[data-toolpad-color-scheme="dark"] &': {
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            },
+          },
+        },
+      },
+    },
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          '[data-toolpad-color-scheme="dark"] &': {
+            '& .MuiTableRow-root': {
+              backgroundColor: 'transparent',
+            },
+          },
+        },
+      },
+    },
+    MuiBox: {
+      styleOverrides: {
+        root: {
+          '[data-toolpad-color-scheme="dark"] &': {
+            '&[data-weekly-summary="true"]': {
+              backgroundColor: 'transparent !important',
+            },
+            '&[style*="background-color: rgb(245, 245, 245)"]': {
+              backgroundColor: 'transparent !important',
+            },
+          },
+        },
+      },
+    },
   },
   typography: {
     fontFamily: 'var(--font-roboto)',
