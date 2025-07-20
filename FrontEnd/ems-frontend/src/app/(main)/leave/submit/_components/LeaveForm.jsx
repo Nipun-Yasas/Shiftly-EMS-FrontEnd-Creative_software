@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import InputItem from '../../../../_components/inputs/InputItem';
 import TextInput from '../../../../_components/inputs/TextInput';
 import SelectInput from '../../../../_components/inputs/SelectInput';
@@ -35,7 +36,10 @@ const LeaveForm = ({ onSubmitSuccess }) => {
   };
 
   const validationSchema = Yup.object({
-    leave_type: Yup.string().required('Leave Type is required'),
+    leave_type: Yup.mixed()
+      .transform((val) => (val && typeof val === 'object' ? val.value : val))
+      .required('Leave Type is required')
+      .typeError('Leave Type must be a string'),
     leave_from: Yup.date().required('Start date is required'),
     leave_to: Yup.date()
       .min(Yup.ref('leave_from'), 'End date must be after start date')
@@ -59,8 +63,6 @@ const LeaveForm = ({ onSubmitSuccess }) => {
 
   return (
     <Box>
-      <h2 className="!text-lg !font-bold mb-6 text-gray-800">Request Leave</h2>
-
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

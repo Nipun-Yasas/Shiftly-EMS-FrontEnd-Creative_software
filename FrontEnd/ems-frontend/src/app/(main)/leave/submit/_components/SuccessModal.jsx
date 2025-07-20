@@ -1,54 +1,57 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@mui/material';
-import { Box, Typography, Button } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
+
 
 const SuccessModal = ({ isOpen, onClose }) => {
   const theme = useTheme();
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-          >
-            <Box
-              className="rounded-xl shadow-xl max-w-md w-full p-6"
-              sx={{
-                bgcolor: 'background.paper',
-                color: 'text.primary',
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Leave Request Submitted Successfully!
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 4 }}>
-                Your leave request has been submitted and is pending approval.
-              </Typography>
-              <Box className="flex justify-end">
-                <Button
-                  onClick={onClose}
-                  variant="contained"
-                  sx={{
-                    color: 'text.primary',
-                    borderColor: 'divider',
-                    '&:hover': {
-                      bgcolor: theme.palette.action.hover,
-                    },
-                  }}
-                >
-                  Close
-                </Button>
-              </Box>
-            </Box>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      aria-labelledby="success-dialog-title"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: 6,
+          bgcolor: 'background.paper',
+          color: 'text.primary',
+        },
+      }}
+    >
+      <DialogTitle id="success-dialog-title" sx={{ fontWeight: 700 }}>
+        Leave Request Submitted Successfully!
+      </DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          Your leave request has been submitted and is pending approval.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={onClose}
+          variant="contained"
+          sx={{
+            color: theme.palette.text.primary,
+            bgcolor: theme.palette.grey[200],
+            '&:hover': {
+              bgcolor: theme.palette.grey[300],
+            },
+          }}
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

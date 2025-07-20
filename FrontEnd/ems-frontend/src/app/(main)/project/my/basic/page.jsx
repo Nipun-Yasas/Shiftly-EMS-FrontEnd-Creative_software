@@ -1,115 +1,86 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-import { Paper , Box} from '@mui/material';
+import { useState } from "react";
+import { Paper, Box, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import SearchBar from "../../../../_components/header/SearchBar";
 
 export default function MyProject() {
-  const pathname = usePathname();
-
   const project = {
     logo: "/images/dips_logo.png",
-    projectDates: "Jan 2017 – Dec 2026",
-    client: "ABC Corp",
-    projectEntity: "Entity Y",
-    status: "Active",
+    name: "ABC Corp",
     description:
       "DIPS AS is Norway’s leading provider of E-healthcare solutions for hospitals. The success of an initial collaboration to develop the first mobile applications led to DIPS establishing additional teams to work on other areas of their product.",
-    director: {
-      name: "Kristier Jon Suglund",
-      image: "/images/lead.png",
-    },
-    teamLeads: Array.from({ length: 8 }).map((_, i) => ({
-      name: `Team Lead ${i + 1}`,
-      image: "/images/lead.png",
-    })),
+    start_date: "Jan 2017",
+    end_date: "Dec 2026",
   };
 
+  const userRows = [
+    { id: 1, first_name: "Alice", last_name: "Johnson", designation: "Frontend Developer" },
+    { id: 2, first_name: "Bob", last_name: "Smith", designation: "Backend Developer" },
+    { id: 3, first_name: "Carol", last_name: "Williams", designation: "QA Engineer" },
+  ];
+
+  const userColumns = [
+    { field: "first_name", headerName: "First Name", flex: 1 },
+    { field: "last_name", headerName: "Last Name", flex: 1 },
+    { field: "designation", headerName: "Designation", flex: 1 },
+  ];
+
+  // Search state and filtering
+  const [userSearch, setUserSearch] = useState("");
+  const filteredUsers = userRows.filter((row) =>
+    Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(userSearch.toLowerCase())
+    )
+  );
+
   return (
-    <Paper elevation={10}
-      sx={{
-        height: '100%',
-        width: '100%',
-      }}>
-      <Box className="rounded-2xl shadow-md p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-y-4">
-          <Image
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
+      <Box sx={{ width: "100%", px: 5, py: 1 }}>
+        <Box sx={{ mb: 0 }}>
+          <img
             src={project.logo}
             alt="Project Logo"
-            width={120}
-            height={120}
-            className="object-contain"
+            style={{ width: 120, height: 120, objectFit: "contain" }}
           />
-
-          <div className="flex gap-6 overflow-x-auto">
-            {[{ name: "BASIC INFO", href: "/project/my-projects/basic-info" },
-              { name: "TEAM", href: "/project/my-projects/team" }].map((tab) => {
-              const isActive = pathname === tab.href;
-              return (
-                <Link
-                  key={tab.name}
-                  href={tab.href}
-                  className={`pb-2 text-sm font-medium whitespace-nowrap ${
-                    isActive ? "border-b-2 border-[#E90A4D] text-[#E90A4D]" : " hover:text-[#E90A4D]"
-                  }`}
-                >
-                  {tab.name}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className=" rounded-xl p-6 shadow mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm  mb-6">
-            <div>
-              <p><span className="font-semibold">Project Dates:</span> {project.projectDates}</p>
-              <p><span className="font-semibold">Client:</span> {project.client}</p>
-              <p><span className="font-semibold">Project Entity:</span> {project.projectEntity}</p>
-            </div>
-            <div>
-              <p><span className="font-semibold">Project Status:</span> {project.status}</p>
-              <p><span className="font-semibold">Client:</span> {project.client}</p>
-            </div>
-          </div>
-          <p className="text-sm">
-            <span className="font-semibold">Project Description:</span> {project.description}
-          </p>
-        </div>
-
-        <Box className=" rounded-xl p-6 shadow mb-6  ">
-          <h3 className="font-semibold mb-4">Software Engineering Director:</h3>
-          <Box className="flex items-center gap-4 mb-6 px-6 py-3 rounded-lg max-w-sm shadow ">
-            <Image
-              src={project.director.image}
-              alt={project.director.name}
-              width={50}
-              height={50}
-              className="rounded-full object-cover"
-            />
-            <p className="">{project.director.name}</p>
-          </Box>
-
-          <h3 className="font-semibold mb-4 ">Team Leads:</h3>
-          <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
-            {project.teamLeads.map((lead, idx) => (
-              <Box
-                key={idx}
-                className="flex items-center gap-4  px-6 py-3 rounded-lg shadow"
-              >
-                <Image
-                  src={lead.image}
-                  alt={lead.name}
-                  width={50}
-                  height={50}
-                  className="rounded-full object-cover"
-                />
-                <p className="">{lead.name}</p>
-              </Box>
-            ))}
-          </Box>
+        </Box>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Project Details
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 5 }}>
+          <Typography variant="body1">
+            <strong>Name:</strong> {project.name}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Description:</strong> {project.description}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Start Date:</strong> {project.start_date}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Estimated End Date:</strong> {project.end_date}
+          </Typography>
+        </Box>
+        
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Project Users
+        </Typography>
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <SearchBar
+            label="Search Users"
+            value={userSearch}
+            onChange={(e) => setUserSearch(e.target.value)}
+          />
+        </Box>
+        <Box sx={{ height: 320, width: '100%' }}>
+          <DataGrid
+            rows={filteredUsers}
+            columns={userColumns}
+            pageSizeOptions={[5, 10, 20]}
+            autoHeight
+            disableSelectionOnClick
+          />
         </Box>
       </Box>
     </Paper>
