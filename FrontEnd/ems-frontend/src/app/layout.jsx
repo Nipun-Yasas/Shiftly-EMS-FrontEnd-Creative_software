@@ -43,7 +43,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
-      <body>
+      <body suppressHydrationWarning={true}>
         <ClientThemeProvider>
           <AppRouterCacheProvider>
             <React.Suspense fallback={<LinearProgress />}>
