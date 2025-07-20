@@ -6,11 +6,9 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
-import Button from "@mui/material/Button";
-import Collapse from "@mui/material/Collapse";
+
 
 export default function TimesheetRecord() {
-  const [tableExpanded, setTableExpanded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [timesheetRecords, setTimesheetRecords] = useState([
     {
@@ -85,9 +83,7 @@ export default function TimesheetRecord() {
     fetchTimesheetRecords();
   }, []);
 
-  const toggleTableExpanded = () => {
-    setTableExpanded(!tableExpanded);
-  };
+
 
   // Function to determine status color and styling
   const getStatusChip = (status) => {
@@ -226,73 +222,46 @@ export default function TimesheetRecord() {
 
   return (
     <Paper elevation={1} sx={{ mb: 3 }}>
-      <Box sx={{ 
-        p: 3, 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        borderBottom: tableExpanded ? '1px solid' : 'none',
-        borderColor: 'divider'
-      }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-          Timesheet Record
-        </Typography>
-        <Button 
-          variant="outlined" 
-          size="small"
-          onClick={toggleTableExpanded}
-          sx={{ 
-            borderRadius: 2, 
-            textTransform: 'none',
-            minWidth: 100
-          }}
-        >
-          {tableExpanded ? "Collapse" : "Expand"}
-        </Button>
+      <Box sx={{ p: 3 }}>
+        {loading ? (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            py: 4 
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              Loading records...
+            </Typography>
+          </Box>
+        ) : timesheetRecords.length > 0 ? (
+          <DataGrid
+            rows={timesheetRecords}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+          />
+        ) : (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            py: 4 
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              No timesheet records found.
+            </Typography>
+          </Box>
+        )}
       </Box>
-
-      <Collapse in={tableExpanded}>
-        <Box sx={{ p: 3 }}>
-          {loading ? (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              py: 4 
-            }}>
-              <Typography variant="body2" color="text.secondary">
-                Loading records...
-              </Typography>
-            </Box>
-          ) : timesheetRecords.length > 0 ? (
-            <DataGrid
-              rows={timesheetRecords}
-              columns={columns}
-              height="auto"
-              pageSize={10}
-              rowsPerPageOptions={[10]}
-              disableSelectionOnClick
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 50, 100]}
-            />
-          ) : (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              py: 4 
-            }}>
-              <Typography variant="body2" color="text.secondary">
-                No timesheet records found.
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Collapse>
     </Paper>
   );
 } 

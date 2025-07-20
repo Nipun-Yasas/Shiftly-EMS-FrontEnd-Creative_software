@@ -5,104 +5,31 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Chip from "@mui/material/Chip";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useTheme } from "@mui/material/styles";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import dayjs from "dayjs";
+import WeeklyTimeEntries from "./WeeklyTimeEntries";
+import DailyTimeEntry from "./DailyTimeEntry";
 
 export default function UpdateTimesheet() {
-  const theme = useTheme();
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedDay, setSelectedDay] = useState(dayjs());
-  const [activeTab, setActiveTab] = useState(0);
-  const [weekDays, setWeekDays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [activeTab, setActiveTab] = useState(0);
   
   // Daily entries for each day of the week
   const [dailyEntries, setDailyEntries] = useState({});
-  // Single day entry for daily tab
+  const [totalHours, setTotalHours] = useState({ regular: 0, overtime: 0 });
+
+  // Daily entry for single day
   const [dailyEntry, setDailyEntry] = useState({
     workMode: "",
     activity: "",
     hours: ""
   });
-  const [leaveDays, setLeaveDays] = useState([]);
-  const [totalHours, setTotalHours] = useState({ regular: 0, overtime: 0 });
-
-  const workModes = ["Online", "On-site", "Hybrid"];
-
-  // Calculate week days (Monday to Sunday) based on selected date
-  useEffect(() => {
-    const calculateWeekDays = () => {
-      const monday = selectedDate.startOf('week').add(1, 'day'); // Monday
-      const days = [];
-      
-      for (let i = 0; i < 7; i++) {
-        const day = monday.add(i, 'day');
-        const dateKey = day.format('YYYY-MM-DD');
-        days.push({
-          date: day,
-          dateKey: dateKey,
-          display: day.format('DD / ddd'),
-          dayName: day.format('dddd'),
-          isWeekend: day.day() === 0 || day.day() === 6, // Sunday or Saturday
-          isLeaveDay: false, // Will be fetched from backend
-          workMode: dailyEntries[dateKey]?.workMode || "",
-          activity: dailyEntries[dateKey]?.activity || "",
-          hours: dailyEntries[dateKey]?.hours || ""
-        });
-      }
-      
-      setWeekDays(days);
-    };
-
-    calculateWeekDays();
-  }, [selectedDate, dailyEntries]);
-
-  // Fetch leave days from backend
-  useEffect(() => {
-    const fetchLeaveDays = async () => {
-      try {
-        // Mock API call - replace with actual backend call
-        const mockLeaveDays = [
-          selectedDate.startOf('week').add(3, 'day').format('YYYY-MM-DD'), // Thursday
-        ];
-        setLeaveDays(mockLeaveDays);
-        
-        // Update weekDays with leave day information
-        setWeekDays(prev => prev.map(day => ({
-          ...day,
-          isLeaveDay: mockLeaveDays.includes(day.dateKey)
-        })));
-      } catch (error) {
-        console.error("Error fetching leave days:", error);
-      }
-    };
-
-    fetchLeaveDays();
-  }, [selectedDate]);
+  const [dailyOvertime, setDailyOvertime] = useState(0);
 
   // Calculate total hours and overtime
   useEffect(() => {
@@ -125,253 +52,59 @@ export default function UpdateTimesheet() {
     });
   }, [dailyEntries]);
 
-  const handleDateChange = (newDate) => {
-    setSelectedDate(newDate);
-    setDailyEntries({}); // Reset entries for new week
-  };
-
-  const handlePreviousWeek = () => {
-    setSelectedDate(prev => prev.subtract(1, 'week'));
-  };
-
-  const handleNextWeek = () => {
-    setSelectedDate(prev => prev.add(1, 'week'));
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  const handleDayChange = (newDate) => {
-    setSelectedDay(newDate);
-    // Reset daily entry for new day
-    setDailyEntry({
-      workMode: "",
-      activity: "",
-      hours: ""
-    });
-  };
-
-  const handleDailyWorkModeChange = (value) => {
-    setDailyEntry(prev => ({
-      ...prev,
-      workMode: value
-    }));
-  };
-
-  const handleDailyActivityChange = (value) => {
-    setDailyEntry(prev => ({
-      ...prev,
-      activity: value
-    }));
-  };
-
-  const handleDailyTimeChange = (value) => {
-    // Allow empty string, numbers, and single decimal point
-    if (value === '') {
-      setDailyEntry(prev => ({
-        ...prev,
-        hours: ''
-      }));
-      return;
+  // Calculate daily overtime
+  useEffect(() => {
+    const numHours = parseFloat(dailyEntry.hours) || 0;
+    if (numHours > 8) {
+      setDailyOvertime((numHours - 8).toFixed(2));
+    } else {
+      setDailyOvertime(0);
     }
-
-    // Check if it's a valid number format (including decimals)
-    const isValidFormat = /^\d*\.?\d*$/.test(value);
-    if (!isValidFormat) {
-      return; // Don't update if invalid format
-    }
-
-    // Check if it's within the allowed range (4-15 hours)
-    const numValue = parseFloat(value);
-    if (numValue > 15) {
-      return; // Don't allow more than 15 hours
-    }
-
-    // Allow the input as-is for better UX
-    setDailyEntry(prev => ({
-      ...prev,
-      hours: value
-    }));
-  };
-
-  const handleDailyTimeBlur = (value) => {
-    if (value && value !== '') {
-      const numValue = parseFloat(value);
-      if (!isNaN(numValue)) {
-        // Check minimum hours (4 hours)
-        if (numValue < 4) {
-          setMessage({ text: "Minimum hours per day is 4 hours", type: "warning" });
-          setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-          return;
-        }
-        
-        // Check maximum hours (15 hours)
-        if (numValue > 15) {
-          setMessage({ text: "Maximum hours per day is 15 hours", type: "warning" });
-          setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-          return;
-        }
-        
-        // Format to 2 decimal places
-        setDailyEntry(prev => ({
-          ...prev,
-          hours: numValue.toFixed(2)
-        }));
-      }
-    }
-  };
-
-  const handleWorkModeChange = (dateKey, value) => {
-    setDailyEntries(prev => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        workMode: value
-      }
-    }));
-  };
-
-  const handleActivityChange = (dateKey, value) => {
-    setDailyEntries(prev => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        activity: value
-      }
-    }));
-  };
-
-  const handleTimeChange = (dateKey, value) => {
-    // Allow empty string, numbers, and single decimal point
-    if (value === '') {
-      setDailyEntries(prev => ({
-        ...prev,
-        [dateKey]: {
-          ...prev[dateKey],
-          hours: ''
-        }
-      }));
-      return;
-    }
-
-    // Check if it's a valid number format (including decimals)
-    const isValidFormat = /^\d*\.?\d*$/.test(value);
-    if (!isValidFormat) {
-      return; // Don't update if invalid format
-    }
-
-    // Check if it's within the allowed range (4-15 hours)
-    const numValue = parseFloat(value);
-    if (numValue > 15) {
-      return; // Don't allow more than 15 hours
-    }
-
-    // Allow the input as-is for better UX
-    setDailyEntries(prev => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        hours: value
-      }
-    }));
-  };
-
-  // Format hours on blur to ensure proper decimal format and validate range
-  const handleTimeBlur = (dateKey, value) => {
-    if (value && value !== '') {
-      const numValue = parseFloat(value);
-      if (!isNaN(numValue)) {
-        // Check minimum hours (4 hours)
-        if (numValue < 4) {
-          setMessage({ text: "Minimum hours per day is 4 hours", type: "warning" });
-          setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-          return;
-        }
-        
-        // Check maximum hours (15 hours)
-        if (numValue > 15) {
-          setMessage({ text: "Maximum hours per day is 15 hours", type: "warning" });
-          setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-          return;
-        }
-        
-        const formattedValue = numValue.toFixed(2);
-        setDailyEntries(prev => ({
-          ...prev,
-          [dateKey]: {
-            ...prev[dateKey],
-            hours: formattedValue
-          }
-        }));
-      }
-    }
-  };
+  }, [dailyEntry.hours]);
 
   const handleSubmit = async () => {
-    // Validation
-    const hasEntries = Object.values(dailyEntries).some(entry => 
-      entry.workMode && entry.activity && parseFloat(entry.hours) > 0
-    );
-    
-    if (!hasEntries) {
-      setMessage({ text: "Please fill in at least one complete entry (Work Mode, Activity, and Hours)", type: "error" });
-      return;
-    }
-
-    // Validate hours range for all entries
-    const invalidEntries = Object.entries(dailyEntries).filter(([dateKey, entry]) => {
-      const hours = parseFloat(entry.hours);
-      return hours > 0 && (hours < 4 || hours > 15);
-    });
-
-    if (invalidEntries.length > 0) {
-      setMessage({ text: "All time entries must be between 4-15 hours per day", type: "error" });
-      return;
-    }
-
     setLoading(true);
     try {
-      // Prepare data for submission
-      const timesheetData = {
-        weekStart: selectedDate.startOf('week').add(1, 'day').format('YYYY-MM-DD'),
-        weekEnd: selectedDate.startOf('week').add(7, 'day').format('YYYY-MM-DD'),
-        dailyEntries,
-        totalHours,
-        status: "Pending"
-      };
-      
-      console.log("Submitting timesheet:", timesheetData);
-      
       // Mock API call - replace with actual backend call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setMessage({ text: "Timesheet submitted successfully", type: "success" });
+      if (activeTab === 0) {
+        // Submit weekly entries
+        console.log("Submitting weekly entries:", dailyEntries);
+      } else {
+        // Submit daily entry
+        console.log("Submitting daily entry:", dailyEntry);
+      }
+      
+      setMessage({ text: "Timesheet submitted successfully!", type: "success" });
       setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+      
+      // Reset form
+      if (activeTab === 0) {
+        setDailyEntries({});
+      } else {
+        setDailyEntry({ workMode: "", activity: "", hours: "" });
+      }
     } catch (error) {
       console.error("Error submitting timesheet:", error);
-      setMessage({ text: "Failed to submit timesheet", type: "error" });
+      setMessage({ text: "Error submitting timesheet. Please try again.", type: "error" });
       setTimeout(() => setMessage({ text: "", type: "" }), 3000);
     }
     setLoading(false);
   };
 
   const handleCancel = () => {
-    setDailyEntries({});
+    if (activeTab === 0) {
+      setDailyEntries({});
+    } else {
+      setDailyEntry({ workMode: "", activity: "", hours: "" });
+    }
     setMessage({ text: "Form reset successfully", type: "success" });
     setTimeout(() => setMessage({ text: "", type: "" }), 3000);
   };
 
-  const getDayCellColor = (day) => {
-    if (day.isLeaveDay) return theme.palette.error.light;
-    if (day.isWeekend) return 'rgba(76, 175, 80, 0.2)'; // Reduced opacity green
-    return 'transparent';
-  };
-
-  const getHoverColor = (day) => {
-    if (day.isLeaveDay) return theme.palette.error.light;
-    if (day.isWeekend) return theme.palette.success.light;
-    return theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : theme.palette.grey[50];
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
   return (
@@ -383,233 +116,64 @@ export default function UpdateTimesheet() {
         </Alert>
       )}
 
-      {/* Week Navigation */}
+      {/* Tabs */}
       <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <IconButton onClick={handlePreviousWeek} disabled={loading}>
-            <ChevronLeftIcon />
-          </IconButton>
-          
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            Week of {selectedDate.startOf('week').add(1, 'day').format('MMM DD')} - {selectedDate.startOf('week').add(7, 'day').format('MMM DD, YYYY')}
-          </Typography>
-          
-          <IconButton onClick={handleNextWeek} disabled={loading}>
-            <ChevronRightIcon />
-          </IconButton>
-        </Box>
-
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="Select Week"
-            value={selectedDate}
-            onChange={handleDateChange}
-            renderInput={(params) => <TextField {...params} size="small" sx={{ width: 200 }} />}
-          />
-        </LocalizationProvider>
+        <Tabs value={activeTab} onChange={handleTabChange}>
+          <Tab label="Weekly Time Entries" />
+          <Tab label="Daily Time Entry" />
+        </Tabs>
       </Box>
 
-      {/* Daily Time Entries Table */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-          Weekly Time Entries
-        </Typography>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ 
-                backgroundColor: theme.palette.mode === 'dark' ? 'transparent' : theme.palette.grey[100] 
-              }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Day</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Work Mode</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Activity</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Hours</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {weekDays.map((day) => (
-                <TableRow 
-                  key={day.dateKey}
-                  sx={{ 
-                    backgroundColor: getDayCellColor(day),
-                    '&:hover': { 
-                      backgroundColor: getHoverColor(day),
-                      transition: 'background-color 0.2s ease'
-                    }
-                  }}
-                >
-                  <TableCell>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {day.display}
-                      </Typography>
-                      {day.isWeekend && (
-                        <Chip 
-                          label="Weekend" 
-                          color="success" 
-                          size="small" 
-                          sx={{ mt: 0.5 }}
-                        />
-                      )}
-                    </Box>
-                  </TableCell>
-                  
-                  <TableCell>
-                    {day.isLeaveDay ? (
-                      <Chip 
-                        label="Leave Day" 
-                        color="error" 
-                        size="small"
-                      />
-                    ) : (
-                      <FormControl fullWidth size="small">
-                        <Select
-                          value={day.workMode}
-                          onChange={(e) => handleWorkModeChange(day.dateKey, e.target.value)}
-                          displayEmpty
-                          disabled={day.isLeaveDay}
-                        >
-                          <MenuItem value="">Select mode</MenuItem>
-                          {workModes.map(mode => (
-                            <MenuItem key={mode} value={mode}>{mode}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                  </TableCell>
-                  
-                  <TableCell>
-                    {day.isLeaveDay ? (
-                      <Typography variant="body2" color="text.secondary">
-                        Leave day
-                      </Typography>
-                    ) : (
-                      <TextField
-                        value={day.activity}
-                        onChange={(e) => handleActivityChange(day.dateKey, e.target.value)}
-                        placeholder="Enter activity"
-                        size="small"
-                        fullWidth
-                        disabled={day.isLeaveDay}
-                      />
-                    )}
-                  </TableCell>
-                  
-                  <TableCell>
-                    {day.isLeaveDay ? (
-                      <Typography variant="body2" color="text.secondary">
-                        0.00
-                      </Typography>
-                    ) : (
-                      <TextField
-                        value={day.hours}
-                        onChange={(e) => handleTimeChange(day.dateKey, e.target.value)}
-                        onBlur={(e) => handleTimeBlur(day.dateKey, e.target.value)}
-                        placeholder="0.00"
-                        size="small"
-                        disabled={day.isLeaveDay}
-                       
-                        sx={{
-                          width: 120,
-                          '& .MuiOutlinedInput-root': {
-                            '& input': {
-                              textAlign: 'center',
-                              fontWeight: 'bold'
-                            }
-                          }
-                        }}
-                        inputProps={{
-                          maxLength: 5,
-                          style: { textAlign: 'center' }
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  
-                  <TableCell>
-                    {day.isLeaveDay ? (
-                      <Chip 
-                        label="Leave" 
-                        color="error" 
-                        size="small"
-                      />
-                    ) : day.isWeekend ? (
-                      <Chip 
-                        label="Weekend" 
-                        color="success" 
-                        size="small"
-                      />
-                    ) : day.workMode && day.activity && day.hours ? (
-                      <Chip 
-                        label="Complete" 
-                        color="success" 
-                        size="small"
-                      />
-                    ) : (
-                      <Chip 
-                        label="Incomplete" 
-                        color="default" 
-                        size="small"
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+      {/* Weekly Time Entries Tab */}
+      {activeTab === 0 && (
+        <WeeklyTimeEntries
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          dailyEntries={dailyEntries}
+          setDailyEntries={setDailyEntries}
+          totalHours={totalHours}
+          message={message}
+          setMessage={setMessage}
+          loading={loading}
+        />
+      )}
 
-      {/* Summary */}
-      <Box 
-        sx={{ 
-          mb: 3, 
-          p: 2, 
-          backgroundColor: theme.palette.mode === 'dark' ? 'transparent' : theme.palette.grey[0], 
-          borderRadius: 1 
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
-          Weekly Summary
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="body2" color="text.secondary">
-              Regular Hours: <strong>{totalHours.regular}</strong>
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="body2" color="text.secondary">
-              Overtime Hours: <strong style={{ color: '#f57c00' }}>{totalHours.overtime}</strong>
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="body2" color="text.secondary">
-              Total Hours: <strong>{parseFloat(totalHours.regular) + parseFloat(totalHours.overtime)}</strong>
-            </Typography>
-          </Grid>
-        </Grid>
-      </Box>
+      {/* Daily Time Entry Tab */}
+      {activeTab === 1 && (
+        <DailyTimeEntry
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          dailyEntry={dailyEntry}
+          setDailyEntry={setDailyEntry}
+          dailyOvertime={dailyOvertime}
+          message={message}
+          setMessage={setMessage}
+          loading={loading}
+        />
+      )}
 
       {/* Action Buttons */}
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: { xs: 'center', md: 'flex-end' },
+          pb: 2,
+          gap: 2,
+        }}
+      >
         <Button
-          variant="outlined"
+          color="text.primary"
           onClick={handleCancel}
           disabled={loading}
-          sx={{ borderRadius: 2, textTransform: 'none' }}
         >
           Cancel
         </Button>
         <Button
           variant="contained"
-          color="primary"
           onClick={handleSubmit}
           disabled={loading}
-          sx={{ borderRadius: 2, textTransform: 'none' }}
         >
-          {loading ? "Submitting..." : "Submit Timesheet"}
+          {loading ? "Submitting..." : "Submit"}
         </Button>
       </Box>
 
