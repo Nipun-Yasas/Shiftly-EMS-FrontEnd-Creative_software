@@ -12,6 +12,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import NAVIGATION from './_utils/navigation';
 
 import { AuthProvider } from './context/AuthContext';
+import ClientThemeProvider from './ClientThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,20 +43,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
-      <body
-      >
-        <AppRouterCacheProvider>
-          <React.Suspense fallback={<LinearProgress />}>
-            {/* <AuthProvider> */}
-              <NextAppProvider
-                theme={theme}
-                navigation={NAVIGATION}
-              >
+      <body>
+        <ClientThemeProvider>
+          <AppRouterCacheProvider>
+            <React.Suspense fallback={<LinearProgress />}>
+              <NextAppProvider theme={theme} navigation={NAVIGATION}>
                 {children}
               </NextAppProvider>
-            {/* </AuthProvider> */}
-          </React.Suspense>
-        </AppRouterCacheProvider>
+            </React.Suspense>
+          </AppRouterCacheProvider>
+        </ClientThemeProvider>
       </body>
     </html>
   );

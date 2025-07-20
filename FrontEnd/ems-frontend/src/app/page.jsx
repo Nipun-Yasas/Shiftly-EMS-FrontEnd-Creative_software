@@ -34,6 +34,10 @@ import {
   SHIFTLY_LOGO_HEIGHT,
 } from "./_utils/constants";
 
+import dynamic from 'next/dynamic';
+
+const CollageGridClient = dynamic(() => import('./CollageGridClient'), { ssr: false });
+
 export default function LandingPage() {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
@@ -101,7 +105,7 @@ export default function LandingPage() {
             zIndex: 0,
           }}
         >
-          {collagePhotos}
+          <CollageGridClient />
         </Box>
 
         <Container
@@ -145,7 +149,7 @@ export default function LandingPage() {
                     alt="Creative Software Company Logo"
                     width={LOGO_WIDTH}
                     height={LOGO_HEIGHT}
-                    style={{ objectFit: "contain" }}
+                    style={{ objectFit: "contain", width: LOGO_WIDTH, height: 'auto' }}
                   />
                 </Box>
 
