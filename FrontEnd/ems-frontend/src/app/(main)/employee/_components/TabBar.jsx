@@ -48,12 +48,8 @@ const TabBar = () => {
           sx={{
             '& .MuiTab-root': {
               minWidth: { xs: 'auto', sm: 120 },
-              fontSize: { xs: '0.75rem', sm: '0.875rem' },
               padding: { xs: '6px 8px', sm: '12px 16px' },
-              textTransform: 'none',
-              fontWeight: 500,
               '&.Mui-selected': {
-                fontWeight: 600,
                 color: 'primary.main'
               }
             },

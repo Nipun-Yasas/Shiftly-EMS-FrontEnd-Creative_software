@@ -157,6 +157,12 @@ const Education = () => {
               '& .MuiDataGrid-columnHeader': {
                 fontSize: { xs: '0.75rem', sm: '0.875rem' },
                 fontWeight: 600
+              },
+              // Fix for positioning "No rows" message
+              '& .MuiDataGrid-overlayWrapperInner': {
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '60px'
               }
             }}
           />
@@ -166,4 +172,4 @@ const Education = () => {
   );
 };
 
-export default Education; 
+export default Education;

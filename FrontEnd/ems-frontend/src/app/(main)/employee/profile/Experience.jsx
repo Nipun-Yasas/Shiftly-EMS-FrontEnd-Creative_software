@@ -131,39 +131,43 @@ const Experience = () => {
       </Snackbar>
 
       {/* DataGrid */}
-      
-        <Box sx={{ 
-          width: "100%", 
-          p: { xs: 0.5, sm: 1, md: 1.5 },
-          mt: { xs: 2, sm: 3 }
-        }}>
-          <DataGrid
-            rows={experiences}
-            columns={columns}
-            height={400}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 50, 100]}
-            sx={{
-              '& .MuiDataGrid-cell': {
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              },
-              '& .MuiDataGrid-columnHeader': {
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                fontWeight: 600
-              }
-            }}
-          />
-        </Box>
-      
+      <Box sx={{ 
+        width: "100%", 
+        p: { xs: 0.5, sm: 1, md: 1.5 },
+        mt: { xs: 2, sm: 3 }
+      }}>
+        <DataGrid
+          rows={experiences}
+          columns={columns}
+          height={400}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          disableSelectionOnClick
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[10, 50, 100]}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            },
+            '& .MuiDataGrid-columnHeader': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              fontWeight: 600
+            },
+            // Fix for positioning "No rows" message
+            '& .MuiDataGrid-overlayWrapperInner': {
+              display: 'flex',
+              justifyContent: 'center',
+              paddingTop: '60px'
+            }
+          }}
+        />
+      </Box>
     </Box>
   );
 };
 
-export default Experience; 
+export default Experience;
