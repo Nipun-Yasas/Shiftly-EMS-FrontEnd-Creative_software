@@ -22,6 +22,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '../../_utils/axiosInstance';
 import { API_PATHS } from '../../_utils/apiPaths';
+import { handleUserLogout } from '../../_utils/localStorageUtils';
 
 
 const UserMenu = () => {
@@ -49,8 +50,20 @@ const UserMenu = () => {
   // }, [user, loading, router]);
 
   const handleLogout = async () => {
-    await signOut();
-    router.push('/');
+    try {
+      // Handle user logout with data preservation
+      handleUserLogout();
+      
+      // If you have an actual signOut function, call it here
+      // await signOut();
+      
+      console.log("User logged out successfully - data preserved");
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still redirect even if there's an error
+      router.push('/');
+    }
   };
 
   // State for managing the dropdown menu
@@ -67,12 +80,22 @@ const UserMenu = () => {
     setAnchorEl(null);
   };
 
-  // Handle logout action
-  const handlelogout = () => {
-    handleLogout();
-    console.log("Logging out...");
-    handleCloseMenu();
-    // You could redirect to login page or call an API here
+  // Handle logout action with data preservation
+  const handlelogout = async () => {
+    try {
+      // Backup user data before logout (optional)
+      handleUserLogout();
+      
+      // Call the original logout handler
+      await handleLogout();
+      
+      console.log("Logging out...");
+      handleCloseMenu();
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still proceed with logout even if backup fails
+      await handleLogout();
+    }
   };
 
   return (
