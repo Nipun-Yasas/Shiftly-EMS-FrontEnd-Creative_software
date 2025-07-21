@@ -13,26 +13,26 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import EducationForm from '../components/EducationForm';
+import ExperienceForm from '../_components/ExperienceForm';
 
 const columns = [
-  { field: "id", headerName: "ID",flex:1 },
-  { field: "degree", headerName: "Degree", flex:1 },
-  { field: "institution", headerName: "Institution", flex:1 },
+  { field: "id", headerName: "ID", flex:1 },
+  { field: "jobTitle", headerName: "Job Title", flex:1 },
+  { field: "company", headerName: "Company", flex:1 },
   { field: "duration", headerName: "Duration", flex:1 },
 ];
 
-const Education = () => {
+const Experience = () => {
   const theme = useTheme();
 
   const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [formData, setFormData] = useState({
-    degree: '',
-    institution: '',
+    jobTitle: '',
+    company: '',
     duration: '',
   });
-  const [educations, setEducations] = useState([]);
+  const [experiences, setExperiences] = useState([]);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -44,14 +44,14 @@ const Education = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newEducation = {
-      id: educations.length + 1,
+    const newExperience = {
+      id: experiences.length + 1,
       ...formData
     };
-    setEducations((prev) => [...prev, newEducation]);
+    setExperiences((prev) => [...prev, newExperience]);
     setOpenModal(false);
     setOpenSnackbar(true);
-    setFormData({ degree: '', institution: '', duration: '' });
+    setFormData({ jobTitle: '', company: '', duration: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -68,7 +68,7 @@ const Education = () => {
           position: 'absolute',
           top: 16,
           right: 16,
-          bgcolor: theme.palette.background,
+          bgcolor: theme.palette.background.paper,
           border: `1px solid ${theme.palette.divider}`,
           '&:hover': {
             bgcolor: theme.palette.action.hover,
@@ -82,8 +82,8 @@ const Education = () => {
       <Modal
         open={openModal}
         onClose={handleCloseModal}
-        aria-labelledby="education-form-modal"
-        aria-describedby="form-to-add-education"
+        aria-labelledby="experience-form-modal"
+        aria-describedby="form-to-add-experience"
       >
         <Box
           sx={{
@@ -99,9 +99,9 @@ const Education = () => {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Add Education
+            Add Experience
           </Typography>
-          <EducationForm
+          <ExperienceForm
             formData={formData}
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
@@ -123,10 +123,10 @@ const Education = () => {
       </Snackbar>
 
       {/* DataGrid */}
-     
-        <Box sx={{ width: "100%", p: 3 }}>
+      
+        <Box sx={{ width: "100%", p: 5 }}>
           <DataGrid
-            rows={educations}
+            rows={experiences}
             columns={columns}
             height="auto"
             pageSize={10}
@@ -138,11 +138,20 @@ const Education = () => {
               },
             }}
             pageSizeOptions={[10, 50, 100]}
+            sx={{
+              
+              // Fix for positioning "No rows" message
+              '& .MuiDataGrid-overlayWrapperInner': {
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '60px'
+              }
+            }}
           />
         </Box>
-     
+      
     </Box>
   );
 };
 
-export default Education;
+export default Experience;

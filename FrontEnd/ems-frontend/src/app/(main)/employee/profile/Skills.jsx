@@ -13,10 +13,10 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import SkillsForm from '../components/SkillsForm';
+import SkillsForm from '../_components/SkillsForm';
 
 const columns = [
-  { field: "id", headerName: "ID", flex:1 },
+  { field: "id", headerName: "ID", flex:1},
   { field: "skillName", headerName: "Skill Name",flex:1 },
   { field: "proficiency", headerName: "Proficiency", flex:1 },
 ];
@@ -58,18 +58,26 @@ const Skills = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', p: { xs: 2, sm: 4 } }}>
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: { xs: '60vh', sm: '70vh' }, 
+      p: { xs: 1, sm: 2, md: 3 },
+      maxWidth: '100%',
+      overflow: 'hidden'
+    }}>
       <IconButton
         color="primary"
         onClick={handleOpenModal}
         sx={{
           position: 'absolute',
-          top: 16,
-          right: 16,
-          
+          top: { xs: 8, sm: 16 },
+          right: { xs: 8, sm: 16 },
+          bgcolor: theme.palette.background.paper,
           border: `1px solid ${theme.palette.divider}`,
+          zIndex: 1,
           '&:hover': {
-            bgcolor: theme.palette.action.hover,
+            bgcolor: theme.palette.primary.light,
+            color: 'white'
           },
         }}
       >
@@ -122,7 +130,13 @@ const Skills = () => {
 
       {/* DataGrid */}
      
-        <Box sx={{ width: "100%", p: 3 }}>
+        <Box 
+            sx={{ width: "100%", p: 5 ,
+
+             
+            }}
+        
+        >
           <DataGrid
             rows={skills}
             columns={columns}
@@ -136,6 +150,15 @@ const Skills = () => {
               },
             }}
             pageSizeOptions={[10, 50, 100]}
+            sx={{
+              
+              // Fix for positioning "No rows" message
+              '& .MuiDataGrid-overlayWrapperInner': {
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '60px'
+              }
+            }}
           />
         </Box>
       

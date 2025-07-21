@@ -13,26 +13,26 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import ExperienceForm from '../components/ExperienceForm';
+import EducationForm from '../_components/EducationForm';
 
 const columns = [
   { field: "id", headerName: "ID", flex:1 },
-  { field: "jobTitle", headerName: "Job Title", flex:1 },
-  { field: "company", headerName: "Company", flex:1 },
+  { field: "degree", headerName: "Degree", flex:1 },
+  { field: "institution", headerName: "Institution", flex:1 },
   { field: "duration", headerName: "Duration", flex:1 },
 ];
 
-const Experience = () => {
+const Education = () => {
   const theme = useTheme();
 
   const [openModal, setOpenModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [formData, setFormData] = useState({
-    jobTitle: '',
-    company: '',
+    degree: '',
+    institution: '',
     duration: '',
   });
-  const [experiences, setExperiences] = useState([]);
+  const [educations, setEducations] = useState([]);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -44,14 +44,14 @@ const Experience = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newExperience = {
-      id: experiences.length + 1,
+    const newEducation = {
+      id: educations.length + 1,
       ...formData
     };
-    setExperiences((prev) => [...prev, newExperience]);
+    setEducations((prev) => [...prev, newEducation]);
     setOpenModal(false);
     setOpenSnackbar(true);
-    setFormData({ jobTitle: '', company: '', duration: '' });
+    setFormData({ degree: '', institution: '', duration: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -82,8 +82,8 @@ const Experience = () => {
       <Modal
         open={openModal}
         onClose={handleCloseModal}
-        aria-labelledby="experience-form-modal"
-        aria-describedby="form-to-add-experience"
+        aria-labelledby="education-form-modal"
+        aria-describedby="form-to-add-education"
       >
         <Box
           sx={{
@@ -99,9 +99,9 @@ const Experience = () => {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Add Experience
+            Add Education
           </Typography>
-          <ExperienceForm
+          <EducationForm
             formData={formData}
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
@@ -124,9 +124,9 @@ const Experience = () => {
 
       {/* DataGrid */}
       
-        <Box sx={{ width: "100%", p: 3 }}>
+        <Box sx={{ width: "100%", p: 5 }}>
           <DataGrid
-            rows={experiences}
+            rows={educations}
             columns={columns}
             height="auto"
             pageSize={10}
@@ -138,6 +138,15 @@ const Experience = () => {
               },
             }}
             pageSizeOptions={[10, 50, 100]}
+            sx={{
+              
+              // Fix for positioning "No rows" message
+              '& .MuiDataGrid-overlayWrapperInner': {
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '60px'
+              }
+            }}
           />
         </Box>
       
@@ -145,4 +154,4 @@ const Experience = () => {
   );
 };
 
-export default Experience;
+export default Education;
