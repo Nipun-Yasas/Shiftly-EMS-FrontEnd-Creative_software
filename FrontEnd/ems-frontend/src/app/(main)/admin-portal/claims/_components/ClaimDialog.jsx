@@ -105,6 +105,9 @@ export default function ClaimApprovalDialog({
             width: "100%",
           }}
         >
+          <Button color="text.primary" onClick={handleClose}>
+            Cancel
+          </Button>
           {action === "approve" ? (
             <Button
               color="success"
@@ -125,9 +128,7 @@ export default function ClaimApprovalDialog({
             </Button>
           )}
 
-          <Button color="text.primary" onClick={handleClose}>
-            Cancel
-          </Button>
+          
         </Box>
       </DialogActions>
     </Dialog>

@@ -97,6 +97,9 @@ export default function LeaveDialog({
             width: "100%",
           }}
         >
+          <Button color="text.primary" onClick={handleClose}>
+            Cancel
+          </Button>
           {approvalAction === "approve" ? (
             <Button
               color="success"
@@ -116,10 +119,6 @@ export default function LeaveDialog({
               Reject
             </Button>
           )}
-
-          <Button color="text.primary" onClick={handleClose}>
-            Cancel
-          </Button>
         </Box>
       </DialogActions>
     </Dialog>

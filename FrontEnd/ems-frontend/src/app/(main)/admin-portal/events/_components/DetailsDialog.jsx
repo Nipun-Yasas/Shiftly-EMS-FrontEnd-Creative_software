@@ -57,14 +57,16 @@ export default function DetailsDialog({
       <DialogContent dividers>
         {selectedEvent && (
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid sx={{ xs: 12, md: 6 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
                     <PersonIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                     Organizer Information
                   </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
                     <Typography>
                       <strong>Name:</strong> {selectedEvent.organizer}
                     </Typography>
@@ -85,14 +87,16 @@ export default function DetailsDialog({
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid sx={{ xs: 12, md: 6 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
                     <EventIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                     Event Details
                   </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <CategoryIcon color="action" />
                       <Typography>
@@ -124,14 +128,16 @@ export default function DetailsDialog({
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid sx={{ xs: 12, md: 6 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
                     <CalendarIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                     Date & Time
                   </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
                     <Typography>
                       <strong>Start:</strong>{" "}
                       {dayjs(selectedEvent.startDate).format(
@@ -140,7 +146,9 @@ export default function DetailsDialog({
                     </Typography>
                     <Typography>
                       <strong>End:</strong>{" "}
-                      {dayjs(selectedEvent.endDate).format("MMMM DD, YYYY HH:mm")}
+                      {dayjs(selectedEvent.endDate).format(
+                        "MMMM DD, YYYY HH:mm"
+                      )}
                     </Typography>
                     <Typography>
                       <strong>Duration:</strong>{" "}
@@ -155,13 +163,15 @@ export default function DetailsDialog({
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid sx={{ xs: 12, md: 6 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
                     Status & Approval
                   </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
                     <Chip
                       icon={getStatusIcon(selectedEvent.status)}
                       label={
@@ -191,7 +201,7 @@ export default function DetailsDialog({
               </Card>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid sx={{ xs: 12 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="h6" gutterBottom color="primary">
@@ -216,7 +226,9 @@ export default function DetailsDialog({
                   >
                     Requirements
                   </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
                     {selectedEvent.requirements?.map((requirement, index) => (
                       <Typography
                         key={index}
@@ -232,56 +244,56 @@ export default function DetailsDialog({
           </Grid>
         )}
       </DialogContent>
-      <DialogActions dividers sx={{p:2}}>
+      <DialogActions dividers sx={{ p: 2 }}>
         <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: { xs: "column", sm: "row" },
-                    justifyContent: { xs: "center", sm: "flex-end" },
-                    gap: { xs: 0, sm: 2 },
-                    alignItems: "center",
-                    width: "100%",
-                  }}
-                >
-        {selectedEvent?.status === "pending" && (
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: { xs: "center", sm: "flex-end" },
+            gap: { xs: 0, sm: 2 },
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
           <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1,
-                          justifyContent: "center",
-                        }}
-                      >
-            <Button
-              startIcon={<CheckCircleIcon />}
-              onClick={() => onApprovalAction(selectedEvent, "approve")}
-              variant="contained"
-              color="success"
-            >
-              Approve 
-            </Button>
-            <Button
-              startIcon={<CancelIcon />}
-              onClick={() => onApprovalAction(selectedEvent, "reject")}
-              variant="contained"
-              color="error"
-            >
-              Reject 
+            sx={{
+              display: "flex",
+              gap: 1,
+              justifyContent: "center",
+              mt: { xs: 1, sm: 0 },
+            }}
+          >
+            <Button color="text.primary" onClick={onClose} variant="text">
+              Close
             </Button>
           </Box>
-        )}
-        <Box
-                    sx={{
-                      display: "flex",
-                      gap: 1,
-                      justifyContent: "center",
-                      mt: { xs: 1, sm: 0 },
-                    }}
-                  >
-                    <Button color='text.primary' onClick={onClose} variant="text">
-          Close
-        </Button>
-                  </Box>
-        
+
+          {selectedEvent?.status === "pending" && (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                startIcon={<CheckCircleIcon />}
+                onClick={() => onApprovalAction(selectedEvent, "approve")}
+                variant="contained"
+                color="success"
+              >
+                Approve
+              </Button>
+              <Button
+                startIcon={<CancelIcon />}
+                onClick={() => onApprovalAction(selectedEvent, "reject")}
+                variant="contained"
+                color="error"
+              >
+                Reject
+              </Button>
+            </Box>
+          )}
         </Box>
       </DialogActions>
     </Dialog>

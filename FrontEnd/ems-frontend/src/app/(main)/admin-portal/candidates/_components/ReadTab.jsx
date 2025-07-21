@@ -1,30 +1,19 @@
-import React from 'react';
-import { Box } from '@mui/material';
-import SearchField from '../../../../_components/main/SearchField';
-import ReferDataGrid from './ReferDataGrid';
+import React from "react";
+import { Box } from "@mui/material";
 
-export default function ReadTab({ 
-  searchQuery, 
-  onSearchChange, 
-  filteredCandidates, 
-  loading, 
-  onViewDetails, 
-  onMarkAsRead, 
-  onMarkAsUnread 
+import ReferDataGrid from "./ReferDataGrid";
+
+export default function ReadTab({
+  candidates,
+  loading,
+  onViewDetails,
+  onMarkAsRead,
+  onMarkAsUnread,
 }) {
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <SearchField
-          placeholder="Search read candidates..."
-          value={searchQuery}
-          onChange={onSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-      </Box>
-      
+    <Box sx={{ p: 3, mb: 3 }}>
       <ReferDataGrid
-        rows={filteredCandidates.filter(c => c.status === 'read')}
+        rows={candidates}
         loading={loading}
         onViewDetails={onViewDetails}
         onMarkAsRead={onMarkAsRead}

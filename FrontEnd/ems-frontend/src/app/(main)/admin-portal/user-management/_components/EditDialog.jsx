@@ -61,7 +61,7 @@ export default function EditDialog({
           enableReinitialize
         >
           {({ isSubmitting, submitForm }) => (
-            <Form id="edit-user-form">
+            <Form>
               <UserForm
                 showEmployeeNumber={false}
                 isSubmitting={isSubmitting}

@@ -99,7 +99,6 @@ const MOCK_TIMESHEETS = [
 export default function TimesheetAdminReview(){
   const [tabValue, setTabValue] = useState(0);
   const [employees, setEmployees] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // State for timesheet details
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -118,28 +117,10 @@ export default function TimesheetAdminReview(){
     setEmployees(MOCK_EMPLOYEES);
   }, []);
 
-  // Filter employees based on search query
-  const getFilteredEmployees = () => {
-    if (searchQuery.trim() === "") {
-      return employees;
-    }
 
-    const query = searchQuery.toLowerCase();
-    return employees.filter(
-      (employee) =>
-        employee.name.toLowerCase().includes(query) ||
-        employee.department.toLowerCase().includes(query) ||
-        employee.team.toLowerCase().includes(query) ||
-        employee.project.toLowerCase().includes(query)
-    );
-  };
-
-  // Group employees by team
   const getTeamGroupedEmployees = () => {
     const teams = {};
-    const filteredEmployees = getFilteredEmployees();
-    
-    filteredEmployees.forEach((employee) => {
+    employees.forEach((employee) => {
       if (!teams[employee.team]) {
         teams[employee.team] = [];
       }
@@ -148,12 +129,10 @@ export default function TimesheetAdminReview(){
     return teams;
   };
 
-  // Group employees by project
   const getProjectGroupedEmployees = () => {
     const projects = {};
-    const filteredEmployees = getFilteredEmployees();
     
-    filteredEmployees.forEach((employee) => {
+    employees.forEach((employee) => {
       if (!projects[employee.project]) {
         projects[employee.project] = [];
       }
@@ -162,14 +141,10 @@ export default function TimesheetAdminReview(){
     return projects;
   };
 
-  // Event handlers without useCallback
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
 
   const handleViewTimesheets = (employee) => {
     setSelectedEmployee(employee);
@@ -235,9 +210,7 @@ export default function TimesheetAdminReview(){
 
         <TabPanel value={tabValue} index={0}>
           <EmployeeTab
-            employees={getFilteredEmployees()}
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
+            employees={employees}
             onViewTimesheets={handleViewTimesheets}
           />
         </TabPanel>
@@ -245,8 +218,6 @@ export default function TimesheetAdminReview(){
         <TabPanel value={tabValue} index={1}>
           <TeamTab
             teamGroupedEmployees={getTeamGroupedEmployees()}
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
             onViewTimesheets={handleViewTimesheets}
           />
         </TabPanel>
@@ -254,8 +225,6 @@ export default function TimesheetAdminReview(){
         <TabPanel value={tabValue} index={2}>
           <ProjectTab
             projectGroupedEmployees={getProjectGroupedEmployees()}
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
             onViewTimesheets={handleViewTimesheets}
           />
         </TabPanel>

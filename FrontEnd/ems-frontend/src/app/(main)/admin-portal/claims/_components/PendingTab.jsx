@@ -3,32 +3,16 @@
 import React from "react";
 import Box from "@mui/material/Box";
 
-import SearchField from "../../../../_components/main/SearchField";
 import ClaimsDataGrid from "./ClaimsDataGrid";
 
 export default function PendingTab({
   claims,
   loading,
-  searchQuery,
-  handleSearchChange,
   onViewClaim,
   onApprovalAction,
 }) {
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 3,
-        }}
-      >
-        <SearchField
-          placeholder="Search claims..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-      </Box>
-
+    <Box sx={{ p: 3, mb: 3 }}>
       <ClaimsDataGrid
         claims={claims}
         loading={loading}

@@ -42,17 +42,6 @@ export default function EventDialog({
           Are you sure you want to {approvalAction} the event "
           {selectedEvent?.title}"?
         </Typography>
-        {approvalAction === "reject" && (
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            label="Rejection Reason"
-            value={approvalReason}
-            onChange={(e) => setApprovalReason(e.target.value)}
-            placeholder="Please provide a reason for rejection..."
-          />
-        )}
         {approvalAction === "approve" && (
           <TextField
             fullWidth
@@ -62,6 +51,17 @@ export default function EventDialog({
             value={approvalReason}
             onChange={(e) => setApprovalReason(e.target.value)}
             placeholder="Any additional notes or conditions for approval..."
+          />
+        )}
+        {approvalAction === "reject" && (
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="Rejection Reason"
+            value={approvalReason}
+            onChange={(e) => setApprovalReason(e.target.value)}
+            placeholder="Please provide a reason for rejection..."
           />
         )}
       </DialogContent>
@@ -74,17 +74,17 @@ export default function EventDialog({
             width: "100%",
           }}
         >
-            
-        <Button
-          onClick={onSubmit}
-          variant="contained"
-          color={approvalAction === "approve" ? "success" : "error"}
-        >
-          {approvalAction === "approve" ? "Approve" : "Reject"}
-        </Button>
-        <Button color='text.primary' onClick={onClose}>Cancel</Button>
+          <Button color="text.primary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={onSubmit}
+            variant="contained"
+            color={approvalAction === "approve" ? "success" : "error"}
+          >
+            {approvalAction === "approve" ? "Approve" : "Reject"}
+          </Button>
         </Box>
-        
       </DialogActions>
     </Dialog>
   );

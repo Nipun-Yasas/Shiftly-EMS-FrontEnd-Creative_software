@@ -66,7 +66,7 @@ export default function VerifyDialog({
           enableReinitialize
         >
           {({ isSubmitting, submitForm }) => (
-            <Form id="assign-user-form">
+            <Form>
               <UserForm
                 showEmployeeNumber={true}
                 isSubmitting={isSubmitting}

@@ -22,7 +22,6 @@ export default function LeavesManagementPage() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [openApprovalDialog, setApprovalDialogOpen] = useState(false);
@@ -206,9 +205,6 @@ export default function LeavesManagementPage() {
     setTabValue(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
 
   const handleViewDetails = (leave) => {
     setSelectedLeave(leave);
@@ -222,35 +218,21 @@ export default function LeavesManagementPage() {
     setApprovalDialogOpen(true);
   };
 
-  const filteredLeaves = leaves.filter((leave) => {
-    const matchesSearch =
-      leave.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      leave.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      leave.leaveType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      leave.reason.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesFilter =
-      filterStatus === "all" || leave.status === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
 
   const getFilteredLeaves = (status) => {
     if (status === "all") {
-      return filteredLeaves;
+      return leaves;
     }
-    return filteredLeaves.filter((leave) => leave.status === status);
+    return leaves.filter((leave) => leave.status === status);
   };
 
   const pendingCount = leaves.filter((l) => l.status === "pending").length;
 
   const tabProps = {
-    leaves: getFilteredLeaves(),
+    leaves: leaves,
     loading,
     onViewDetails: handleViewDetails,
     onApprovalAction: handleApprovalAction,
-    searchQuery,
-    handleSearchChange,
     filterStatus,
     setFilterStatus,
   };

@@ -1,49 +1,19 @@
-import React from 'react';
-import { Box, Button } from '@mui/material';
-import { FilterList as FilterIcon } from '@mui/icons-material';
-import SearchField from '../../../../_components/main/SearchField';
-import ReferDataGrid from './ReferDataGrid';
+import React from "react";
+import Box from "@mui/material/Box";
 
-export default function AllTab({ 
-  searchQuery, 
-  onSearchChange, 
-  filteredCandidates, 
-  loading, 
-  onViewDetails, 
-  onMarkAsRead, 
+import ReferDataGrid from "./ReferDataGrid";
+
+export default function AllTab({
+  candidates,
+  loading,
+  onViewDetails,
+  onMarkAsRead,
   onMarkAsUnread,
-  filterStatus,
-  onFilterChange
 }) {
   return (
-    <Box sx={{ p: 3 }}>
-          <Box
-            sx={{
-              mb: 3,
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 1, sm: 2 },
-              alignItems: "center",
-            }}
-          >
-        <SearchField
-          placeholder="Search candidates..."
-          value={searchQuery}
-          onChange={onSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-        <Button
-          variant="outlined"
-          startIcon={<FilterIcon />}
-          onClick={onFilterChange}
-        >
-          {filterStatus === 'all' ? 'Show All' : 'Show Unread Only'}
-        </Button>
-      </Box>
-      
+    <Box sx={{ p: 3, mb: 3 }}>
       <ReferDataGrid
-        rows={filteredCandidates}
+        rows={candidates}
         loading={loading}
         onViewDetails={onViewDetails}
         onMarkAsRead={onMarkAsRead}

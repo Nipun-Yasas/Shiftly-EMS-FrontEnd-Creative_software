@@ -25,7 +25,6 @@ export default function ClaimsManagementPage() {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedClaim, setSelectedClaim] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [openApprovalDialog, setApprovalDialogOpen] = useState(false);
@@ -168,10 +167,6 @@ export default function ClaimsManagementPage() {
     setTabValue(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
   const handleViewDetails = (claim) => {
     setSelectedClaim(claim);
     setOpenDetailDialog(true);
@@ -184,41 +179,20 @@ export default function ClaimsManagementPage() {
     setApprovalDialogOpen(true);
   };
 
-  const filteredClaims = claims.filter((claim) => {
-    const matchesSearch =
-      claim.employee_name
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.type?.toLowerCase().includes(String(searchQuery).toLowerCase()) ||
-      claim.description
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase()) ||
-      claim.department
-        ?.toLowerCase()
-        .includes(String(searchQuery).toLowerCase());
-
-    const matchesFilter =
-      filterStatus === "all" || claim.status === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
-
   const getFilteredClaims = (status) => {
     if (status === "all") {
-      return filteredClaims;
+      return claims;
     }
-    return filteredClaims.filter((claim) => claim.status === status);
+    return claims.filter((claim) => claim.status === status);
   };
 
   const pendingCount = claims.filter((l) => l.status === "pending").length;
 
   const tabProps = {
-    claims: getFilteredClaims(),
+    claims: claims,
     loading,
     onViewClaim: handleViewDetails,
     onApprovalAction: handleApprovalAction,
-    searchQuery,
-    handleSearchChange,
     filterStatus,
     setFilterStatus,
   };
@@ -226,10 +200,7 @@ export default function ClaimsManagementPage() {
   return (
     <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-        >
+        <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab
             label={
               <Badge badgeContent={pendingCount} color="warning">
@@ -242,64 +213,58 @@ export default function ClaimsManagementPage() {
           <Tab label="All Claims" />
         </Tabs>
 
-      <TabPanel value={tabValue} index={0}>
-        <PendingTab {...tabProps} claims={getFilteredClaims("pending")} />
-      </TabPanel>
+        <TabPanel value={tabValue} index={0}>
+          <PendingTab {...tabProps} claims={getFilteredClaims("pending")} />
+        </TabPanel>
 
-      <TabPanel value={tabValue} index={1}>
-        <ApprovedTab
-          {...tabProps}
-          claims={getFilteredClaims("approved")}
+        <TabPanel value={tabValue} index={1}>
+          <ApprovedTab {...tabProps} claims={getFilteredClaims("approved")} />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          <RejectedTab {...tabProps} claims={getFilteredClaims("rejected")} />
+        </TabPanel>
+        <TabPanel value={tabValue} index={3}>
+          <AllTab {...tabProps} claims={getFilteredClaims("all")} />
+        </TabPanel>
+
+        {/* Claim Details Dialog */}
+        <DetailsDialog
+          open={openDetailDialog}
+          selectedClaim={selectedClaim}
+          onClose={() => setOpenDetailDialog(false)}
+          onApprovalAction={handleApprovalAction}
         />
-      </TabPanel>
 
-      <TabPanel value={tabValue} index={2}>
-        <RejectedTab
-          {...tabProps}
-          claims={getFilteredClaims("rejected")}
+        {/* Claim Dialog */}
+        <ClaimDialog
+          open={openApprovalDialog}
+          selectedClaim={selectedClaim}
+          action={approvalAction}
+          onClose={() => setApprovalDialogOpen(false)}
+          onApprove={(reason) => {
+            submitApprovalAction();
+          }}
+          onReject={(reason) => {
+            submitApprovalAction();
+          }}
         />
-      </TabPanel>
-      <TabPanel value={tabValue} index={3}>
-        <AllTab {...tabProps} claims={getFilteredClaims("all")} />
-      </TabPanel>
 
-      {/* Claim Details Dialog */}
-      <DetailsDialog
-        open={openDetailDialog}
-        selectedClaim={selectedClaim}
-        onClose={() => setOpenDetailDialog(false)}
-        onApprovalAction={handleApprovalAction}
-      />
-
-      {/* Claim Dialog */}
-      <ClaimDialog
-        open={openApprovalDialog}
-        selectedClaim={selectedClaim}
-        action={approvalAction}
-        onClose={() => setApprovalDialogOpen(false)}
-        onApprove={(reason) => {
-          submitApprovalAction();
-        }}
-        onReject={(reason) => {
-          submitApprovalAction();
-        }}
-      />
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </Paper>
   );

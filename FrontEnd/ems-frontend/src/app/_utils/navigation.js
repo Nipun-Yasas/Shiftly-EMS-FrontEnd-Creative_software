@@ -73,11 +73,6 @@ const  NAVIGATION = [
         icon: <FreeCancellationOutlinedIcon/>,
       },
       {
-        segment: 'letters',
-        title: 'Letters',
-        icon: <MarkAsUnreadOutlinedIcon/>,
-      },
-      {
         segment: 'claims',
         title: 'Claims',
         icon: <ReceiptLongOutlinedIcon/>,

@@ -9,25 +9,15 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
 import UserDataGrid from "./UserDataGrid";
 
-export default function VerifyTab({
-  loading,
-  users,
-  handleAssignUser,
-}) {
+export default function VerifyTab({ loading, users, handleAssignUser }) {
   const columns = [
     {
       field: "username",
       headerName: "Username",
-      width: 170,
+      width: 150,
       disableColumnSeparator: true,
     },
     { field: "email", headerName: "Email", width: 250 },
-    {
-      field: "createdAt",
-      headerName: "Created Date",
-      width: 170,
-      align: "center",
-    },
     {
       field: "actions",
       headerName: "Actions",
@@ -50,37 +40,16 @@ export default function VerifyTab({
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h6">Unverified Users</Typography>
-        </Box>
-
-        
-      </Box>
-
-      <Box
+    <Box sx={{ p: 3, mb: 3 }}>
+     <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           width: "100%",
         }}
       >
-        <Box sx={{ width: { xs: "100%", lg: "700px" } }}>
-          <UserDataGrid
-            loading={loading}
-            rows={users}
-            columns={columns}
-          />
+        <Box sx={{ width: { xs: "100%", md: "510px" } }}>
+          <UserDataGrid loading={loading} rows={users} columns={columns} />
         </Box>
       </Box>
     </Box>

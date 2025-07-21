@@ -65,7 +65,15 @@ export default function ClaimsDataGrid({
       width: 130,
       sortable: false,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
           <Tooltip title="View Details">
             <IconButton
               size="small"
@@ -117,7 +125,6 @@ export default function ClaimsDataGrid({
           <DataGrid
             rows={claims}
             columns={claimColumns}
-            disableSelectionOnClick
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },

@@ -22,7 +22,6 @@ export default function EventSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
@@ -175,10 +174,6 @@ export default function EventSubmissionPage() {
     setTabValue(newValue);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   const handleViewDetails = (event) => {
     setSelectedEvent(event);
     setOpenDetailDialog(true);
@@ -234,32 +229,16 @@ export default function EventSubmissionPage() {
     }
   };
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.eventType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesFilter =
-      filterStatus === "all" || event.status === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
-
   const getFilteredEvents = (status) => {
-    if (!status) return filteredEvents;
-    return filteredEvents.filter((event) => event.status === status);
+    if (!status) return events;
+    return events.filter((event) => event.status === status);
   };
 
   const tabProps = {
-    events: getFilteredEvents(),
+    events: events,
     loading,
     onViewDetails: handleViewDetails,
     onApprovalAction: handleApprovalAction,
-    searchQuery,
-    onSearchChange: handleSearchChange,
     filterStatus,
     setFilterStatus,
   };

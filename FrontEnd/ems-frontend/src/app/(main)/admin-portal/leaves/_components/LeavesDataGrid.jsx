@@ -89,7 +89,15 @@ export default function LeavesDataGrid({
       headerClassName: "last-column",
       align: "center",
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
           <Tooltip title="View Details">
             <IconButton
               size="small"
@@ -138,7 +146,6 @@ export default function LeavesDataGrid({
             columns={leaveColumns}
             pageSize={10}
             rowsPerPageOptions={[10]}
-            disableSelectionOnClick
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },

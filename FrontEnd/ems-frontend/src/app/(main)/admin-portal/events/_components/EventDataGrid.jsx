@@ -116,7 +116,6 @@ export default function EventDataGrid({
             columns={eventColumns}
             pageSize={10}
             rowsPerPageOptions={[5, 10, 20]}
-            disableSelectionOnClick
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },

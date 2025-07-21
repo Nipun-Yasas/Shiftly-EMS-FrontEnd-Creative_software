@@ -7,7 +7,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import * as Yup from "yup";
 
-import TextInput from "../../../../_components/inputs/TextInput";
 import SelectInput from "../../../../_components/inputs/SelectInput";
 import InputItem from "../../../../_components/inputs/InputItem";
 
@@ -41,33 +40,18 @@ const designations = [
   { id: 11, name: "Accountant", label: "Accountant" },
 ];
 
-const reportingPersons = [
-  { id: 1, name: "Jane Smith", label: "Jane Smith" },
-  { id: 2, name: "John Doe", label: "John Doe" },
-  { id: 3, name: "Sarah Connor", label: "Sarah Connor" },
-  { id: 4, name: "John Smith", label: "John Smith - IT Manager" },
-  { id: 5, name: "Mike Davis", label: "Mike Davis - Finance Manager" },
-  { id: 6, name: "Lisa Brown", label: "Lisa Brown - Marketing Manager" },
-  { id: 7, name: "Tom Wilson", label: "Tom Wilson - Sales Manager" },
-  { id: 8, name: "Emma Taylor", label: "Emma Taylor - Operations Manager" },
-];
 
 // Validation schemas
 export const editValidationSchema = Yup.object({
   roleId: Yup.object().required("Role is required"),
   department: Yup.object().required("Department is required"),
   designation: Yup.object().required("Designation is required"),
-  reporting_person: Yup.object().required("Reporting person is required"),
 });
 
 export const assignValidationSchema = Yup.object({
-  employeeNumber: Yup.string()
-    .min(3, "Employee Number must be at least 3 characters")
-    .required("Employee Number is required"),
-  roleId: Yup.object().required("Role is required"),
+ roleId: Yup.object().required("Role is required"),
   department: Yup.object().required("Department is required"),
   designation: Yup.object().required("Designation is required"),
-  reporting_person: Yup.object().required("Reporting person is required"),
 });
 
 // Helper functions
@@ -93,34 +77,25 @@ export const getEditInitialValues = (editingUser) => {
             d.name === editingUser.designation ||
             d.label === editingUser.designation
         ) || null,
-      reporting_person:
-        reportingPersons.find(
-          (r) =>
-            r.name === editingUser.reporting_person ||
-            r.label === editingUser.reporting_person
-        ) || null,
+      
     };
   }
   return {
     roleId: null,
     department: null,
     designation: null,
-    reporting_person: null,
   };
 };
 
 export const getAssignInitialValues = () => {
   return {
-    employeeNumber: "",
     roleId: null,
     department: null,
     designation: null,
-    reporting_person: null,
   };
 };
 
 export default function UserForm({
-  showEmployeeNumber = false,
   isSubmitting = false,
   isEdit = false,
   onCancel = null,
@@ -128,16 +103,6 @@ export default function UserForm({
 }) {
   return (
     <Stack spacing={2}>
-      {showEmployeeNumber && (
-        <InputItem>
-          <TextInput
-            name="employeeNumber"
-            label="Employee Number"
-            placeholder="Enter employee number"
-          />
-        </InputItem>
-      )}
-
       <InputItem>
         <SelectInput
           name="roleId"
@@ -165,14 +130,7 @@ export default function UserForm({
         />
       </InputItem>
 
-      <InputItem>
-        <SelectInput
-          name="reporting_person"
-          label="Reporting Person"
-          options={reportingPersons}
-          getOptionLabel={(option) => option.label}
-        />
-      </InputItem>
+      
 
       <Box
         sx={{
@@ -183,6 +141,14 @@ export default function UserForm({
           pt: 2,
         }}
       >
+        
+
+        {onCancel && (
+          <Button color="text.primary" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+
         <Button
           onClick={submitForm}
           variant="contained"
@@ -197,12 +163,6 @@ export default function UserForm({
               ? "Update User"
               : "Verify User"}
         </Button>
-
-        {onCancel && (
-          <Button color="text.primary" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
       </Box>
     </Stack>
   );

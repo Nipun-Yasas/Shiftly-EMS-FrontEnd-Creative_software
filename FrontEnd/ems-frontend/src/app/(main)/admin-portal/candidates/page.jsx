@@ -249,22 +249,23 @@ export default function CandidateSubmissionPage() {
     showSnackbar('Resume download started', 'success');
   };
 
-  const filteredCandidates = candidates.filter(candidate => {
-    const matchesSearch = 
-      candidate.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.department.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilter = 
-      filterStatus === 'all' || 
-      candidate.status === filterStatus;
-    
-    return matchesSearch && matchesFilter;
-  });
+    const getFilteredRefers = (status) => {
+    if (status === "all") {
+      return candidates;
+    }
+    return candidates.filter((candidate) => candidate.status === status);
+  };
+
 
   const unreadCount = candidates.filter(c => c.status === 'unread').length;
+
+  const tabProps = {
+    candidates: candidates,
+    loading,
+    onViewDetails: handleViewDetails,
+    onMarkAsRead: markAsRead,
+    onMarkAsUnread: markAsUnread,
+  };
 
   return (
     <Paper elevation={3} sx={{ height: '100%', width: '100%', }}>
@@ -291,37 +292,18 @@ export default function CandidateSubmissionPage() {
 
       <TabPanel value={tabValue} index={0}>
         <UnReadTab
-          searchQuery={searchQuery}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
-          filteredCandidates={filteredCandidates}
-          loading={loading}
-          onViewDetails={handleViewDetails}
-          onMarkAsRead={markAsRead}
-          onMarkAsUnread={markAsUnread}
+          {...tabProps} candidates={getFilteredRefers("unread")}
         />
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
         <ReadTab
-          searchQuery={searchQuery}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
-          filteredCandidates={filteredCandidates}
-          loading={loading}
-          onViewDetails={handleViewDetails}
-          onMarkAsRead={markAsRead}
-          onMarkAsUnread={markAsUnread}
+         {...tabProps} candidates={getFilteredRefers("read")}
         />
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        <AllTab
-          searchQuery={searchQuery}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
-          filteredCandidates={filteredCandidates}
-          loading={loading}
-          onViewDetails={handleViewDetails}
-          onMarkAsRead={markAsRead}
-          onMarkAsUnread={markAsUnread}
+        <AllTab {...tabProps} candidates={getFilteredRefers("all")}
           filterStatus={filterStatus}
           onFilterChange={handleFilterChange}
         />

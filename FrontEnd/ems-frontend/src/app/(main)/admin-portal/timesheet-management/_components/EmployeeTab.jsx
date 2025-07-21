@@ -8,24 +8,10 @@ import TimesheetDataGrid from "./TimesheetDataGrid";
 
 export default function EmployeeTab({
   employees,
-  searchQuery,
-  handleSearchChange,
   onViewTimesheets,
 }) {
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 3,
-        }}
-      >
-        <SearchField
-          placeholder="Search ..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-      </Box>
+    <Box sx={{ p: 3, mb: 3 }}>
       <Box
         sx={{
           display: "flex",

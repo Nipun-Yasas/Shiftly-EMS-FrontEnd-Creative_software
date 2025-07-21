@@ -4,30 +4,14 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import SearchField from "../../../../_components/main/SearchField";
 import TimesheetDataGrid from "./TimesheetDataGrid";
 
 export default function TeamTab({
   teamGroupedEmployees,
-  searchQuery,
-  handleSearchChange,
   onViewTimesheets,
 }) {
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 3,
-        }}
-      >
-        <SearchField
-          placeholder="Search ..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-      </Box>
-
+    <Box sx={{ p: 3, mb: 3 }}>
       {Object.entries(teamGroupedEmployees).map(([team, teamEmployees]) => (
         <Box>
           <Typography variant="h6">{team} Team</Typography>
@@ -42,7 +26,7 @@ export default function TeamTab({
               mt: 2,
             }}
           >
-            <Box sx={{ width: { xs: "100%", lg: "650px" } }}>
+            <Box sx={{ width: { xs: "100%", lg: "650px" }, mb:3 }}>
               <TimesheetDataGrid
                 data={teamEmployees}
                 type="employee"

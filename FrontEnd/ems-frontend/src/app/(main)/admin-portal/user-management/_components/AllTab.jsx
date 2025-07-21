@@ -7,7 +7,6 @@ import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import SearchField from "../../../../_components/main/SearchField";
 import UserDataGrid from "./UserDataGrid";
 
 export default function AllTab({
@@ -18,45 +17,25 @@ export default function AllTab({
   setDeleteConfirmOpen,
 }) {
   const columns = [
-    { field: "username", headerName: "Username", width: 120 },
-    { field: "email", headerName: "Email", width: 200 },
+    { field: "username", headerName: "Username", width: 150 },
+    { field: "email", headerName: "Email", width: 250 },
     {
       field: "roles",
       headerName: "Role",
-      width: 110,
+      width: 150,
       renderCell: (params) => {
-        // Handle both roleId.name (old structure) and roles array (new structure)
-        if (params.value && Array.isArray(params.value)) {
-          return params.value.join(", ");
-        }
-        return params.row.roleId?.name || params.value || "N/A";
+        return params.value?.[0] || "No role";
       },
     },
-    { 
-      field: "active", 
-      headerName: "Status", 
-      width: 100,
-      renderCell: (params) => (
-        <span style={{ 
-          color: params.value ? 'green' : 'red',
-          fontWeight: 'bold'
-        }}>
-          {params.value ? 'Active' : 'Inactive'}
-        </span>
-      ),
+    {
+      field: "designation",
+      headerName: "Designation",
+      width: 200,
     },
-    { 
-      field: "verified", 
-      headerName: "Verified", 
-      width: 100,
-      renderCell: (params) => (
-        <span style={{ 
-          color: params.value ? 'green' : 'orange',
-          fontWeight: 'bold'
-        }}>
-          {params.value ? 'Yes' : 'No'}
-        </span>
-      ),
+    {
+      field: "department",
+      headerName: "Department",
+      width: 200,
     },
     {
       field: "actions",
@@ -65,7 +44,15 @@ export default function AllTab({
       headerClassName: "last-column",
       width: 90,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1,width: '100%', justifyContent: 'center'  }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
           <Tooltip title="Edit">
             <IconButton
               size="small"
@@ -94,14 +81,6 @@ export default function AllTab({
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 3,
-        }}
-      >
-        
-      </Box>
-
       <UserDataGrid loading={loading} rows={users} columns={columns} />
     </Box>
   );

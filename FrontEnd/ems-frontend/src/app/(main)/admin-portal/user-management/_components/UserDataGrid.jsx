@@ -18,10 +18,10 @@ export default function UserDataGrid({ loading, rows, columns }) {
             rows={rows}
             columns={columns}
             rowsPerPageOptions={[10]}
-            disableSelectionOnClick
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },
+                id:'pagination',
               },
             }}
             pageSizeOptions={[10, 50, 100]}

@@ -160,7 +160,6 @@ export default function TimesheetDataGrid({
         rows={data}
         columns={columns}
         rowsPerPageOptions={[10]}
-        disableSelectionOnClick
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 10 },
