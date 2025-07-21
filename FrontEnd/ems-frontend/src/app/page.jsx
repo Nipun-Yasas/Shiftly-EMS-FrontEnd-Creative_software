@@ -6,12 +6,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { motion } from "framer-motion";
-import { ThemeSwitcher } from "@toolpad/core";
 
 import Container from "@mui/material/Container";
 import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import LoginForm from "./_components/dialog/Login";
 import SignUpForm from "./_components/dialog/SignUp";
@@ -21,7 +22,7 @@ import CollagePhoto from "./_components/landing/CollagePhoto";
 import companyLogo from "../../public/creative_software_logo.png";
 import shiftlyLogo from "../../public/shiftly-logo.png";
 
-import { useAuth } from "./context/AuthContext";
+
 
 import { useWindowSize } from "./_hooks/useWindowSize";
 import {
@@ -37,16 +38,10 @@ import {
 export default function LandingPage() {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
-  // const { user, loading } = useAuth();
   const router = useRouter();
   const { width, height } = useWindowSize();
 
-  // useEffect(() => {
-  //   if (!loading && user) {
-  //     router.push("/dashboard");
-  //   }
-  // }, [user, loading, router]);
-
+ 
   const cols = Math.ceil(width / PHOTO_WIDTH);
   const rows = Math.ceil(height / PHOTO_HEIGHT);
   const numPhotos = Math.min(rows * cols, MAX_PHOTOS);
@@ -88,7 +83,6 @@ export default function LandingPage() {
         sx={{
           position: "relative",
           minHeight: "100vh",
-          bgcolor: "background.default",
           color: "text.primary",
           overflow: "hidden",
           fontFamily: "sans-serif",
@@ -175,34 +169,21 @@ export default function LandingPage() {
                 </motion.div>
 
                 <Box sx={{ display: "flex", gap: 2, zIndex: 10 }}>
-                  <motion.button
-                    initial={{ backgroundColor: "#E80A4D" }}
-                    whileHover={{ scale: 1.1, backgroundColor: "#E90A4D" }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="bg-black-800 text-white font-semibold px-6 py-3 rounded-md shadow-md"
+                  <Button 
+                    variant="contained" 
+                    sx={{ backgroundColor: '#E90A4D', color: '#fff', '&:hover': { backgroundColor: '#D00940' } }} 
                     onClick={() => setOpenLogin(true)}
-                    aria-label="Open login form"
-                    style={{ cursor: "pointer" }}
                   >
-                    <Typography variant="button" color="white">
-                      LOGIN
-                    </Typography>
-                  </motion.button>
-                  <motion.button
-                    initial={{ backgroundColor: "#FFFFFF" }}
-                    whileHover={{ scale: 1.1, backgroundColor: "#E5E7EB" }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className="bg-white text-black font-semibold px-6 py-3 rounded-md shadow-md"
+                    LOGIN
+                  </Button>
+
+                  <Button 
+                    variant="contained" 
+                    sx={{ backgroundColor: '#E90A4D', color: '#fff', '&:hover': { backgroundColor: '#D00940' } }} 
                     onClick={() => setOpenSignUp(true)}
-                    aria-label="Open sign up form"
-                    style={{ cursor: "pointer" }}
                   >
-                    <Typography variant="button" color="black">
-                      Sign Up
-                    </Typography>
-                  </motion.button>
+                    Sign Up
+                  </Button>
                 </Box>
               </CardContent>
             </LandingCard>
@@ -215,7 +196,6 @@ export default function LandingPage() {
             <Typography variant="body2" fontWeight="bold">
               © Copyright 2025 by Creative Software. All Rights Reserved.
             </Typography>
-            <ThemeSwitcher />
           </Box>
         </Container>
       </Box>

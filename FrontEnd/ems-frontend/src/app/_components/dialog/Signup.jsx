@@ -50,18 +50,25 @@ export default function SignupForm(props) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
-        username: values.username,
-        email: values.email,
-        password: values.password,
+    const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+        user
       });
-      setError(null);
-      setOpenSignUp(false);
-    } catch (err) {
-      const message = err.response?.data?.message || err.message || "Registration failed";
-      setError(message);
-    } finally {
-      setSubmitting(false);
+
+      const {token,user} = response.data;
+
+      if(token){
+        localStorage.setItem("token",token);
+        updateUser(user);
+        navigate("/dashboard");
+      }
+    }
+    catch(error){
+      if(error.response && error.response.data.message){
+        setError(error.response.data.message);
+      }
+      else{
+        setError("Something went wrong.Please try again.");
+      }
     }
   };
 
@@ -113,8 +120,6 @@ export default function SignupForm(props) {
             <X size={24} />
           </IconButton>
 
-          <Typography variant="h6" id="signup-dialog-title">Sign Up</Typography>
-
         {error && (
           <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
             {error}
@@ -130,7 +135,7 @@ export default function SignupForm(props) {
               <Form>
                 <Stack spacing={{ xs: 1, sm: 2 }} alignItems="center">
                   <FormItem>
-                    <TextInput name="username" label="Username" />
+                    <TextInput name="username" label="Username"  />
                   </FormItem>
                   <FormItem>
                     <TextInput name="email" label="Email" />
@@ -161,15 +166,11 @@ export default function SignupForm(props) {
                       gap: 1,
                     }}
                   >
-                    <CustomCheckBox
-                      name="terms"
-                      label="I accept the terms and conditions"
-                    />
+                   
 
                     <Link href="/change-password">
                       <Typography
-                        color="primary.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem",color: '#E90A4D'} }}
                       >
                         Forgot Password?
                       </Typography>
@@ -181,10 +182,9 @@ export default function SignupForm(props) {
                     disabled={isSubmitting}
                     variant="contained"
                     sx={{
-                      my: 2,
-                      py: 1,
                       width: { xs: "100%", sm: "auto" },
                       fontSize: { xs: "0.875rem", sm: "1rem" },
+                      backgroundColor: '#E90A4D', color: '#fff'
                     }}
                   >
                     {isSubmitting ? "Signing up..." : "Sign Up"}
@@ -200,22 +200,24 @@ export default function SignupForm(props) {
                     }}
                   >
                     <Typography
-                      color="textblack.main"
                       sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
                     >
                       Already have an account?{" "}
                     </Typography>
                     <Button
                     variant="text"
-                    color="info.main"
                       onClick={() => {setOpenSignUp(false);
                         openLogin();
                       }}
                       className="hover:cursor-pointer"
                     >
                       <Typography
-                        color="info.main"
-                        sx={{ fontSize: { xs: "0.875rem", sm: "0.9rem" } }}
+                        sx={{
+                        fontSize: "0.875rem",
+                        color: '#E90A4D',
+                        opacity: isSubmitting ? 0.5 : 1,
+                        textTransform: 'none'
+                      }}
                       >
                         Sign Up
                       </Typography>

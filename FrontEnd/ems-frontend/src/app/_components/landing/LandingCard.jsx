@@ -4,7 +4,7 @@ import { Card } from '@mui/material';
 const LandingCard = styled(Card)(({ theme }) => ({
   background: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.05)',
   backdropFilter: 'blur(16px)',
-  border: `2px solid ${theme.palette.primary.main}`,
+  border: `2px solid #E90A4D`,
   boxShadow: theme.shadows[10],
   borderRadius: '1.5rem',
   padding: theme.spacing(3),

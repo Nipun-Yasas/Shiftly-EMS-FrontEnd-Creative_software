@@ -31,6 +31,17 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import FreeCancellationOutlinedIcon from '@mui/icons-material/FreeCancellationOutlined';
 import { HistoryOutlined, PersonAddOutlined } from '@mui/icons-material';
 
+export function getNavigationForUser(user) {
+  const roles = user?.roles?.map((r) => r.toLowerCase()) || [];
+
+  const isAdmin = roles.includes('admin') || roles.includes('superadmin');
+
+  return NAVIGATION.filter((item) => {
+    if (!isAdmin && item.segment === 'admin-portal') return false;
+    return true;
+  });
+}
+
 const  NAVIGATION = [
   {
     kind: 'header',
@@ -259,5 +270,3 @@ const  NAVIGATION = [
   },
   
 ];
-
-export default NAVIGATION;
