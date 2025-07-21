@@ -49,4 +49,17 @@ export const API_PATHS = {
     UPDATE_EVENT: '/api/calendar/events',
     DELETE_EVENT: '/api/calendar/events',
   },
+  EVENTS: {
+    // Admin endpoints
+    GET_ALL_EVENTS: '/api/v1/shiftly/ems/events/all',
+    APPROVE_EVENT: (id) => `/api/v1/shiftly/ems/events/approve/${id}`,
+    REJECT_EVENT: (id) => `/api/v1/shiftly/ems/events/reject/${id}`,
+    GET_EVENT_BY_ID: (id) => `/api/v1/shiftly/ems/events/${id}`,
+    
+    // Employee endpoints
+    ADD_EVENT: '/api/v1/shiftly/ems/events/add',
+    UPDATE_EVENT: (id) => `/api/v1/shiftly/ems/events/update/${id}`,
+    DELETE_EVENT: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
+    GET_MY_EVENTS: (employeeId) => `/api/v1/shiftly/ems/events/my/${employeeId}`,
+  },
 };
