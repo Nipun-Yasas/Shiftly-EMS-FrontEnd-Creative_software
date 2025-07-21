@@ -1,6 +1,11 @@
 "use client";
 
-import { Paper ,Box } from "@mui/material";
+import { Paper } from "@mui/material";
+import { Box } from "@mui/material";
+import { Card } from "@mui/material";
+import { CardMedia } from "@mui/material";
+import { CardContent } from "@mui/material";
+import { Typography } from "@mui/material";
 
 const demoProjects = [
   {
@@ -61,43 +66,64 @@ const demoProjects = [
 
 export default function AllProjects() {
   return (
-    <Paper elevation={10}
+    <Paper
+      elevation={3}
+      square={false}
       sx={{
         height: '100%',
         width: '100%',
-      }}>
-      {/* Project Cards */}
-      <Box className=" rounded-2xl shadow-md p-6">
-        <Box className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-8">
-          {demoProjects.map((project) => (
-            <Box
-              key={project.id}
-              className=" rounded-xl shadow hover:shadow-lg transition duration-200 overflow-hidden"
-            >
-              <img
-                src={project.imageUrl}
-                alt="Project"
-                className="w-full h-40 object-cover"
-              />
-              <Box className="p-4 space-y-2 ">
-                <div className="flex items-center space-x-2">
-                  <img src={project.logo} alt="Logo" className="h-5" />
-                </div>
-                <h3 className="text-sm font-semibold">{project.title}</h3>
-                <p className="text-xs text-gray-500">
-                  <strong>Created:</strong> {project.createdDate}
-                </p>
-                <p className="text-xs text-gray-500">
-                  <strong>Project Status:</strong>{" "}
-                  <span className="text-green-600 font-medium">{project.status}</span>
-                </p>
-                <p className="text-xs text-gray-500">
-                  <strong>Software Engineering Director:</strong> {project.director}
-                </p>
+        p: 3,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 3,
+        }}
+      >
+        {demoProjects.map((project) => (
+          <Card
+            key={project.id}
+            sx={{
+              borderRadius: 3,
+              boxShadow: 3,
+              transition: 'box-shadow 0.2s',
+              '&:hover': {
+                boxShadow: 6,
+              },
+              overflow: 'hidden',
+            }}
+          >
+            <CardMedia
+              component="img"
+              height="160"
+              image={project.imageUrl}
+              alt="Project"
+              sx={{ objectFit: 'cover' }}
+            />
+            <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <img src={project.logo} alt="Logo" style={{ height: 20 }} />
               </Box>
-            </Box>
-          ))}
-        </Box>
+              <Typography variant="body1" fontWeight="medium">
+                {project.title}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                <strong>Created:</strong> {project.createdDate}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                <strong>Project Status:</strong>{" "}
+                <Typography component="span" color="success.main" fontWeight="medium">
+                  {project.status}
+                </Typography>
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                <strong>Software Engineering Director:</strong> {project.director}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
     </Paper>
   );

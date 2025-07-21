@@ -1,18 +1,16 @@
-import { Box, useTheme } from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 
 const AvailableLeaves = ({ leaves }) => {
   const theme = useTheme();
 
   return (
-    <Box
-      className="shadow-lg rounded-xl p-6 w-full"
-      sx={{
-        bgcolor: "background.paper",
-        color: "text.primary",
-      }}
-    >
-      <h3 className="!text-lg !font-bold !mb-4 px-5">Available Leaves</h3>
-      <Box className="flex flex-wrap gap-4 px-5">
+    <Box sx={{ width: '100%', mb: 3 }}>
+      <Typography variant="h6" fontWeight={700} mb={2} px={1}>
+        Available Leaves
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, px: 1 }}>
         {leaves.map((leave, i) => {
           const bgColor = leave.hexColor;
           const textColor = theme.palette.getContrastText(bgColor);
@@ -20,18 +18,40 @@ const AvailableLeaves = ({ leaves }) => {
           return (
             <Box
               key={i}
-              className="flex items-center text-sm rounded-xl"
               sx={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: 14,
                 backgroundColor: bgColor,
                 color: textColor,
                 px: 2,
                 py: 1,
+                minWidth: 120,
+                fontWeight: 500,
+                borderRadius: 3, // Add rounded corners
               }}
             >
-              <div className="bg-white text-black rounded-xl w-6 h-6 flex items-center justify-center mr-2 text-xs font-bold">
+              <Box
+                sx={{
+                  backgroundColor: '#fff',
+                  color: '#000',
+                  borderRadius: 2,
+                  width: 28,
+                  height: 28,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 1.5,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  boxShadow: 1,
+                }}
+              >
                 {leave.count}
-              </div>
-              {leave.type}
+              </Box>
+              <Typography variant="body2" fontWeight={600}>
+                {leave.type}
+              </Typography>
             </Box>
           );
         })}

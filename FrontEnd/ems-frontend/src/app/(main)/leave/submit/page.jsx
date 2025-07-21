@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Paper,Box } from "@mui/material";
+import { Paper, Box } from "@mui/material";
 import AvailableLeaves from "./_components/AvailableLeaves";
 import LeaveForm from "./_components/LeaveForm";
 import SuccessModal from "./_components/SuccessModal";
@@ -16,38 +16,22 @@ export default function RequestLeave() {
   ];
 
   return (
-  <Box>
-
+    <Box>
       <Paper
         elevation={3}
         square={false}
         sx={{
-          justifyItems: "center",
-          alignContent: "center",
           width: "100%",
-          marginBottom: 2,
+          p: { xs: 2, sm: 4 },
+          mb: 2,
         }}
       >
         <AvailableLeaves leaves={mockLeaves} />
+        <Box sx={{ width: "100%", px: { xs: 0, sm: 3 }, py: 3 }}>
+          <LeaveForm onSubmitSuccess={() => setModalOpen(true)} />
+        </Box>
       </Paper>
-
-       <Paper
-        elevation={3}
-        square={false}
-        sx={{
-          justifyItems: "center",
-          alignContent: "center",
-          width: "100%"
-        }}
-      >
-        <Box sx={{ width: "100%", px: 5 ,py: 5}}>
-        <LeaveForm onSubmitSuccess={() => setModalOpen(true)} />
-          </Box>
-     
       <SuccessModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-        </Paper>
-
-
     </Box>
   );
 }
