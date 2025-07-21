@@ -74,8 +74,6 @@ const UserMenu = () => {
       
       // Call the original logout handler
       await handleLogout();
-      
-      console.log("Logging out...");
       handleCloseMenu();
     } catch (error) {
       console.error('Error during logout:', error);

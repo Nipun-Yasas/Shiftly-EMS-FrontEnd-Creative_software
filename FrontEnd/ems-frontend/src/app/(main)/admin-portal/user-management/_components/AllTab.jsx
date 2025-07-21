@@ -12,27 +12,52 @@ import UserDataGrid from "./UserDataGrid";
 
 export default function AllTab({
   loading,
-  filteredUsers,
+  users,
   handleEdit,
   setUserToDelete,
   setDeleteConfirmOpen,
-  searchQuery,
-  handleSearchChange,
 }) {
   const columns = [
     { field: "username", headerName: "Username", width: 120 },
     { field: "email", headerName: "Email", width: 200 },
     {
-      field: "roleId",
+      field: "roles",
       headerName: "Role",
       width: 110,
-      renderCell: (params) => params.value?.name || params.value,
+      renderCell: (params) => {
+        // Handle both roleId.name (old structure) and roles array (new structure)
+        if (params.value && Array.isArray(params.value)) {
+          return params.value.join(", ");
+        }
+        return params.row.roleId?.name || params.value || "N/A";
+      },
     },
-    { field: "designation", headerName: "Designation", width: 140 },
-
-    { field: "department", headerName: "Department", width: 140 },
-    { field: "reporting_person", headerName: "Reporting Person", width: 130 },
-    { field: "verifiedBy", headerName: "Verified By", width: 130 },
+    { 
+      field: "active", 
+      headerName: "Status", 
+      width: 100,
+      renderCell: (params) => (
+        <span style={{ 
+          color: params.value ? 'green' : 'red',
+          fontWeight: 'bold'
+        }}>
+          {params.value ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    { 
+      field: "verified", 
+      headerName: "Verified", 
+      width: 100,
+      renderCell: (params) => (
+        <span style={{ 
+          color: params.value ? 'green' : 'orange',
+          fontWeight: 'bold'
+        }}>
+          {params.value ? 'Yes' : 'No'}
+        </span>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -74,17 +99,10 @@ export default function AllTab({
           mb: 3,
         }}
       >
-        <Box>
-          <SearchField
-            placeholder="Search users ..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            sx={{ minWidth: { xs: "auto", sm: 200 } }}
-          />
-        </Box>
+        
       </Box>
 
-      <UserDataGrid loading={loading} rows={filteredUsers} columns={columns} />
+      <UserDataGrid loading={loading} rows={users} columns={columns} />
     </Box>
   );
 }

@@ -22,8 +22,6 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
   };
 
   const handleSubmit = (values) => {
-    console.log("EditReferDialog - Form values:", values);
-    console.log("EditReferDialog - Original record:", record);
     
     // Transform form values to match the data grid structure
     const updatedRecord = {
@@ -35,7 +33,6 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
       resume_file_path: values.resume?.name || values.resume,
     };
 
-    console.log("EditReferDialog - Updated record:", updatedRecord);
     onUpdate(updatedRecord);
     handleClose();
   };

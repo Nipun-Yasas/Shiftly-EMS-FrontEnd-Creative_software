@@ -219,7 +219,6 @@ const Dashboard = () => {
       // Initialize user session first
       const currentUserId = initializeUserSession();
       setUserId(currentUserId);
-      console.log('User session initialized:', currentUserId);
       
       // Load ToDo items from localStorage with user-specific persistence
       loadToDoData(currentUserId);
@@ -250,18 +249,15 @@ const Dashboard = () => {
       if (migratedData) {
         // Use migrated data
         setToDoItems(migratedData);
-        saveUserData('todos', migratedData, currentUserId);
-        console.log('Successfully migrated ToDo data to new format for user:', currentUserId);
+        saveUserData('todos', migratedData, currentUserId);``
       } else if (savedToDos) {
         // Use existing user data
         setToDoItems(savedToDos);
-        console.log('Loaded existing ToDo data for user:', currentUserId);
       } else {
         // First time user - set initial realistic data
         const initialToDos = getInitialToDoItems();
         setToDoItems(initialToDos);
         saveUserData('todos', initialToDos, currentUserId);
-        console.log('Created initial ToDo data for new user:', currentUserId);
       }
     } catch (error) {
       console.error('Error loading ToDo items from localStorage:', error);
@@ -284,16 +280,13 @@ const Dashboard = () => {
         // Use migrated data
         setGoals(migratedData);
         saveUserData('goals', migratedData, currentUserId);
-        console.log('Successfully migrated Goals data to new format for user:', currentUserId);
       } else if (savedGoals) {
         // Use existing user data
         setGoals(savedGoals);
-        console.log('Loaded existing Goals data for user:', currentUserId);
       } else {
         // First time user - set initial realistic data
         setGoals(initialGoals);
         saveUserData('goals', initialGoals, currentUserId);
-        console.log('Created initial Goals data for new user:', currentUserId);
       }
     } catch (error) {
       console.error('Error loading Goals from localStorage:', error);
@@ -307,7 +300,6 @@ const Dashboard = () => {
     if (mounted && toDoItems.length > 0 && userId) {
       try {
         saveUserData('todos', toDoItems, userId);
-        console.log('ToDo items saved for user:', userId);
       } catch (error) {
         console.error('Error saving ToDo items to localStorage:', error);
       }
@@ -319,7 +311,6 @@ const Dashboard = () => {
     if (mounted && goals.length > 0 && userId) {
       try {
         saveUserData('goals', goals, userId);
-        console.log('Goals saved for user:', userId);
       } catch (error) {
         console.error('Error saving Goals to localStorage:', error);
       }
@@ -336,12 +327,10 @@ const Dashboard = () => {
       highlighted: false
     };
     setToDoItems(prev => [newTodo, ...prev]);
-    console.log('New ToDo added:', newTodo);
   };
 
   const handleDeleteToDo = (id) => {
     setToDoItems(prev => prev.filter(t => t.id !== id));
-    console.log('ToDo deleted:', id);
   };
 
   const handleEditToDo = (todo) => { 
@@ -366,7 +355,6 @@ const Dashboard = () => {
       }
       return t;
     }));
-    console.log('ToDo updated:', updated);
   };
 
   // Toggle ToDo completion status
@@ -395,12 +383,10 @@ const Dashboard = () => {
       completed: false
     };
     setGoals(prev => [newGoal, ...prev]);
-    console.log('New Goal added:', newGoal);
   };
 
   const handleDeleteGoal = (id) => {
     setGoals(prev => prev.filter(g => g.id !== id));
-    console.log('Goal deleted:', id);
   };
 
   const handleEditGoal = (goal) => { 
@@ -425,7 +411,6 @@ const Dashboard = () => {
       }
       return g;
     }));
-    console.log('Goal updated:', updated);
   };
 
   const handleToggleEvent = (eventId) => {
@@ -438,7 +423,6 @@ const Dashboard = () => {
     const totalGoals = goals.length;
     const calculatedProgress = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
     setProgress(calculatedProgress);
-    console.log(`Progress updated: ${completedGoals}/${totalGoals} = ${calculatedProgress}%`);
   }, [goals]);
 
   const getPriorityColor = (priority) => ({

@@ -14,10 +14,13 @@ export const API_PATHS = {
   },
   ADMIN_USER: {
     ADD_USER: '/api/v1/shiftly/ems/admin/user/add',
-    GET_ALL_USERS: '/api/v1/shiftly/ems/admin/user/all',
-    GET_USER_BY_ID: (id) => `/api/v1/shiftly/ems/admin/user/${id}`,
-    UPDATE_USER: (id) => `/api/v1/shiftly/ems/admin/user/update/${id}`,
-    DELETE_USER: (id) => `/api/v1/shiftly/ems/admin/user/delete/${id}`,
+    GET_ALL_USERS: '/users/all',
+    GET_USER_BY_ID: (id) => `/users/${id}`,
+    UPDATE_USER: (id) => `/users/update/${id}`,
+    DELETE_USER: (id) => `/users/delete/${id}`,
+    GET_UNASSIGNED_USERS: '/api/v1/shiftly/ems/admin/user/unassigned',
+    ASSIGN_USER: '/api/v1/shiftly/ems/admin/user/assign',
+    UPDATE_USER_ROLE: (id) => `/api/v1/shiftly/ems/admin/user/role/${id}`,
   },
   CANDIDATES: {
     GET_ALL_SUBMISSIONS: '/api/v1/shiftly/ems/admin/candidates/submissions',

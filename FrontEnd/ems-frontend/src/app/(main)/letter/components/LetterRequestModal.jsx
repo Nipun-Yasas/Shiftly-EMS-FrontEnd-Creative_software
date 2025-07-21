@@ -101,7 +101,6 @@ const LetterRequestModal = ({ letterType, onClose, open }) => {
             return errors;
           }}
           onSubmit={(values, { resetForm }) => {
-            console.log("Submitted:", values);
             // Handle form submission here
             resetForm();
           }}

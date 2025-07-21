@@ -7,15 +7,12 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
-import SearchField from "../../../../_components/main/SearchField";
 import UserDataGrid from "./UserDataGrid";
 
 export default function VerifyTab({
   loading,
-  unassignedUsers,
+  users,
   handleAssignUser,
-  searchQuery,
-  handleSearchChange,
 }) {
   const columns = [
     {
@@ -68,12 +65,7 @@ export default function VerifyTab({
           <Typography variant="h6">Unverified Users</Typography>
         </Box>
 
-        <SearchField
-          placeholder="Search users..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
+        
       </Box>
 
       <Box
@@ -86,7 +78,7 @@ export default function VerifyTab({
         <Box sx={{ width: { xs: "100%", lg: "700px" } }}>
           <UserDataGrid
             loading={loading}
-            rows={unassignedUsers}
+            rows={users}
             columns={columns}
           />
         </Box>

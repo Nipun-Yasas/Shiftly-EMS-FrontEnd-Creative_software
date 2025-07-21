@@ -70,7 +70,6 @@ const LeaveForm = ({ onSubmitSuccess }) => {
           try {
             setIsSubmitting(true);
             values.leave_type = selectedLeave.value;
-            console.log('Submitted:', values);
             await new Promise((res) => setTimeout(res, 1000));
             resetForm();
             setSelectedLeave(leaveOptions[0]);

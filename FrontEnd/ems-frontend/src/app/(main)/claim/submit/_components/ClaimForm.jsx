@@ -50,7 +50,6 @@ export default function ClaimForm(props){
           return errors;
         }}
         onSubmit={(values, { resetForm }) => {
-          console.log("Submitted:", values);
           setOpenSubmit(true);
           resetForm();
           setFileName("");

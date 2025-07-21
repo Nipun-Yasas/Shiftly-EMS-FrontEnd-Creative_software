@@ -27,10 +27,6 @@ const RequestLetter = () => {
     letter.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSearch = () => {
-    console.log('User searched for:', searchQuery);
-  };
-
   return (
     <>
       <Paper

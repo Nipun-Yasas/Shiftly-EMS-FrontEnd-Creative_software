@@ -73,7 +73,6 @@ const UserDataStatus = () => {
   const handleBackup = () => {
     try {
       const backup = backupUserData();
-      console.log('User data backed up:', backup);
       refreshData();
     } catch (error) {
       console.error('Error backing up user data:', error);

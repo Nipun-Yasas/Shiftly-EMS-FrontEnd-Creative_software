@@ -55,7 +55,6 @@ export default function ReferForm(props) {
           return errors;
         }}
         onSubmit={(values, { resetForm }) => {
-          console.log("Submitted:", values);
           
           if (onSubmit) {
             onSubmit(values);

@@ -59,7 +59,6 @@ export const setUserIdentifier = (userId) => {
     // Save to both localStorage (persistent) and sessionStorage (current session)
     localStorage.setItem(USER_SESSION_KEY, userId);
     sessionStorage.setItem('shiftly_user_id', userId);
-    console.log(`User identifier set: ${userId}`);
   } catch (error) {
     console.error('Error setting user identifier:', error);
   }
@@ -79,7 +78,6 @@ export const clearUserSession = (userId = null) => {
     // Optionally clear localStorage session key but keep user data
     // localStorage.removeItem(USER_SESSION_KEY);
     
-    console.log(`User session cleared for: ${currentUserId}`);
   } catch (error) {
     console.error('Error clearing user session:', error);
   }
@@ -100,7 +98,6 @@ export const saveUserData = (key, data, userId = null) => {
     // Also save a timestamp for data freshness
     localStorage.setItem(`${userKey}_timestamp`, Date.now().toString());
     
-    console.log(`Data saved for user ${currentUserId}: ${key}`);
   } catch (error) {
     console.error(`Error saving ${key} to localStorage:`, error);
   }
@@ -121,7 +118,6 @@ export const getUserData = (key, defaultValue = null, userId = null) => {
     
     if (data) {
       const parsedData = JSON.parse(data);
-      console.log(`Data retrieved for user ${currentUserId}: ${key}`);
       return parsedData;
     }
     
@@ -143,8 +139,6 @@ export const removeUserData = (key, userId = null) => {
     const userKey = getUserKey(key, currentUserId);
     localStorage.removeItem(userKey);
     localStorage.removeItem(`${userKey}_timestamp`);
-    
-    console.log(`Data removed for user ${currentUserId}: ${key}`);
   } catch (error) {
     console.error(`Error removing ${key} from localStorage:`, error);
   }
@@ -246,8 +240,6 @@ export const backupUserData = (userId = null) => {
     // Save backup with timestamp
     const backupKey = `dataBackup_${currentUserId}_${Date.now()}`;
     localStorage.setItem(backupKey, JSON.stringify(backup));
-    
-    console.log(`User data backed up for ${currentUserId}`);
     return backup;
   } catch (error) {
     console.error('Error backing up user data:', error);
@@ -307,7 +299,6 @@ export const cleanupOldBackups = () => {
       backupKeys.sort().slice(0, backupKeys.length - 5).forEach(key => {
         localStorage.removeItem(key);
       });
-      console.log(`Cleaned up ${backupKeys.length - 5} old backups for user ${currentUserId}`);
     }
   } catch (error) {
     console.error('Error cleaning up old backups:', error);
@@ -334,8 +325,6 @@ export const migrateUserData = (key, defaultValue = null) => {
       
       // Remove old format data
       localStorage.removeItem(oldKey);
-      
-      console.log(`Migrated data for key: ${key}`);
       return JSON.parse(oldData);
     }
     
@@ -359,8 +348,6 @@ export const handleUserLogout = () => {
     
     // Clear session storage but keep localStorage data
     clearUserSession(currentUserId);
-    
-    console.log(`User logged out successfully. Data preserved for user: ${currentUserId}`);
   } catch (error) {
     console.error('Error handling user logout:', error);
   }
@@ -372,7 +359,6 @@ export const handleUserLogout = () => {
 export const initializeUserSession = () => {
   try {
     const userId = getCurrentUserId();
-    console.log(`User session initialized: ${userId}`);
     return userId;
   } catch (error) {
     console.error('Error initializing user session:', error);
@@ -401,8 +387,6 @@ export const clearAllUserData = (userId = null) => {
     // Also remove user session
     localStorage.removeItem(USER_SESSION_KEY);
     sessionStorage.removeItem('shiftly_user_id');
-    
-    console.log(`All data cleared for user: ${currentUserId}`);
   } catch (error) {
     console.error('Error clearing all user data:', error);
   }
@@ -415,18 +399,10 @@ export const clearAllUserData = (userId = null) => {
 export const debugUserData = (userId = null) => {
   try {
     const currentUserId = userId || getCurrentUserId();
-    console.log('=== User Data Debug ===');
-    console.log('Current User ID:', currentUserId);
-    console.log('Session Storage User ID:', sessionStorage.getItem('shiftly_user_id'));
-    console.log('Local Storage User Session:', localStorage.getItem(USER_SESSION_KEY));
     
     const allData = getAllUserData(currentUserId);
     const keys = getUserDataKeys(currentUserId);
     const hasData = hasUserData(currentUserId);
-    
-    console.log('Has User Data:', hasData);
-    console.log('User Data Keys:', keys);
-    console.log('All User Data:', allData);
     
     // Log all localStorage keys for this user
     const userKeys = [];
@@ -436,7 +412,6 @@ export const debugUserData = (userId = null) => {
         userKeys.push(key);
       }
     }
-    console.log('All localStorage keys for user:', userKeys);
     
     return {
       userId: currentUserId,
@@ -456,11 +431,9 @@ export const debugUserData = (userId = null) => {
  */
 export const testLocalStoragePersistence = () => {
   try {
-    console.log('=== Testing localStorage Persistence ===');
     
     // Test 1: Check if user session persists
     const userId1 = getCurrentUserId();
-    console.log('Initial User ID:', userId1);
     
     // Test 2: Save some test data
     const testData = {
@@ -474,45 +447,27 @@ export const testLocalStoragePersistence = () => {
       ],
       testSettings: { theme: 'dark', notifications: true }
     };
-    
-    saveUserData('testTodos', testData.testTodos, userId1);
-    saveUserData('testGoals', testData.testGoals, userId1);
-    saveUserData('testSettings', testData.testSettings, userId1);
+  
     
     // Test 3: Verify data was saved
     const savedTodos = getUserData('testTodos', null, userId1);
     const savedGoals = getUserData('testGoals', null, userId1);
     const savedSettings = getUserData('testSettings', null, userId1);
     
-    console.log('Saved Todos:', savedTodos);
-    console.log('Saved Goals:', savedGoals);
-    console.log('Saved Settings:', savedSettings);
-    
     // Test 4: Simulate logout (clear session storage)
     sessionStorage.removeItem('shiftly_user_id');
     
     // Test 5: Get user ID again (should be same)
     const userId2 = getCurrentUserId();
-    console.log('User ID after logout simulation:', userId2);
-    console.log('User IDs match:', userId1 === userId2);
     
     // Test 6: Retrieve data after logout simulation
     const retrievedTodos = getUserData('testTodos', null, userId2);
     const retrievedGoals = getUserData('testGoals', null, userId2);
-    const retrievedSettings = getUserData('testSettings', null, userId2);
-    
-    console.log('Retrieved Todos:', retrievedTodos);
-    console.log('Retrieved Goals:', retrievedGoals);
-    console.log('Retrieved Settings:', retrievedSettings);
+    const retrievedSettings = getUserData('testSettings', null, userId2)
     
     const todosPersisted = JSON.stringify(savedTodos) === JSON.stringify(retrievedTodos);
     const goalsPersisted = JSON.stringify(savedGoals) === JSON.stringify(retrievedGoals);
     const settingsPersisted = JSON.stringify(savedSettings) === JSON.stringify(retrievedSettings);
-    
-    console.log('Todos persistence test passed:', todosPersisted);
-    console.log('Goals persistence test passed:', goalsPersisted);
-    console.log('Settings persistence test passed:', settingsPersisted);
-    console.log('Overall persistence test passed:', todosPersisted && goalsPersisted && settingsPersisted);
     
     // Clean up test data
     removeUserData('testTodos', userId2);

@@ -68,14 +68,6 @@ export default function UpdateTimesheet() {
       // Mock API call - replace with actual backend call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (activeTab === 0) {
-        // Submit weekly entries
-        console.log("Submitting weekly entries:", dailyEntries);
-      } else {
-        // Submit daily entry
-        console.log("Submitting daily entry:", dailyEntry);
-      }
-      
       setMessage({ text: "Timesheet submitted successfully!", type: "success" });
       setTimeout(() => setMessage({ text: "", type: "" }), 3000);
       

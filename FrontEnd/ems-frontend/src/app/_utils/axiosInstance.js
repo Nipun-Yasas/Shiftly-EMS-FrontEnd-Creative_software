@@ -1,6 +1,16 @@
 import axios from 'axios';
 import { BASE_URL } from './apiPaths';
 
+// Helper function to check if token is expired
+const isTokenExpired = (token) => {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 < Date.now();
+    } catch (e) {
+        return true;
+    }
+};
+
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
     timeout: 10000,
@@ -8,7 +18,7 @@ const axiosInstance = axios.create({
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    withCredentials: false, // Set to false for CORS
+    withCredentials: false, 
 })
 
 axiosInstance.interceptors.request.use(
@@ -19,16 +29,20 @@ axiosInstance.interceptors.request.use(
         if (!isAuthRequest) {
             const accessToken = localStorage.getItem('token');
             if (accessToken) {
+                // Check if token is expired before making request
+                if (isTokenExpired(accessToken)) {
+                    console.error('Token expired! Clearing storage and redirecting to login.');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                    return Promise.reject(new Error('Token expired'));
+                }
+                
                 config.headers['Authorization'] = `Bearer ${accessToken}`;
+            } else {
+                console.warn('Debug - No token found for protected route:', config.url);
             }
         }
-        
-        console.log('Request config:', {
-            url: config.baseURL + config.url,
-            method: config.method,
-            headers: config.headers,
-            data: config.data
-        });
         
         return config;
     },
@@ -44,8 +58,22 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         if(error.response){
+            console.error('Response error details:', {
+                status: error.response.status,
+                statusText: error.response.statusText,
+                data: error.response.data,
+                url: error.config?.url,
+                headers: error.response.headers
+            });
+            
             if (error.response.status === 401){
-                window.location.href = '/login';
+                console.warn('401 Unauthorized - redirecting to login');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+            else if (error.response.status === 403){
+                console.error('403 Forbidden - Access denied. Check user permissions and token validity.');
             }
             else if(error.response.status === 500){
                 console.error("Server Error.Please try again later.");
@@ -55,6 +83,7 @@ axiosInstance.interceptors.response.use(
             }
             return Promise.reject(error)
         }
+        return Promise.reject(error);
     }
 );
 

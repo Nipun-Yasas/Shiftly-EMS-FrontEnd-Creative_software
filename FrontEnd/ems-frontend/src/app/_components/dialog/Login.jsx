@@ -45,14 +45,11 @@ export default function LoginForm(props) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log('Attempting login with:', { username: values.username });
       
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         username: values.username,
         password: values.password,
       });
-
-      console.log('Login response:', response.data);
 
       // Match your Spring Boot API response structure
       const { jwttoken, userDTO } = response.data;

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -10,6 +11,7 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { debugAuthStatus, checkUserPermissions, isTokenExpired } from "../../../_utils/debugAuth";
 
 import AllTab from "./_components/AllTab";
 import VerifyTab from "./_components/VerifyTab";
@@ -19,6 +21,7 @@ import DeleteDialog from "./_components/DeleteDialog";
 import TabPanel from "../../../_components/main/TabPanel";
 
 export default function UserManagementPage() {
+  const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [users, setUsers] = useState([]);
   const [unassignedUsers, setUnassignedUsers] = useState([]);
@@ -29,8 +32,6 @@ export default function UserManagementPage() {
   const [assigningUser, setAssigningUser] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [assignSearchQuery, setAssignSearchQuery] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -40,47 +41,31 @@ export default function UserManagementPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      // Debug: Check token and user data before making request
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (!token) {
+        showSnackbar("No authentication token found. Please login again.", "error");
+        return;
+      }
+
       const response = await axiosInstance.get(
         API_PATHS.ADMIN_USER.GET_ALL_USERS
       );
-      setUsers(response.data || []);
+      
+      // Handle both single user and array of users response
+      let usersData = response.data;
+      if (usersData && !Array.isArray(usersData)) {
+        // If response is a single user object, wrap it in an array
+        usersData = [usersData];
+      }
+      
+      setUsers(usersData || []);
     } catch (error) {
       console.error("Error fetching users:", error);
-      showSnackbar("Error fetching users", "error");
-
-      // Mock data for assigned users
-      setUsers([
-        {
-          id: 1,
-          username: "johndoe",
-          email: "john.doe@company.com",
-          roleId: { id: 1, name: "Admin" },
-          designation: "Software Engineer",
-          department: "Engineering",
-          reporting_person: "Jane Smith",
-          verifiedBy: "System Admin",
-        },
-        {
-          id: 2,
-          username: "janesmith",
-          email: "jane.smith@company.com",
-          roleId: { id: 2, name: "Manager" },
-          designation: "Project Manager",
-          department: "Project Management",
-          reporting_person: "John Doe",
-          verifiedBy: "System Admin",
-        },
-        {
-          id: 3,
-          username: "mikejohnson",
-          email: "mike.johnson@company.com",
-          roleId: { id: 3, name: "Employee" },
-          designation: "HR Specialist",
-          department: "Human Resources",
-          reporting_person: "Sarah Connor",
-          verifiedBy: "HR Manager",
-        },
-      ]);
+      showSnackbar("Error fetching users. Please try again.", "error");
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -89,29 +74,19 @@ export default function UserManagementPage() {
   const fetchUnassignedUsers = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(
-        API_PATHS.ADMIN_USER.GET_UNASSIGNED_USERS
-      );
-      setUnassignedUsers(response.data || []);
+      // TODO: Add endpoint for unassigned users in backend
+      // const response = await axiosInstance.get(
+      //   API_PATHS.ADMIN_USER.GET_UNASSIGNED_USERS
+      // );
+      // setUnassignedUsers(response.data || []);
+      
+      // For now, show empty array since no backend endpoint exists
+      setUnassignedUsers([]);
+      showSnackbar("Unassigned users feature is not yet implemented", "info");
     } catch (error) {
       console.error("Error fetching unassigned users:", error);
-      showSnackbar("Error fetching unassigned users", "error");
-
-      // Mock data for unassigned users
-      setUnassignedUsers([
-        {
-          id: 4,
-          username: "newuser1",
-          email: "newuser1@company.com",
-          createdAt: "2023-07-15",
-        },
-        {
-          id: 5,
-          username: "newuser2",
-          email: "newuser2@company.com",
-          createdAt: "2023-07-16",
-        },
-      ]);
+      showSnackbar("Error fetching unassigned users. Please try again.", "error");
+      setUnassignedUsers([]);
     } finally {
       setLoading(false);
     }
@@ -203,31 +178,9 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleAssignSearchChange = (event) => {
-    setAssignSearchQuery(event.target.value);
-  };
-
-  const filteredUsers = users.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.roleId?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.designation?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.reporting_person?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredUnassignedUsers = unassignedUsers.filter(
-    (user) =>
-      user.username.toLowerCase().includes(assignSearchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(assignSearchQuery.toLowerCase())
-  );
 
   useEffect(() => {
+    
     fetchUsers();
   }, []);
 
@@ -246,22 +199,18 @@ export default function UserManagementPage() {
         <TabPanel value={tabValue} index={0}>
           <AllTab
             loading={loading}
-            filteredUsers={filteredUsers}
+            users={users}
             handleEdit={handleEdit}
             setUserToDelete={setUserToDelete}
             setDeleteConfirmOpen={setDeleteConfirmOpen}
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
           />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
           <VerifyTab
             loading={loading}
-            unassignedUsers={filteredUnassignedUsers}
+            users={users}
             handleAssignUser={handleAssignUser}
-            searchQuery={assignSearchQuery}
-            handleSearchChange={handleAssignSearchChange}
           />
         </TabPanel>
 
