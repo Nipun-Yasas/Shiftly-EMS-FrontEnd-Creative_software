@@ -65,77 +65,50 @@ export default function ProjectManagementPage() {
     return initialFormValues;
   };
 
-  // Fetch projects
+  // Fetch projects from backend
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      // Replace with actual API call when backend is ready
-      const response = await axiosInstance.get("/api/projects");
-      setProjects(response.data || []);
+      console.log("Fetching projects from:", API_PATHS.PROJECTS.GET_ALL_PROJECTS);
+      
+      const response = await axiosInstance.get(API_PATHS.PROJECTS.GET_ALL_PROJECTS);
+      console.log("Backend response:", response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        // Map backend data to frontend format
+        const mappedProjects = response.data.map(project => ({
+          id: project.projectId,
+          projectName: project.name,
+          description: project.description,
+          teamName: project.teamName || "No Team",
+          departmentName: project.departmentName || "No Department",
+          startDate: project.startDate,
+          deadline: project.endDate,
+          progress: project.progress || 0,
+        }));
+        
+        console.log("Mapped projects:", mappedProjects);
+        setProjects(mappedProjects);
+      } else {
+        console.warn("Invalid response format or no data");
+        setProjects([]);
+      }
     } catch (error) {
       console.error("Error fetching projects:", error);
-      showSnackbar("Error fetching projects", "error");
-      // Set sample data for demo purposes
+      console.error("Error details:", error.response?.data);
+      
+      showSnackbar("Failed to fetch projects from server", "error");
+      
+      // Fallback to sample data for demo
       setProjects([
         {
           id: 1,
-          projectName: "E-Commerce Platform",
-          description:
-            "Development of a modern e-commerce platform with advanced features including payment gateway, inventory management, and user analytics",
-          teamName: "Alpha Team",
+          projectName: "Sample E-Commerce Platform",
+          description: "Demo project - backend connection failed",
+          teamName: "Demo Team",
           startDate: "2024-01-15",
           deadline: "2024-06-30",
           progress: 65,
-        },
-        {
-          id: 2,
-          projectName: "Mobile Banking App",
-          description:
-            "Secure mobile banking application for iOS and Android with biometric authentication and real-time transaction monitoring",
-          teamName: "Beta Team",
-          startDate: "2024-03-01",
-          deadline: "2024-09-15",
-          progress: 25,
-        },
-        {
-          id: 3,
-          projectName: "Inventory Management System",
-          description:
-            "Web-based inventory tracking and management system with barcode scanning and automated reorder alerts",
-          teamName: "Gamma Team",
-          startDate: "2023-08-01",
-          deadline: "2023-12-31",
-          progress: 100,
-        },
-        {
-          id: 4,
-          projectName: "Learning Management System",
-          description:
-            "Online learning platform with video streaming capabilities, quiz engine, and progress tracking for educational institutions",
-          teamName: "Delta Team",
-          startDate: "2024-02-01",
-          deadline: "2024-08-30",
-          progress: 45,
-        },
-        {
-          id: 5,
-          projectName: "CRM Dashboard",
-          description:
-            "Customer relationship management dashboard with sales pipeline tracking, lead management, and reporting analytics",
-          teamName: "Epsilon Team",
-          startDate: "2024-04-01",
-          deadline: "2024-10-15",
-          progress: 30,
-        },
-        {
-          id: 6,
-          projectName: "Healthcare Portal",
-          description:
-            "Patient management portal with appointment scheduling, medical records access, and telemedicine integration",
-          teamName: "Zeta Team",
-          startDate: "2024-01-01",
-          deadline: "2024-07-31",
-          progress: 80,
         },
       ]);
     } finally {
@@ -146,21 +119,50 @@ export default function ProjectManagementPage() {
   // Handle form submission for Add Project tab
   const handleAddSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      console.log("Form values received:", values);
+      
+      // Map frontend form data to backend DTO format
       const projectData = {
-        ...values,
-        status: values.status?.name || values.status,
-        priority: values.priority?.name || values.priority,
+        name: values.projectName,
+        description: values.description,
+        startDate: values.startDate,
+        endDate: values.deadline,
+        progress: parseInt(values.progress) || 0,
       };
 
-      // Add new project
-      await axiosInstance.post("/api/projects", projectData);
-      showSnackbar("Project added successfully", "success");
+      // Only include team and department if selected
+      if (values.teamName?.name) {
+        projectData.teamName = values.teamName.name;
+      }
+      
+      if (values.department?.name) {
+        projectData.departmentName = values.department.name;
+      }
 
+      console.log("Sending to backend:", projectData);
+      
+      const response = await axiosInstance.post(API_PATHS.PROJECTS.ADD_PROJECT, projectData);
+      console.log("Backend response:", response.data);
+      
+      showSnackbar("Project created successfully!", "success");
       resetForm();
-      fetchProjects();
+      setTabValue(0); // Switch back to project list
+      fetchProjects(); // Refresh the project list
+      
     } catch (error) {
-      console.error("Error adding project:", error);
-      showSnackbar("Error adding project", "error");
+      console.error("Error creating project:", error);
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = "Failed to create project";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error. Please ensure teams and departments exist in the database.";
+      } else if (error.response?.status === 400) {
+        errorMessage = "Invalid project data. Please check all required fields.";
+      }
+      
+      showSnackbar(errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -169,26 +171,56 @@ export default function ProjectManagementPage() {
   // Handle form submission for Edit Project dialog
   const handleEditSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      console.log("Edit form values:", values);
+      console.log("Editing project:", editingProject);
+      
+      // Map frontend form data to backend DTO format
       const projectData = {
-        ...values,
-        status: values.status?.name || values.status,
-        priority: values.priority?.name || values.priority,
+        name: values.projectName,
+        description: values.description,
+        startDate: values.startDate,
+        endDate: values.deadline,
+        progress: parseInt(values.progress) || 0,
       };
 
-      // Update project
-      await axiosInstance.put(
-        `/api/projects/${editingProject.id}`,
+      // Only include team and department if selected
+      if (values.teamName?.name) {
+        projectData.teamName = values.teamName.name;
+      }
+      
+      if (values.department?.name) {
+        projectData.departmentName = values.department.name;
+      }
+
+      console.log("Updating project ID:", editingProject.id);
+      console.log("Sending update data:", projectData);
+      
+      const response = await axiosInstance.put(
+        API_PATHS.PROJECTS.UPDATE_PROJECT(editingProject.id),
         projectData
       );
-      showSnackbar("Project updated successfully", "success");
-
+      console.log("Update response:", response.data);
+      
+      showSnackbar("Project updated successfully!", "success");
       resetForm();
       setEditDialogOpen(false);
       setEditingProject(null);
-      fetchProjects();
+      fetchProjects(); // Refresh the project list
+      
     } catch (error) {
       console.error("Error updating project:", error);
-      showSnackbar("Error updating project", "error");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = "Failed to update project";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error. Please ensure teams and departments exist in the database.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Project not found. It may have been deleted.";
+      }
+      
+      showSnackbar(errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -199,14 +231,34 @@ export default function ProjectManagementPage() {
     if (!projectToDelete) return;
 
     try {
-      await axiosInstance.delete(`/api/projects/${projectToDelete.id}`);
-      showSnackbar("Project deleted successfully", "success");
-      setProjects(
-        projects.filter((project) => project.id !== projectToDelete.id)
+      console.log("Deleting project ID:", projectToDelete.id);
+      
+      await axiosInstance.delete(API_PATHS.PROJECTS.DELETE_PROJECT(projectToDelete.id));
+      
+      showSnackbar("Project deleted successfully!", "success");
+      
+      // Remove from local state immediately for better UX
+      setProjects(prevProjects => 
+        prevProjects.filter(project => project.id !== projectToDelete.id)
       );
+      
+      // Also refresh from server to ensure consistency
+      fetchProjects();
+      
     } catch (error) {
       console.error("Error deleting project:", error);
-      showSnackbar("Error deleting project", "error");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = "Failed to delete project";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 404) {
+        errorMessage = "Project not found. It may have been already deleted.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error while deleting project.";
+      }
+      
+      showSnackbar(errorMessage, "error");
     } finally {
       setDeleteConfirmOpen(false);
       setProjectToDelete(null);

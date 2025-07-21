@@ -146,17 +146,52 @@ export default function EventSubmissionPage() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      // Replace with actual API call
-      // const response = await axiosInstance.get('/api/events/submissions');
-      // setEvents(response.data || []);
-
-      // Using sample data for demo
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
-      setEvents(sampleEvents);
+      console.log("Fetching events from:", API_PATHS.EVENTS.GET_ALL_EVENTS);
+      
+      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_ALL_EVENTS);
+      console.log("Backend response:", response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        // Map backend data to frontend format
+        const mappedEvents = response.data.map(event => ({
+          id: event.id,
+          title: event.title,
+          organizer: `Employee ${event.createdBy}`, // Will need to fetch employee details later
+          organizerEmail: `employee${event.createdBy}@company.com`, // Placeholder
+          department: "Unknown", // Not in backend DTO, will need to fetch
+          eventType: event.eventType,
+          description: `Event: ${event.title}`, // Basic description since not in backend
+          startDate: event.enableDate,
+          endDate: event.expireDate,
+          location: "TBD", // Not in backend DTO
+          expectedAttendees: 0, // Not in backend DTO
+          budget: 0, // Not in backend DTO
+          status: event.status.toLowerCase(),
+          submissionDate: event.enableDate, // Using enableDate as placeholder
+          requirements: [], // Not in backend DTO
+          approvedBy: event.status === 'APPROVED' ? 'Admin' : null,
+          approvedAt: event.status === 'APPROVED' ? new Date().toISOString() : null,
+          rejectionReason: event.status === 'REJECTED' ? 'Event rejected by admin' : null,
+          // Backend specific fields
+          createdBy: event.createdBy,
+          fileName: event.fileName,
+          filePath: event.filePath,
+        }));
+        
+        console.log("Mapped events:", mappedEvents);
+        setEvents(mappedEvents);
+      } else {
+        console.warn("Invalid response format or no data");
+        setEvents([]);
+      }
     } catch (error) {
       console.error("Error fetching events:", error);
-      showSnackbar("Error fetching event submissions", "error");
-      setEvents(sampleEvents); // Fallback to sample data
+      console.error("Error details:", error.response?.data);
+      
+      showSnackbar("Failed to fetch events from server", "error");
+      
+      // Fallback to sample data for demo
+      setEvents(sampleEvents);
     } finally {
       setLoading(false);
     }
@@ -190,28 +225,27 @@ export default function EventSubmissionPage() {
     if (!selectedEvent || !approvalAction) return;
 
     try {
-      // Replace with actual API call
-      // await axiosInstance.put(`/api/events/${selectedEvent.id}/${approvalAction}`, {
-      //   reason: approvalReason
-      // });
+      console.log(`${approvalAction}ing event:`, selectedEvent.id);
+      
+      let response;
+      if (approvalAction === "approve") {
+        response = await axiosInstance.put(API_PATHS.EVENTS.APPROVE_EVENT(selectedEvent.id));
+      } else {
+        response = await axiosInstance.put(API_PATHS.EVENTS.REJECT_EVENT(selectedEvent.id));
+      }
+      
+      console.log("Approval response:", response.data);
 
-      const updatedStatus =
-        approvalAction === "approve" ? "approved" : "rejected";
-
+      // Update local state with the response from backend
       setEvents((prev) =>
         prev.map((event) =>
           event.id === selectedEvent.id
             ? {
                 ...event,
-                status: updatedStatus,
-                approvedBy:
-                  approvalAction === "approve" ? "Current Admin" : null,
-                approvedAt:
-                  approvalAction === "approve"
-                    ? new Date().toISOString()
-                    : null,
-                rejectionReason:
-                  approvalAction === "reject" ? approvalReason : null,
+                status: response.data.status.toLowerCase(),
+                approvedBy: response.data.status === 'APPROVED' ? "Current Admin" : null,
+                approvedAt: response.data.status === 'APPROVED' ? new Date().toISOString() : null,
+                rejectionReason: response.data.status === 'REJECTED' ? approvalReason || "Event rejected by admin" : null,
               }
             : event
         )
@@ -223,9 +257,24 @@ export default function EventSubmissionPage() {
       );
       setApprovalDialogOpen(false);
       setOpenDetailDialog(false);
+      
+      // Refresh events to get latest data
+      fetchEvents();
+      
     } catch (error) {
       console.error(`Error ${approvalAction}ing event:`, error);
-      showSnackbar(`Error ${approvalAction}ing event`, "error");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = `Error ${approvalAction}ing event`;
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 404) {
+        errorMessage = "Event not found. It may have been deleted.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error while processing the request.";
+      }
+      
+      showSnackbar(errorMessage, "error");
     }
   };
 

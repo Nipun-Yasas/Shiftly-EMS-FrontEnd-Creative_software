@@ -30,6 +30,13 @@ export const API_PATHS = {
     GET_READ_HISTORY: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/read-history`,
     DOWNLOAD_RESUME: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/resume`,
   },
+  PROJECTS: {
+    ADD_PROJECT: '/api/v1/shiftly/ems/projects/add',
+    UPDATE_PROJECT: (id) => `/api/v1/shiftly/ems/projects/update/${id}`,
+    DELETE_PROJECT: (id) => `/api/v1/shiftly/ems/projects/delete/${id}`,
+    GET_ALL_PROJECTS: '/api/v1/shiftly/ems/projects/all',
+    GET_MY_PROJECTS: '/api/v1/shiftly/ems/projects/my',
+  },
   SAMPLE: {
     ADMIN_DASHBOARD: '/api/admin/dashboard',
     USER_PROFILE: '/api/user/profile',
@@ -41,5 +48,18 @@ export const API_PATHS = {
     ADD_EVENT: '/api/calendar/events',
     UPDATE_EVENT: '/api/calendar/events',
     DELETE_EVENT: '/api/calendar/events',
+  },
+  EVENTS: {
+    // Admin endpoints
+    GET_ALL_EVENTS: '/api/v1/shiftly/ems/events/all',
+    APPROVE_EVENT: (id) => `/api/v1/shiftly/ems/events/approve/${id}`,
+    REJECT_EVENT: (id) => `/api/v1/shiftly/ems/events/reject/${id}`,
+    GET_EVENT_BY_ID: (id) => `/api/v1/shiftly/ems/events/${id}`,
+    
+    // Employee endpoints
+    ADD_EVENT: '/api/v1/shiftly/ems/events/add',
+    UPDATE_EVENT: (id) => `/api/v1/shiftly/ems/events/update/${id}`,
+    DELETE_EVENT: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
+    GET_MY_EVENTS: (employeeId) => `/api/v1/shiftly/ems/events/my/${employeeId}`,
   },
 };
