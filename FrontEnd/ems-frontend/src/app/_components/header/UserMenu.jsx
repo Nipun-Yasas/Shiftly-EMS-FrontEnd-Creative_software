@@ -17,23 +17,38 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Link from "next/link";
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import { UserContext } from '../../context/UserContext';
 import axiosInstance from '../../_utils/axiosInstance';
 import { API_PATHS } from '../../_utils/apiPaths';
 
 
 const UserMenu = () => {
 
-   const { user, signOut, loading } = useAuth();
     const router = useRouter();
+    const { user, updateUser, clearUser } = useContext(UserContext);
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
 
   const handleLogout = async () => {
-    await signOut();
-    router.push('/');
+    try {
+      // Call logout API
+      await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear all authentication data
+      clearUser();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      
+      // Clear any cookies
+      document.cookie = 'JWT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      
+      // Redirect to home page
+      router.push('/');
+    }
   };
 
   // State for managing the dropdown menu
@@ -76,8 +91,10 @@ const UserMenu = () => {
           <Avatar
             src="/profilePic.jpg"
             alt="User Avatar"
-            sx={{ width: 44, height: 44 }}
-          />
+            sx={{ width: 44, height: 44, bgcolor: '#1976d2' }}
+          >
+            {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+          </Avatar>
           <Typography
             variant="body1"
             color="#737791"

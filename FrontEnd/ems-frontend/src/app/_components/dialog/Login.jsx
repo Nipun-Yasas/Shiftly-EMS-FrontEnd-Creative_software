@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,18 +15,22 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 
-import { useAuth } from "../../context/AuthContext";
 import TextInput from "../inputs/TextInput";
 import PasswordInput from "../inputs/PasswordInput";
 import CustomCheckBox from "../inputs/CustomCheckBox";
 import FormItem from "../landing/FormItem";
+import  {UserContext}  from "../../context/UserContext";
+import axiosInstance from "../../_utils/axiosInstance";
+import { API_PATHS } from "../../_utils/apiPaths";
 
 export default function LoginForm(props) {
   const { openLogin, setOpenLogin, openSignUp } = props;
   const [error, setError] = useState(null);
-  const { signIn, user } = useAuth();
+
+
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateUser } = useContext(UserContext);
 
   const initialValues = {
     username: "",
@@ -41,36 +45,73 @@ export default function LoginForm(props) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      setIsSubmitting(true);
-      setError(null);
+      console.log('Attempting login with:', { username: values.username });
       
-      const userData = await signIn(values.username, values.password);
-      if (userData) {
-        setOpenLogin(false);
-        router.replace("/dashboard");
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+        username: values.username,
+        password: values.password,
+      });
+
+      console.log('Login response:', response.data);
+
+      // Match your Spring Boot API response structure
+      const { jwttoken, userDTO } = response.data;
+
+      if (jwttoken) {
+        localStorage.setItem("token", jwttoken);
+        updateUser(userDTO);
+        setOpenLogin(false); 
+        router.push("/dashboard");
+      } else {
+        setError("Login failed: No token received");
       }
-    } catch (err) {
-      setError(err.message || "Login failed");
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+        console.error('Error headers:', error.response.headers);
+        
+        if (error.response.status === 403) {
+          setError("Access forbidden. Please check your credentials or contact administrator.");
+        } else if (error.response.status === 401) {
+          setError("Invalid username or password.");
+        } else if (error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError(`Login failed: ${error.response.status} ${error.response.statusText}`);
+        }
+      } else if (error.request) {
+        console.error('Network error:', error.request);
+        setError("Network error. Please check your connection and server status.");
+      } else {
+        console.error('Error message:', error.message);
+        setError("Something went wrong. Please try again later.");
+      }
     } finally {
-      setIsSubmitting(false);
       setSubmitting(false);
     }
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
-      setError(null);
-      setOpenLogin(false);
-    }
+    setError(null);
+    setOpenLogin(false);
   };
 
   return (
     <Dialog
       open={openLogin}
-      onClose={handleClose}
+      onClose={(event, reason) => {
+        // Only close if not submitting and not caused by escape key when disabled
+        if (reason !== 'escapeKeyDown') {
+          setError(null);
+          setOpenLogin(false);
+        }
+      }}
       fullWidth
       maxWidth="xs"
-      disableEscapeKeyDown={isSubmitting}
     >
       <DialogContent>
         <IconButton
@@ -80,8 +121,6 @@ export default function LoginForm(props) {
             position: "absolute",
             top: 8,
             right: 8,
-            color: "grey.500",
-            "&:hover": { color: "grey.900" },
           }}
         >
           <X size={24} />
@@ -92,7 +131,7 @@ export default function LoginForm(props) {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting: formSubmitting }) => (
+          {({ isSubmitting }) => (
             <Form>
               <Stack spacing={2}>
                 <FormItem>
@@ -122,11 +161,6 @@ export default function LoginForm(props) {
                     gap: 1,
                   }}
                 >
-                  <CustomCheckBox 
-                    name="remember" 
-                    label="Remember Me" 
-                    disabled={isSubmitting}
-                  />
 
                   <Link href="/change-password">
                     <Typography
@@ -158,13 +192,8 @@ export default function LoginForm(props) {
                   sx={{
                     py: 1,
                     backgroundColor: '#E90A4D',
-                    color: '#fff',
                     '&:hover': {
                       backgroundColor: '#D00940'
-                    },
-                    '&.Mui-disabled': {
-                      backgroundColor: '#E90A4D',
-                      opacity: 0.5
                     }
                   }}
                 >
@@ -173,7 +202,7 @@ export default function LoginForm(props) {
 
                 <Box sx={{ textAlign: "center" }}>
                   <Typography sx={{ fontSize: "0.875rem" }}>
-                    Don't have an account?{" "}
+                    Don't have an account?
                     <Button
                       variant="text"
                       onClick={() => {

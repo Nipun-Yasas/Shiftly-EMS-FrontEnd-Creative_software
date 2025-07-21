@@ -1,35 +1,40 @@
 "use client";
-import * as React from 'react';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
-import CustomToolbarActions from '../_components/header/CustomToolbarActions';
-import CustomAppTitle from '../_components/header/CustomAppTitle';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
 
-import { useAuth } from '../context/AuthContext';
-import theme from '../../theme';
+import { useRouter } from "next/navigation";
+import { useContext, useEffect } from "react";
+import { NextAppProvider } from "@toolpad/core/nextjs";
+import { Box, CircularProgress } from "@mui/material";
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { PageContainer } from "@toolpad/core/PageContainer";
 
-import { NextAppProvider } from '@toolpad/core/nextjs';
-import { getNavigationForUser } from '../_utils/navigation';
+import CustomToolbarActions from "../_components/header/CustomToolbarActions";
+import CustomAppTitle from "../_components/header/CustomAppTitle";
+import theme from "../../theme";
+import { getNavigationForUser } from "../_utils/navigation";
+import useUserAuth from "../_hooks/useUserAuth";
+import {UserContext} from "../context/UserContext";
 
 export default function Layout({ children }) {
-  const { user, loading } = useAuth();
+  useUserAuth();
+
+  const { user } = useContext(UserContext);
   const router = useRouter();
-  const pathname = usePathname();
+  const navigation = getNavigationForUser(user);
 
   useEffect(() => {
-    // Only redirect if we're not on the landing page and there's no user
-    if (!loading && !user && pathname !== '/') {
-      router.replace('/');
+    // Check for both token and user data
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+    
+    if (!token && !userData && !user) {
+      // No authentication data found, redirect to landing page
+      router.push("/");
     }
-  }, [user, loading, router, pathname]);
+  }, [user, router]);
 
-  // Show loading while checking authentication status
-  if (loading) {
+  // Show loading if user data is still being fetched
+  if (!user) {
     return (
       <Box
         sx={{
@@ -44,13 +49,6 @@ export default function Layout({ children }) {
     );
   }
 
-  // If no user after loading, don't render anything (will redirect)
-  if (!user) {
-    return null;
-  }
-
-  const navigation = getNavigationForUser(user);
-
   return (
     <NextAppProvider theme={theme} navigation={navigation}>
       <DashboardLayout
@@ -59,10 +57,10 @@ export default function Layout({ children }) {
           toolbarActions: CustomToolbarActions,
         }}
       >
-        <PageContainer>
-          {children}
-        </PageContainer>
+        <PageContainer>{children}</PageContainer>
       </DashboardLayout>
     </NextAppProvider>
   );
 }
+
+

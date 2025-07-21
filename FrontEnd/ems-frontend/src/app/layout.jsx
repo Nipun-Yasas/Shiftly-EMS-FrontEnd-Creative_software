@@ -7,8 +7,9 @@ import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 import LinearProgress from '@mui/material/LinearProgress';
+import { User } from 'lucide-react';
+import UserProvider from './context/UserContext';
 
-import { AuthProvider } from './context/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,14 +41,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}>
       <body
-      >
+      ><UserProvider>
         <AppRouterCacheProvider>
           <React.Suspense fallback={<LinearProgress />}>
-            <AuthProvider>
+            
                 {children}
-            </AuthProvider>
+            
           </React.Suspense>
         </AppRouterCacheProvider>
+        </UserProvider>
       </body>
     </html>
   );

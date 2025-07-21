@@ -22,7 +22,7 @@ import CollagePhoto from "./_components/landing/CollagePhoto";
 import companyLogo from "../../public/creative_software_logo.png";
 import shiftlyLogo from "../../public/shiftly-logo.png";
 
-import { useAuth } from "./context/AuthContext";
+
 
 import { useWindowSize } from "./_hooks/useWindowSize";
 import {
@@ -38,17 +38,10 @@ import {
 export default function LandingPage() {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(false);
-  const { user, loading } = useAuth();
   const router = useRouter();
   const { width, height } = useWindowSize();
 
-  useEffect(() => {
-    if (!loading && user) {
-      // Use replace to prevent back navigation
-      router.replace("/dashboard");
-    }
-  }, [user, loading, router]);
-
+ 
   const cols = Math.ceil(width / PHOTO_WIDTH);
   const rows = Math.ceil(height / PHOTO_HEIGHT);
   const numPhotos = Math.min(rows * cols, MAX_PHOTOS);
@@ -83,27 +76,6 @@ export default function LandingPage() {
     }
     return photos;
   }, [cols, rows, numPhotos]);
-
-  // Show loading spinner while checking authentication
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  // If user exists after loading, don't render anything
-  if (user) {
-    return null;
-  }
 
   return (
     <>

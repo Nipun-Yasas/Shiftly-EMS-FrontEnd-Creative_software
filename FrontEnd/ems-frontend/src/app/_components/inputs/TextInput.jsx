@@ -12,6 +12,7 @@ export default function TextInput({ name, label, ...props }) {
       {...field}
       {...props}
       label={label}
+      autoComplete="off"
       variant="standard"
       error={Boolean(meta.touched && meta.error)}
       helperText={meta.touched && meta.error ? meta.error : ""}
