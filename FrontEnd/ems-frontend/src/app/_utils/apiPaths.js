@@ -30,6 +30,13 @@ export const API_PATHS = {
     GET_READ_HISTORY: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/read-history`,
     DOWNLOAD_RESUME: (id) => `/api/v1/shiftly/ems/admin/candidates/submission/${id}/resume`,
   },
+  PROJECTS: {
+    ADD_PROJECT: '/api/v1/shiftly/ems/projects/add',
+    UPDATE_PROJECT: (id) => `/api/v1/shiftly/ems/projects/update/${id}`,
+    DELETE_PROJECT: (id) => `/api/v1/shiftly/ems/projects/delete/${id}`,
+    GET_ALL_PROJECTS: '/api/v1/shiftly/ems/projects/all',
+    GET_MY_PROJECTS: '/api/v1/shiftly/ems/projects/my',
+  },
   SAMPLE: {
     ADMIN_DASHBOARD: '/api/admin/dashboard',
     USER_PROFILE: '/api/user/profile',
