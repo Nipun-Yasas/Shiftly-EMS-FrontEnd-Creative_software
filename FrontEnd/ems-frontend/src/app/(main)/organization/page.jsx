@@ -1,11 +1,25 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Avatar, Card, CardContent, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import Link from 'next/link';
 import StyledCard from './_components/StyledCard';
 import Paper from '@mui/material/Paper';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import OrgChart from './_components/OrgChart';
+import TeamCard from './_components/TeamCard';
+import TeamDialog from './_components/TeamDialog';
 
 const teamData = [
   {
@@ -76,8 +90,6 @@ const teamData = [
   },
 ];
 
-
-
 const OrgChartContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
@@ -103,138 +115,12 @@ const OrgMember = styled(Box)({
   margin: '15px',
 });
 
-const OrgChart = () => (
-  <Box>
-    <OrgMember>
-      <Avatar sx={{ width: 90, height: 90, marginBottom: 1, border: '3px solid #FF2D55' }} />
-      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '1.25rem', color: 'avatarname.main' }}>
-        Sushena Ranatunga
-      </Typography>
-      <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem' , color: '#6B7280'  }}>
-        CEO
-      </Typography>
-    </OrgMember>
-    <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px' }}>
-      <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
-          Channa De Silva
-        </Typography>
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
-          Software Engineering Director
-        </Typography>
-      </OrgMember>
-      <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55'}} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
-          Damitha Liyanage
-        </Typography>
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
-          Software Engineering Director
-        </Typography>
-      </OrgMember>
-      <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55' }} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
-          Asma Cader
-        </Typography>
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
-          Director Marketing
-        </Typography>
-      </OrgMember>
-      <OrgMember>
-        <Avatar sx={{ width: 70, height: 70, marginBottom: 1 , border: '3px solid #FF2D55'}} />
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '1rem', color: 'avatarname.main' }}>
-          Dinithi Abeygunawardena
-        </Typography>
-        <Typography sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: '0.875rem', color: '#6B7280' }}>
-          Head of Human Resources
-        </Typography>
-      </OrgMember>
-    </Box>
-  </Box>
-);
-
-const TeamCard = ({ team }) => (
-  <StyledCard>
-    <CardContent>
-      <Typography
-        sx={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 600,
-          fontSize: '1.125rem',
-          color: 'avatarname.main',
-          marginBottom: '8px',
-        }}
-      >
-        {team.name}
-      </Typography>
-      <Typography
-        sx={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 400,
-          fontSize: '0.875rem',
-          color: 'avatarname.main',
-          marginBottom: '12px',
-        }}
-      >
-        {team.members} MEMBERS
-      </Typography>
-      {team.team.slice(0, 5).map((member, index) => (
-        <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
-          <Avatar sx={{ width: 40, height: 40, marginRight: 2, border: '1px solid #E5E7EB' }} />
-          <Box>
-            <Typography
-              sx={{
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 500,
-                fontSize: '0.9375rem',
-                color: 'avatarname.main',
-              }}
-            >
-              {member.name}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 400,
-                fontSize: '0.8125rem',
-                color: '#6B7280',
-              }}
-            >
-              {member.role}
-            </Typography>
-          </Box>
-        </Box>
-      ))}
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}>
-        <Link href={`/organization/${team.name.toLowerCase().replace(/\./g, '')}`} passHref>
-          <Button
-            variant="outlined"
-            sx={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 500,
-              fontSize: '0.875rem',
-              color: '#FF2D55',
-              borderColor: '#FF2D55',
-              borderRadius: '8px',
-              textTransform: 'none',
-              padding: '4px 16px',
-              '&:hover': {
-                backgroundColor: 'viewButton.main',
-                borderColor: '#FECDD3',
-              },
-            }}
-          >
-            View More
-          </Button>
-        </Link>
-      </Box>
-    </CardContent>
-  </StyledCard>
-);
-
 export default function Organization(){
+  const [openTeam, setOpenTeam] = React.useState(null); // team index or null
+
+  const handleOpenTeam = (idx) => setOpenTeam(idx);
+  const handleCloseTeam = () => setOpenTeam(null);
+
   return (
     <Paper elevation={2} square={false}
       sx={{
@@ -245,7 +131,10 @@ export default function Organization(){
         <OrgChart />
       <TeamContainer>
         {teamData.map((team, index) => (
-          <TeamCard key={index} team={team} />
+          <React.Fragment key={index}>
+            <TeamCard team={team} onViewMore={() => handleOpenTeam(index)} />
+            <TeamDialog open={openTeam === index} onClose={handleCloseTeam} team={team} />
+          </React.Fragment>
         ))}
       </TeamContainer>
         

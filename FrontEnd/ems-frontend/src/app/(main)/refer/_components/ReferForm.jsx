@@ -19,16 +19,16 @@ const vacancyOptions = [
 ];
 
 export default function ReferForm(props) {
-  const { setOpenSubmit } = props;
+  const { setOpenSubmit, initialValues, onSubmit, isEditMode = false } = props;
 
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState(initialValues?.resume || "");
 
   return (
     <>
       <Formik
-        initialValues={{
+        initialValues={initialValues || {
           vacancy: null,
           applicantName: "",
           applicantEmail: "",
@@ -56,12 +56,17 @@ export default function ReferForm(props) {
         }}
         onSubmit={(values, { resetForm }) => {
           console.log("Submitted:", values);
-          setOpenSubmit(true);
-          resetForm();
-          setFileName("");
-          setPreview(null);
-          if (resumeRef.current) {
-            resumeRef.current.value = "";
+          
+          if (onSubmit) {
+            onSubmit(values);
+          } else {
+            setOpenSubmit(true);
+            resetForm();
+            setFileName("");
+            setPreview(null);
+            if (resumeRef.current) {
+              resumeRef.current.value = "";
+            }
           }
         }}
       >
@@ -187,7 +192,7 @@ export default function ReferForm(props) {
                       validateForm();
                     }}
                   >
-                    Submit
+                    {isEditMode ? "Update" : "Submit"}
                   </Button>
                 </Box>
               </InputItem>
