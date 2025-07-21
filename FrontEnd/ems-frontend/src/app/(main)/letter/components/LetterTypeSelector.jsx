@@ -30,7 +30,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
       description: "Request a letter for updating your name in EPF/ETF records",
       icon: <Assignment />,
       category: "Personal Documents",
-      estimatedTime: "2-3 business days"
+      
     },
     {
       id: 2,
@@ -38,7 +38,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
       description: "Official letter confirming your skills and competencies",
       icon: <Work />,
       category: "Professional",
-      estimatedTime: "3-5 business days"
+      
     },
     {
       id: 3,
@@ -46,7 +46,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
       description: "Letter providing salary undertaking for various purposes",
       icon: <AttachMoney />,
       category: "Financial",
-      estimatedTime: "1-2 business days"
+      
     },
     {
       id: 4,
@@ -54,7 +54,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
       description: "Official confirmation of your current salary details",
       icon: <VerifiedUser />,
       category: "Financial",
-      estimatedTime: "1-2 business days"
+      
     },
     {
       id: 5,
@@ -62,7 +62,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
       description: "Verification letter confirming your employment status",
       icon: <BusinessCenter />,
       category: "Employment",
-      estimatedTime: "2-3 business days"
+      
     }
   ];
 
@@ -101,13 +101,16 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
               sx={{
                 height: 180,
                 transition: 'all 0.3s ease-in-out',
+                bgcolor: theme.palette.mode === 'dark' ? '#23272f' : 'background.paper',
+                color: theme.palette.text.primary,
                 '&:hover': {
                   elevation: 6,
                   transform: 'translateY(-2px)',
-                  boxShadow: theme.shadows[6]
+                  boxShadow: theme.shadows[6],
+                  borderColor: theme.palette.mode === 'dark' ? '#ff4081' : '#E90A4D',
                 },
                 borderRadius: 2,
-                border: '1.5px solid #E90A4D'
+                border: `1.5px solid ${theme.palette.mode === 'dark' ? '#ff4081' : '#E90A4D'}`
               }}
             >
               <CardActionArea
@@ -117,10 +120,11 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
                   p: 0,
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'stretch'
+                  alignItems: 'stretch',
+                  color: 'inherit',
                 }}
               >
-                <CardContent sx={{ flexGrow: 1, p: 2, display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1, p: 2, display: 'flex', flexDirection: 'column', bgcolor: 'inherit', color: 'inherit' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1.5 }}>
                     <Box
                       sx={{
@@ -130,7 +134,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
                         color: getCategoryColor(letterType.category),
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}
                     >
                       {letterType.icon}
@@ -147,7 +151,8 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
                       fontSize: '0.7rem',
                       height: 20,
                       mb: 1,
-                      alignSelf: 'center'
+                      alignSelf: 'center',
+                      boxShadow: theme.palette.mode === 'dark' ? '0 0 2px #000' : undefined
                     }}
                   />
 
@@ -159,7 +164,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
                       mb: 1,
                       lineHeight: 1.2,
                       textAlign: 'center',
-                      fontSize: '0.85rem'
+                      fontSize: '0.85rem',
                     }}
                   >
                     {letterType.name}
