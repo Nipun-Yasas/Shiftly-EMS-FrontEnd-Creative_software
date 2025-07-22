@@ -15,6 +15,7 @@ import UserForm, {
   editValidationSchema,
   getEditInitialValues,
 } from "./UserForm";
+import { useDepartments } from "../../../../_hooks/useDepartments";
 
 export default function EditDialog({
   editDialogOpen,
@@ -23,6 +24,8 @@ export default function EditDialog({
   setEditingUser,
   handleSubmit,
 }) {
+  const { departments } = useDepartments();
+  
   const handleClose = () => {
     setOpenDialog(false);
     setEditingUser(null);
@@ -55,7 +58,7 @@ export default function EditDialog({
         </Box>
 
         <Formik
-          initialValues={getEditInitialValues(editingUser)}
+          initialValues={getEditInitialValues(editingUser, departments)}
           validationSchema={editValidationSchema}
           onSubmit={handleSubmit}
           enableReinitialize

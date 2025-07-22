@@ -29,7 +29,9 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import EditCalendarOutlinedIcon from '@mui/icons-material/EditCalendarOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import FreeCancellationOutlinedIcon from '@mui/icons-material/FreeCancellationOutlined';
-import { HistoryOutlined, PersonAddOutlined } from '@mui/icons-material';
+import HistoryOutlined from '@mui/icons-material/HistoryOutlined';
+import PersonAddOutlined from '@mui/icons-material/PersonAddOutlined';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 export function getNavigationForUser(user) {
   const roles = user?.roles?.map((r) => r.toLowerCase()) || [];
@@ -42,7 +44,7 @@ export function getNavigationForUser(user) {
   });
 }
 
-const  NAVIGATION = [
+const NAVIGATION = [
   {
     kind: 'header',
     title: 'Main items',
@@ -50,66 +52,71 @@ const  NAVIGATION = [
   {
     segment: 'admin-portal',
     title: 'Admin Portal',
-    icon: <AdminPanelSettingsIcon/>,
+    icon: <AdminPanelSettingsIcon />,
     children: [
       {
         segment: 'user-management',
         title: 'User Management',
-        icon: <ManageAccountsOutlinedIcon/>,
+        icon: <ManageAccountsOutlinedIcon />,
       },
       {
         segment: 'project-management',
         title: 'Project Management',
-        icon: <WorkOutlineIcon/>,
+        icon: <WorkOutlineIcon />,
       },
-       {
+      {
         segment: 'timesheet-management',
         title: 'Timesheet Management',
-        icon: <WorkHistoryOutlinedIcon/>,
+        icon: <WorkHistoryOutlinedIcon />,
       },
       {
         segment: 'leaves',
         title: 'Leaves',
-        icon: <FreeCancellationOutlinedIcon/>,
+        icon: <FreeCancellationOutlinedIcon />,
       },
       {
         segment: 'claims',
         title: 'Claims',
-        icon: <ReceiptLongOutlinedIcon/>,
+        icon: <ReceiptLongOutlinedIcon />,
       },
       {
         segment: 'events',
         title: 'Events',
-        icon: <EditCalendarOutlinedIcon/>,
+        icon: <EditCalendarOutlinedIcon />,
       },
-       {
+      {
         segment: 'candidates',
         title: 'Candidates',
-        icon: <GroupAddOutlinedIcon/>,
+        icon: <GroupAddOutlinedIcon />,
       }
     ]
   },
   {
     segment: 'dashboard',
     title: 'Dashboard',
-    icon: <DashboardIcon/>,
+    icon: <DashboardIcon />,
   },
   {
     segment: 'employee',
     title: 'Employee',
-    icon: <AccountCircleIcon/>,
+    icon: <AccountCircleIcon />,
     children: [
       {
         segment: 'profile',
         title: 'Profile',
-        icon: <PersonIcon/>,
+        icon: <PersonIcon />,
+      },
+      {
+        segment: 'update',
+        title: 'Update Profile',
+        icon: <ManageAccountsIcon />,
       }
     ]
   },
   {
     segment: 'organization',
     title: 'Organization',
-    icon: <ApartmentIcon/>
+    icon: <ApartmentIcon />
   },
   {
     kind: 'divider',
@@ -121,12 +128,12 @@ const  NAVIGATION = [
   {
     segment: 'project',
     title: 'Project',
-    icon: <WorkIcon/>,
+    icon: <WorkIcon />,
     children: [
       {
         segment: 'all',
         title: 'All Projects',
-        icon: <WorkHistoryIcon/>,
+        icon: <WorkHistoryIcon />,
       },
       {
         segment: 'my',
@@ -150,7 +157,7 @@ const  NAVIGATION = [
   {
     segment: 'timesheet',
     title: 'Timesheet',
-    icon: <AccessTimeFilledIcon/>,
+    icon: <AccessTimeFilledIcon />,
     children: [
       {
         segment: 'submit',
@@ -174,7 +181,7 @@ const  NAVIGATION = [
   {
     segment: 'letter',
     title: 'Letter',
-    icon: <EmailIcon/>,
+    icon: <EmailIcon />,
     children: [
       {
         segment: 'request',
@@ -191,7 +198,7 @@ const  NAVIGATION = [
   {
     segment: 'leave',
     title: 'Leave',
-    icon: <DirectionsRunIcon/>,
+    icon: <DirectionsRunIcon />,
     children: [
       {
         segment: 'submit',
@@ -208,7 +215,7 @@ const  NAVIGATION = [
   {
     segment: 'claim',
     title: 'Claim',
-    icon: <ReceiptIcon/>,
+    icon: <ReceiptIcon />,
     children: [
       {
         segment: 'submit',
@@ -232,7 +239,7 @@ const  NAVIGATION = [
   {
     segment: 'events',
     title: 'Event',
-    icon: <DateRangeIcon/>,
+    icon: <DateRangeIcon />,
     children: [
       {
         segment: 'submit',
@@ -249,7 +256,7 @@ const  NAVIGATION = [
   {
     segment: 'refer',
     title: 'Refer',
-    icon: <SupervisorAccountIcon/>,
+    icon: <SupervisorAccountIcon />,
     children: [
       {
         segment: 'submit',
@@ -259,9 +266,9 @@ const  NAVIGATION = [
       {
         segment: 'history',
         title: 'Refer History',
-        icon: <HistoryOutlined/>,
+        icon: <HistoryOutlined />,
       }
     ]
   },
-  
+
 ];

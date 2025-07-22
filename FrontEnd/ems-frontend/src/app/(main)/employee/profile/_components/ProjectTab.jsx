@@ -1,11 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
-import url from '../../../../../public/creative_software_logo.png';
+import url from '../../../../../../public/creative_software_logo.png';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Typography, IconButton, Paper } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
 
-const Projects = () => {
+const Projects = ({ employeeData }) => {
   const theme = useTheme();
 
   return (

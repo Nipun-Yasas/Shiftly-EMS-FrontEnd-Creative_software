@@ -1,6 +1,7 @@
 "use client";
 
-import { Formik, Form } from "formik";
+import { Formik } from "formik";
+import { Form } from "formik";
 
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
@@ -8,32 +9,28 @@ import Button from "@mui/material/Button";
 
 import InputItem from "@/app/_components/inputs/InputItem";
 import TextInput from "@/app/_components/inputs/TextInput";
-import SelectInput from "@/app/_components/inputs/SelectInput";
 
-const proficiencyOptions = [
-  { id: 1, name: "Beginner" },
-  { id: 2, name: "Intermediate" },
-  { id: 3, name: "Advanced" },
-];
-
-export default function SkillsForm(props) {
+export default function ExperienceForm(props) {
   const { formData, handleInputChange, handleSubmit, handleCancel } = props;
 
   return (
     <>
       <Formik
         initialValues={{
-          skillName: formData?.skillName || "",
-          proficiency: formData?.proficiency ? 
-            proficiencyOptions.find(option => option.name === formData.proficiency) || null : null,
+          jobTitle: formData?.jobTitle || "",
+          company: formData?.company || "",
+          duration: formData?.duration || "",
         }}
         validate={(values) => {
           const errors = {};
-          if (!values.skillName) {
-            errors.skillName = "Skill Name is required";
+          if (!values.jobTitle) {
+            errors.jobTitle = "Job Title is required";
           }
-          if (!values.proficiency) {
-            errors.proficiency = "Proficiency Level is required";
+          if (!values.company) {
+            errors.company = "Company is required";
+          }
+          if (!values.duration) {
+            errors.duration = "Duration is required";
           }
           return errors;
         }}
@@ -43,15 +40,17 @@ export default function SkillsForm(props) {
             preventDefault: () => {},
             target: {
               elements: {
-                skillName: { value: values.skillName },
-                proficiency: { value: values.proficiency?.name || values.proficiency }
+                jobTitle: { value: values.jobTitle },
+                company: { value: values.company },
+                duration: { value: values.duration }
               }
             }
           };
           
           // Update formData through handleInputChange
-          handleInputChange({ target: { name: 'skillName', value: values.skillName } });
-          handleInputChange({ target: { name: 'proficiency', value: values.proficiency?.name || values.proficiency } });
+          handleInputChange({ target: { name: 'jobTitle', value: values.jobTitle } });
+          handleInputChange({ target: { name: 'company', value: values.company } });
+          handleInputChange({ target: { name: 'duration', value: values.duration } });
           
           // Call the original handleSubmit
           handleSubmit(syntheticEvent);
@@ -70,7 +69,7 @@ export default function SkillsForm(props) {
                 }}
               >
                 <InputItem>
-                  <TextInput name="skillName" label="Skill Name (e.g., JavaScript)" />
+                  <TextInput name="jobTitle" label="Job Title" />
                 </InputItem>
               </Box>
 
@@ -83,12 +82,20 @@ export default function SkillsForm(props) {
                 }}
               >
                 <InputItem>
-                  <SelectInput
-                    name="proficiency"
-                    label="Proficiency Level"
-                    options={proficiencyOptions}
-                    getOptionLabel={(option) => option.name || ""}
-                  />
+                  <TextInput name="company" label="Company" />
+                </InputItem>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 0, sm: 2 },
+                }}
+              >
+                <InputItem>
+                  <TextInput name="duration" label="Duration (e.g., Jan 2020 - Dec 2022)" />
                 </InputItem>
               </Box>
 
@@ -100,7 +107,7 @@ export default function SkillsForm(props) {
                   gap: 2,
                 }}
               >
-                
+          
 
                 <Button
                   color="text.primary"

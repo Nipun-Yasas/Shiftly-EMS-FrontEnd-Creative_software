@@ -1,6 +1,7 @@
 "use client";
 
-import { Formik, Form } from "formik";
+import { Formik } from "formik";
+import { Form } from "formik";
 
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
@@ -8,28 +9,32 @@ import Button from "@mui/material/Button";
 
 import InputItem from "@/app/_components/inputs/InputItem";
 import TextInput from "@/app/_components/inputs/TextInput";
+import SelectInput from "@/app/_components/inputs/SelectInput";
 
-export default function ExperienceForm(props) {
+const proficiencyOptions = [
+  { id: 1, name: "Beginner" },
+  { id: 2, name: "Intermediate" },
+  { id: 3, name: "Advanced" },
+];
+
+export default function SkillsForm(props) {
   const { formData, handleInputChange, handleSubmit, handleCancel } = props;
 
   return (
     <>
       <Formik
         initialValues={{
-          jobTitle: formData?.jobTitle || "",
-          company: formData?.company || "",
-          duration: formData?.duration || "",
+          skillName: formData?.skillName || "",
+          proficiency: formData?.proficiency ? 
+            proficiencyOptions.find(option => option.name === formData.proficiency) || null : null,
         }}
         validate={(values) => {
           const errors = {};
-          if (!values.jobTitle) {
-            errors.jobTitle = "Job Title is required";
+          if (!values.skillName) {
+            errors.skillName = "Skill Name is required";
           }
-          if (!values.company) {
-            errors.company = "Company is required";
-          }
-          if (!values.duration) {
-            errors.duration = "Duration is required";
+          if (!values.proficiency) {
+            errors.proficiency = "Proficiency Level is required";
           }
           return errors;
         }}
@@ -39,17 +44,15 @@ export default function ExperienceForm(props) {
             preventDefault: () => {},
             target: {
               elements: {
-                jobTitle: { value: values.jobTitle },
-                company: { value: values.company },
-                duration: { value: values.duration }
+                skillName: { value: values.skillName },
+                proficiency: { value: values.proficiency?.name || values.proficiency }
               }
             }
           };
           
           // Update formData through handleInputChange
-          handleInputChange({ target: { name: 'jobTitle', value: values.jobTitle } });
-          handleInputChange({ target: { name: 'company', value: values.company } });
-          handleInputChange({ target: { name: 'duration', value: values.duration } });
+          handleInputChange({ target: { name: 'skillName', value: values.skillName } });
+          handleInputChange({ target: { name: 'proficiency', value: values.proficiency?.name || values.proficiency } });
           
           // Call the original handleSubmit
           handleSubmit(syntheticEvent);
@@ -68,7 +71,7 @@ export default function ExperienceForm(props) {
                 }}
               >
                 <InputItem>
-                  <TextInput name="jobTitle" label="Job Title" />
+                  <TextInput name="skillName" label="Skill Name (e.g., JavaScript)" />
                 </InputItem>
               </Box>
 
@@ -81,20 +84,12 @@ export default function ExperienceForm(props) {
                 }}
               >
                 <InputItem>
-                  <TextInput name="company" label="Company" />
-                </InputItem>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: { xs: "column", sm: "row" },
-                  gap: { xs: 0, sm: 2 },
-                }}
-              >
-                <InputItem>
-                  <TextInput name="duration" label="Duration (e.g., Jan 2020 - Dec 2022)" />
+                  <SelectInput
+                    name="proficiency"
+                    label="Proficiency Level"
+                    options={proficiencyOptions}
+                    getOptionLabel={(option) => option.name || ""}
+                  />
                 </InputItem>
               </Box>
 
@@ -106,7 +101,7 @@ export default function ExperienceForm(props) {
                   gap: 2,
                 }}
               >
-          
+                
 
                 <Button
                   color="text.primary"

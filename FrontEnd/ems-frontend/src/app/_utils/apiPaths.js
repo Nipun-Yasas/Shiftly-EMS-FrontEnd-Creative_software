@@ -62,4 +62,17 @@ export const API_PATHS = {
     DELETE_EVENT: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
     GET_MY_EVENTS: (employeeId) => `/api/v1/shiftly/ems/events/my/${employeeId}`,
   },
+  DEPARTMENTS: {
+    GET_ALL_DEPARTMENTS: '/api/v1/shiftly/ems/departments/all',
+  },
+  EMPLOYEE: {
+    ADD_EMPLOYEE: '/api/v1/shiftly/ems/employee/add',
+    GET_ALL_EMPLOYEES: '/api/v1/shiftly/ems/employee/all',
+    GET_EMPLOYEE_BY_ID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
+    DELETE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
+    UPDATE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/update/${id}`,
+    GET_PROFILE: '/api/v1/shiftly/ems/employee/profile',
+    UPDATE_PROFILE: '/api/v1/shiftly/ems/employee/profile',
+    SELF_UPDATE: '/api/v1/shiftly/ems/employee/self-update',
+  },
 };

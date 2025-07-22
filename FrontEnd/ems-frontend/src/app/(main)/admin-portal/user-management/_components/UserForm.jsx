@@ -9,21 +9,11 @@ import * as Yup from "yup";
 
 import SelectInput from "../../../../_components/inputs/SelectInput";
 import InputItem from "../../../../_components/inputs/InputItem";
+import { useDepartments } from "../../../../_hooks/useDepartments";
 
 const roles = [
-  { id: 1, name: "Admin", label: "Administrator" },
-  { id: 2, name: "Employee", label: "Employee" },
-];
-
-const departments = [
-  { id: 1, name: "Engineering", label: "Engineering" },
-  { id: 2, name: "Project Management", label: "Project Management" },
-  { id: 3, name: "Human Resources", label: "Human Resources" },
-  { id: 4, name: "IT", label: "Information Technology" },
-  { id: 5, name: "Finance", label: "Finance" },
-  { id: 6, name: "Marketing", label: "Marketing" },
-  { id: 7, name: "Sales", label: "Sales" },
-  { id: 8, name: "Operations", label: "Operations" },
+  { id: 1, name: "ADMIN", label: "Admin" },
+  { id: 2, name: "USER", label: "User" },
 ];
 
 const designations = [
@@ -55,7 +45,7 @@ export const assignValidationSchema = Yup.object({
 });
 
 // Helper functions
-export const getEditInitialValues = (editingUser) => {
+export const getEditInitialValues = (editingUser, departments = []) => {
   if (editingUser) {
     return {
       roleId:
@@ -69,7 +59,8 @@ export const getEditInitialValues = (editingUser) => {
         departments.find(
           (d) =>
             d.name === editingUser.department ||
-            d.label === editingUser.department
+            d.label === editingUser.department ||
+            d.id === editingUser.department?.id
         ) || null,
       designation:
         designations.find(
@@ -101,6 +92,8 @@ export default function UserForm({
   onCancel = null,
   submitForm = null,
 }) {
+  const { departments, loading: loadingDepartments } = useDepartments();
+
   return (
     <Stack spacing={2}>
       <InputItem>
@@ -115,9 +108,10 @@ export default function UserForm({
       <InputItem>
         <SelectInput
           name="department"
-          label="Department"
+          label={loadingDepartments ? "Loading Departments..." : "Department"}
           options={departments}
           getOptionLabel={(option) => option.label}
+          disabled={loadingDepartments}
         />
       </InputItem>
 

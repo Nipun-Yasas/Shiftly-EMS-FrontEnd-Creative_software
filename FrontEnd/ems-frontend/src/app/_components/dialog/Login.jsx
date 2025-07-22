@@ -58,7 +58,24 @@ export default function LoginForm(props) {
         localStorage.setItem("token", jwttoken);
         updateUser(userDTO);
         setOpenLogin(false); 
-        router.push("/dashboard");
+        
+        // Check if user has employee profile
+        try {
+          const employeeResponse = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
+          
+          // If employee profile exists, redirect to dashboard
+          if (employeeResponse.data) {
+            router.push("/dashboard");
+          }
+        } catch (employeeError) {
+          // If employee profile doesn't exist (404 or other error), redirect to profile creation
+          if (employeeError.response && employeeError.response.status === 404) {
+            router.push("/employee/profile");
+          } else {
+            // For other errors, still redirect to profile creation as fallback
+            router.push("/employee/profile");
+          }
+        }
       } else {
         setError("Login failed: No token received");
       }

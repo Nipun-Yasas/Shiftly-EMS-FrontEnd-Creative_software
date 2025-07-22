@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -10,6 +11,7 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { UserContext } from "../../../context/UserContext";
 
 import AllTab from "./_components/AllTab";
 import VerifyTab from "./_components/VerifyTab";
@@ -19,7 +21,18 @@ import DeleteDialog from "./_components/DeleteDialog";
 import TabPanel from "../../../_components/main/TabPanel";
 
 export default function UserManagementPage() {
-  const [tabValue, setTabValue] = useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, updateUser } = useContext(UserContext);
+  
+  const getInitialTabValue = () => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'verify') return 1;
+    if (tabParam === 'verified') return 0;
+    return 0;
+  };
+
+  const [tabValue, setTabValue] = useState(getInitialTabValue);
   const [users, setUsers] = useState([]);
   const [unverifiedUsers, setUnverifiedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -51,7 +64,7 @@ export default function UserManagementPage() {
       }
 
       const response = await axiosInstance.get(
-        API_PATHS.ADMIN_USER.GET_ALL_USERS
+        API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES
       );
 
       // Handle both single user and array of users response
@@ -74,6 +87,19 @@ export default function UserManagementPage() {
       setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to refresh current user data from server
+  const refreshCurrentUserData = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.AUTH.GET_CURRENT_USER);
+      if (response.data) {
+        console.log("Refreshed user data from server:", response.data);
+        updateUser(response.data);
+      }
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
     }
   };
 
@@ -102,22 +128,58 @@ export default function UserManagementPage() {
 
   const handleAssignSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const assignData = {
-        employeeNumber: values.employeeNumber,
-        roleId: values.roleId?.id || values.roleId,
-        userId: assigningUser.id,
+      const verifyData = {
+        role: values.roleId?.name || values.roleId,
+        designation: values.designation?.name || values.designation,
+        department: values.department?.name || values.department, // Send department name, not ID
       };
 
-      await axiosInstance.post(API_PATHS.ADMIN_USER.ASSIGN_USER, assignData);
-      showSnackbar("User assigned successfully", "success");
+      console.log("Sending verification data:", verifyData);
+
+      const response = await axiosInstance.put(
+        API_PATHS.SUPER_ADMIN.VERIFY_EMPLOYEE(assigningUser.id),
+        verifyData
+      );
+      
+      console.log("User verified successfully");
+      console.log("Verification response:", response.data);
+      
+      // Update UserContext if the verified user is the current logged-in user
+      if (user && (user.id === assigningUser.id || user.email === assigningUser.email)) {
+        console.log("Updating current user context with new data");
+        const updatedUser = {
+          ...user,
+          designation: verifyData.designation,
+          department: verifyData.department,
+          verified: true
+        };
+        updateUser(updatedUser);
+        console.log("UserContext updated:", updatedUser);
+        
+        // Also refresh from server to get the latest data
+        setTimeout(() => {
+          refreshCurrentUserData();
+        }, 1000);
+      }
+      
+      showSnackbar("User verified and assigned successfully", "success");
 
       setAssignDialogOpen(false);
       setAssigningUser(null);
       fetchUsers(); 
       resetForm();
     } catch (error) {
-      console.error("Error assigning user:", error);
-      showSnackbar("Error assigning user", "error");
+      console.error("Error verifying user:", error);
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = "Error verifying user";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      showSnackbar(errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -157,7 +219,23 @@ export default function UserManagementPage() {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+    
+    // Update URL parameter based on tab selection
+    const params = new URLSearchParams(searchParams.toString());
+    if (newValue === 0) {
+      params.set('tab', 'verified');
+    } else if (newValue === 1) {
+      params.set('tab', 'verify');
+    }
+    
+    // Update URL without page refresh
+    router.push(`?${params.toString()}`, { scroll: false });
   };
+
+  // Update tab value when URL changes (for direct navigation)
+  useEffect(() => {
+    setTabValue(getInitialTabValue());
+  }, [searchParams]);
 
   useEffect(() => {
     fetchUsers();

@@ -1,19 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Box,
-  Modal,
-  Snackbar,
-  Alert,
-  Typography,
-  IconButton,
-  useTheme
-} from '@mui/material';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import SkillsForm from '../_components/SkillsForm';
+import SkillsForm from './SkillsForm';
 
 const columns = [
   { field: "id", headerName: "ID", flex:1},
@@ -21,7 +19,7 @@ const columns = [
   { field: "proficiency", headerName: "Proficiency", flex:1 },
 ];
 
-const Skills = () => {
+const SkillsTab = ({ employeeData }) => {
   const theme = useTheme();
 
   const [openModal, setOpenModal] = useState(false);
@@ -30,7 +28,18 @@ const Skills = () => {
     skillName: '',
     proficiency: '',
   });
-  const [skills, setSkills] = useState([]);
+
+  // Parse skills from employeeData (assuming it's a string)
+  const skillsText = employeeData?.skills || '';
+  
+  // Convert skills text to table data - you can modify this logic based on your data format
+  const skillsData = skillsText ? [
+    {
+      id: 1,
+      skillName: "SkillsTab Overview",
+      proficiency: skillsText.length > 50 ? "Multiple SkillsTab" : "Basic SkillsTab"
+    }
+  ] : [];
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -42,11 +51,8 @@ const Skills = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newSkill = {
-      id: skills.length + 1,
-      ...formData
-    };
-    setSkills((prev) => [...prev, newSkill]);
+    // For now, just close modal and show success message
+    // In a real implementation, you would update the employee skills via API
     setOpenModal(false);
     setOpenSnackbar(true);
     setFormData({ skillName: '', proficiency: '' });
@@ -128,42 +134,60 @@ const Skills = () => {
         </Alert>
       </Snackbar>
 
-      {/* DataGrid */}
-     
-        <Box 
-            sx={{ width: "100%", p: 5 ,
-
-             
-            }}
-        
-        >
-          <DataGrid
-            rows={skills}
-            columns={columns}
-            height="auto"
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 50, 100]}
+      {/* DataGrid or SkillsTab Display */}
+      {skillsText ? (
+        <Box sx={{ width: "100%", p: 3 }}>
+          <Typography
+            variant="h6"
             sx={{
-              
-              // Fix for positioning "No rows" message
-              '& .MuiDataGrid-overlayWrapperInner': {
-                display: 'flex',
-                justifyContent: 'center',
-                paddingTop: '60px'
-              }
+              color: theme.palette.primary.main,
+              fontWeight: 600,
+              mb: 2,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
             }}
-          />
+          >
+            SkillsTab & Expertise
+          </Typography>
+          <Typography
+            variant="body1"
+            color="text.primary"
+            sx={{
+              backgroundColor: theme.palette.grey[50],
+              p: 3,
+              borderRadius: 2,
+              whiteSpace: 'pre-wrap',
+              lineHeight: 1.6,
+              border: `1px solid ${theme.palette.grey[200]}`
+            }}
+          >
+            {skillsText}
+          </Typography>
         </Box>
+      ) : (
+        <Box 
+          sx={{ 
+            width: "100%", 
+            p: 5,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 200
+          }}
+        >
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+            No SkillsTab Information Available
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            SkillsTab information will be displayed here once added to the profile.
+          </Typography>
+        </Box>
+      )}
       
     </Box>
   );
 };
 
-export default Skills;
+export default SkillsTab;
