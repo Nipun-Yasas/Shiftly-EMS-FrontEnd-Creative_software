@@ -12,6 +12,8 @@ import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
 import FileUpload from "../../../_components/inputs/FileUpload";
+import axiosInstance from '../../../_utils/axiosInstance';
+import { REFERRAL_API } from '../../../_utils/apiPaths';
 
 const vacancyOptions = [
   { id: 1, name: "Software Engineer" },
@@ -24,6 +26,37 @@ export default function ReferForm(props) {
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.resume || "");
+  const [submitting, setSubmitting] = useState(false);
+
+  // New: handle backend submission
+  const handleBackendSubmit = async (values, { resetForm }) => {
+    setSubmitting(true);
+    try {
+      const data = new FormData();
+      data.append('vacancyId', values.vacancy?.id || '');
+      data.append('applicantName', values.applicantName);
+      data.append('applicantEmail', values.applicantEmail);
+      data.append('message', values.message);
+      if (values.resume) {
+        data.append('file', values.resume);
+      }
+      const response = await axiosInstance.post(REFERRAL_API.SUBMIT, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      alert('Referral submitted! ID: ' + response.data.id);
+      setOpenSubmit && setOpenSubmit(true);
+      resetForm();
+      setFileName("");
+      setPreview(null);
+      if (resumeRef.current) {
+        resumeRef.current.value = "";
+      }
+    } catch (error) {
+      alert('Failed to submit referral.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -54,20 +87,7 @@ export default function ReferForm(props) {
           }
           return errors;
         }}
-        onSubmit={(values, { resetForm }) => {
-          
-          if (onSubmit) {
-            onSubmit(values);
-          } else {
-            setOpenSubmit(true);
-            resetForm();
-            setFileName("");
-            setPreview(null);
-            if (resumeRef.current) {
-              resumeRef.current.value = "";
-            }
-          }
-        }}
+        onSubmit={handleBackendSubmit}
       >
         {({ errors, validateForm, resetForm }) => (
           <Form>

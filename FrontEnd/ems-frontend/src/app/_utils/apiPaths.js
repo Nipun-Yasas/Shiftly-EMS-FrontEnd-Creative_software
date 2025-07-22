@@ -76,3 +76,8 @@ export const API_PATHS = {
     SELF_UPDATE: '/api/v1/shiftly/ems/employee/self-update',
   },
 };
+
+export const REFERRAL_API = {
+  SUBMIT: '/api/v1/shiftly/ems/referrals/add',
+  GET_ALL: '/api/v1/shiftly/ems/referrals/all',
+};
