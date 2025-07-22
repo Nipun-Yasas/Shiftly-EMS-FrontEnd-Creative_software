@@ -51,7 +51,6 @@ const RequestLetter = () => {
             <SearchField
               value={searchQuery}
               onChange={setSearchTerm}
-              onSearch={handleSearch}
             />
           </Box>
 
