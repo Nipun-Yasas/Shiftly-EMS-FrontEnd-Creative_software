@@ -229,13 +229,13 @@ const EmployeeUpdatePage = () => {
         />
         <Typography
           variant="h4"
-          sx={{ mb: 1, color: theme.palette.text.primary }}
+          sx={{ mb: 1, color: theme.palette.text }}
         >
           {employeeData ? "Update Employee Profile" : "Create Employee Profile"}
         </Typography>
         <Typography
           variant="body1"
-          sx={{ color: theme.palette.text.secondary }}
+          sx={{ color: theme.palette.text }}
         >
           {employeeData
             ? "Update your employee information below"
@@ -394,10 +394,12 @@ const EmployeeUpdatePage = () => {
                 >
                   <Button
                     variant="text"
-                    color="text.primary"
+                    
                     onClick={handleBack}
                     disabled={isSubmitting}
-                    sx={{ px: 4 }}
+                    sx={{ px: 4,
+                      color: theme.palette.text.primary
+                     }}
                   >
                     Cancel
                   </Button>
