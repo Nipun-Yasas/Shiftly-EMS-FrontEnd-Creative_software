@@ -1,38 +1,23 @@
-
 "use client";
 
-import { 
-  Paper, 
-  CircularProgress, 
-  Box, 
-  Typography, 
-  Button, 
-  Avatar, 
-  Chip,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  useTheme,
-  Checkbox,
-  TextField,
-  Grow,
-  Fade,
-  LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Person from '@mui/icons-material/Person';
+import Event from '@mui/icons-material/Event';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import { useState, useEffect, useRef } from "react";
-import AddToDoDialog from './AddToDoDialog';
-import ToDoTableDialog from './ToDoTableDialog';
 import AddGoalDialog from './AddGoalDialog';
 import GoalTableDialog from './GoalTableDialog';
 import dayjs from 'dayjs';
-import { TrendingUp, Edit, Delete, ChevronLeft, ChevronRight, Person, Event, CheckCircle, EmojiEvents, Add, Star } from "@mui/icons-material";
 import GreetingHeader from './_components/GreetingHeader';
 import ProgressCard from './_components/ProgressCard';
 import ToDoCard from './_components/ToDoCard';
@@ -40,16 +25,13 @@ import EventsCard from './_components/EventsCard';
 import StarPointsCard from './_components/StarPointsCard';
 import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import UserDataStatus from '../../_components/UserDataStatus';
-import { getGreeting, getPriorityColor, getEventTypeColor } from './_components/dashboardUtils';
+import { getGreeting } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
-import { 
-  saveUserData, 
-  getUserData, 
-  migrateUserData, 
-  cleanupOldBackups,
-  initializeUserSession,
-  getCurrentUserId
-} from '../../_utils/localStorageUtils';
+import saveUserData from '../../_utils/localStorageUtils';
+import getUserData from '../../_utils/localStorageUtils';
+import migrateUserData from '../../_utils/localStorageUtils';
+import cleanupOldBackups from '../../_utils/localStorageUtils';
+import initializeUserSession from '../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
 import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 
@@ -151,37 +133,7 @@ const demoEvents = [
   { id: 4, title: "Call of Duty: Warzone", date: "Aug 03 - Aug 05, 2025", participants: 256, joined: false, imageUrl: "/images/project4.jpg", category: "Gaming" },
 ];
 
-// FlipDigit component for flip clock animation
-const FlipDigit = ({ value }) => {
-  const [prev, setPrev] = useState(value);
-  const [flipping, setFlipping] = useState(false);
-  useEffect(() => {
-    if (value !== prev) {
-      setFlipping(true);
-      const timeout = setTimeout(() => {
-        setFlipping(false);
-        setPrev(value);
-      }, 600);
-      return () => clearTimeout(timeout);
-    }
-  }, [value, prev]);
-  return (
-    <span className={`flip-digit${flipping ? ' flipping' : ''}`} style={{ display: 'inline-block', minWidth: 24, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>
-      <span className="flip-digit-top">{prev}</span>
-      <span className="flip-digit-bottom">{value}</span>
-      <style>{`
-        .flip-digit { position: relative; perspective: 80px; }
-        .flip-digit-top, .flip-digit-bottom { display: block; font-size: 1.18em; font-weight: 900; color: inherit; background: none; border-radius: 4px; line-height: 1.1; }
-        .flip-digit-top { z-index: 2; background: none; }
-        .flip-digit-bottom { position: absolute; top: 0; left: 0; right: 0; z-index: 1; background: none; transform: rotateX(90deg); opacity: 0; }
-        .flip-digit.flipping .flip-digit-top { animation: flipTop 0.3s forwards; }
-        .flip-digit.flipping .flip-digit-bottom { animation: flipBottom 0.3s 0.3s forwards; }
-        @keyframes flipTop { 0% { transform: rotateX(0); } 100% { transform: rotateX(-90deg); opacity: 0; } }
-        @keyframes flipBottom { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
-      `}</style>
-    </span>
-  );
-};
+
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -494,7 +446,7 @@ const Dashboard = () => {
   const greeting = currentTime ? getGreeting(currentTime.hour()) : '';
 
   return (
-    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh', width: '100%', position: 'relative' }}>
+    <Box sx={{ p: 3,  minHeight: '100vh', width: '100%', position: 'relative' }}>
       <GreetingHeader greeting={greeting} />
       
       {/* Performance and ToDo Cards - Side by Side at Top */}
@@ -675,9 +627,9 @@ function StarDetailsDialog({ open, onClose }) {
         <IconButton onClick={onClose} size="small" sx={{ ml: 2 }}><CloseIcon /></IconButton>
       </DialogTitle>
       <DialogContent sx={{ fontFamily: 'var(--font-lexend)', color: 'text.secondary', pt: 1 }}>
-        <Typography variant="body1" sx={{ mb: 2 }}><b>What are Star Points?</b><br />Star Points are special recognitions awarded by admins for outstanding performance, teamwork, or going above and beyond in your role.</Typography>
-        <Typography variant="body1" sx={{ mb: 2 }}><b>How do I earn more?</b><br />Admins can add stars to your profile when you achieve something exceptional. Keep striving for excellence!</Typography>
-        <Typography variant="body1" sx={{ mb: 2, color: 'primary.main', fontWeight: 700 }}>Rewards you can unlock:</Typography>
+        <Typography variant="text" sx={{ mb: 2 }}><b>What are Star Points?</b><br />Star Points are special recognitions awarded by admins for outstanding performance, teamwork, or going above and beyond in your role.</Typography>
+        <Typography variant="text" sx={{ mb: 2 }}><b>How do I earn more?</b><br />Admins can add stars to your profile when you achieve something exceptional. Keep striving for excellence!</Typography>
+        <Typography variant="text" sx={{ mb: 2, color: 'primary.main', fontWeight: 700 }}>Rewards you can unlock:</Typography>
         <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontSize: '1rem' }}>
           <li>1 star: Bronze badge</li>
           <li>3 stars: Gift card</li>

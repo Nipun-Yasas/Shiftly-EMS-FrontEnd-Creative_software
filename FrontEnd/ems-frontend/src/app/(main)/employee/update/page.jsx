@@ -394,11 +394,11 @@ const EmployeeUpdatePage = () => {
                 >
                   <Button
                     variant="text"
-                    
+                    color="primary"
                     onClick={handleBack}
                     disabled={isSubmitting}
                     sx={{ px: 4,
-                      color: theme.palette.text.primary
+                      
                      }}
                   >
                     Cancel
