@@ -113,7 +113,21 @@ export default function ReferHistory() {
         </Box>
       )
     },
-    { field: "resume_file_path", headerName: "Uploaded Resume", width: 180 },
+    { 
+      field: "resume_file_path", 
+      headerName: "Uploaded Resume", 
+      width: 180,
+      renderCell: (params) => {
+        const fileUrl = params.value;
+        if (!fileUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + fileUrl;
+        return (
+          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
+            Download
+          </a>
+        );
+      }
+    },
     { field: "status", headerName: "Referral State", width: 150 },
     {
       field: "actions",
