@@ -71,10 +71,14 @@ const validationSchema = Yup.object({
     .max(100, "Location must be less than 100 characters")
     .required("Location is required"),
   designation: Yup.object().nullable(), // Make designation optional
-  skills: Yup.string().max(1000, "SkillsTab must be less than 1000 characters"),
+  skills: Yup.string().max(1000, "Skills must be less than 1000 characters"),
   education: Yup.string().max(
     1000,
-    "EducationTab must be less than 1000 characters"
+    "Education must be less than 1000 characters"
+  ),
+  experience: Yup.string().max(
+    1000,
+    "Experience must be less than 1000 characters"
   ),
 });
 
@@ -121,8 +125,9 @@ const EmployeeUpdatePage = () => {
         designation:
           designationOptions.find((d) => d.name === employeeData.designation) ||
           null,
-        skills: employeeData.skills || "",
-        education: employeeData.education || "",
+        skills: Array.isArray(employeeData.skills) ? employeeData.skills.join('\n') : (employeeData.skills || ""),
+        education: Array.isArray(employeeData.education) ? employeeData.education.join('\n') : (employeeData.education || ""),
+        experience: Array.isArray(employeeData.experience) ? employeeData.experience.join('\n') : (employeeData.experience || ""),
       };
     }
     return {
@@ -134,6 +139,7 @@ const EmployeeUpdatePage = () => {
       designation: null,
       skills: "",
       education: "",
+      experience: "",
     };
   };
 
@@ -142,7 +148,7 @@ const EmployeeUpdatePage = () => {
       setError(null);
       setSuccess(null);
 
-      // Transform data to match backend expectations (simple strings, not objects)
+      // Transform data to match backend expectations (arrays instead of strings)
       const employeePayload = {
         firstName: values.firstName,
         lastName: values.lastName,
@@ -150,11 +156,12 @@ const EmployeeUpdatePage = () => {
         dob: values.dob,
         location: values.location,
         designation: values.designation?.name || values.designation,
-        skills: values.skills || "",
-        education: values.education || "",
+        skills: values.skills ? values.skills.split('\n').filter(skill => skill.trim() !== '') : [],
+        education: values.education ? values.education.split('\n').filter(edu => edu.trim() !== '') : [],
+        experience: values.experience ? values.experience.split('\n').filter(exp => exp.trim() !== '') : [],
       };
 
-      console.log('Sending payload:', employeePayload); // Debug log
+      console.log("Sending payload:", employeePayload); // Debug log
 
       let response;
       if (employeeData?.employeeId) {
@@ -171,7 +178,7 @@ const EmployeeUpdatePage = () => {
         );
       }
 
-      console.log('Response:', response.data); // Debug log
+      console.log("Response:", response.data); // Debug log
 
       if (response.data) {
         setSuccess("Employee profile updated successfully!");
@@ -318,8 +325,6 @@ const EmployeeUpdatePage = () => {
                       disabled={isSubmitting}
                     />
                   </InputItem>
-
-                  
                 </Box>
                 <Typography
                   variant="h6"
@@ -328,7 +333,6 @@ const EmployeeUpdatePage = () => {
                   Professional Information
                 </Typography>
 
-                
                 <Box
                   sx={{
                     display: "flex",
@@ -337,13 +341,13 @@ const EmployeeUpdatePage = () => {
                     gap: { xs: 0, sm: 2 },
                   }}
                 >
-                <InputItem>
+                  <InputItem>
                     <TextInput
                       name="skills"
-                      label="SkillsTab"
+                      label="Skills"
                       multiline
                       rows={4}
-                      placeholder="List your technical skills, programming languages, tools, etc."
+                      placeholder="List your technical skills, programming languages, tools, etc. (one per line)"
                       disabled={isSubmitting}
                     />
                   </InputItem>
@@ -351,14 +355,35 @@ const EmployeeUpdatePage = () => {
                   <InputItem>
                     <TextInput
                       name="education"
-                      label="EducationTab"
+                      label="Education"
                       multiline
                       rows={4}
-                      placeholder="Describe your educational background, degrees, certifications, etc."
+                      placeholder="Describe your educational background, degrees, certifications, etc. (one per line)"
                       disabled={isSubmitting}
                     />
                   </InputItem>
+
+                  
                 </Box>
+                <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      flexDirection: { xs: "column", sm: "row" },
+                      gap: { xs: 0, sm: 2 },
+                    }}
+                  >
+                    <InputItem>
+                      <TextInput
+                        name="experience"
+                        label="Experience"
+                        multiline
+                        rows={4}
+                        placeholder="Describe your work experience, roles, responsibilities, etc. (one per line)"
+                        disabled={isSubmitting}
+                      />
+                    </InputItem>
+                  </Box>
                 <Box
                   sx={{
                     display: "flex",

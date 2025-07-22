@@ -33,8 +33,12 @@ const EducationTab = ({ employeeData }) => {
     duration: '',
   });
 
-  // Get education text from employeeData
-  const educationText = employeeData?.education || '';
+  // Get education data from employeeData (should be an array now)
+  const educationData = employeeData?.education || [];
+  
+  // Convert education to array format
+  const educationArray = Array.isArray(educationData) ? educationData : 
+    (typeof educationData === 'string' && educationData ? [educationData] : []);
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
@@ -105,8 +109,8 @@ const EducationTab = ({ employeeData }) => {
         </Alert>
       </Snackbar>
 
-      {/* EducationTab Display */}
-      {educationText ? (
+      {/* Education Display */}
+      {educationArray && educationArray.length > 0 ? (
         <Box sx={{ width: "100%", p: 3 }}>
           <Typography
             variant="h6"
@@ -119,22 +123,41 @@ const EducationTab = ({ employeeData }) => {
               gap: 1
             }}
           >
-            EducationTab Background
+            Education Background
           </Typography>
-          <Typography
-            variant="body1"
-            color="text.primary"
-            sx={{
-              backgroundColor: theme.palette.grey[50],
-              p: 3,
-              borderRadius: 2,
-              whiteSpace: 'pre-wrap',
-              lineHeight: 1.6,
-              border: `1px solid ${theme.palette.grey[200]}`
-            }}
-          >
-            {educationText}
-          </Typography>
+          <Box sx={{ 
+            backgroundColor: theme.palette.grey[50],
+            p: 3,
+            borderRadius: 2,
+            border: `1px solid ${theme.palette.grey[200]}`
+          }}>
+            {educationArray.map((education, index) => (
+              <Typography
+                key={index}
+                variant="body1"
+                color="text.primary"
+                sx={{
+                  lineHeight: 1.6,
+                  mb: index < educationArray.length - 1 ? 2 : 0,
+                  p: 2,
+                  backgroundColor: 'white',
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.grey[200]}`,
+                  position: 'relative',
+                  '&:before': {
+                    content: `"${index + 1}."`,
+                    position: 'absolute',
+                    left: -16,
+                    top: 8,
+                    fontWeight: 'bold',
+                    color: theme.palette.primary.main,
+                  }
+                }}
+              >
+                {education}
+              </Typography>
+            ))}
+          </Box>
         </Box>
       ) : (
         <Box 
@@ -149,10 +172,10 @@ const EducationTab = ({ employeeData }) => {
           }}
         >
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-            No EducationTab Information Available
+            No Education Information Available
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            EducationTab background will be displayed here once added to the profile.
+            Education background will be displayed here once added to the profile.
           </Typography>
         </Box>
       )}

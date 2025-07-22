@@ -29,17 +29,12 @@ const SkillsTab = ({ employeeData }) => {
     proficiency: '',
   });
 
-  // Parse skills from employeeData (assuming it's a string)
-  const skillsText = employeeData?.skills || '';
+  // Parse skills from employeeData (should be an array now)
+  const skillsData = employeeData?.skills || [];
   
   // Convert skills text to table data - you can modify this logic based on your data format
-  const skillsData = skillsText ? [
-    {
-      id: 1,
-      skillName: "SkillsTab Overview",
-      proficiency: skillsText.length > 50 ? "Multiple SkillsTab" : "Basic SkillsTab"
-    }
-  ] : [];
+  const skillsArray = Array.isArray(skillsData) ? skillsData : 
+    (typeof skillsData === 'string' && skillsData ? [skillsData] : []);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -134,8 +129,8 @@ const SkillsTab = ({ employeeData }) => {
         </Alert>
       </Snackbar>
 
-      {/* DataGrid or SkillsTab Display */}
-      {skillsText ? (
+      {/* Skills Display */}
+      {skillsArray && skillsArray.length > 0 ? (
         <Box sx={{ width: "100%", p: 3 }}>
           <Typography
             variant="h6"
@@ -148,22 +143,41 @@ const SkillsTab = ({ employeeData }) => {
               gap: 1
             }}
           >
-            SkillsTab & Expertise
+            Skills & Expertise
           </Typography>
-          <Typography
-            variant="body1"
-            color="text.primary"
-            sx={{
-              backgroundColor: theme.palette.grey[50],
-              p: 3,
-              borderRadius: 2,
-              whiteSpace: 'pre-wrap',
-              lineHeight: 1.6,
-              border: `1px solid ${theme.palette.grey[200]}`
-            }}
-          >
-            {skillsText}
-          </Typography>
+          <Box sx={{ 
+            backgroundColor: theme.palette.grey[50],
+            p: 3,
+            borderRadius: 2,
+            border: `1px solid ${theme.palette.grey[200]}`
+          }}>
+            {skillsArray.map((skill, index) => (
+              <Typography
+                key={index}
+                variant="body1"
+                color="text.primary"
+                sx={{
+                  lineHeight: 1.6,
+                  mb: index < skillsArray.length - 1 ? 2 : 0,
+                  p: 2,
+                  backgroundColor: 'white',
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.grey[200]}`,
+                  position: 'relative',
+                  '&:before': {
+                    content: `"${index + 1}."`,
+                    position: 'absolute',
+                    left: -16,
+                    top: 8,
+                    fontWeight: 'bold',
+                    color: theme.palette.primary.main,
+                  }
+                }}
+              >
+                {skill}
+              </Typography>
+            ))}
+          </Box>
         </Box>
       ) : (
         <Box 
@@ -178,10 +192,10 @@ const SkillsTab = ({ employeeData }) => {
           }}
         >
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-            No SkillsTab Information Available
+            No Skills Information Available
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            SkillsTab information will be displayed here once added to the profile.
+            Skills information will be displayed here once added to the profile.
           </Typography>
         </Box>
       )}
