@@ -8,17 +8,19 @@ import DialogContent from '@mui/material/DialogContent';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
+
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ExperienceForm from './ExperienceForm';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
-const columns = [
-  { field: "id", headerName: "ID", flex:1 },
-  { field: "jobTitle", headerName: "Job Title", flex:1 },
-  { field: "company", headerName: "Company", flex:1 },
-  { field: "duration", headerName: "Duration", flex:1 },
-];
+
+
+import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
+import Fab from '@mui/material/Fab';
+
+
 
 const ExperienceTab = ({ employeeData }) => {
   const theme = useTheme();
@@ -27,8 +29,7 @@ const ExperienceTab = ({ employeeData }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: '',
-    company: '',
-    duration: '',
+    
   });
 
   // Get experience data from employeeData
@@ -48,7 +49,7 @@ const ExperienceTab = ({ employeeData }) => {
     // In a real implementation, you would update the employee experience via API
     setOpenDialog(false);
     setOpenSnackbar(true);
-    setFormData({ jobTitle: '', company: '', duration: '' });
+    setFormData({ jobTitle: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -62,27 +63,8 @@ const ExperienceTab = ({ employeeData }) => {
       minHeight: { xs: '60vh', sm: '70vh' }, 
       p: { xs: 1, sm: 2, md: 3 },
       maxWidth: '100%',
-      overflow: 'hidden'
+      overflow: 'hidden',
     }}>
-      <IconButton
-        color="primary"
-        onClick={handleOpenDialog}
-        sx={{
-          position: 'absolute',
-          top: { xs: 8, sm: 16 },
-          right: { xs: 8, sm: 16 },
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${theme.palette.divider}`,
-          zIndex: 1,
-          '&:hover': {
-            bgcolor: theme.palette.primary.light,
-            color: 'white'
-          },
-        }}
-      >
-        <AddIcon />
-      </IconButton>
-
       {/* Dialog */}
       <Dialog
         open={openDialog}
@@ -90,8 +72,11 @@ const ExperienceTab = ({ employeeData }) => {
         aria-labelledby="experience-form-dialog-title"
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, p: 1 }
+        }}
       >
-        <DialogTitle id="experience-form-dialog-title">
+        <DialogTitle id="experience-form-dialog-title" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
           Add Experience
         </DialogTitle>
         <DialogContent>
@@ -100,6 +85,7 @@ const ExperienceTab = ({ employeeData }) => {
             handleInputChange={handleInputChange}
             handleSubmit={handleSubmit}
             handleCancel={handleCloseDialog}
+            existingExperiences={experienceData}
           />
         </DialogContent>
       </Dialog>
@@ -118,51 +104,37 @@ const ExperienceTab = ({ employeeData }) => {
 
       {/* Experience Display */}
       {experienceData && experienceData.length > 0 ? (
-        <Box sx={{ width: "100%", p: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 600,
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-          >
-            Work Experience
-          </Typography>
-          <Box sx={{ 
-            backgroundColor: theme.palette.grey[50],
-            p: 3,
-            borderRadius: 2,
-            border: `1px solid ${theme.palette.grey[200]}`
-          }}>
+        <Box sx={{ width: '100%', p: { xs: 1, sm: 3 } }}>
+                    {/* Vertical list of experience cards */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {experienceData.map((experience, index) => (
-              <Typography
+              <Card
                 key={index}
-                variant="body1"
-                color="text.primary"
+                elevation={3}
                 sx={{
-                  lineHeight: 1.6,
-                  mb: index < experienceData.length - 1 ? 2 : 0,
-                  p: 2,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  border: `1px solid ${theme.palette.grey[200]}`,
-                  position: 'relative',
-                  '&:before': {
-                    content: `"${index + 1}."`,
-                    position: 'absolute',
-                    left: -16,
-                    top: 8,
-                    fontWeight: 'bold',
-                    color: theme.palette.primary.main,
-                  }
+                  width: '100%',
+                  maxWidth: 600,
+                  mx: 'auto',
+                  px: { xs: 2, sm: 3 },
+                  py: { xs: 2, sm: 2.5 },
+                  borderRadius: 3,
+                  boxShadow: theme.shadows[2],
+                  background: theme.palette.background,
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                 }}
               >
-                {experience}
-              </Typography>
+                <CardContent sx={{ p: 0, width: '100%' }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5, fontSize: '1.05rem', color: theme.palette.text }}>
+                    {experience.jobTitle || experience}
+                  </Typography>
+                  
+                  
+                  
+                </CardContent>
+              </Card>
             ))}
           </Box>
         </Box>
@@ -178,12 +150,16 @@ const ExperienceTab = ({ employeeData }) => {
             minHeight: 200
           }}
         >
+          <SentimentDissatisfiedIcon color="disabled" sx={{ fontSize: 60, mb: 2 }} />
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             No Experience Information Available
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Work experience will be displayed here once added to the profile.
           </Typography>
+          <Fab color="primary" size="medium" onClick={handleOpenDialog}>
+            <AddIcon />
+          </Fab>
         </Box>
       )}
       
