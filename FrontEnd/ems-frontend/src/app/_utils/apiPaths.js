@@ -42,4 +42,9 @@ export const API_PATHS = {
     UPDATE_EVENT: '/api/calendar/events',
     DELETE_EVENT: '/api/calendar/events',
   },
+  LETTER: {
+    GENERATE: '/api/v1/shiftly/ems/ai-letter/generate',
+    GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
+    SEND: '/api/v1/shiftly/ems/ai-letter/send',
+  },
 };

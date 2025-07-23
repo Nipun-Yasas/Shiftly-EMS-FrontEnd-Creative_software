@@ -62,9 +62,12 @@ export default function FormikFileUpload({
     <>
       <Box display="flex" justifyContent="center" width="100%">
         {errors[name] && touched[name] && (
-          <Typography color="error" fontSize="0.875rem" mt={2} mx={2}>
-            {errors[name]}
-          </Typography>
+          // Move Box out of Typography
+          <Box>
+            <Typography color="error" fontSize="0.875rem" mt={2} mx={2}>
+              {errors[name]}
+            </Typography>
+          </Box>
         )}
         <Box width="50%">
           <input

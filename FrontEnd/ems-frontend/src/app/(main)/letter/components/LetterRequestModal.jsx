@@ -195,36 +195,7 @@ const LetterRequestModal = ({ letterType, onClose, open }) => {
               Edit Your Letter Below:
             </Typography>
             <Box sx={{ border: '1.5px solid', borderColor: 'primary.main', borderRadius: 2, p: 3, bgcolor: theme.palette.mode === 'dark' ? '#23272f' : 'background.paper', maxHeight: 400, overflow: 'auto', mb: 2 }}>
-              <TextField
-                value={generatedLetter}
-                onChange={e => { setGeneratedLetter(e.target.value); setLetterEdited(true); }}
-                multiline
-                minRows={8}
-                maxRows={20}
-                fullWidth
-                autoFocus
-                variant="outlined"
-                label="Generated Letter (Editable)"
-                placeholder="Edit your letter here..."
-                helperText={`${generatedLetter.length} characters`}
-                InputProps={{
-                  style: { color: theme.palette.text.primary }
-                }}
-                InputLabelProps={{
-                  style: { color: theme.palette.text.primary }
-                }}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    fontFamily: theme.typography.fontFamily,
-                    fontSize: theme.typography.body1.fontSize,
-                    color: theme.palette.text.primary,
-                    background: 'transparent',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                }}
-              />
+              <RichTextEditor value={generatedLetter} onChange={setGeneratedLetter} />
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
                 <Tooltip title="Download your edited letter as a .txt file">
                   <span>

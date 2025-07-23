@@ -83,7 +83,7 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
         <Typography
           variant="body1"
           sx={{
-            color: theme.palette.text.secondary,
+            color: theme.palette.text,
             maxWidth: 600,
             mx: 'auto'
           }}
@@ -121,7 +121,6 @@ const LetterTypeSelector = ({ onSelectLetterType }) => {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'stretch',
-                  color: 'inherit',
                 }}
               >
                 <CardContent sx={{ flexGrow: 1, p: 2, display: 'flex', flexDirection: 'column', bgcolor: 'inherit', color: 'inherit' }}>
