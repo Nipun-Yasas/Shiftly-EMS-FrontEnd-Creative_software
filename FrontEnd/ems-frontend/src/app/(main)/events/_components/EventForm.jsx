@@ -60,7 +60,7 @@ export default function EventForm(props) {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
-      alert('Event submitted! ID: ' + response.data.id);
+      showSnackbar('Event submitted! ID: ' + response.data.id, 'success');
       resetForm();
       setFileName("");
       setPreview(null);
@@ -72,7 +72,7 @@ export default function EventForm(props) {
       if (error.response?.data?.message) {
         errorMsg = error.response.data.message;
       }
-      alert(errorMsg);
+      showSnackbar(errorMsg, 'error');
     } finally {
       setSubmitting(false);
     }

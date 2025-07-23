@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Box, Chip, CircularProgress, Typography } from "@mui/material";
@@ -11,6 +11,13 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { getStatusIcon, getStatusColor } from "../../admin-portal/_helpers/colorhelper";
 import dayjs from "dayjs";
+import EditDialog from './EditDialog';
+import DeleteDialog from './DeleteDialog';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { UserContext } from '../../../context/UserContext';
 
 const columns = [
   { 
@@ -69,18 +76,24 @@ export default function EventHistory() {
     message: "",
     severity: "success",
   });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const { user } = useContext(UserContext);
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
 
-  const fetchAllEvents = async () => {
+  const fetchUserEvents = async () => {
+    if (!user?.id) return;
     setLoading(true);
     try {
       const response = await axiosInstance.get(API_PATHS.EVENTS.GET_ALL_EVENTS);
       if (response.data && Array.isArray(response.data)) {
-        // Map backend fields to DataGrid fields
-        const mapped = response.data.map(event => ({
+        // Filter events by current user id
+        const filtered = response.data.filter(event => event.userId === user.id || event.employeeId === user.id);
+        const mapped = filtered.map(event => ({
           id: event.id,
           title: event.title,
           eventType: event.eventType,
@@ -90,6 +103,7 @@ export default function EventHistory() {
           fileName: event.imageUrl ? (
             <a href={`http://localhost:8080${event.imageUrl}`} target="_blank" rel="noopener noreferrer">Download</a>
           ) : 'No file',
+          raw: event,
         }));
         setEvents(mapped);
       } else {
@@ -108,8 +122,98 @@ export default function EventHistory() {
   };
 
   useEffect(() => {
-    fetchAllEvents();
-  }, []);
+    fetchUserEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleEdit = (event) => {
+    setSelectedEvent(event.raw);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (event) => {
+    setSelectedEvent(event.raw);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleUpdateEvent = (updatedEvent) => {
+    setEvents((prev) => prev.map(row => row.id === updatedEvent.id ? { ...row, ...updatedEvent, raw: updatedEvent } : row));
+    showSnackbar('Event updated successfully!', 'success');
+  };
+
+  const handleDeleteEvent = (deletedEvent) => {
+    setEvents((prev) => prev.filter(row => row.id !== deletedEvent.id));
+    showSnackbar('Event deleted successfully!', 'success');
+  };
+
+  const columns = [
+    { 
+      field: "id", 
+      headerName: "Event ID", 
+      width: 100 
+    },
+    { 
+      field: "title", 
+      headerName: "Event Title", 
+      width: 200 
+    },
+    { 
+      field: "eventType", 
+      headerName: "Event Type", 
+      width: 150 
+    },
+    { 
+      field: "enableDate", 
+      headerName: "Start Date", 
+      width: 150,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
+    },
+    { 
+      field: "expireDate", 
+      headerName: "End Date", 
+      width: 150,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
+    },
+    { 
+      field: "fileName", 
+      headerName: "Attached File", 
+      width: 150,
+      renderCell: (params) => params.value || "No file"
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      align: "center",
+      width: 120,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+          <Tooltip title="Edit">
+            <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
 
   return (
     <Paper
@@ -161,6 +265,18 @@ export default function EventHistory() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <EditDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        event={selectedEvent}
+        onUpdate={handleUpdateEvent}
+      />
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        event={selectedEvent}
+        onDelete={handleDeleteEvent}
+      />
     </Paper>
   );
 }
