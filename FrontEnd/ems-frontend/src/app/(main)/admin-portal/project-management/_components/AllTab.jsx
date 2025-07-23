@@ -9,7 +9,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import SearchField from "../../../../_components/main/SearchField";
 import dayjs from "dayjs";
 
 import { DataGrid } from "@mui/x-data-grid";
@@ -17,8 +16,6 @@ import { DataGrid } from "@mui/x-data-grid";
 export default function AllTab({
   projects,
   loading,
-  searchQuery,
-  handleSearchChange,
   onEditProject,
   onDeleteProject,
 }) {
@@ -113,20 +110,7 @@ export default function AllTab({
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 3,
-        }}
-      >
-        <SearchField
-          placeholder="Search projects..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          sx={{ minWidth: { xs: "auto", sm: 200 } }}
-        />
-      </Box>
-
+    <Box sx={{ p: 3, mb :3 }}>
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
           <CircularProgress />
@@ -138,7 +122,6 @@ export default function AllTab({
             columns={columns}
             pageSize={10}
             rowsPerPageOptions={[5, 10, 20]}
-            disableSelectionOnClick
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },

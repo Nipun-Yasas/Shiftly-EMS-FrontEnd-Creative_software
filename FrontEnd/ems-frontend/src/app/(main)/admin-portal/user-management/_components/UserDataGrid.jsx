@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { DataGrid } from "@mui/x-data-grid";
@@ -21,7 +20,6 @@ export default function UserDataGrid({ loading, rows, columns }) {
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },
-                id:'pagination',
               },
             }}
             pageSizeOptions={[10, 50, 100]}

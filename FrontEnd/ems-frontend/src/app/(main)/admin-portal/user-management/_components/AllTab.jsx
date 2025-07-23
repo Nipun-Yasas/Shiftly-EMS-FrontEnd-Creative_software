@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -17,12 +16,12 @@ export default function AllTab({
   setDeleteConfirmOpen,
 }) {
   const columns = [
-    { field: "username", headerName: "Username", width: 150 },
-    { field: "email", headerName: "Email", width: 250 },
+    { field: "username", headerName: "Username", width: 120 },
+    { field: "email", headerName: "Email", width: 170 },
     {
       field: "roles",
       headerName: "Role",
-      width: 150,
+      width: 80,
       renderCell: (params) => {
         return params.value?.[0] || "No role";
       },
@@ -30,12 +29,23 @@ export default function AllTab({
     {
       field: "designation",
       headerName: "Designation",
-      width: 200,
+      width: 140,
     },
     {
       field: "department",
       headerName: "Department",
-      width: 200,
+      width: 140,
+    },
+    
+    {
+      field: "reportingPerson",
+      headerName: "Reporting Person",
+      width: 140,
+    },
+    {
+      field: "reportingPersonEmail",
+      headerName: "Reporting Email",
+      width: 170,
     },
     {
       field: "actions",

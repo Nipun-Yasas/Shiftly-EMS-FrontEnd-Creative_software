@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect,useContext } from "react";
+import { useState,useContext } from "react";
+
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,7 +18,6 @@ import IconButton from "@mui/material/IconButton";
 
 import TextInput from "../inputs/TextInput";
 import PasswordInput from "../inputs/PasswordInput";
-import CustomCheckBox from "../inputs/CustomCheckBox";
 import FormItem from "../landing/FormItem";
 import  {UserContext}  from "../../context/UserContext";
 import axiosInstance from "../../_utils/axiosInstance";
@@ -26,7 +26,6 @@ import { API_PATHS } from "../../_utils/apiPaths";
 export default function LoginForm(props) {
   const { openLogin, setOpenLogin, openSignUp } = props;
   const [error, setError] = useState(null);
-
 
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +50,6 @@ export default function LoginForm(props) {
         password: values.password,
       });
 
-      // Match your Spring Boot API response structure
       const { jwttoken, userDTO } = response.data;
 
       if (jwttoken) {
@@ -82,28 +80,6 @@ export default function LoginForm(props) {
       
     } catch (error) {
       console.error('Login error:', error);
-      
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
-        
-        if (error.response.status === 403) {
-          setError("Access forbidden. Please check your credentials or contact administrator.");
-        } else if (error.response.status === 401) {
-          setError("Invalid username or password.");
-        } else if (error.response.data && error.response.data.message) {
-          setError(error.response.data.message);
-        } else {
-          setError(`Login failed: ${error.response.status} ${error.response.statusText}`);
-        }
-      } else if (error.request) {
-        console.error('Network error:', error.request);
-        setError("Network error. Please check your connection and server status.");
-      } else {
-        console.error('Error message:', error.message);
-        setError("Something went wrong. Please try again later.");
-      }
     } finally {
       setSubmitting(false);
     }
@@ -176,7 +152,7 @@ export default function LoginForm(props) {
                   }}
                 >
 
-                  <Link href="/change-password">
+                  <Link href="/forgotpassword">
                     <Typography
                       sx={{ 
                         fontSize: "0.875rem",

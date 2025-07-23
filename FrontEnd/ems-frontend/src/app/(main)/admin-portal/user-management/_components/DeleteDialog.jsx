@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -23,10 +22,17 @@ export default function DeleteDialog({
       <DialogTitle>Confirm Delete</DialogTitle>
       <DialogContent>
         <Typography>
-          Are you sure you want to delete user {userToDelete?.username}? This
+          Are you sure you want to delete user <strong>{userToDelete?.username || userToDelete?.email || 'Unknown User'}</strong>? This
           action cannot be undone and will permanently remove the user's access
           to the system.
         </Typography>
+        {userToDelete && (
+          <Typography variant="body1" color="text.primary" sx={{ mt: 2 }}>
+            <strong>User ID: {userToDelete.id}<br/></strong>
+            <strong>Email: {userToDelete.email}<br/></strong>
+            
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="text.primary">

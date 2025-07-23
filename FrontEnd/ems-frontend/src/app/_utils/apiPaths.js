@@ -10,17 +10,12 @@ export const API_PATHS = {
   SUPER_ADMIN: {
     GET_ALL_EMPLOYEES: '/superadmin/employees',
     VERIFY_EMPLOYEE: (id) => `/superadmin/employee/${id}/verify`,
-    VERIFY_ALL_EMPLOYEES: '/superadmin/verify-all',
   },
   ADMIN_USER: {
-    ADD_USER: '/api/v1/shiftly/ems/admin/user/add',
     GET_ALL_USERS: '/users/all',
     GET_USER_BY_ID: (id) => `/users/${id}`,
     UPDATE_USER: (id) => `/users/update/${id}`,
     DELETE_USER: (id) => `/users/delete/${id}`,
-    GET_UNASSIGNED_USERS: '/api/v1/shiftly/ems/admin/user/unassigned',
-    ASSIGN_USER: '/api/v1/shiftly/ems/admin/user/assign',
-    UPDATE_USER_ROLE: (id) => `/api/v1/shiftly/ems/admin/user/role/${id}`,
   },
   CANDIDATES: {
     GET_ALL_SUBMISSIONS: '/api/v1/shiftly/ems/admin/candidates/submissions',
@@ -64,6 +59,9 @@ export const API_PATHS = {
   },
   DEPARTMENTS: {
     GET_ALL_DEPARTMENTS: '/api/v1/shiftly/ems/departments/all',
+  },
+  TEAMS: {
+    GET_ALL_TEAMS: '/api/v1/shiftly/ems/teams/all',
   },
   EMPLOYEE: {
     ADD_EMPLOYEE: '/api/v1/shiftly/ems/employee/add',

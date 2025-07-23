@@ -5,7 +5,14 @@ import { Formik, Form } from "formik";
 
 import ProjectForm, { projectValidationSchema } from "./ProjectForm";
 
-export default function AddTab({ onSubmit, initialFormValues }) {
+export default function AddTab({
+  onSubmit,
+  initialFormValues,
+  departments = [],
+  teams = [],
+  loadingDepartments = false,
+  loadingTeams = false,
+}) {
   return (
     <Box sx={{ p: 3, align: "space-between", height: "100%" }}>
       <Formik
@@ -20,6 +27,10 @@ export default function AddTab({ onSubmit, initialFormValues }) {
               isEdit={false}
               showResetButton={true}
               resetForm={resetForm}
+              departments={departments}
+              teams={teams}
+              loadingDepartments={loadingDepartments}
+              loadingTeams={loadingTeams}
             />
           </Form>
         )}
