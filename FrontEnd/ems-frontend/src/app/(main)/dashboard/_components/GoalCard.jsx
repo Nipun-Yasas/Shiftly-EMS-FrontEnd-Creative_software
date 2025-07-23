@@ -38,7 +38,7 @@ export default function GoalCard({ goals, onAddGoal, onEditGoal, onDeleteGoal, o
       minHeight: 420,
       display: 'flex',
       flexDirection: 'column',
-      background: theme => theme.palette.mode === 'dark' ? '#181a20' : '#fff',
+      background: theme => theme.palette.background.paper,
       boxShadow: 4,
       overflow: 'hidden',
       position: 'relative',
@@ -58,8 +58,8 @@ export default function GoalCard({ goals, onAddGoal, onEditGoal, onDeleteGoal, o
       </Box>
       <Chip label="Latest goals" size="small" icon={<TrendingUp />} sx={{ mb: 2, bgcolor: theme => theme.palette.warning.light, color: theme => theme.palette.warning.contrastText, fontFamily: 'var(--font-lexend)' }} />
       <Box sx={{ mb: 3 }}>
-        <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 4, bgcolor: theme => theme.palette.mode === 'dark' ? '#232323' : 'action.hover', '& .MuiLinearProgress-bar': { borderRadius: 4, background: 'linear-gradient(90deg, #ff80ab 0%, #ffd6e0 100%)' } }} />
-        <Typography variant="body2" sx={{ mt: 1, color: theme => theme.palette.mode === 'dark' ? 'text.secondary' : 'text.secondary', fontFamily: 'var(--font-lexend)' }}>{completed} of {total} goals completed</Typography>
+        <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 4, bgcolor: theme => theme.palette.background.default, '& .MuiLinearProgress-bar': { borderRadius: 4, background: 'linear-gradient(90deg, ' + theme.palette.primary.light + ' 0%, ' + theme.palette.primary.main + ' 100%)' } }} />
+        <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary', fontFamily: 'var(--font-lexend)' }}>{completed} of {total} goals completed</Typography>
       </Box>
       <Box sx={{ mb: 2 }}>
         <TextField
@@ -69,7 +69,7 @@ export default function GoalCard({ goals, onAddGoal, onEditGoal, onDeleteGoal, o
           value={quickAdd}
           onChange={e => setQuickAdd(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleQuickAdd(); }}
-          sx={{ width: '100%', bgcolor: theme => theme.palette.mode === 'dark' ? '#232323' : '#fff', borderRadius: 2, input: { color: theme => theme.palette.mode === 'dark' ? '#fff' : 'inherit' } }}
+          sx={{ width: '100%', bgcolor: theme => theme.palette.background.paper, borderRadius: 2, input: { color: 'text.primary' } }}
           InputProps={{
             endAdornment: (
               <IconButton onClick={handleQuickAdd} color="primary" size="small"><Add /></IconButton>
@@ -79,10 +79,10 @@ export default function GoalCard({ goals, onAddGoal, onEditGoal, onDeleteGoal, o
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
         {activeGoals.length === 0 ? (
-          <Typography variant="body2" sx={{ color: theme => theme.palette.mode === 'dark' ? 'text.secondary' : 'text.secondary', fontFamily: 'var(--font-lexend)' }}>No active goals. Add one above!</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)' }}>No active goals. Add one above!</Typography>
         ) : (
           activeGoals.map(goal => (
-            <Paper key={goal.id} elevation={1} sx={{ display: 'flex', alignItems: 'center', p: 1.5, mb: 1, borderRadius: 2, bgcolor: theme => theme.palette.mode === 'dark' ? '#232323' : '#fff', boxShadow: 1 }}>
+            <Paper key={goal.id} elevation={1} sx={{ display: 'flex', alignItems: 'center', p: 1.5, mb: 1, borderRadius: 2, bgcolor: theme => theme.palette.background.paper, boxShadow: 1 }}>
               <Checkbox checked={goal.completed} onChange={() => onToggleComplete(goal.id)} sx={{ color: 'success.main' }} />
               <Box sx={{ flex: 1 }}>
                 <Typography variant="body2" sx={{ fontFamily: 'var(--font-lexend)', fontWeight: 600, color: goal.completed ? 'text.secondary' : 'text.primary', textDecoration: goal.completed ? 'line-through' : 'none' }}>{goal.title}</Typography>
@@ -97,8 +97,8 @@ export default function GoalCard({ goals, onAddGoal, onEditGoal, onDeleteGoal, o
       <Button variant="outlined" fullWidth sx={{ borderColor: theme => theme.palette.primary.main, color: theme => theme.palette.primary.main, '&:hover': { borderColor: theme => theme.palette.primary.dark, bgcolor: theme => theme.palette.primary.light + '20' }, borderRadius: 2, fontWeight: 700, fontFamily: 'var(--font-lexend)', mt: 2 }} onClick={onViewAll}>
         View All + Add Goal
       </Button>
-      <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: theme => theme.palette.mode === 'dark' ? '#181a20' : '#fff', textAlign: 'center', boxShadow: 0 }}>
-        <Typography variant="body2" sx={{ fontFamily: 'var(--font-lexend)', color: theme => theme.palette.mode === 'dark' ? '#ff80ab' : 'primary.main', fontWeight: 600 }}>
+      <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: theme => theme.palette.background.paper, textAlign: 'center', boxShadow: 0 }}>
+        <Typography variant="body2" sx={{ fontFamily: 'var(--font-lexend)', color: 'primary.main', fontWeight: 600 }}>
           {motivationalQuote}
         </Typography>
       </Box>

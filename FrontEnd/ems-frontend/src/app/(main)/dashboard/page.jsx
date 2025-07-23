@@ -27,11 +27,7 @@ import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import UserDataStatus from '../../_components/UserDataStatus';
 import { getGreeting } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
-import saveUserData from '../../_utils/localStorageUtils';
-import getUserData from '../../_utils/localStorageUtils';
-import migrateUserData from '../../_utils/localStorageUtils';
-import cleanupOldBackups from '../../_utils/localStorageUtils';
-import initializeUserSession from '../../_utils/localStorageUtils';
+import { saveUserData, getUserData, migrateUserData, cleanupOldBackups, initializeUserSession } from '../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
 import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 
@@ -520,7 +516,7 @@ const Dashboard = () => {
         onClose={() => setAddGoalDialogOpen(false)} 
         onAdd={handleAddGoal}
         onUpdate={handleUpdateGoal}
-        goal={editGoal}
+        goal={null}
       />
       
       {/* Edit Goal Dialog */}

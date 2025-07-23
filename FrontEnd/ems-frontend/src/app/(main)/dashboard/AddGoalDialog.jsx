@@ -214,8 +214,6 @@ const AddGoalDialog = ({ open, onClose, onAdd, onUpdate, goal = null }) => {
           variant="contained"
           disabled={!title.trim()}
           sx={{ 
-            bgcolor: theme.palette.primary.main,
-            '&:hover': { bgcolor: theme.palette.primary.dark },
             borderRadius: 2,
             px: 3,
             fontFamily: 'var(--font-lexend)'
