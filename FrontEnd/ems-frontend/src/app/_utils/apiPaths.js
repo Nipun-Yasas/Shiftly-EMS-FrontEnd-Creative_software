@@ -75,4 +75,11 @@ export const API_PATHS = {
     UPDATE_PROFILE: '/api/v1/shiftly/ems/employee/profile',
     SELF_UPDATE: '/api/v1/shiftly/ems/employee/self-update',
   },
+  LEAVES: {
+    
+    GET_MY_LEAVES: '/api/v1/shiftly/ems/leaves/my',
+    UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
+    DELETE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/delete/${id}`,
+    ADD_MY_LEAVE: '/api/v1/shiftly/ems/leaves/apply',
+  },
 };
