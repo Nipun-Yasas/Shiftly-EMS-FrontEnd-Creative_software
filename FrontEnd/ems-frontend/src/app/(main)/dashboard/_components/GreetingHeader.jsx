@@ -9,7 +9,7 @@ const getTimeBasedEmoji = (hour) => {
   return "🌃"; // Late night
 };
 
-export default function GreetingHeader({ greeting }) {
+export default function GreetingHeader({ greeting, name }) {
   // Get current hour for dynamic emoji
   const currentHour = new Date().getHours();
   const timeEmoji = getTimeBasedEmoji(currentHour);
@@ -32,7 +32,7 @@ export default function GreetingHeader({ greeting }) {
             lineHeight: 1.2
           }}
         >
-          Hello Simmons {timeEmoji}
+          Hello {name || "User"} {timeEmoji}
         </Typography>
         <Typography 
           variant="body1" 

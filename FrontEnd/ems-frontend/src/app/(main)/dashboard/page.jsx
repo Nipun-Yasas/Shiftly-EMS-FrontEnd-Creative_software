@@ -14,7 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Person from '@mui/icons-material/Person';
 import Event from '@mui/icons-material/Event';
 import CheckCircle from '@mui/icons-material/CheckCircle';
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import AddGoalDialog from './AddGoalDialog';
 import GoalTableDialog from './GoalTableDialog';
 import dayjs from 'dayjs';
@@ -22,7 +22,6 @@ import GreetingHeader from './_components/GreetingHeader';
 import ProgressCard from './_components/ProgressCard';
 import ToDoCard from './_components/ToDoCard';
 import EventsCard from './_components/EventsCard';
-import StarPointsCard from './_components/StarPointsCard';
 import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import UserDataStatus from '../../_components/UserDataStatus';
 import { getGreeting } from './_components/dashboardUtils';
@@ -30,6 +29,9 @@ import { useRouter } from 'next/navigation';
 import { saveUserData, getUserData, migrateUserData, cleanupOldBackups, initializeUserSession } from '../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
 import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
+import axios from 'axios';
+import axiosInstance from '../../_utils/axiosInstance';
+import { UserContext } from '../../context/UserContext';
 
 // Note: Ensure --font-poppins and --font-lexend are defined in global CSS
 
@@ -134,8 +136,8 @@ const demoEvents = [
 const Dashboard = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { user } = useContext(UserContext);
   const [progress, setProgress] = useState(25); // Initial static value - will be calculated from goals
-  const [starPoints, setStarPoints] = useState(1); // Initial static value
   const [toDoItems, setToDoItems] = useState([]); // Start empty, will be loaded from localStorage
   const [goals, setGoals] = useState([]); // Start empty, will be loaded from localStorage
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -151,39 +153,44 @@ const Dashboard = () => {
   const motivationalQuote = "The only way to do great work is to love what you do. - Steve Jobs";
   const rightCardRef = useRef(null);
   const [cardRight, setCardRight] = useState(null); // Initialize as null
-  const [starDialogOpen, setStarDialogOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(null); // null for SSR, set after mount
   const [goalStreak, setGoalStreak] = useState(0);
   const [demoEventsState, setDemoEventsState] = useState(demoEvents);
   const [mounted, setMounted] = useState(false);
-  const [userId, setUserId] = useState(null);
   const [scheduleMeetingOpen, setScheduleMeetingOpen] = useState(false);
+  const [userName, setUserName] = useState('');
 
   // Initialize user session and load data on component mount
-  useEffect(() => {
-    setMounted(true);
-    
-    try {
-      // Initialize user session first
-      const currentUserId = initializeUserSession();
-      setUserId(currentUserId);
-      
-      // Load ToDo items from localStorage with user-specific persistence
-      loadToDoData(currentUserId);
-      
-      // Load Goals from localStorage with user-specific persistence
-      loadGoalsData(currentUserId);
-      
-      // Clean up old backups
-      cleanupOldBackups();
-    } catch (error) {
-      console.error('Error initializing dashboard:', error);
-      // Fallback to initial data if initialization fails
-      const initialToDos = getInitialToDoItems();
-      setToDoItems(initialToDos);
-      setGoals(initialGoals);
+  // 1. Initialize user and other data
+useEffect(() => {
+  setMounted(true);
+  try {
+    if (user && user.id) {
+      loadToDoData(user.id);
+      loadGoalsData(user.id);
     }
-  }, []);
+    cleanupOldBackups();
+  } catch (error) {
+    console.error('Error initializing dashboard:', error);
+    setToDoItems(getInitialToDoItems());
+    setGoals(initialGoals);
+  }
+}, [user]);
+
+// 2. Fetch user name when user is set
+useEffect(() => {
+  if (user && user.id) {
+    axiosInstance.get(`http://localhost:8080/api/v1/shiftly/ems/employee/name/${user.id}`)
+      .then(res => {
+        if (res.data && res.data.fullName) {
+          setUserName(res.data.fullName);
+        } else {
+          setUserName('');
+        }
+      })
+      .catch(() => setUserName(''));
+  }
+}, [user]);
 
   // Function to load ToDo data with proper error handling
   const loadToDoData = (currentUserId) => {
@@ -245,25 +252,25 @@ const Dashboard = () => {
 
   // Save ToDo items to localStorage whenever they change
   useEffect(() => {
-    if (mounted && toDoItems.length > 0 && userId) {
+    if (mounted && toDoItems.length > 0 && user?.id) {
       try {
-        saveUserData('todos', toDoItems, userId);
+        saveUserData('todos', toDoItems, user.id);
       } catch (error) {
         console.error('Error saving ToDo items to localStorage:', error);
       }
     }
-  }, [toDoItems, mounted, userId]);
+  }, [toDoItems, mounted, user?.id]);
 
   // Save Goals to localStorage whenever they change
   useEffect(() => {
-    if (mounted && goals.length > 0 && userId) {
+    if (mounted && goals.length > 0 && user?.id) {
       try {
-        saveUserData('goals', goals, userId);
+        saveUserData('goals', goals, user.id);
       } catch (error) {
         console.error('Error saving Goals to localStorage:', error);
       }
     }
-  }, [goals, mounted, userId]);
+  }, [goals, mounted, user?.id]);
 
   // Enhanced ToDo handlers with proper state management
   const handleAddToDo = (todo) => {
@@ -443,7 +450,7 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ p: 3,  minHeight: '100vh', width: '100%', position: 'relative' }}>
-      <GreetingHeader greeting={greeting} />
+      <GreetingHeader greeting={greeting} name={userName} />
       
       {/* Performance and ToDo Cards - Side by Side at Top */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
@@ -493,13 +500,6 @@ const Dashboard = () => {
           />
         </Grid>
         <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 3' } }}>
-          <StarPointsCard starPoints={starPoints} starDialogOpen={starDialogOpen} setStarDialogOpen={setStarDialogOpen} />
-        </Grid>
-      </Grid>
-
-      {/* Meetings History Card - Full Width */}
-      <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid sx={{ gridColumn: { xs: 'span 12' } }}>
           <MeetingsHistoryCard onScheduleMeeting={() => setScheduleMeetingOpen(true)} />
         </Grid>
       </Grid>
