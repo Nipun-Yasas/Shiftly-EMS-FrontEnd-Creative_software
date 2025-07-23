@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 import { Paper, Box } from "@mui/material";
 import AvailableLeaves from "./_components/AvailableLeaves";
 import LeaveForm from "./_components/LeaveForm";
 import SuccessModal from "./_components/SuccessModal";
+import { usePathname } from 'next/navigation';
 
 export default function RequestLeave() {
   const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const mockLeaves = [
     { type: "Annual Leave", count: 6, hexColor: "#D81B60" }, 
@@ -28,7 +32,13 @@ export default function RequestLeave() {
       >
         <AvailableLeaves leaves={mockLeaves} />
         <Box sx={{ width: "100%", px: { xs: 0, sm: 3 }, py: 3 }}>
-          <LeaveForm onSubmitSuccess={() => setModalOpen(true)} />
+          <LeaveForm onSubmitSuccess={() => {
+            setModalOpen(true);
+            setTimeout(() => {
+              setModalOpen(false);
+              router.push('/leave/history');
+            }, 1500);
+          }} />
         </Box>
       </Paper>
       <SuccessModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />

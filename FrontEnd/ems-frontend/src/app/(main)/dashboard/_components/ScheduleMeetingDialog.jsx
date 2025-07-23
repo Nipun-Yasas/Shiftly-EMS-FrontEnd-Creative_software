@@ -112,17 +112,45 @@ const ScheduleMeetingDialog = ({ open, onClose }) => {
       <DialogContent>
         {errors.general && <Alert severity="error" sx={{ mb: 2 }}>{errors.general}</Alert>}
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          {/* Meeting Details */}
+          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextField label="Meeting Title" value={meetingData.title} onChange={e => handleInputChange('title', e.target.value)} fullWidth required error={!!errors.title} helperText={errors.title} InputProps={{ startAdornment: (<InputAdornment position="start"><VideoCall color="action" /></InputAdornment>) }} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, fontFamily: 'var(--font-lexend)' } }} />
               <TextField label="Description (Optional)" value={meetingData.description} onChange={e => handleInputChange('description', e.target.value)} fullWidth multiline rows={3} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, fontFamily: 'var(--font-lexend)' } }} />
               <TextField label="Attendees (Optional)" value={meetingData.attendees} onChange={e => handleInputChange('attendees', e.target.value)} fullWidth placeholder="Enter email addresses separated by commas" InputProps={{ startAdornment: (<InputAdornment position="start"><People color="action" /></InputAdornment>) }} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, fontFamily: 'var(--font-lexend)' } }} />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          {/* Time and Duration */}
+          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker label="Start Time" value={meetingData.startTime} onChange={value => handleInputChange('startTime', value)} renderInput={params => <TextField {...params} fullWidth required error={!!errors.startTime} helperText={errors.startTime} InputProps={{ ...params.InputProps, startAdornment: (<InputAdornment position="start"><Schedule color="action" /></InputAdornment>) }} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, fontFamily: 'var(--font-lexend)' } }} />} />
+                <DateTimePicker
+                  label="Start Time"
+                  value={meetingData.startTime}
+                  onChange={(value) => handleInputChange('startTime', value)}
+                  textField={
+                    <TextField
+                      fullWidth
+                      required
+                      error={!!errors.startTime}
+                      helperText={errors.startTime}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Schedule color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          fontFamily: 'var(--font-lexend)'
+                        }
+                      }}
+                    />
+                  }
+                />
               </LocalizationProvider>
               <FormControl fullWidth>
                 <InputLabel sx={{ fontFamily: 'var(--font-lexend)' }}>Duration</InputLabel>

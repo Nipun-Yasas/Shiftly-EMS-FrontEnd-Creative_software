@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Box,
-  Chip,
-  Typography
-} from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
 import { PriorityHigh, Schedule, Category } from '@mui/icons-material';
 
 export default function AddToDoDialog({ open, onClose, onAdd, onUpdate, todo = null }) {
@@ -124,7 +122,6 @@ export default function AddToDoDialog({ open, onClose, onAdd, onUpdate, todo = n
               value={priority}
               onChange={e => setPriority(e.target.value)}
               label="Priority"
-              startAdornment={<PriorityHigh sx={{ color: getPriorityColor(priority), mr: 1 }} />}
             >
               <MenuItem value="high">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -153,7 +150,6 @@ export default function AddToDoDialog({ open, onClose, onAdd, onUpdate, todo = n
               value={category}
               onChange={e => setCategory(e.target.value)}
               label="Category"
-              startAdornment={<Category sx={{ mr: 1 }} />}
             >
               <MenuItem value="work">💼 Work</MenuItem>
               <MenuItem value="personal">👤 Personal</MenuItem>
@@ -174,7 +170,6 @@ export default function AddToDoDialog({ open, onClose, onAdd, onUpdate, todo = n
           InputLabelProps={{ shrink: true }}
           error={!!errors.dueDate}
           helperText={errors.dueDate}
-          startAdornment={<Schedule sx={{ mr: 1, color: 'text.secondary' }} />}
           sx={{ mt: 2 }}
         />
 

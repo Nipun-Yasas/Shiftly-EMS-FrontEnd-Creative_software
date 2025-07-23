@@ -1,151 +1,76 @@
 import { useState, useEffect } from 'react';
-import { 
-  Paper, 
-  Box, 
-  Typography, 
-  IconButton, 
-  useTheme,
-  Grid,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Alert,
-  CircularProgress,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Chip,
-  Switch,
-  FormControlLabel,
-  Tabs,
-  Tab,
-  Slider,
-  InputAdornment,
-  IconButton as MuiIconButton,
-  Snackbar,
-  Menu,
-  LinearProgress
-} from '@mui/material';
-import { 
-  MoreVert,
-  Bolt,
-  Add,
-  Refresh,
-  Close as CloseIcon,
-  Schedule,
-  Event,
-  Notifications,
-  Settings,
-  Download,
-  Upload,
-  Search,
-  FilterList,
-  Bookmark,
-  Share,
-  Print,
-  Email,
-  Phone,
-  LocationOn,
-  AccessTime,
-  CalendarToday,
-  WorkOutline,
-  Home,
-  DirectionsCar,
-  Restaurant,
-  LocalHospital,
-  School,
-  ShoppingCart,
-  Payment,
-  Receipt,
-  AccountBalance,
-  CreditCard,
-  Assignment,
-  Description,
-  Folder,
-  CloudUpload,
-  CloudDownload,
-  Security,
-  Lock,
-  Visibility,
-  VisibilityOff,
-  Wifi,
-  Bluetooth,
-  VolumeUp,
-  Brightness4,
-  Language,
-  Translate,
-  Palette,
-  Transform,
-  Code,
-  ContentCopy,
-  Check,
-  ContentPaste,
-  FormatIndentIncrease,
-  FormatIndentDecrease,
-  Send,
-  PlayArrow,
-  Stop,
-  Refresh as RefreshIcon,
-  ColorLens,
-  Tune,
-  DataObject,
-  Storage,
-  Api,
-  BugReport,
-  Build,
-  Science,
-  Psychology,
-  Memory,
-  Speed,
-  Storage as StorageIcon,
-  Cloud,
-  NetworkCheck,
-  Router,
-  Hub,
-  DeviceHub,
-  Timeline,
-  TrendingUp,
-  Analytics,
-  Assessment,
-  ShowChart,
-  Edit,
-  Delete,
-  Settings as SettingsIcon,
-  Download as DownloadIcon,
-  Share as ShareIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  CheckCircle,
-  Warning,
-  Error,
-  Info,
-  CalendarToday as CalendarTodayIcon,
-  AccessTime as AccessTimeIcon,
-  Person,
-  Group,
-  Task,
-  Star,
-  Flag,
-  Target,
-  Timeline as TimelineIcon,
-  BarChart,
-  PieChart,
-  ShowChart as ShowChartIcon,
-  CloudSync,
-  HealthAndSafety,
-  VideoCall,
-  People
-} from '@mui/icons-material';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Chip from '@mui/material/Chip';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Slider from '@mui/material/Slider';
+import InputAdornment from '@mui/material/InputAdornment';
+import MuiIconButton from '@mui/material/IconButton';
+import Snackbar from '@mui/material/Snackbar';
+import Menu from '@mui/material/Menu';
+import LinearProgress from '@mui/material/LinearProgress';
+import MoreVert from '@mui/icons-material/MoreVert';
+import Bolt from '@mui/icons-material/Bolt';
+import Schedule from '@mui/icons-material/Schedule';
+import Event from '@mui/icons-material/Event';
+import Settings from '@mui/icons-material/Settings';
+import FilterList from '@mui/icons-material/FilterList';
+import Assignment from '@mui/icons-material/Assignment';
+import Description from '@mui/icons-material/Description';
+import Security from '@mui/icons-material/Security';
+import Palette from '@mui/icons-material/Palette';
+import Transform from '@mui/icons-material/Transform';
+import Code from '@mui/icons-material/Code';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import Check from '@mui/icons-material/Check';
+import ContentPaste from '@mui/icons-material/ContentPaste';
+import FormatIndentIncrease from '@mui/icons-material/FormatIndentIncrease';
+import FormatIndentDecrease from '@mui/icons-material/FormatIndentDecrease';
+import Send from '@mui/icons-material/Send';
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import Stop from '@mui/icons-material/Stop';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Speed from '@mui/icons-material/Speed';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
+import Star from '@mui/icons-material/Star';
+import Flag from '@mui/icons-material/Flag';
+import CloudSync from '@mui/icons-material/CloudSync';
+import HealthAndSafety from '@mui/icons-material/HealthAndSafety';
+import VideoCall from '@mui/icons-material/VideoCall';
+import People from '@mui/icons-material/People';
+import TrackChanges from '@mui/icons-material/TrackChanges';
+import Receipt from '@mui/icons-material/Receipt';
+import Download from '@mui/icons-material/Download';
+import Upload from '@mui/icons-material/Upload';
+import CloseIcon from '@mui/icons-material/Close';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { saveUserData, getUserData } from '../../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './ScheduleMeetingDialog';
@@ -185,17 +110,18 @@ const hexToHsl = (hex) => {
   return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
 };
 
-const getContrastColor = (hex) => {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return '#ffffff';
-  
-  const r = parseInt(result[1], 16);
-  const g = parseInt(result[2], 16);
-  const b = parseInt(result[3], 16);
-  
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness > 128 ? '#000000' : '#ffffff';
-};
+// Utility to get contrast color (black or white) for a given hex color
+function getContrastColor(hex) {
+  // Remove # if present
+  hex = hex.replace('#', '');
+  // Parse r, g, b
+  let r = parseInt(hex.substr(0,2),16);
+  let g = parseInt(hex.substr(2,2),16);
+  let b = parseInt(hex.substr(4,2),16);
+  // Calculate luminance
+  let luminance = (0.299*r + 0.587*g + 0.114*b)/255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
 
 export default function QuickActionsCard() {
   const theme = useTheme();
@@ -354,15 +280,7 @@ export default function QuickActionsCard() {
   }, [mounted]);
 
   // Force dialog background for dark theme
-  useEffect(() => {
-    if (showQuickTools && theme.palette.mode === 'dark') {
-      const dialogPaper = document.querySelector('.MuiDialog-paper');
-      if (dialogPaper) {
-        dialogPaper.style.background = 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)';
-      }
-    }
-  }, [showQuickTools, theme.palette.mode]);
-
+  
   // Save snippets to localStorage whenever they change
   useEffect(() => {
     if (mounted) {
@@ -1252,7 +1170,9 @@ export default function QuickActionsCard() {
         effectiveType: connection.effectiveType || 'unknown',
         downlink: connection.downlink || 0,
         rtt: connection.rtt || 0,
-        saveData: connection.saveData || false
+        saveData: connection.saveData || false,
+        status: connection.effectiveType === '4g' ? 'excellent' : 
+                connection.effectiveType === '3g' ? 'good' : 'poor'
       };
     }
     return null;
@@ -1795,7 +1715,7 @@ export default function QuickActionsCard() {
           </Typography>
           <Grid container spacing={1}>
             {quickActions.map((action) => (
-              <Grid item xs={6} md={4} key={action.id}>
+              <Grid sx={{ gridColumn: { xs: 'span 6', md: 'span 4' } }} key={action.id}>
                 <Paper
                   elevation={2}
                   sx={{
@@ -1891,7 +1811,7 @@ export default function QuickActionsCard() {
           </Box>
           <Grid container spacing={1}>
             {tools.slice(0, 4).map((tool) => (
-              <Grid item xs={6} key={tool.id}>
+              <Grid sx={{ gridColumn: { xs: 'span 6' } }} key={tool.id}>
                 <Paper
                   elevation={1}
                   sx={{
@@ -2022,9 +1942,7 @@ export default function QuickActionsCard() {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            background: theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)'
-              : '#ffffff',
+            
             border: theme.palette.mode === 'dark' 
               ? '1px solid rgba(255, 255, 255, 0.12)' 
               : '1px solid rgba(0, 0, 0, 0.12)',
@@ -2040,9 +1958,9 @@ export default function QuickActionsCard() {
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          color: theme.palette.mode === 'dark' ? '#ffffff' : 'text.primary'
+          color: theme.palette.text
         }}>
-          <Settings sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : 'primary.main' }} />
+          <Settings sx={{ color: theme.palette.text }} />
           Smart Settings & Analytics
         </DialogTitle>
         
@@ -2061,7 +1979,7 @@ export default function QuickActionsCard() {
                   Real-time Statistics
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2080,7 +1998,7 @@ export default function QuickActionsCard() {
                       <Typography variant="caption">Page Load Time</Typography>
                     </Paper>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2099,7 +2017,7 @@ export default function QuickActionsCard() {
                       <Typography variant="caption">Response Time</Typography>
                     </Paper>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2118,7 +2036,7 @@ export default function QuickActionsCard() {
                       <Typography variant="caption">Memory Usage</Typography>
                     </Paper>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2137,7 +2055,7 @@ export default function QuickActionsCard() {
                       <Typography variant="caption">Uptime</Typography>
                     </Paper>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2156,7 +2074,7 @@ export default function QuickActionsCard() {
                       <Typography variant="caption">Local Storage</Typography>
                     </Paper>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 6' } }}>
                     <Paper sx={{ 
                       p: 2, 
                       textAlign: 'center', 
@@ -2237,7 +2155,7 @@ export default function QuickActionsCard() {
                   <Box sx={{ 
                     mt: 2, 
                     p: 2, 
-                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'background.paper', 
+                    bgcolor: theme.palette.mode === 'dark' ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)' : 'background.paper', 
                     borderRadius: 1, 
                     border: '1px solid', 
                     borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider',
@@ -2288,7 +2206,7 @@ export default function QuickActionsCard() {
                     <Box sx={{ 
                       mt: 1, 
                       p: 2, 
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'background.paper', 
+                      bgcolor: theme.palette.mode === 'dark' ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)' : 'background.paper', 
                       borderRadius: 1, 
                       border: '1px solid', 
                       borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'divider',
@@ -2425,9 +2343,7 @@ export default function QuickActionsCard() {
           sx: {
             borderRadius: 2,
             minWidth: 200,
-            bgcolor: theme.palette.mode === 'dark' 
-              ? 'rgba(255, 255, 255, 0.05)' 
-              : 'rgba(255, 255, 255, 0.95)',
+            
             border: `1px solid ${theme.palette.divider}`,
             boxShadow: theme.palette.mode === 'dark' 
               ? '0 8px 32px rgba(0, 0, 0, 0.4)' 
@@ -2494,29 +2410,14 @@ export default function QuickActionsCard() {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            background: theme.palette.mode === 'dark'
-              ? '#1a1a1a'
-              : 'rgba(255, 255, 255, 0.95)',
+            
             border: `1px solid ${theme.palette.divider}`,
             '& .MuiDialog-paper': {
-              background: theme.palette.mode === 'dark'
-                ? '#1a1a1a'
-                : 'rgba(255, 255, 255, 0.95)',
+              
             }
           }
         }}
-        sx={{
-          '& .MuiDialog-paper': {
-            background: theme.palette.mode === 'dark'
-              ? '#1a1a1a'
-              : 'rgba(255, 255, 255, 0.95)',
-          },
-          '& .MuiBackdrop-root': {
-            backgroundColor: theme.palette.mode === 'dark' 
-              ? 'rgba(0, 0, 0, 0.8)' 
-              : 'rgba(0, 0, 0, 0.5)',
-          }
-        }}
+        
       >
         <DialogTitle sx={{ 
           display: 'flex',
@@ -2524,20 +2425,18 @@ export default function QuickActionsCard() {
           alignItems: 'center',
           fontFamily: 'var(--font-poppins)',
           fontWeight: 600,
-          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-          background: theme.palette.mode === 'dark'
-            ? '#1a1a1a'
-            : 'rgba(255, 255, 255, 0.95)',
+          color: theme.palette.text,
+          
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}>
           Developer Tools
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Tooltip title="Refresh" arrow>
-              <IconButton size="small" sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>
+              <IconButton size="small" sx={{ color: theme.palette.text }}>
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
-            <IconButton size="small" onClick={() => setShowQuickTools(false)} sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>
+            <IconButton size="small" onClick={() => setShowQuickTools(false)} sx={{ color: theme.palette.text  }}>
               <CloseIcon />
             </IconButton>
           </Box>
@@ -2545,21 +2444,12 @@ export default function QuickActionsCard() {
         
         <DialogContent sx={{ 
           p: 0, 
-          background: theme.palette.mode === 'dark'
-            ? '#1a1a1a'
-            : 'rgba(255, 255, 255, 0.95)',
-          '&.MuiDialogContent-root': {
-            background: theme.palette.mode === 'dark'
-              ? '#1a1a1a'
-              : 'rgba(255, 255, 255, 0.95)',
-          }
+          
         }}>
           <Box sx={{ 
             borderBottom: 1, 
             borderColor: 'divider',
-            background: theme.palette.mode === 'dark'
-              ? '#1a1a1a'
-              : 'rgba(255, 255, 255, 0.95)',
+            
           }}>
             <Tabs 
               value={activeTool} 
@@ -2568,18 +2458,7 @@ export default function QuickActionsCard() {
               scrollButtons="auto"
               sx={{ 
                 px: 3,
-                background: theme.palette.mode === 'dark'
-                  ? '#1a1a1a'
-                  : 'rgba(255, 255, 255, 0.95)',
-                '& .MuiTab-root': {
-                  color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
-                  '&.Mui-selected': {
-                    color: theme.palette.primary.main,
-                  }
-                },
-                '& .MuiTabs-indicator': {
-                  backgroundColor: theme.palette.primary.main,
-                }
+                
               }}
             >
               {tools.map((tool) => (
@@ -2592,10 +2471,7 @@ export default function QuickActionsCard() {
                   sx={{ 
                     fontFamily: 'var(--font-lexend)',
                     minHeight: 64,
-                    color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
-                    '&.Mui-selected': {
-                      color: theme.palette.primary.main,
-                    }
+                    color: theme.palette.text
                   }}
                 />
               ))}
@@ -2604,23 +2480,21 @@ export default function QuickActionsCard() {
           
           <Box sx={{ 
             p: 3, 
-            background: theme.palette.mode === 'dark'
-              ? '#1a1a1a'
-              : 'rgba(255, 255, 255, 0.95)',
+           
             minHeight: '400px',
           }}>
             {/* Code Snippet Tool */}
             {activeTool === 'code-snippet' && (
               <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.text }}>
                   Code Snippet Manager
                 </Typography>
                 
                 <Grid container spacing={3}>
                   {/* Left side - Form */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.text}}>
                         {isEditing ? 'Edit Snippet' : 'Create New Snippet'}
                       </Typography>
                     </Box>
@@ -2634,9 +2508,7 @@ export default function QuickActionsCard() {
                       sx={{ 
                         mb: 2,
                         '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                          
                           border: `1px solid ${theme.palette.divider}`,
                           '&:hover': {
                             borderColor: theme.palette.primary.main,
@@ -2646,34 +2518,25 @@ export default function QuickActionsCard() {
                           }
                         },
                         '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
+                          color: theme.palette.text,
                         },
                         '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                          color:  theme.palette.text,
                         }
                       }}
                     />
                     
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>Language</InputLabel>
+                      <InputLabel sx={{ color: theme.palette.text }}>Language</InputLabel>
                       <Select
                         value={snippetLanguage}
                         onChange={(e) => setSnippetLanguage(e.target.value)}
                         label="Language"
                         sx={{
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                         
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '& .MuiSelect-select': {
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          }
+                          
+                          
                         }}
                       >
                         <MenuItem value="javascript">JavaScript</MenuItem>
@@ -2698,26 +2561,12 @@ export default function QuickActionsCard() {
                       onChange={(e) => setCodeSnippet(e.target.value)}
                       placeholder="Enter your code here..."
                       sx={{
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                       
+                          
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          fontFamily: 'monospace',
-                          fontSize: '0.875rem',
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                        }
+                          
+                        
+                        
                       }}
                     />
                     
@@ -2728,15 +2577,13 @@ export default function QuickActionsCard() {
                         disabled={!snippetTitle.trim() || !codeSnippet.trim()}
                         sx={{ 
                           minWidth: 100,
-                          bgcolor: (!snippetTitle.trim() || !codeSnippet.trim()) 
-                            ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-                            : 'primary.main',
+                          
                           color: (!snippetTitle.trim() || !codeSnippet.trim())
-                            ? theme.palette.mode === 'dark' ? '#cccccc' : '#666666'
-                            : 'white',
+                            ? theme.palette.text
+                            : theme.palette.text,
                           '&:hover': {
                             bgcolor: (!snippetTitle.trim() || !codeSnippet.trim())
-                              ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'
+                              ? theme.palette.text
                               : 'primary.dark',
                           }
                         }}
@@ -2749,13 +2596,11 @@ export default function QuickActionsCard() {
                           variant="outlined" 
                           onClick={clearForm}
                           sx={{
-                            borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                            color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                            borderColor:theme.palette.divider,
+                            color: theme.palette.text,
                             '&:hover': {
                               borderColor: theme.palette.primary.main,
-                              bgcolor: theme.palette.mode === 'dark' 
-                                ? 'rgba(255, 255, 255, 0.1)' 
-                                : 'rgba(0, 0, 0, 0.02)',
+                              
                             }
                           }}
                         >
@@ -2769,13 +2614,12 @@ export default function QuickActionsCard() {
                         onClick={() => copyToClipboard(codeSnippet)}
                         disabled={!codeSnippet.trim()}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                          borderColor:  theme.palette.divider,
+                          color:theme.palette.text,
                           '&:hover': {
                             borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
+                             
+                              
                           }
                         }}
                       >
@@ -2785,39 +2629,27 @@ export default function QuickActionsCard() {
                   </Grid>
                   
                   {/* Right side - Saved Snippets */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.text }}>
                         Saved Snippets ({savedSnippets.length})
                       </Typography>
                     </Box>
                     
                     <TextField
                       label="Search snippets"
-                      fullWidth
+                      width="auto"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search by title or language..."
                       sx={{ 
                         mb: 2,
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
-                          border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                        }
+                        
+                          
+                           
+                          border: `1px solid ${theme.palette.divider}`
+                          
+                       
                       }}
                     />
                     
@@ -2826,13 +2658,12 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                       
+                        
                     }}>
                       {filteredSnippets.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color:theme.palette.text }}>
                             {searchQuery ? 'No snippets found' : 'No saved snippets yet'}
                           </Typography>
                         </Box>
@@ -2844,20 +2675,14 @@ export default function QuickActionsCard() {
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
                               cursor: 'pointer',
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
-                              '&:last-child': {
-                                borderBottom: 'none',
-                              }
+                              
+                             
                             }}
                           >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                               <Typography variant="subtitle2" sx={{ 
                                 fontWeight: 600, 
-                                color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                color:theme.palette.text,
                                 flex: 1,
                                 mr: 1
                               }}>
@@ -2870,13 +2695,13 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   height: 20,
                                   bgcolor: theme.palette.primary.main,
-                                  color: 'white'
+                                  color: theme.palette.text
                                 }} 
                               />
                             </Box>
                             
                             <Typography variant="caption" sx={{ 
-                              color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                              color:theme.palette.text,
                               display: 'block',
                               mb: 1
                             }}>
@@ -2885,11 +2710,11 @@ export default function QuickActionsCard() {
                             
                             <Box sx={{ 
                               p: 1, 
-                              bgcolor: theme.palette.mode === 'dark' ? '#ffffff' : '#f5f5f5',
+                              
                               borderRadius: 1,
                               fontFamily: 'monospace',
                               fontSize: '0.75rem',
-                              color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                              color:  theme.palette.text,
                               maxHeight: 60,
                               overflow: 'hidden',
                               mb: 1
@@ -2903,17 +2728,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => loadSnippet(snippet)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor:  theme.palette.divider,
+                                  color:theme.palette.text.primary,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Edit
@@ -2923,17 +2743,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => copyToClipboard(snippet.code)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color:  theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Copy
@@ -2949,10 +2764,7 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    bgcolor: theme.palette.error.main,
-                                    color: 'white',
-                                  }
+                                  
                                 }}
                               >
                                 Delete
@@ -2976,9 +2788,9 @@ export default function QuickActionsCard() {
                 
                 <Grid container spacing={3}>
                   {/* Left side - Form */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         {isEditingApi ? 'Edit API Request' : 'New API Request'}
                       </Typography>
                     </Box>
@@ -2991,47 +2803,26 @@ export default function QuickActionsCard() {
                       placeholder="https://api.example.com/endpoint"
                       sx={{ 
                         mb: 2,
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
-                          border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                        }
+                        
+                        border: `1px solid ${theme.palette.divider}`,
+                        
+                        
                       }}
                     />
                     
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>Method</InputLabel>
+                      <InputLabel sx={{ color: theme.palette.text }}>Method</InputLabel>
                       <Select
                         value={apiMethod}
                         onChange={(e) => setApiMethod(e.target.value)}
                         label="Method"
                         sx={{
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                          
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '& .MuiSelect-select': {
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          }
+                         
+                          
+                          
+                          
                         }}
                       >
                         <MenuItem value="GET">GET</MenuItem>
@@ -3051,24 +2842,10 @@ export default function QuickActionsCard() {
                       onChange={(e) => setApiHeaders(e.target.value)}
                       placeholder='{"Authorization": "Bearer token"}'
                       sx={{
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
-                          border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                        }
+
+                        border: `1px solid ${theme.palette.divider}`,
+                        
+                        
                       }}
                     />
                     
@@ -3081,24 +2858,12 @@ export default function QuickActionsCard() {
                       onChange={(e) => setApiBody(e.target.value)}
                       placeholder='{"key": "value"}'
                       sx={{
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
-                          border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                        }
+                        border: `1px solid ${theme.palette.divider}`,
+                          
+                          
+
+                      
+                        
                       }}
                     />
                     
@@ -3118,17 +2883,12 @@ export default function QuickActionsCard() {
                         onClick={saveApiRequest}
                         disabled={!apiUrl.trim()}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                          borderColor: theme.palette.divider,
+                          color: theme.palette.text,
                           bgcolor: (!apiUrl.trim()) 
                             ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
                             : 'transparent',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                          }
+                          
                         }}
                       >
                         {isEditingApi ? 'Update' : 'Save'}
@@ -3145,29 +2905,18 @@ export default function QuickActionsCard() {
                         InputProps={{ readOnly: true }}
                         sx={{
                           mt: 2,
-                          '& .MuiInputBase-root': {
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? '#ffffff' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                            border: `1px solid ${theme.palette.divider}`,
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                          },
-                          '& .MuiInputBase-input': {
-                            fontFamily: 'monospace',
-                            fontSize: '0.875rem',
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          }
+                          border: `1px solid ${theme.palette.divider}`,
+                          
+                          
                         }}
                       />
                     )}
                   </Grid>
                   
                   {/* Right side - Saved Requests */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Saved Requests ({savedApiRequests.length})
                       </Typography>
                     </Box>
@@ -3177,13 +2926,11 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                      
                     }}>
                       {savedApiRequests.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color: theme.palette.text }}>
                             No saved API requests yet
                           </Typography>
                         </Box>
@@ -3194,11 +2941,7 @@ export default function QuickActionsCard() {
                             sx={{
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
+                              
                               '&:last-child': {
                                 borderBottom: 'none',
                               }
@@ -3207,7 +2950,7 @@ export default function QuickActionsCard() {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                               <Typography variant="subtitle2" sx={{ 
                                 fontWeight: 600, 
-                                color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                color: theme.palette.text,
                                 flex: 1,
                                 mr: 1
                               }}>
@@ -3223,13 +2966,13 @@ export default function QuickActionsCard() {
                                           request.method === 'POST' ? 'primary.main' :
                                           request.method === 'PUT' ? 'warning.main' :
                                           request.method === 'DELETE' ? 'error.main' : 'info.main',
-                                  color: 'white'
+                                  color: theme.palette.text
                                 }} 
                               />
                             </Box>
                             
                             <Typography variant="caption" sx={{ 
-                              color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                              color:  theme.palette.text,
                               display: 'block',
                               mb: 1,
                               fontFamily: 'monospace',
@@ -3239,7 +2982,7 @@ export default function QuickActionsCard() {
                             </Typography>
                             
                             <Typography variant="caption" sx={{ 
-                              color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                              color:  theme.palette.text,
                               display: 'block',
                               mb: 1
                             }}>
@@ -3252,17 +2995,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => loadApiRequest(request)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color:  theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Load
@@ -3278,10 +3016,7 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    bgcolor: theme.palette.error.main,
-                                    color: 'white',
-                                  }
+                                  
                                 }}
                               >
                                 Delete
@@ -3299,14 +3034,14 @@ export default function QuickActionsCard() {
             {/* Password Generator Tool */}
             {activeTool === 'password-generator' && (
               <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color:theme.palette.text }}>
                   Password Generator
                 </Typography>
                 
                 <Grid container spacing={3}>
                   {/* Left side - Generator */}
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="body2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
+                    <Typography variant="body2" sx={{ mb: 1, color:  theme.palette.text }}>
                       Password Length: {passwordLength}
                     </Typography>
                     <Slider
@@ -3326,7 +3061,7 @@ export default function QuickActionsCard() {
                           />
                         }
                         label="Include Uppercase (A-Z)"
-                        sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}
+                        sx={{ color:theme.palette.text }}
                       />
                       <FormControlLabel
                         control={
@@ -3336,7 +3071,7 @@ export default function QuickActionsCard() {
                           />
                         }
                         label="Include Lowercase (a-z)"
-                        sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}
+                        sx={{ color:theme.palette.text }}
                       />
                       <FormControlLabel
                         control={
@@ -3346,7 +3081,7 @@ export default function QuickActionsCard() {
                           />
                         }
                         label="Include Numbers (0-9)"
-                        sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}
+                        sx={{ color: theme.palette.text }}
                       />
                       <FormControlLabel
                         control={
@@ -3356,7 +3091,7 @@ export default function QuickActionsCard() {
                           />
                         }
                         label="Include Symbols (!@#$%^&*)"
-                        sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}
+                        sx={{ color: theme.palette.text }}
                       />
                     </Box>
                     
@@ -3373,16 +3108,14 @@ export default function QuickActionsCard() {
                         variant="outlined" 
                         onClick={savePassword}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                          borderColor:  theme.palette.divider,
+                          color:  theme.palette.text,
                           bgcolor: (!generatedPassword) 
                             ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
                             : 'transparent',
                           '&:hover': {
                             borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
+                            
                           }
                         }}
                       >
@@ -3403,14 +3136,14 @@ export default function QuickActionsCard() {
                                 <MuiIconButton
                                   onClick={() => setShowPassword(!showPassword)}
                                   edge="end"
-                                  sx={{ color: theme.palette.mode === 'dark' ? '#666666' : theme.palette.text.secondary }}
+                                  sx={{ color: theme.palette.text }}
                                 >
                                   {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </MuiIconButton>
                                 <MuiIconButton
                                   onClick={() => copyToClipboard(generatedPassword)}
                                   edge="end"
-                                  sx={{ color: theme.palette.mode === 'dark' ? '#666666' : theme.palette.text.secondary }}
+                                  sx={{ color:  theme.palette.text }}
                                 >
                                   <ContentCopy />
                                 </MuiIconButton>
@@ -3421,20 +3154,18 @@ export default function QuickActionsCard() {
                           sx={{ 
                             mb: 2,
                             '& .MuiInputBase-root': {
-                              bgcolor: theme.palette.mode === 'dark' 
-                                ? '#ffffff' 
-                                : 'rgba(0, 0, 0, 0.02)',
+                              
                               border: `1px solid ${theme.palette.divider}`,
                             },
                             '& .MuiInputLabel-root': {
-                              color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
+                              color: theme.palette.text,
                             },
                             '& .MuiInputBase-input': {
-                              color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                              color: theme.palette.text,
                             }
                           }}
                         />
-                        <Typography variant="caption" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                        <Typography variant="caption" sx={{ color:  theme.palette.text }}>
                           Password Strength: {generatedPassword.length >= 12 ? 'Strong' : generatedPassword.length >= 8 ? 'Medium' : 'Weak'}
                         </Typography>
                       </Box>
@@ -3442,9 +3173,9 @@ export default function QuickActionsCard() {
                   </Grid>
                   
                   {/* Right side - Saved Passwords */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Saved Passwords ({savedPasswords.length})
                       </Typography>
                     </Box>
@@ -3454,13 +3185,11 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                      
                     }}>
                       {savedPasswords.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color:  theme.palette.text }}>
                             No saved passwords yet
                           </Typography>
                         </Box>
@@ -3471,11 +3200,7 @@ export default function QuickActionsCard() {
                             sx={{
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
+                              
                               '&:last-child': {
                                 borderBottom: 'none',
                               }
@@ -3484,7 +3209,7 @@ export default function QuickActionsCard() {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                               <Typography variant="subtitle2" sx={{ 
                                 fontWeight: 600, 
-                                color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                color: theme.palette.text,
                                 flex: 1,
                                 mr: 1
                               }}>
@@ -3534,16 +3259,14 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => copyToClipboard(password.password)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor:theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
                                   '&:hover': {
                                     borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
+                                    
                                   }
                                 }}
                               >
@@ -3581,15 +3304,15 @@ export default function QuickActionsCard() {
             {/* JSON Formatter Tool */}
             {activeTool === 'json-formatter' && (
               <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.text }}>
                   JSON Formatter
                 </Typography>
                 
                 <Grid container spacing={3}>
                   {/* Left side - Formatter */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         {isEditingJson ? 'Edit JSON Snippet' : 'New JSON Input'}
                       </Typography>
                     </Box>
@@ -3605,22 +3328,15 @@ export default function QuickActionsCard() {
                       sx={{
                         mb: 2,
                         '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                          
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
+                          
                         },
                         '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
+                          color: theme.palette.text,
                         },
                         '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                          color: theme.palette.text,
                           fontFamily: 'monospace',
                           fontSize: '0.875rem',
                         }
@@ -3642,17 +3358,12 @@ export default function QuickActionsCard() {
                         onClick={saveJsonSnippet}
                         disabled={!jsonInput.trim()}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                          borderColor: theme.palette.divider,
+                          color: theme.palette.text,
                           bgcolor: (!jsonInput.trim()) 
                             ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
                             : 'transparent',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                          }
+                          
                         }}
                       >
                         {isEditingJson ? 'Update' : 'Save'}
@@ -3675,18 +3386,16 @@ export default function QuickActionsCard() {
                         InputProps={{ readOnly: true }}
                         sx={{
                           '& .MuiInputBase-root': {
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? '#ffffff' 
-                              : 'rgba(0, 0, 0, 0.02)',
+                            
                             border: `1px solid ${theme.palette.divider}`,
                           },
                           '& .MuiInputLabel-root': {
-                            color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
+                            color: theme.palette.text,
                           },
                           '& .MuiInputBase-input': {
                             fontFamily: 'monospace',
                             fontSize: '0.875rem',
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                            color: theme.palette.text,
                           }
                         }}
                       />
@@ -3694,9 +3403,9 @@ export default function QuickActionsCard() {
                   </Grid>
                   
                   {/* Right side - Saved JSON Snippets */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Saved JSON Snippets ({savedJsonSnippets.length})
                       </Typography>
                     </Box>
@@ -3706,13 +3415,11 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                      
                     }}>
                       {savedJsonSnippets.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color:  theme.palette.text }}>
                             No saved JSON snippets yet
                           </Typography>
                         </Box>
@@ -3723,11 +3430,7 @@ export default function QuickActionsCard() {
                             sx={{
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
+                              
                               '&:last-child': {
                                 borderBottom: 'none',
                               }
@@ -3756,11 +3459,11 @@ export default function QuickActionsCard() {
                             
                             <Box sx={{ 
                               p: 1, 
-                              bgcolor: theme.palette.mode === 'dark' ? '#ffffff' : '#f5f5f5',
+                              
                               borderRadius: 1,
                               fontFamily: 'monospace',
                               fontSize: '0.75rem',
-                              color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                              color: theme.palette.text,
                               mb: 1,
                               maxHeight: 100,
                               overflow: 'hidden',
@@ -3770,7 +3473,7 @@ export default function QuickActionsCard() {
                             </Box>
                             
                             <Typography variant="caption" sx={{ 
-                              color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                              color:  theme.palette.text,
                               display: 'block',
                               mb: 1
                             }}>
@@ -3783,17 +3486,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => loadJsonSnippet(snippet)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Load
@@ -3803,17 +3501,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => copyToClipboard(snippet.formatted)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Copy
@@ -3829,10 +3522,7 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    bgcolor: theme.palette.error.main,
-                                    color: 'white',
-                                  }
+
                                 }}
                               >
                                 Delete
@@ -3851,21 +3541,21 @@ export default function QuickActionsCard() {
             {activeTool === 'color-picker' && (
               mounted ? (
               <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.text }}>
                   Color Picker
                 </Typography>
                 
                 <Grid container spacing={3}>
                   {/* Left side - Color Picker */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Color Selection
                       </Typography>
                     </Box>
                     
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                        <Typography variant="body2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Selected Color
                       </Typography>
                       <Box sx={{ 
@@ -3882,7 +3572,7 @@ export default function QuickActionsCard() {
                         <Typography 
                           variant="h6" 
                           sx={{ 
-                            color: getContrastColor(selectedColor),
+                            color: getContrastColor(selectedColor, theme),
                             fontWeight: 600,
                             textShadow: '0 1px 2px rgba(0,0,0,0.3)'
                           }}
@@ -3900,9 +3590,7 @@ export default function QuickActionsCard() {
                           height: 50, 
                           borderRadius: 8,
                           border: `1px solid ${theme.palette.divider}`,
-                          backgroundColor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                         
                           cursor: 'pointer'
                         }}
                       />
@@ -3915,49 +3603,24 @@ export default function QuickActionsCard() {
                       onChange={(e) => setSelectedColor(e.target.value)}
                       sx={{
                         mb: 2,
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                        
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          fontFamily: 'monospace',
-                        }
+                         
+                        
                       }}
                     />
                     
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>Format</InputLabel>
+                      <InputLabel sx={{ color: theme.palette.text }}>Format</InputLabel>
                       <Select
                         value={colorFormat}
                         onChange={(e) => setColorFormat(e.target.value)}
                         label="Format"
                         sx={{
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                         
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '& .MuiSelect-select': {
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          }
-                        }}
+                          
+                        }}  
                       >
                         <MenuItem value="hex">HEX</MenuItem>
                         <MenuItem value="rgb">RGB</MenuItem>
@@ -3978,15 +3641,10 @@ export default function QuickActionsCard() {
                         variant="outlined" 
                         onClick={saveColor}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                          borderColor: theme.palette.divider,
+                          color: theme.palette.text,
                           bgcolor: 'transparent',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                          }
+                          
                         }}
                       >
                         Save Color
@@ -3994,14 +3652,12 @@ export default function QuickActionsCard() {
                     </Box>
                     
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="body2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Color Formats
                       </Typography>
                       <Box sx={{ 
                         p: 2, 
-                        bgcolor: theme.palette.mode === 'dark' 
-                          ? 'rgba(255, 255, 255, 0.05)' 
-                          : 'rgba(0, 0, 0, 0.02)',
+
                         borderRadius: 1,
                         border: `1px solid ${theme.palette.divider}`
                       }}>
@@ -4009,7 +3665,7 @@ export default function QuickActionsCard() {
                           display: 'block', 
                           mb: 1, 
                           fontFamily: 'monospace',
-                          color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary
+                          color:  theme.palette.text
                         }}>
                           HEX: {selectedColor}
                         </Typography>
@@ -4017,14 +3673,14 @@ export default function QuickActionsCard() {
                           display: 'block', 
                           mb: 1, 
                           fontFamily: 'monospace',
-                          color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary
+                          color:  theme.palette.text
                         }}>
                           RGB: {hexToRgb(selectedColor)}
                         </Typography>
                         <Typography variant="caption" sx={{ 
                           display: 'block', 
                           fontFamily: 'monospace',
-                          color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary
+                          color:  theme.palette.text
                         }}>
                           HSL: {hexToHsl(selectedColor)}
                         </Typography>
@@ -4033,9 +3689,9 @@ export default function QuickActionsCard() {
                   </Grid>
                   
                   {/* Right side - Saved Colors */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Saved Colors ({savedColors.length})
                       </Typography>
                     </Box>
@@ -4045,13 +3701,11 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                      
                     }}>
                       {savedColors.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color:  theme.palette.text }}>
                             No saved colors yet
                           </Typography>
                         </Box>
@@ -4062,11 +3716,7 @@ export default function QuickActionsCard() {
                             sx={{
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
+                              
                               '&:last-child': {
                                 borderBottom: 'none',
                               }
@@ -4084,14 +3734,14 @@ export default function QuickActionsCard() {
                               <Box sx={{ flex: 1 }}>
                                 <Typography variant="subtitle2" sx={{ 
                                   fontWeight: 600, 
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  color: theme.palette.text,
                                   fontFamily: 'monospace',
                                   fontSize: '0.875rem'
                                 }}>
                                   {color.color}
                                 </Typography>
                                 <Typography variant="caption" sx={{ 
-                                  color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                                  color:  theme.palette.text,
                                   display: 'block'
                                 }}>
                                   {new Date(color.createdAt).toLocaleDateString()} • {color.format.toUpperCase()}
@@ -4105,17 +3755,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => copyToClipboard(color.color)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Copy
@@ -4125,17 +3770,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => setSelectedColor(color.color)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+
                                 }}
                               >
                                 Load
@@ -4151,10 +3791,7 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    bgcolor: theme.palette.error.main,
-                                    color: 'white',
-                                  }
+
                                 }}
                               >
                                 Delete
@@ -4177,39 +3814,29 @@ export default function QuickActionsCard() {
             {/* Base64 Converter Tool */}
             {activeTool === 'base64-converter' && (
               <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.text }}>
                   Base64 Converter
                 </Typography>
                 
                 <Grid container spacing={3}>
                   {/* Left side - Converter */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         {isEditingBase64 ? 'Edit Base64 Conversion' : 'New Conversion'}
                       </Typography>
                     </Box>
                     
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel sx={{ color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary }}>Mode</InputLabel>
+                      <InputLabel sx={{ color: theme.palette.text }}>Mode</InputLabel>
                       <Select
                         value={base64Mode}
                         onChange={(e) => setBase64Mode(e.target.value)}
                         label="Mode"
                         sx={{
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
+                          
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '& .MuiSelect-select': {
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          }
+                          
                         }}
                       >
                         <MenuItem value="encode">Encode</MenuItem>
@@ -4227,26 +3854,9 @@ export default function QuickActionsCard() {
                       placeholder={base64Mode === 'encode' ? 'Enter text to encode to Base64' : 'Enter Base64 string to decode'}
                       sx={{
                         mb: 2,
-                        '& .MuiInputBase-root': {
-                          bgcolor: theme.palette.mode === 'dark' 
-                            ? '#ffffff' 
-                            : 'rgba(0, 0, 0, 0.02)',
                           border: `1px solid ${theme.palette.divider}`,
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                          },
-                          '&.Mui-focused': {
-                            borderColor: theme.palette.primary.main,
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          fontFamily: 'monospace',
-                          fontSize: '0.875rem',
-                        }
+                          
+                        
                       }}
                     />
                     
@@ -4265,17 +3875,10 @@ export default function QuickActionsCard() {
                         onClick={saveBase64Conversion}
                         disabled={!base64Input.trim()}
                         sx={{
-                          borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                          color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-                          bgcolor: (!base64Input.trim()) 
-                            ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
-                            : 'transparent',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.main,
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? 'rgba(255, 255, 255, 0.1)' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                          }
+                          borderColor: theme.palette.divider,
+                          color: theme.palette.text,
+
+                          
                         }}
                       >
                         {isEditingBase64 ? 'Update' : 'Save'}
@@ -4291,29 +3894,17 @@ export default function QuickActionsCard() {
                         value={base64Output}
                         InputProps={{ readOnly: true }}
                         sx={{
-                          '& .MuiInputBase-root': {
-                            bgcolor: theme.palette.mode === 'dark' 
-                              ? '#ffffff' 
-                              : 'rgba(0, 0, 0, 0.02)',
-                            border: `1px solid ${theme.palette.divider}`,
-                          },
-                          '& .MuiInputLabel-root': {
-                            color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.secondary,
-                          },
-                          '& .MuiInputBase-input': {
-                            fontFamily: 'monospace',
-                            fontSize: '0.875rem',
-                            color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
-                          }
+                          border: `1px solid ${theme.palette.divider}`,
+                          
                         }}
                       />
-                    )}
+                    )}  
                   </Grid>
                   
                   {/* Right side - Saved Conversions */}
-                  <Grid item xs={12} md={6}>
+                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
                         Saved Conversions ({savedBase64Conversions.length})
                       </Typography>
                     </Box>
@@ -4323,13 +3914,11 @@ export default function QuickActionsCard() {
                       overflowY: 'auto',
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? 'rgba(255, 255, 255, 0.05)' 
-                        : 'rgba(0, 0, 0, 0.02)',
+                      
                     }}>
                       {savedBase64Conversions.length === 0 ? (
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary }}>
+                          <Typography variant="body2" sx={{ color:  theme.palette.text }}>
                             No saved conversions yet
                           </Typography>
                         </Box>
@@ -4340,11 +3929,7 @@ export default function QuickActionsCard() {
                             sx={{
                               p: 2,
                               borderBottom: `1px solid ${theme.palette.divider}`,
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark' 
-                                  ? 'rgba(255, 255, 255, 0.08)' 
-                                  : 'rgba(0, 0, 0, 0.04)',
-                              },
+                              
                               '&:last-child': {
                                 borderBottom: 'none',
                               }
@@ -4353,7 +3938,7 @@ export default function QuickActionsCard() {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                               <Typography variant="subtitle2" sx={{ 
                                 fontWeight: 600, 
-                                color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  color: theme.palette.text,
                                 flex: 1,
                                 mr: 1
                               }}>
@@ -4365,19 +3950,19 @@ export default function QuickActionsCard() {
                                 sx={{ 
                                   fontSize: '0.75rem',
                                   height: 20,
-                                  bgcolor: conversion.mode === 'encode' ? 'primary.main' : 'secondary.main',
-                                  color: 'white'
+                                  
+                                  color: theme.palette.text
                                 }} 
                               />
                             </Box>
                             
                             <Box sx={{ 
                               p: 1, 
-                              bgcolor: theme.palette.mode === 'dark' ? '#ffffff' : '#f5f5f5',
+                              
                               borderRadius: 1,
                               fontFamily: 'monospace',
                               fontSize: '0.75rem',
-                              color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary,
+                              color: theme.palette.text,
                               mb: 1,
                               maxHeight: 60,
                               overflow: 'hidden',
@@ -4388,7 +3973,7 @@ export default function QuickActionsCard() {
                             </Box>
                             
                             <Typography variant="caption" sx={{ 
-                              color: theme.palette.mode === 'dark' ? '#cccccc' : theme.palette.text.secondary,
+                              color: theme.palette.text,
                               display: 'block',
                               mb: 1
                             }}>
@@ -4401,17 +3986,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => loadBase64Conversion(conversion)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Load
@@ -4421,17 +4001,12 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 onClick={() => copyToClipboard(conversion.output)}
                                 sx={{
-                                  borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-                                  color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
+                                  borderColor: theme.palette.divider,
+                                  color: theme.palette.text,
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    borderColor: theme.palette.primary.main,
-                                    bgcolor: theme.palette.mode === 'dark' 
-                                      ? 'rgba(255, 255, 255, 0.1)' 
-                                      : 'rgba(0, 0, 0, 0.02)',
-                                  }
+                                  
                                 }}
                               >
                                 Copy
@@ -4447,10 +4022,7 @@ export default function QuickActionsCard() {
                                   fontSize: '0.75rem',
                                   minWidth: 'auto',
                                   px: 1,
-                                  '&:hover': {
-                                    bgcolor: theme.palette.error.main,
-                                    color: 'white',
-                                  }
+                                  
                                 }}
                               >
                                 Delete
@@ -4470,9 +4042,7 @@ export default function QuickActionsCard() {
         <DialogActions sx={{ 
           p: 3, 
           pt: 0,
-          background: theme.palette.mode === 'dark'
-            ? '#1a1a1a'
-            : 'rgba(255, 255, 255, 0.95)',
+          
         }}>
           <Button 
             onClick={() => setShowQuickTools(false)}
@@ -4480,16 +4050,11 @@ export default function QuickActionsCard() {
             sx={{ 
               fontFamily: 'var(--font-lexend)',
               borderRadius: 2,
-              borderColor: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.divider,
-              color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary,
-              '&:hover': {
-                borderColor: theme.palette.primary.main,
-                bgcolor: theme.palette.mode === 'dark' 
-                  ? 'rgba(255, 255, 255, 0.1)' 
-                  : 'rgba(0, 0, 0, 0.02)',
-              }
+              borderColor: theme.palette.divider,
+              color: theme.palette.text,
+
             }}
-          >
+          > 
             Close
           </Button>
         </DialogActions>
