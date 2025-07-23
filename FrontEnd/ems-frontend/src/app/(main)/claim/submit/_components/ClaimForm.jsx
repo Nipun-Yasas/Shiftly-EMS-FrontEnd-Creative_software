@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import { Formik, Form } from "formik";
 
@@ -12,6 +12,10 @@ import SelectInput from "../../../../_components/inputs/SelectInput";
 import FileUpload from "../../../../_components/inputs/FileUpload";
 import DateInput from "../../../../_components/inputs/DateInput";
 
+import { API_PATHS } from "../../../../_utils/apiPaths";
+import axiosInstance from "../../../../_utils/axiosInstance";
+import dayjs from "dayjs";
+
 const claimtypeOptions = [
   { id: 1, name: "Medical" },
   { id: 2, name: "Insuarance" },
@@ -23,6 +27,20 @@ export default function ClaimForm(props){
   const claimfileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
+
+  // Fetch claims by user ID on mount (example: userId = 2)
+  useEffect(() => {
+    const fetchClaims = async () => {
+      try {
+        const userId = 2; // Replace with dynamic user ID as needed
+        const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(userId));
+        console.log("Claims for user", userId, response.data);
+      } catch (error) {
+        console.error("Failed to fetch claims by user ID:", error);
+      }
+    };
+    fetchClaims();
+  }, []);
 
   return (
     <>
@@ -49,13 +67,39 @@ export default function ClaimForm(props){
           }
           return errors;
         }}
-        onSubmit={(values, { resetForm }) => {
-          setOpenSubmit(true);
-          resetForm();
-          setFileName("");
-          setPreview(null);
-          if (claimfileRef.current) {
-            claimfileRef.current.value = "";
+        onSubmit={async (values, { resetForm }) => {
+          try {
+            const data = new FormData();
+            data.append('claimType', values.claimtype?.name || values.claimtype);
+            data.append('description', values.description);
+            if (values.claimdate) {
+              data.append('claimDate', dayjs(values.claimdate).format('YYYY-MM-DD'));
+            }
+            if (values.claimfile) {
+              data.append('file', values.claimfile);
+            }
+            // Optionally add status if needed
+            // data.append('status', 'PENDING');
+
+            const response = await axiosInstance.post(
+              API_PATHS.CLAIMS.CREATE_CLAIM,
+              data,
+              { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            alert('Claim submitted! ID: ' + response.data.id);
+            setOpenSubmit(true);
+            resetForm();
+            setFileName("");
+            setPreview(null);
+            if (claimfileRef.current) {
+              claimfileRef.current.value = "";
+            }
+          } catch (error) {
+            let errorMsg = 'Failed to submit claim.';
+            if (error.response?.data?.message) {
+              errorMsg = error.response.data.message;
+            }
+            alert(errorMsg);
           }
         }}
       >
@@ -137,8 +181,8 @@ export default function ClaimForm(props){
                     resetForm();
                     setFileName("");
                     setPreview(null);
-                    if (bannerRef.current) {
-                      bannerRef.current.value = "";
+                    if (claimfileRef.current) {
+                      claimfileRef.current.value = "";
                     }
                   }}
                 >

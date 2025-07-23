@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -10,42 +10,41 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditReferDialog from "../_components/EditReferDialog";
 import DeleteConfirmDialog from "../_components/DeleteConfirmDialog";
-
-const initialRows = [
-  {
-    id: 1,
-    vacancy: "Software Engineer",
-    applicant_name: "John Doe",
-    applicant_email: "john.doe@example.com",
-    message: "Experienced developer with 5+ years in React and Node.js",
-    resume_file_path: "john_doe_resume.pdf",
-    status: "Pending"
-  },
-  {
-    id: 2,
-    vacancy: "UI/UX Designer",
-    applicant_name: "Jane Smith",
-    applicant_email: "jane.smith@example.com",
-    message: "Creative designer with strong portfolio in web and mobile design",
-    resume_file_path: "jane_smith_portfolio.pdf",
-    status: "Approved"
-  },
-  {
-    id: 3,
-    vacancy: "Product Manager",
-    applicant_name: "Mike Johnson",
-    applicant_email: "mike.johnson@example.com",
-    message: "Strategic product leader with experience in agile methodologies",
-    resume_file_path: "mike_johnson_cv.pdf",
-    status: "Rejected"
-  },
-];
+import axiosInstance from '../../../_utils/axiosInstance';
+import { REFERRAL_API } from '../../../_utils/apiPaths';
 
 export default function ReferHistory() {
-  const [referData, setReferData] = useState(initialRows);
+  const [referData, setReferData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+
+  useEffect(() => {
+    const fetchReferrals = async () => {
+      setLoading(true);
+      try {
+        const userId = 2; // Replace with dynamic user ID as needed
+        const response = await axiosInstance.get(REFERRAL_API.GET_BY_USER_ID(userId));
+        // Map backend fields to frontend DataGrid fields
+        const mapped = response.data.map(ref => ({
+          id: ref.id,
+          vacancy: ref.vacancyName || ref.vacancyId,
+          applicant_name: ref.applicantName,
+          applicant_email: ref.applicantEmail,
+          message: ref.message,
+          resume_file_path: ref.fileUrl,
+          status: ref.status,
+        }));
+        setReferData(mapped);
+      } catch (error) {
+        setReferData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReferrals();
+  }, []);
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -115,7 +114,21 @@ export default function ReferHistory() {
         </Box>
       )
     },
-    { field: "resume_file_path", headerName: "Uploaded Resume", width: 180 },
+    { 
+      field: "resume_file_path", 
+      headerName: "Uploaded Resume", 
+      width: 180,
+      renderCell: (params) => {
+        const fileUrl = params.value;
+        if (!fileUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + fileUrl;
+        return (
+          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
+            Download
+          </a>
+        );
+      }
+    },
     { field: "status", headerName: "Referral State", width: 150 },
     {
       field: "actions",
@@ -130,20 +143,24 @@ export default function ReferHistory() {
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
-        <DataGrid
-          rows={referData}
-          columns={columns}
-          height="auto"
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          disableSelectionOnClick
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
-          pageSizeOptions={[10, 50, 100]}
-        />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <DataGrid
+            rows={referData}
+            columns={columns}
+            height="auto"
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 50, 100]}
+          />
+        )}
       </Box>
       
       <EditReferDialog
