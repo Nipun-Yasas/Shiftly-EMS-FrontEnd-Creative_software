@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -23,12 +24,12 @@ import TabPanel from "../../../_components/main/TabPanel";
 export default function UserManagementPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, updateUser } = useContext(UserContext);
-  
+  const { user } = useContext(UserContext);
+
   const getInitialTabValue = () => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'verify') return 1;
-    if (tabParam === 'verified') return 0;
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "verify") return 1;
+    if (tabParam === "verified") return 0;
     return 0;
   };
 
@@ -47,80 +48,71 @@ export default function UserManagementPage() {
     message: "",
     severity: "success",
   });
+  const [refreshInterval, setRefreshInterval] = useState(null);
 
-  const fetchUsers = async () => {
-    setLoading(true);
+  const fetchUsers = async (showLoadingState = true) => {
+    if (showLoadingState) {
+      setLoading(true);
+    }
     try {
-      // Debug: Check token and user data before making request
-      const token = localStorage.getItem("token");
-      const userData = localStorage.getItem("user");
-
-      if (!token) {
-        showSnackbar(
-          "No authentication token found. Please login again.",
-          "error"
-        );
-        return;
-      }
-
       const response = await axiosInstance.get(
         API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES
       );
 
-      // Handle both single user and array of users response
       let usersData = response.data;
-      if (usersData && !Array.isArray(usersData)) {
-        // If response is a single user object, wrap it in an array
-        usersData = [usersData];
-      }
-
       const allUsers = usersData || [];
 
-      // Filter users based on verification status
-      const verifiedUsers = allUsers.filter((user) => user.verified === true);
-      const unverifiedUsers = allUsers.filter((user) => user.verified === false);
+      const currentUserId = user?.id;
+      const currentUserEmail = user?.email;
+
+      // Filter out the current logged-in user from all users
+      const filteredUsers = allUsers.filter((userData) => {
+        // Exclude current user by ID or email
+        return (
+          userData.id !== currentUserId && userData.email !== currentUserEmail
+        );
+      });
+
+      const verifiedUsers = filteredUsers.filter(
+        (user) => user.verified === true
+      );
+      const unverifiedUsers = filteredUsers.filter(
+        (user) => user.verified === false
+      );
 
       setUsers(verifiedUsers);
       setUnverifiedUsers(unverifiedUsers);
     } catch (error) {
       showSnackbar("Error fetching users. Please try again.", "error");
       setUsers([]);
+      setUnverifiedUsers([]);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  // Function to refresh current user data from server
-  const refreshCurrentUserData = async () => {
-    try {
-      const response = await axiosInstance.get(API_PATHS.AUTH.GET_CURRENT_USER);
-      if (response.data) {
-        console.log("Refreshed user data from server:", response.data);
-        updateUser(response.data);
+      if (showLoadingState) {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error refreshing user data:", error);
     }
   };
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const roleData = {
-        roleId: values.roleId?.id || values.roleId,
+      const updateData = {
+        designation: values.designation?.name || values.designation,
+        department: values.department?.name || values.department,
+        reportingPerson: values.reportingPerson || "",
+        reportingPersonEmail: values.reportingPersonEmail || "",
       };
 
       await axiosInstance.put(
-        API_PATHS.ADMIN_USER.UPDATE_USER_ROLE(editingUser.id),
-        roleData
+        API_PATHS.ADMIN_USER.UPDATE_USER(editingUser.id),
+        updateData
       );
-      showSnackbar("User role updated successfully", "success");
+      showSnackbar("User updated successfully", "success");
 
       setOpenDialog(false);
       setEditingUser(null);
       fetchUsers();
     } catch (error) {
-      console.error("Error updating user role:", error);
-      showSnackbar("Error updating user role", "error");
+      showSnackbar("Error updating user", "error");
     } finally {
       setSubmitting(false);
     }
@@ -131,55 +123,27 @@ export default function UserManagementPage() {
       const verifyData = {
         role: values.roleId?.name || values.roleId,
         designation: values.designation?.name || values.designation,
-        department: values.department?.name || values.department, // Send department name, not ID
+        department: values.department?.name || values.department,
+        reportingPerson: values.reportingPerson || "",
+        reportingPersonEmail: values.reportingPersonEmail || "",
       };
-
-      console.log("Sending verification data:", verifyData);
 
       const response = await axiosInstance.put(
         API_PATHS.SUPER_ADMIN.VERIFY_EMPLOYEE(assigningUser.id),
         verifyData
       );
-      
-      console.log("User verified successfully");
-      console.log("Verification response:", response.data);
-      
-      // Update UserContext if the verified user is the current logged-in user
-      if (user && (user.id === assigningUser.id || user.email === assigningUser.email)) {
-        console.log("Updating current user context with new data");
-        const updatedUser = {
-          ...user,
-          designation: verifyData.designation,
-          department: verifyData.department,
-          verified: true
-        };
-        updateUser(updatedUser);
-        console.log("UserContext updated:", updatedUser);
-        
-        // Also refresh from server to get the latest data
-        setTimeout(() => {
-          refreshCurrentUserData();
-        }, 1000);
-      }
-      
+
       showSnackbar("User verified and assigned successfully", "success");
 
+      // Close dialog and reset state
       setAssignDialogOpen(false);
       setAssigningUser(null);
-      fetchUsers(); 
       resetForm();
+
+      // Refresh user data to get updated lists
+      await fetchUsers();
     } catch (error) {
-      console.error("Error verifying user:", error);
-      console.error("Error response:", error.response?.data);
-      
-      let errorMessage = "Error verifying user";
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      }
-      
-      showSnackbar(errorMessage, "error");
+      showSnackbar("Network error. Please check your connection.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -194,9 +158,11 @@ export default function UserManagementPage() {
       );
       showSnackbar("User deleted successfully", "success");
       setUsers(users.filter((user) => user.id !== userToDelete.id));
+      setUnverifiedUsers(
+        unverifiedUsers.filter((user) => user.id !== userToDelete.id)
+      );
     } catch (error) {
-      console.error("Error deleting user:", error);
-      showSnackbar("Error deleting user", "error");
+      showSnackbar("Network error. Please check your connection.", "error");
     } finally {
       setDeleteConfirmOpen(false);
       setUserToDelete(null);
@@ -217,17 +183,21 @@ export default function UserManagementPage() {
     setAssignDialogOpen(true);
   };
 
+  const handleRefresh = () => {
+    fetchUsers();
+  };
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-    
+
     // Update URL parameter based on tab selection
     const params = new URLSearchParams(searchParams.toString());
     if (newValue === 0) {
-      params.set('tab', 'verified');
+      params.set("tab", "verified");
     } else if (newValue === 1) {
-      params.set('tab', 'verify');
+      params.set("tab", "verify");
     }
-    
+
     // Update URL without page refresh
     router.push(`?${params.toString()}`, { scroll: false });
   };
@@ -237,9 +207,43 @@ export default function UserManagementPage() {
     setTabValue(getInitialTabValue());
   }, [searchParams]);
 
+  // Set up automatic refresh when on verify tab
+  useEffect(() => {
+    // Clear any existing interval
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      setRefreshInterval(null);
+    }
+
+    // Set up new interval only if on verify tab (tab index 1)
+    if (tabValue === 1) {
+      const interval = setInterval(() => {
+        fetchUsers(false);
+      }, 30000);
+
+      setRefreshInterval(interval);
+    }
+
+    // Cleanup function
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [tabValue]);
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Cleanup interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [refreshInterval]);
 
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
@@ -268,6 +272,7 @@ export default function UserManagementPage() {
             loading={loading}
             users={unverifiedUsers}
             handleAssignUser={handleAssignUser}
+            onRefresh={handleRefresh}
           />
         </TabPanel>
 

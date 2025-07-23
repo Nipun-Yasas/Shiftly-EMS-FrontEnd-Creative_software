@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -10,6 +10,9 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { UserContext } from "../../../context/UserContext";
+import { useDepartments } from "../../../_hooks/useDepartments";
+import { useTeams } from "../../../_hooks/useTeams";
 import AllTab from "./_components/AllTab";
 import AddTab from "./_components/AddTab";
 import EditDialog from "./_components/EditDialog";
@@ -25,6 +28,7 @@ const projectStatuses = [
 ];
 
 export default function ProjectManagementPage() {
+  const { user } = useContext(UserContext);
   const [tabValue, setTabValue] = useState(0);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,12 +36,15 @@ export default function ProjectManagementPage() {
   const [editingProject, setEditingProject] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
-  const [searchQuery, setSearchTerm] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
+  // Use custom hooks for departments and teams
+  const { departments, loading: loadingDepartments, error: departmentsError } = useDepartments();
+  const { teams, loading: loadingTeams, error: teamsError } = useTeams();
 
   const initialFormValues = {
     projectName: "",
@@ -55,7 +62,7 @@ export default function ProjectManagementPage() {
         projectName: project.projectName || "",
         description: project.description || "",
         department:
-          departments.find((d) => d.name === project.department) || null,
+          departments.find((d) => d.name === project.departmentName) || null,
         teamName: teams.find((t) => t.name === project.teamName) || null,
         startDate: project.startDate || null,
         deadline: project.deadline || null,
@@ -120,6 +127,56 @@ export default function ProjectManagementPage() {
   const handleAddSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       console.log("Form values received:", values);
+      console.log("Department value:", values.department);
+      console.log("Department type:", typeof values.department);
+      console.log("Department ID:", values.department?.id);
+      console.log("Team value:", values.teamName);
+      console.log("Team type:", typeof values.teamName);
+      console.log("Team ID:", values.teamName?.id);
+      console.log("Available departments:", departments);
+      console.log("Available teams:", teams);
+      console.log("Current user:", user);
+      
+      // Check if user is available
+      if (!user || !user.id) {
+        showSnackbar("User not authenticated. Please log in again.", "error");
+        setSubmitting(false);
+        return;
+      }
+      
+      // More flexible validation - check if department exists and has an id
+      let departmentId = null;
+      if (values.department) {
+        if (typeof values.department === 'object' && values.department.id) {
+          departmentId = values.department.id;
+        } else if (typeof values.department === 'number') {
+          departmentId = values.department;
+        }
+      }
+      
+      if (!departmentId) {
+        console.error("Department validation failed:", values.department);
+        showSnackbar("Please select a department", "error");
+        setSubmitting(false);
+        return;
+      }
+      
+      // More flexible validation - check if team exists and has an id
+      let teamId = null;
+      if (values.teamName) {
+        if (typeof values.teamName === 'object' && values.teamName.id) {
+          teamId = values.teamName.id;
+        } else if (typeof values.teamName === 'number') {
+          teamId = values.teamName;
+        }
+      }
+      
+      if (!teamId) {
+        console.error("Team validation failed:", values.teamName);
+        showSnackbar("Please select a team", "error");
+        setSubmitting(false);
+        return;
+      }
       
       // Map frontend form data to backend DTO format
       const projectData = {
@@ -128,17 +185,13 @@ export default function ProjectManagementPage() {
         startDate: values.startDate,
         endDate: values.deadline,
         progress: parseInt(values.progress) || 0,
+        userId: user.id,
+        departmentId: departmentId,
+        teamId: teamId,
       };
 
-      // Only include team and department if selected
-      if (values.teamName?.name) {
-        projectData.teamName = values.teamName.name;
-      }
-      
-      if (values.department?.name) {
-        projectData.departmentName = values.department.name;
-      }
-
+      console.log("Selected department object:", values.department);
+      console.log("Selected team object:", values.teamName);
       console.log("Sending to backend:", projectData);
       
       const response = await axiosInstance.post(API_PATHS.PROJECTS.ADD_PROJECT, projectData);
@@ -151,15 +204,37 @@ export default function ProjectManagementPage() {
       
     } catch (error) {
       console.error("Error creating project:", error);
+      console.error("Full error object:", JSON.stringify(error, null, 2));
       console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      console.error("Error headers:", error.response?.headers);
       
       let errorMessage = "Failed to create project";
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.status === 500) {
-        errorMessage = "Server error. Please ensure teams and departments exist in the database.";
+      
+      if (error.response?.data) {
+        // Check for specific error messages in response
+        const responseData = error.response.data;
+        
+        if (typeof responseData === 'string') {
+          errorMessage = responseData;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (responseData.error) {
+          errorMessage = responseData.error;
+        } else if (responseData.details) {
+          errorMessage = responseData.details;
+        }
+        
+        // Log the full response for debugging
+        console.error("Backend error details:", responseData);
+      }
+      
+      if (error.response?.status === 500) {
+        errorMessage += " (Server Error - Check backend logs)";
       } else if (error.response?.status === 400) {
-        errorMessage = "Invalid project data. Please check all required fields.";
+        errorMessage += " (Bad Request - Check form data)";
+      } else if (error.response?.status === 404) {
+        errorMessage += " (Not Found - Check API endpoint)";
       }
       
       showSnackbar(errorMessage, "error");
@@ -173,6 +248,27 @@ export default function ProjectManagementPage() {
     try {
       console.log("Edit form values:", values);
       console.log("Editing project:", editingProject);
+      console.log("Current user:", user);
+      
+      // Check if user is available
+      if (!user || !user.id) {
+        showSnackbar("User not authenticated. Please log in again.", "error");
+        setSubmitting(false);
+        return;
+      }
+      
+      // Validate required fields
+      if (!values.department || !values.department.id) {
+        showSnackbar("Please select a department", "error");
+        setSubmitting(false);
+        return;
+      }
+      
+      if (!values.teamName || !values.teamName.id) {
+        showSnackbar("Please select a team", "error");
+        setSubmitting(false);
+        return;
+      }
       
       // Map frontend form data to backend DTO format
       const projectData = {
@@ -181,16 +277,10 @@ export default function ProjectManagementPage() {
         startDate: values.startDate,
         endDate: values.deadline,
         progress: parseInt(values.progress) || 0,
+        userId: user.id,
+        departmentId: values.department.id,
+        teamId: values.teamName.id,
       };
-
-      // Only include team and department if selected
-      if (values.teamName?.name) {
-        projectData.teamName = values.teamName.name;
-      }
-      
-      if (values.department?.name) {
-        projectData.departmentName = values.department.name;
-      }
 
       console.log("Updating project ID:", editingProject.id);
       console.log("Sending update data:", projectData);
@@ -292,17 +382,23 @@ export default function ProjectManagementPage() {
     setTabValue(1); // Switch to Add Project tab
   };
 
-  // Filter projects based on search term
-  const filteredProjects = projects.filter(
-    (project) =>
-      project.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.teamName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Debug effect to log departments and teams when they load
+  useEffect(() => {
+    if (departments.length > 0) {
+      console.log("Departments loaded:", departments);
+    }
+  }, [departments]);
+
+  useEffect(() => {
+    if (teams.length > 0) {
+      console.log("Teams loaded:", teams);
+    }
+  }, [teams]);
 
   return (
     <Paper
@@ -321,10 +417,8 @@ export default function ProjectManagementPage() {
 
         <TabPanel value={tabValue} index={0}>
           <AllTab
-            projects={filteredProjects}
+            projects={projects}
             loading={loading}
-            searchQuery={searchQuery}
-            handleSearchChange={(e) => setSearchTerm(e.target.value)}
             onAddProject={handleAddProject}
             onEditProject={handleEdit}
             onDeleteProject={handleDeleteProject}
@@ -332,10 +426,35 @@ export default function ProjectManagementPage() {
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
+          {/* Show loading message if departments or teams are still loading */}
+          {(loadingDepartments || loadingTeams) && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              Loading {loadingDepartments ? 'departments' : ''} {loadingDepartments && loadingTeams ? 'and' : ''} {loadingTeams ? 'teams' : ''}...
+            </Alert>
+          )}
+          
+          {/* Show warning if no departments or teams are available */}
+          {!loadingDepartments && departments.length === 0 && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              No departments available. Please add departments to the system first.
+            </Alert>
+          )}
+          
+          {!loadingTeams && teams.length === 0 && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              No teams available. Please add teams to the system first.
+            </Alert>
+          )}
+          
           <AddTab
             onSubmit={handleAddSubmit}
             projectStatuses={projectStatuses}
             initialFormValues={initialFormValues}
+            departments={departments}
+            teams={teams}
+            loadingDepartments={loadingDepartments}
+            loadingTeams={loadingTeams}
+            disabled={loadingDepartments || loadingTeams || departments.length === 0 || teams.length === 0}
           />
         </TabPanel>
 
@@ -348,6 +467,11 @@ export default function ProjectManagementPage() {
           onSubmit={handleEditSubmit}
           editingProject={editingProject}
           projectStatuses={projectStatuses}
+          departments={departments}
+          teams={teams}
+          loadingDepartments={loadingDepartments}
+          loadingTeams={loadingTeams}
+          getEditInitialValues={getEditInitialValues}
         />
 
         <DeleteDialog
@@ -370,6 +494,19 @@ export default function ProjectManagementPage() {
             {snackbar.message}
           </Alert>
         </Snackbar>
+
+        {/* Show error alerts for departments/teams if needed */}
+        {departmentsError && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            Failed to load departments. Some features may not work properly.
+          </Alert>
+        )}
+        
+        {teamsError && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            Failed to load teams. Some features may not work properly.
+          </Alert>
+        )}
       </Box>
     </Paper>
   );

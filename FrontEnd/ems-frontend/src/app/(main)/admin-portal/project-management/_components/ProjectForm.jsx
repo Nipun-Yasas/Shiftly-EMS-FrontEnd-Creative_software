@@ -12,28 +12,6 @@ import DateInput from "../../../../_components/inputs/DateInput";
 
 import AddIcon from "@mui/icons-material/Add";
 
-const departments = [
-  { id: 1, name: "Engineering", label: "Engineering" },
-  { id: 2, name: "Project Management", label: "Project Management" },
-  { id: 3, name: "Human Resources", label: "Human Resources" },
-  { id: 4, name: "IT", label: "Information Technology" },
-  { id: 5, name: "Finance", label: "Finance" },
-  { id: 6, name: "Marketing", label: "Marketing" },
-  { id: 7, name: "Sales", label: "Sales" },
-  { id: 8, name: "Operations", label: "Operations" },
-];
-
-const teams = [
-  { id: 1, name: "Alpha Team", label: "Alpha Team" },
-  { id: 2, name: "Beta Team", label: "Beta Team" },
-  { id: 3, name: "Gamma Team", label: "Gamma Team" },
-  { id: 4, name: "Delta Team", label: "Delta Team" },
-  { id: 5, name: "Epsilon Team", label: "Epsilon Team" },
-  { id: 6, name: "Zeta Team", label: "Zeta Team" },
-  { id: 7, name: "Theta Team", label: "Theta Team" },
-  { id: 8, name: "Sigma Team", label: "Sigma Team" },
-];
-
 export const projectValidationSchema = Yup.object({
   projectName: Yup.string()
     .min(3, "Project name must be at least 3 characters")
@@ -59,6 +37,10 @@ export default function ProjectForm({
   onCancel = null,
   showResetButton = false,
   resetForm = null,
+  departments = [],
+  teams = [],
+  loadingDepartments = false,
+  loadingTeams = false,
 }) {
   return (
     <Stack>
@@ -71,34 +53,36 @@ export default function ProjectForm({
         }}
       >
         <InputItem>
-          <TextInput name="projectName" label="Project Name" />
-        </InputItem>
+        <TextInput
+          name="projectName"
+          label="Project Name"
+          disabled={isSubmitting} />
+      </InputItem>
 
-        <InputItem>
-          <SelectInput
-            name="department"
-            label="Department"
-            options={departments}
-            getOptionLabel={(option) => option.label}
-          />
-        </InputItem>
-      </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: { xs: "column", sm: "row" },
-          gap: { xs: 0, sm: 2 },
-        }}
-      >
+      <InputItem>
+        <SelectInput
+          name="department"
+          label={loadingDepartments ? "Loading Departments..." : "Department"}
+          options={departments}
+          getOptionLabel={(option) => option.label}
+          disabled={loadingDepartments || isSubmitting} />
+      </InputItem>
+        </Box>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        flexDirection: { xs: "column", sm: "row" },
+        gap: { xs: 0, sm: 2 },
+      }}
+    >
         <InputItem>
           <SelectInput
             name="teamName"
-            label="Team Name"
+            label={loadingTeams ? "Loading Teams..." : "Team Name"}
             options={teams}
             getOptionLabel={(option) => option.label}
-          />
+            disabled={loadingTeams || isSubmitting} />
         </InputItem>
 
         <InputItem>
@@ -107,10 +91,9 @@ export default function ProjectForm({
             label="Progress (%)"
             type="number"
             inputProps={{ min: 0, max: 100 }}
-          />
+            disabled={isSubmitting} />
         </InputItem>
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -125,10 +108,9 @@ export default function ProjectForm({
             label="Description"
             multiline
             rows={3}
-          />
+            disabled={isSubmitting} />
         </InputItem>
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -138,20 +120,27 @@ export default function ProjectForm({
           m: 2,
         }}
       >
-        <DateInput name="startDate" label="Start Date" />
+        <DateInput
+          name="startDate"
+          label="Start Date"
+          disabled={isSubmitting} />
 
-        <DateInput name="deadline" label="Deadline" />
-      </Box>
-
-      <Box
+        <DateInput name="deadline" label="Deadline" disabled={isSubmitting} />
+      </Box><Box
         sx={{
           display: "flex",
           justifyContent: { xs: "center", sm: "flex-end" },
           gap: 2,
+          mt: { xs: 0, sm: 2 },
           width: "100%",
         }}
       >
-        <Button type="submit" variant="contained" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={isSubmitting || loadingDepartments || loadingTeams}
+          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+        >
           {isSubmitting
             ? isEdit
               ? "Updating..."
@@ -161,22 +150,30 @@ export default function ProjectForm({
               : "Add Project"}
         </Button>
 
+        {onCancel && (
+          <Button
+            type="button"
+            color="text.primary"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+        )}
+
         {showResetButton && resetForm && (
           <Button
             type="button"
             color="text.primary"
             onClick={() => resetForm()}
+            disabled={isSubmitting}
           >
             Reset
           </Button>
         )}
 
-        {onCancel && (
-          <Button type="button" color="text.primary" onClick={onCancel}>
-            Cancel
-          </Button>
-        )}
+        
       </Box>
     </Stack>
-  );
+  ); 
 }

@@ -10,17 +10,12 @@ export const API_PATHS = {
   SUPER_ADMIN: {
     GET_ALL_EMPLOYEES: '/superadmin/employees',
     VERIFY_EMPLOYEE: (id) => `/superadmin/employee/${id}/verify`,
-    VERIFY_ALL_EMPLOYEES: '/superadmin/verify-all',
   },
   ADMIN_USER: {
-    ADD_USER: '/api/v1/shiftly/ems/admin/user/add',
     GET_ALL_USERS: '/users/all',
     GET_USER_BY_ID: (id) => `/users/${id}`,
     UPDATE_USER: (id) => `/users/update/${id}`,
     DELETE_USER: (id) => `/users/delete/${id}`,
-    GET_UNASSIGNED_USERS: '/api/v1/shiftly/ems/admin/user/unassigned',
-    ASSIGN_USER: '/api/v1/shiftly/ems/admin/user/assign',
-    UPDATE_USER_ROLE: (id) => `/api/v1/shiftly/ems/admin/user/role/${id}`,
   },
   CANDIDATES: {
     GET_ALL_SUBMISSIONS: '/api/v1/shiftly/ems/admin/candidates/submissions',
@@ -65,6 +60,9 @@ export const API_PATHS = {
   DEPARTMENTS: {
     GET_ALL_DEPARTMENTS: '/api/v1/shiftly/ems/departments/all',
   },
+  TEAMS: {
+    GET_ALL_TEAMS: '/api/v1/shiftly/ems/teams/all',
+  },
   EMPLOYEE: {
     ADD_EMPLOYEE: '/api/v1/shiftly/ems/employee/add',
     GET_ALL_EMPLOYEES: '/api/v1/shiftly/ems/employee/all',
@@ -82,10 +80,14 @@ export const API_PATHS = {
   VACANCIES: {
     GET_ALL_VACANCIES: '/api/v1/shiftly/ems/vacancies/all',
   },
-};
 
-export const REFERRAL_API = {
-  SUBMIT: '/api/v1/shiftly/ems/referrals/add',
-  GET_ALL: '/api/v1/shiftly/ems/referrals/all',
-  GET_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/referrals/user/${userId}`,
+  REFERRALS: {
+    ADD: '/api/v1/shiftly/ems/referrals/add',
+    MY_REFERRALS: '/api/v1/shiftly/ems/referrals/my',
+    ALL_REFERRALS: '/api/v1/shiftly/ems/referrals/all',
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/referrals/status/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/referrals/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/referrals/delete/${id}`,
+    GET_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/referrals/user/${userId}`,
+  },
 };

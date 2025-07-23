@@ -10,58 +10,17 @@ import { Formik, Form } from "formik";
 
 import ProjectForm, { projectValidationSchema } from "./ProjectForm";
 
-const departments = [
-  { id: 1, name: "Engineering", label: "Engineering" },
-  { id: 2, name: "Project Management", label: "Project Management" },
-  { id: 3, name: "Human Resources", label: "Human Resources" },
-  { id: 4, name: "IT", label: "Information Technology" },
-  { id: 5, name: "Finance", label: "Finance" },
-  { id: 6, name: "Marketing", label: "Marketing" },
-  { id: 7, name: "Sales", label: "Sales" },
-  { id: 8, name: "Operations", label: "Operations" },
-];
-
-const teams = [
-  { id: 1, name: "Alpha Team", label: "Alpha Team" },
-  { id: 2, name: "Beta Team", label: "Beta Team" },
-  { id: 3, name: "Gamma Team", label: "Gamma Team" },
-  { id: 4, name: "Delta Team", label: "Delta Team" },
-  { id: 5, name: "Epsilon Team", label: "Epsilon Team" },
-  { id: 6, name: "Zeta Team", label: "Zeta Team" },
-  { id: 7, name: "Theta Team", label: "Theta Team" },
-  { id: 8, name: "Sigma Team", label: "Sigma Team" },
-];
-
 export default function EditDialog({
   open,
   onClose,
   onSubmit,
   editingProject,
+  departments = [],
+  teams = [],
+  loadingDepartments = false,
+  loadingTeams = false,
+  getEditInitialValues,
 }) {
-  const getInitialValues = () => {
-    if (editingProject) {
-      return {
-        projectName: editingProject.projectName || "",
-        description: editingProject.description || "",
-        department:
-          departments.find((d) => d.name === editingProject.department) || null,
-        teamName: teams.find((t) => t.name === editingProject.teamName) || null,
-        startDate: editingProject.startDate || null,
-        deadline: editingProject.deadline || null,
-        progress: editingProject.progress || 0,
-      };
-    }
-    return {
-      projectName: "",
-      description: "",
-      department: null,
-      teamName: null,
-      startDate: null,
-      deadline: null,
-      progress: 0,
-    };
-  };
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -80,18 +39,24 @@ export default function EditDialog({
       </DialogTitle>
       <DialogContent dividers>
         <Formik
-          initialValues={getInitialValues()}
+          initialValues={getEditInitialValues(editingProject)}
           validationSchema={projectValidationSchema}
           onSubmit={onSubmit}
           enableReinitialize
         >
           {({ isSubmitting }) => (
             <Form>
-              <ProjectForm
-                isSubmitting={isSubmitting}
-                isEdit={true}
-                onCancel={onClose}
-              />
+              <Box sx={{ mt: 1 }}>
+                <ProjectForm
+                  isSubmitting={isSubmitting}
+                  isEdit={true}
+                  onCancel={onClose}
+                  departments={departments}
+                  teams={teams}
+                  loadingDepartments={loadingDepartments}
+                  loadingTeams={loadingTeams}
+                />
+              </Box>
             </Form>
           )}
         </Formik>
