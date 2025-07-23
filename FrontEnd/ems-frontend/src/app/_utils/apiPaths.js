@@ -73,4 +73,12 @@ export const API_PATHS = {
     UPDATE_PROFILE: '/api/v1/shiftly/ems/employee/profile',
     SELF_UPDATE: '/api/v1/shiftly/ems/employee/self-update',
   },
+  REFERRALS: {
+    ADD: '/api/v1/shiftly/ems/referrals/add',
+    MY_REFERRALS: '/api/v1/shiftly/ems/referrals/my',
+    ALL_REFERRALS: '/api/v1/shiftly/ems/referrals/all',
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/referrals/status/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/referrals/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/referrals/delete/${id}`,
+  },
 };
