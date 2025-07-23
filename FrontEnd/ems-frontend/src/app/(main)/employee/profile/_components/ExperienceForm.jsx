@@ -2,6 +2,7 @@
 
 import { Formik } from "formik";
 import { Form } from "formik";
+import { useEffect, useState } from 'react';
 
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
@@ -11,53 +12,38 @@ import InputItem from "@/app/_components/inputs/InputItem";
 import TextInput from "@/app/_components/inputs/TextInput";
 
 export default function ExperienceForm(props) {
-  const { formData, handleInputChange, handleSubmit, handleCancel } = props;
+  const { formData, handleInputChange, handleSubmit, handleCancel, existingExperiences, onAddExperience } = props;
+
+  // Combine existing experiences into a single string (one per line)
+  const initialExperienceText = (existingExperiences && existingExperiences.length > 0)
+    ? existingExperiences.map(exp => exp.jobTitle || exp).join('\n')
+    : '';
 
   return (
     <>
       <Formik
         initialValues={{
-          jobTitle: formData?.jobTitle || "",
-          company: formData?.company || "",
-          duration: formData?.duration || "",
+          experience: initialExperienceText,
         }}
         validate={(values) => {
           const errors = {};
-          if (!values.jobTitle) {
-            errors.jobTitle = "Job Title is required";
-          }
-          if (!values.company) {
-            errors.company = "Company is required";
-          }
-          if (!values.duration) {
-            errors.duration = "Duration is required";
-          }
           return errors;
         }}
         onSubmit={(values, { resetForm }) => {
-          // Convert Formik values to the expected format for handleSubmit
-          const syntheticEvent = {
-            preventDefault: () => {},
-            target: {
-              elements: {
-                jobTitle: { value: values.jobTitle },
-                company: { value: values.company },
-                duration: { value: values.duration }
-              }
-            }
-          };
-          
-          // Update formData through handleInputChange
-          handleInputChange({ target: { name: 'jobTitle', value: values.jobTitle } });
-          handleInputChange({ target: { name: 'company', value: values.company } });
-          handleInputChange({ target: { name: 'duration', value: values.duration } });
-          
-          // Call the original handleSubmit
-          handleSubmit(syntheticEvent);
+          // Split lines and trim
+          const lines = values.experience.split('\n').map(line => line.trim()).filter(Boolean);
+          // Get job titles from existingExperiences
+          const existingTitles = (existingExperiences || []).map(exp => exp.jobTitle || exp);
+          // Find new experiences (lines not in existing)
+          const newTitles = lines.filter(line => !existingTitles.includes(line));
+          if (newTitles.length > 0 && onAddExperience) {
+            // Add each new experience as a new card
+            newTitles.forEach(title => onAddExperience({ jobTitle: title }));
+          }
           resetForm();
         }}
       >
-        {({ validateForm, resetForm }) => (
+        {({ validateForm, resetForm, values, setFieldValue }) => (
           <Form>
             <Stack>
               <Box
@@ -69,36 +55,15 @@ export default function ExperienceForm(props) {
                 }}
               >
                 <InputItem>
-                  <TextInput name="jobTitle" label="Job Title" />
+                  <TextInput
+                    name="experience"
+                    label="Experience"
+                    multiline
+                    rows={4}
+                    placeholder="Describe your work experience, roles, responsibilities, etc. (one per line)"
+                  />
                 </InputItem>
               </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: { xs: "column", sm: "row" },
-                  gap: { xs: 0, sm: 2 },
-                }}
-              >
-                <InputItem>
-                  <TextInput name="company" label="Company" />
-                </InputItem>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: { xs: "column", sm: "row" },
-                  gap: { xs: 0, sm: 2 },
-                }}
-              >
-                <InputItem>
-                  <TextInput name="duration" label="Duration (e.g., Jan 2020 - Dec 2022)" />
-                </InputItem>
-              </Box>
-
               <Box
                 sx={{
                   display: "flex",
@@ -107,19 +72,16 @@ export default function ExperienceForm(props) {
                   gap: 2,
                 }}
               >
-          
-
                 <Button
                   color="text.primary"
                   type="reset"
                   onClick={() => {
                     resetForm();
-                    handleCancel();
+                    handleCancel && handleCancel();
                   }}
                 >
                   Cancel
                 </Button>
-
                 <Button
                   type="submit"
                   variant="contained"

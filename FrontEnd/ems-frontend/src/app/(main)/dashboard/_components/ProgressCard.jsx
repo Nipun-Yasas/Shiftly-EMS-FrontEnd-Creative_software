@@ -88,7 +88,7 @@ export default function ProgressCard({ progress, goals, setGoalTableDialogOpen, 
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: 'background.paper',
+        background: theme => theme.palette.background.paper,
       }}>
         <Box sx={{ 
           position: 'relative', 

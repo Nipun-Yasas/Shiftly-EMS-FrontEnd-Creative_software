@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -13,48 +13,32 @@ import { useTheme } from '@mui/material/styles';
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import AddIcon from '@mui/icons-material/Add';
-import EducationForm from './EducationForm';
-
-const columns = [
-  { field: "id", headerName: "ID", flex:1 },
-  { field: "degree", headerName: "Degree", flex:1 },
-  { field: "institution", headerName: "Institution", flex:1 },
-  { field: "duration", headerName: "Duration", flex:1 },
-];
+import { Fab } from '@mui/material';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import { Formik, Form, Stack } from 'formik';
+import Button from '@mui/material/Button';
+import TextInput from '@/app/_components/inputs/TextInput';
+import InputItem from '@/app/_components/inputs/InputItem';
 
 const EducationTab = ({ employeeData }) => {
   const theme = useTheme();
 
+  // State for education list
+  const [educationList, setEducationList] = useState(Array.isArray(employeeData?.education) ? employeeData.education : (employeeData?.education ? [employeeData.education] : []));
   const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [formData, setFormData] = useState({
-    degree: '',
-    institution: '',
-    duration: '',
-  });
 
-  // Get education data from employeeData (should be an array now)
-  const educationData = employeeData?.education || [];
-  
-  // Convert education to array format
-  const educationArray = Array.isArray(educationData) ? educationData : 
-    (typeof educationData === 'string' && educationData ? [educationData] : []);
+  // Keep state in sync if employeeData changes
+  useEffect(() => {
+    setEducationList(Array.isArray(employeeData?.education) ? employeeData.education : (employeeData?.education ? [employeeData.education] : []));
+  }, [employeeData]);
 
-  const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // For now, just close modal and show success message
-    // In a real implementation, you would update the employee education via API
+  // Add new education(s)
+  const handleAddEducation = (newEducation) => {
+    setEducationList((prev) => [...prev, ...newEducation]);
     setOpenDialog(false);
     setOpenSnackbar(true);
-    setFormData({ degree: '', institution: '', duration: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -63,36 +47,26 @@ const EducationTab = ({ employeeData }) => {
   };
 
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', p: { xs: 2, sm: 4 } }}>
-      <IconButton
-        color="primary"
-        onClick={handleOpenDialog}
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-        }}
-      >
-        <AddIcon />
-      </IconButton>
+    <Box sx={{ position: 'relative', minHeight: '60vh', p: { xs: 2, sm: 4 } }}>
+      
 
       {/* Dialog */}
       <Dialog
         open={openDialog}
-        onClose={handleCloseDialog}
+        onClose={() => setOpenDialog(false)}
         aria-labelledby="education-form-dialog-title"
         maxWidth="sm"
         fullWidth
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
       >
-        <DialogTitle id="education-form-dialog-title">
+        <DialogTitle id="education-form-dialog-title" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
           Add Education
         </DialogTitle>
         <DialogContent>
           <EducationForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSubmit={handleSubmit}
-            handleCancel={handleCloseDialog}
+            existingEducations={educationList}
+            onAddEducation={handleAddEducation}
+            handleCancel={() => setOpenDialog(false)}
           />
         </DialogContent>
       </Dialog>
@@ -110,52 +84,34 @@ const EducationTab = ({ employeeData }) => {
       </Snackbar>
 
       {/* Education Display */}
-      {educationArray && educationArray.length > 0 ? (
-        <Box sx={{ width: "100%", p: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 600,
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-          >
-            Education Background
-          </Typography>
-          <Box sx={{ 
-            backgroundColor: theme.palette.grey[50],
-            p: 3,
-            borderRadius: 2,
-            border: `1px solid ${theme.palette.grey[200]}`
-          }}>
-            {educationArray.map((education, index) => (
-              <Typography
+      {educationList && educationList.length > 0 ? (
+        <Box sx={{ width: '100%', p: { xs: 1, sm: 3 } }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {educationList.map((education, index) => (
+              <Card
                 key={index}
-                variant="body1"
-                color="text.primary"
+                elevation={3}
                 sx={{
-                  lineHeight: 1.6,
-                  mb: index < educationArray.length - 1 ? 2 : 0,
-                  p: 2,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  border: `1px solid ${theme.palette.grey[200]}`,
-                  position: 'relative',
-                  '&:before': {
-                    content: `"${index + 1}."`,
-                    position: 'absolute',
-                    left: -16,
-                    top: 8,
-                    fontWeight: 'bold',
-                    color: theme.palette.primary.main,
-                  }
+                  width: '100%',
+                  maxWidth: 600,
+                  mx: 'auto',
+                  px: { xs: 2, sm: 3 },
+                  py: { xs: 2, sm: 2.5 },
+                  borderRadius: 3,
+                  boxShadow: theme.shadows[2],
+                  
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                 }}
               >
-                {education}
-              </Typography>
+                <CardContent sx={{ p: 0, width: '100%' }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5, fontSize: '1.05rem', color: theme.palette.text }}>
+                    {education}
+                  </Typography>
+                </CardContent>
+              </Card>
             ))}
           </Box>
         </Box>
@@ -179,9 +135,80 @@ const EducationTab = ({ employeeData }) => {
           </Typography>
         </Box>
       )}
-      
     </Box>
   );
 };
+
+// New EducationForm for single multiline input
+function EducationForm({ existingEducations, onAddEducation, handleCancel }) {
+  // Combine existing educations into a single string (one per line)
+  const initialEducationText = (existingEducations && existingEducations.length > 0)
+    ? existingEducations.join('\n')
+    : '';
+
+  return (
+    <Formik
+      initialValues={{ education: initialEducationText }}
+      onSubmit={(values, { resetForm }) => {
+        const lines = values.education.split('\n').map(line => line.trim()).filter(Boolean);
+        const newLines = lines.filter(line => !existingEducations.includes(line));
+        if (newLines.length > 0 && onAddEducation) {
+          onAddEducation(newLines);
+        }
+        resetForm();
+      }}
+    >
+      {({ resetForm }) => (
+        <Form>
+          <Stack>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 0, sm: 2 },
+              }}
+            >
+              <InputItem>
+                <TextInput
+                  name="education"
+                  label="Education"
+                  multiline
+                  rows={4}
+                  placeholder="Enter your education (one per line)"
+                />
+              </InputItem>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: { xs: 'center', md: 'flex-end' },
+                pb: 2,
+                gap: 2,
+              }}
+            >
+              <Button
+                color="text.primary"
+                type="reset"
+                onClick={() => {
+                  resetForm();
+                  handleCancel && handleCancel();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+              >
+                Submit
+              </Button>
+            </Box>
+          </Stack>
+        </Form>
+      )}
+    </Formik>
+  );
+}
 
 export default EducationTab;

@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  useTheme
-} from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -131,9 +129,8 @@ const AddGoalDialog = ({ open, onClose, onAdd, onUpdate, goal = null }) => {
               label="Due Date"
               value={dueDate}
               onChange={setDueDate}
-              renderInput={(params) => (
+              textField={
                 <TextField
-                  {...params}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -142,7 +139,7 @@ const AddGoalDialog = ({ open, onClose, onAdd, onUpdate, goal = null }) => {
                     }
                   }}
                 />
-              )}
+              }
             />
           </LocalizationProvider>
 
@@ -214,8 +211,6 @@ const AddGoalDialog = ({ open, onClose, onAdd, onUpdate, goal = null }) => {
           variant="contained"
           disabled={!title.trim()}
           sx={{ 
-            bgcolor: theme.palette.primary.main,
-            '&:hover': { bgcolor: theme.palette.primary.dark },
             borderRadius: 2,
             px: 3,
             fontFamily: 'var(--font-lexend)'

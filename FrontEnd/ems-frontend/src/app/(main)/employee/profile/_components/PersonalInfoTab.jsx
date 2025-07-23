@@ -62,42 +62,10 @@ const PersonalInfoTab = ({ employeeData }) => {
               gap: { xs: 0, sm: 2 },
             }}
           >
-            <ReadonlyTextInput
-              label="Department"
-              value={user?.department || employeeData?.department?.name || ""}
-            />
-            <ReadonlyTextInput
-              label="Designation"
-              value={user?.designation || employeeData?.designation || ""}
-            />
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 0, sm: 2 },
-            }}
-          >
             <ReadonlyTextInput label="Gender" value={employeeData?.gender || ""} />
             <ReadonlyTextInput
               label="Date of Birth"
               value={formatDate(employeeData?.dob)}
-            />
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 0, sm: 2 },
-            }}
-          >
-            <ReadonlyTextInput
-              label="Location"
-              value={employeeData?.location || ""}
             />
           </Box>
         </Stack>

@@ -1,38 +1,23 @@
-
 "use client";
 
-import { 
-  Paper, 
-  CircularProgress, 
-  Box, 
-  Typography, 
-  Button, 
-  Avatar, 
-  Chip,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  useTheme,
-  Checkbox,
-  TextField,
-  Grow,
-  Fade,
-  LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Person from '@mui/icons-material/Person';
+import Event from '@mui/icons-material/Event';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import { useState, useEffect, useRef } from "react";
-import AddToDoDialog from './AddToDoDialog';
-import ToDoTableDialog from './ToDoTableDialog';
 import AddGoalDialog from './AddGoalDialog';
 import GoalTableDialog from './GoalTableDialog';
 import dayjs from 'dayjs';
-import { TrendingUp, Edit, Delete, ChevronLeft, ChevronRight, Person, Event, CheckCircle, EmojiEvents, Add, Star } from "@mui/icons-material";
 import GreetingHeader from './_components/GreetingHeader';
 import ProgressCard from './_components/ProgressCard';
 import ToDoCard from './_components/ToDoCard';
@@ -40,16 +25,9 @@ import EventsCard from './_components/EventsCard';
 import StarPointsCard from './_components/StarPointsCard';
 import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import UserDataStatus from '../../_components/UserDataStatus';
-import { getGreeting, getPriorityColor, getEventTypeColor } from './_components/dashboardUtils';
+import { getGreeting } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
-import { 
-  saveUserData, 
-  getUserData, 
-  migrateUserData, 
-  cleanupOldBackups,
-  initializeUserSession,
-  getCurrentUserId
-} from '../../_utils/localStorageUtils';
+import { saveUserData, getUserData, migrateUserData, cleanupOldBackups, initializeUserSession } from '../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
 import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 
@@ -151,37 +129,7 @@ const demoEvents = [
   { id: 4, title: "Call of Duty: Warzone", date: "Aug 03 - Aug 05, 2025", participants: 256, joined: false, imageUrl: "/images/project4.jpg", category: "Gaming" },
 ];
 
-// FlipDigit component for flip clock animation
-const FlipDigit = ({ value }) => {
-  const [prev, setPrev] = useState(value);
-  const [flipping, setFlipping] = useState(false);
-  useEffect(() => {
-    if (value !== prev) {
-      setFlipping(true);
-      const timeout = setTimeout(() => {
-        setFlipping(false);
-        setPrev(value);
-      }, 600);
-      return () => clearTimeout(timeout);
-    }
-  }, [value, prev]);
-  return (
-    <span className={`flip-digit${flipping ? ' flipping' : ''}`} style={{ display: 'inline-block', minWidth: 24, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>
-      <span className="flip-digit-top">{prev}</span>
-      <span className="flip-digit-bottom">{value}</span>
-      <style>{`
-        .flip-digit { position: relative; perspective: 80px; }
-        .flip-digit-top, .flip-digit-bottom { display: block; font-size: 1.18em; font-weight: 900; color: inherit; background: none; border-radius: 4px; line-height: 1.1; }
-        .flip-digit-top { z-index: 2; background: none; }
-        .flip-digit-bottom { position: absolute; top: 0; left: 0; right: 0; z-index: 1; background: none; transform: rotateX(90deg); opacity: 0; }
-        .flip-digit.flipping .flip-digit-top { animation: flipTop 0.3s forwards; }
-        .flip-digit.flipping .flip-digit-bottom { animation: flipBottom 0.3s 0.3s forwards; }
-        @keyframes flipTop { 0% { transform: rotateX(0); } 100% { transform: rotateX(-90deg); opacity: 0; } }
-        @keyframes flipBottom { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
-      `}</style>
-    </span>
-  );
-};
+
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -494,12 +442,12 @@ const Dashboard = () => {
   const greeting = currentTime ? getGreeting(currentTime.hour()) : '';
 
   return (
-    <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh', width: '100%', position: 'relative' }}>
+    <Box sx={{ p: 3,  minHeight: '100vh', width: '100%', position: 'relative' }}>
       <GreetingHeader greeting={greeting} />
       
       {/* Performance and ToDo Cards - Side by Side at Top */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12} md={6}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
           <ProgressCard
             progress={progress}
             goals={goals}
@@ -507,7 +455,10 @@ const Dashboard = () => {
             setAddGoalDialogOpen={setAddGoalDialogOpen}
           />
         </Grid>
-        <Grid item xs={12} md={6} ref={rightCardRef}>
+        <Grid 
+          sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}
+          ref={rightCardRef}
+        >
           <ToDoCard
             toDoItems={toDoItems}
             handleAddToDo={handleAddToDo}
@@ -528,27 +479,27 @@ const Dashboard = () => {
 
       {/* Quick Actions Tools - Full Width Below */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12}>
+        <Grid sx={{ gridColumn: { xs: 'span 12' } }}>
           <PerformanceAnalyticsCard />
         </Grid>
       </Grid>
 
       {/* Events and Star Points Cards - Side by Side */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12} lg={9}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 9' } }}>
           <EventsCard 
             events={demoEventsState} 
             onViewAll={() => router.push('/events')}
           />
         </Grid>
-        <Grid item xs={12} lg={3}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 3' } }}>
           <StarPointsCard starPoints={starPoints} starDialogOpen={starDialogOpen} setStarDialogOpen={setStarDialogOpen} />
         </Grid>
       </Grid>
 
       {/* Meetings History Card - Full Width */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12}>
+        <Grid sx={{ gridColumn: { xs: 'span 12' } }}>
           <MeetingsHistoryCard onScheduleMeeting={() => setScheduleMeetingOpen(true)} />
         </Grid>
       </Grid>
@@ -568,7 +519,7 @@ const Dashboard = () => {
         onClose={() => setAddGoalDialogOpen(false)} 
         onAdd={handleAddGoal}
         onUpdate={handleUpdateGoal}
-        goal={editGoal}
+        goal={null}
       />
       
       {/* Edit Goal Dialog */}
@@ -675,9 +626,9 @@ function StarDetailsDialog({ open, onClose }) {
         <IconButton onClick={onClose} size="small" sx={{ ml: 2 }}><CloseIcon /></IconButton>
       </DialogTitle>
       <DialogContent sx={{ fontFamily: 'var(--font-lexend)', color: 'text.secondary', pt: 1 }}>
-        <Typography variant="body1" sx={{ mb: 2 }}><b>What are Star Points?</b><br />Star Points are special recognitions awarded by admins for outstanding performance, teamwork, or going above and beyond in your role.</Typography>
-        <Typography variant="body1" sx={{ mb: 2 }}><b>How do I earn more?</b><br />Admins can add stars to your profile when you achieve something exceptional. Keep striving for excellence!</Typography>
-        <Typography variant="body1" sx={{ mb: 2, color: 'primary.main', fontWeight: 700 }}>Rewards you can unlock:</Typography>
+        <Typography variant="text" sx={{ mb: 2 }}><b>What are Star Points?</b><br />Star Points are special recognitions awarded by admins for outstanding performance, teamwork, or going above and beyond in your role.</Typography>
+        <Typography variant="text" sx={{ mb: 2 }}><b>How do I earn more?</b><br />Admins can add stars to your profile when you achieve something exceptional. Keep striving for excellence!</Typography>
+        <Typography variant="text" sx={{ mb: 2, color: 'primary.main', fontWeight: 700 }}>Rewards you can unlock:</Typography>
         <Box component="ul" sx={{ pl: 3, m: 0, color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontSize: '1rem' }}>
           <li>1 star: Bronze badge</li>
           <li>3 stars: Gift card</li>

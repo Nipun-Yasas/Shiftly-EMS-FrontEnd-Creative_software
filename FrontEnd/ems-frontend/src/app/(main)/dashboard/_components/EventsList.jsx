@@ -10,9 +10,7 @@ export default function EventsList({ demoEventsState, handleToggleEvent }) {
             borderRadius: 4,
             overflow: 'hidden',
             boxShadow: 8,
-            bgcolor: theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0a0d14 0%, #141620 100%)'
-              : 'rgba(255,255,255,0.95)',
+            bgcolor: theme => theme.palette.background.paper,
             p: 0,
             display: 'flex',
             flexDirection: 'column',
@@ -27,18 +25,18 @@ export default function EventsList({ demoEventsState, handleToggleEvent }) {
               sx={{ 
                 p: 3, 
                 width: '100%', 
-                bgcolor: theme.palette.mode === 'dark' ? '#181a20' : '#fff',
+                bgcolor: theme => theme.palette.background.paper,
                 transition: 'background 0.3s',
                 borderBottomLeftRadius: 16,
                 borderBottomRightRadius: 16
               }}
             >
-              <Typography variant="h6" sx={{ mb: 1, fontFamily: 'var(--font-poppins)', fontWeight: 700, color: theme.palette.mode === 'dark' ? '#000' : 'text.primary', textShadow: theme.palette.mode === 'dark' ? '0 1px 8px rgba(255,255,255,0.9)' : 'none' }}>{event.title}</Typography>
-              <Typography variant="body2" sx={{ mb: 1, color: theme.palette.mode === 'dark' ? '#000' : 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 500, textShadow: theme.palette.mode === 'dark' ? '0 1px 6px rgba(255,255,255,0.8)' : 'none' }}><strong>Date:</strong> {event.date}</Typography>
+              <Typography variant="h6" sx={{ mb: 1, fontFamily: 'var(--font-poppins)', fontWeight: 700, color: 'text.primary' }}>{event.title}</Typography>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 500 }}><strong>Date:</strong> {event.date}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar sx={{ width: 24, height: 24, bgcolor: theme.palette.mode === 'dark' ? '#333' : 'primary.main', fontSize: 14, mr: 1, color: theme.palette.mode === 'dark' ? '#fff' : '#fff' }}>👥</Avatar>
-                <Typography variant="body2" sx={{ color: theme.palette.mode === 'dark' ? '#000' : 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 700, textShadow: theme.palette.mode === 'dark' ? '0 1px 4px rgba(255,255,255,0.7)' : 'none' }}><strong>{event.participants}</strong> Participants</Typography>
-                {event.joined && <Chip label="Joined" size="small" sx={{ ml: 2, fontWeight: 700, fontFamily: 'var(--font-lexend)', bgcolor: theme.palette.mode === 'dark' ? '#388e3c' : 'success.main', color: '#fff' }} />}
+                <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.main', fontSize: 14, mr: 1, color: '#fff' }}>👥</Avatar>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 700 }}><strong>{event.participants}</strong> Participants</Typography>
+                {event.joined && <Chip label="Joined" size="small" sx={{ ml: 2, fontWeight: 700, fontFamily: 'var(--font-lexend)', bgcolor: 'success.main', color: '#fff' }} />}
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                 <Button

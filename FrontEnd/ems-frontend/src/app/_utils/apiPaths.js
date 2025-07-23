@@ -90,4 +90,11 @@ export const API_PATHS = {
     DELETE: (id) => `/api/v1/shiftly/ems/referrals/delete/${id}`,
     GET_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/referrals/user/${userId}`,
   },
+  LEAVES: {
+    
+    GET_MY_LEAVES: '/api/v1/shiftly/ems/leaves/my',
+    UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
+    DELETE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/delete/${id}`,
+    ADD_MY_LEAVE: '/api/v1/shiftly/ems/leaves/apply',
+  },
 };

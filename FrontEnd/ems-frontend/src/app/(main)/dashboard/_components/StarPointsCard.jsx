@@ -22,9 +22,7 @@ export default function StarPointsCard({ starPoints, starDialogOpen, setStarDial
         flexDirection: 'column',
         position: 'relative',
         overflow: 'hidden',
-        background: 'background.paper',
-        alignItems: 'center',
-        justifyContent: 'center'
+        background: theme => theme.palette.background.paper,
       }}>
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Star sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
@@ -49,13 +47,9 @@ export default function StarPointsCard({ starPoints, starDialogOpen, setStarDial
       transition: 'all 0.3s ease',
       '&:hover': {
         transform: 'translateY(-4px)',
-        boxShadow: theme.palette.mode === 'dark' 
-          ? '0 12px 40px rgba(0, 0, 0, 0.4)' 
-          : '0 12px 40px rgba(0, 0, 0, 0.1)',
+        boxShadow: 4,
       },
-      background: theme.palette.mode === 'dark'
-        ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)'
-        : 'background.paper',
+      background: theme => theme.palette.background.paper,
     }}>
       {/* Header */}
       <Box sx={{

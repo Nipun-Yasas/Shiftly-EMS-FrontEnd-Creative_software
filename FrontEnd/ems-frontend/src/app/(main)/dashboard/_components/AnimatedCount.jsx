@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
+import TrackChanges from '@mui/icons-material/TrackChanges';
 
 export default function AnimatedCount({ value }) {
   const [display, setDisplay] = useState(0);

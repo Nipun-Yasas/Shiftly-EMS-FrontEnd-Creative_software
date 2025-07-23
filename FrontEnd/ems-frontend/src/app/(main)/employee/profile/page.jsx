@@ -4,6 +4,8 @@ import React, { useState, useEffect, Suspense, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import FolderIcon from "@mui/icons-material/Folder";
+import EmailIcon from "@mui/icons-material/Email";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -134,12 +136,12 @@ const Employee = () => {
                 position: "absolute",
                 bottom: -5,
                 right: -5,
-                backgroundColor: theme.palette.primary.main,
-                color: "white",
+                backgroundColor: theme.palette.primary,
+                color: theme.palette.text,
                 width: { xs: 28, sm: 32 },
                 height: { xs: 28, sm: 32 },
                 "&:hover": {
-                  backgroundColor: theme.palette.primary.dark,
+                  backgroundColor: theme.palette.primary,
                 },
                 boxShadow: 2,
               }}
@@ -152,7 +154,7 @@ const Employee = () => {
           <Typography
             variant="h5"
             sx={{
-              color: theme.palette.text.primary,
+              color: theme.palette.text,
               fontFamily: "var(--font-poppins)",
               fontWeight: { xs: 600, sm: 500 },
               fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
@@ -190,11 +192,11 @@ const Employee = () => {
                 justifyContent: { xs: "center", sm: "flex-start" },
               }}
             >
-              <FolderIcon
+              <EmailIcon
                 sx={{
                   width: { xs: 20, sm: 24 },
                   height: { xs: 20, sm: 24 },
-                  color: theme.palette.primary.main,
+                  color: theme.palette.primary,
                 }}
               />
               <Typography
@@ -205,7 +207,7 @@ const Employee = () => {
                   color: theme.palette.text,
                 }}
               >
-                {user?.designation || employeeData?.designation}
+                {user?.email || employeeData?.email}
               </Typography>
             </Box>
           )}
@@ -226,7 +228,7 @@ const Employee = () => {
                 sx={{
                   width: { xs: 20, sm: 24 },
                   height: { xs: 20, sm: 24 },
-                  color: theme.palette.text.secondary,
+                  color: theme.palette.text,
                 }}
               />
               <Typography
@@ -234,7 +236,7 @@ const Employee = () => {
                 sx={{
                   fontWeight: 400,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
-                  color: theme.palette.text.secondary,
+                  color: theme.palette.text,
                   wordBreak: "break-word",
                 }}
               >
@@ -249,6 +251,7 @@ const Employee = () => {
               display="flex"
               alignItems="center"
               sx={{
+                
                 color: theme.palette.text,
                 gap: 1,
                 flexWrap: "wrap",
@@ -264,7 +267,7 @@ const Employee = () => {
                   wordBreak: "break-word",
                 }}
               >
-                📍 {employeeData.location}
+                <LocationOnIcon/> {employeeData.location}
               </Typography>
             </Box>
           )}

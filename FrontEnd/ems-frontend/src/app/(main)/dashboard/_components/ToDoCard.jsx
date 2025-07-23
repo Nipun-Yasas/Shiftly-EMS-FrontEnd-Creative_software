@@ -1,4 +1,4 @@
-import { Paper, Box, Typography, IconButton, Chip, Button } from '@mui/material';
+import { Paper, Box, Typography, IconButton, Chip, Button, useTheme } from '@mui/material';
 import { Add, Edit, Delete, TrendingUp, Schedule } from '@mui/icons-material';
 import AddToDoDialog from '../AddToDoDialog';
 import ToDoTableDialog from '../ToDoTableDialog';
@@ -19,12 +19,13 @@ export default function ToDoCard({
   tableDialogOpen,
   setTableDialogOpen
 }) {
-  const getPriorityColor = (priority) => {
+  const theme = useTheme();
+  const getPriorityColor = (priority, theme) => {
     switch (priority) {
-      case 'high': return '#f44336';
-      case 'medium': return '#ff9800';
-      case 'low': return '#4caf50';
-      default: return '#9e9e9e';
+      case 'high': return theme.palette.error.main;
+      case 'medium': return theme.palette.warning.main;
+      case 'low': return theme.palette.success.main;
+      default: return theme.palette.grey[500];
     }
   };
 
@@ -51,9 +52,7 @@ export default function ToDoCard({
       borderRadius: 3,
       height: '100%',
       width: '100%',
-      background: theme => theme.palette.mode === 'dark'
-        ? 'linear-gradient(135deg, #0f121a 0%, #1c1e2e 100%)'
-        : 'background.paper',
+      background: theme => theme.palette.background.paper,
     }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6" sx={{ fontFamily: 'var(--font-poppins)', fontWeight: 600, color: 'text.primary' }}>
@@ -97,7 +96,7 @@ export default function ToDoCard({
                   width: 20, 
                   height: 20, 
                   borderRadius: '50%', 
-                  border: `2px solid ${getPriorityColor(item.priority)}`, 
+                  border: `2px solid ${getPriorityColor(item.priority, theme)}`, 
                   mr: 2,
                   position: 'relative',
                   '&::after': {
@@ -109,7 +108,7 @@ export default function ToDoCard({
                     width: 6,
                     height: 6,
                     borderRadius: '50%',
-                    bgcolor: getPriorityColor(item.priority)
+                    bgcolor: getPriorityColor(item.priority, theme)
                   }
                 }} />
               )}

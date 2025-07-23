@@ -1,56 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import { useTheme } from '@mui/material/styles';
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import AddIcon from '@mui/icons-material/Add';
-import SkillsForm from './SkillsForm';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Snackbar,
+  Alert,
+  Typography,
+  useTheme,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Card,
+  CardContent,
+  Button,
+  Stack
+} from '@mui/material';
+import TextInput from '@/app/_components/inputs/TextInput';
+import InputItem from '@/app/_components/inputs/InputItem';
+import { Formik, Form } from 'formik';
 
-const columns = [
-  { field: "id", headerName: "ID", flex:1},
-  { field: "skillName", headerName: "Skill Name",flex:1 },
-  { field: "proficiency", headerName: "Proficiency", flex:1 },
-];
+
 
 const SkillsTab = ({ employeeData }) => {
   const theme = useTheme();
 
-  const [openModal, setOpenModal] = useState(false);
+  // State for skills list
+  const [skillsList, setSkillsList] = useState(Array.isArray(employeeData?.skills) ? employeeData.skills : (employeeData?.skills ? [employeeData.skills] : []));
+  const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [formData, setFormData] = useState({
-    skillName: '',
-    proficiency: '',
-  });
 
-  // Parse skills from employeeData (should be an array now)
-  const skillsData = employeeData?.skills || [];
-  
-  // Convert skills text to table data - you can modify this logic based on your data format
-  const skillsArray = Array.isArray(skillsData) ? skillsData : 
-    (typeof skillsData === 'string' && skillsData ? [skillsData] : []);
+  // Keep state in sync if employeeData changes
+  useEffect(() => {
+    setSkillsList(Array.isArray(employeeData?.skills) ? employeeData.skills : (employeeData?.skills ? [employeeData.skills] : []));
+  }, [employeeData]);
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // For now, just close modal and show success message
-    // In a real implementation, you would update the employee skills via API
-    setOpenModal(false);
+  // Add new skills
+  const handleAddSkills = (newSkills) => {
+    setSkillsList((prev) => [...prev, ...newSkills]);
+    setOpenDialog(false);
     setOpenSnackbar(true);
-    setFormData({ skillName: '', proficiency: '' });
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -59,63 +48,29 @@ const SkillsTab = ({ employeeData }) => {
   };
 
   return (
-    <Box sx={{ 
-      position: 'relative', 
-      minHeight: { xs: '60vh', sm: '70vh' }, 
-      p: { xs: 1, sm: 2, md: 3 },
-      maxWidth: '100%',
-      overflow: 'hidden'
-    }}>
-      <IconButton
-        color="primary"
-        onClick={handleOpenModal}
-        sx={{
-          position: 'absolute',
-          top: { xs: 8, sm: 16 },
-          right: { xs: 8, sm: 16 },
-          bgcolor: theme.palette.background.paper,
-          border: `1px solid ${theme.palette.divider}`,
-          zIndex: 1,
-          '&:hover': {
-            bgcolor: theme.palette.primary.light,
-            color: 'white'
-          },
-        }}
-      >
-        <AddIcon />
-      </IconButton>
+    <Box sx={{ position: 'relative', minHeight: '60vh', p: { xs: 1, sm: 2, md: 3 }, maxWidth: '100%', overflow: 'hidden' }}>
+      
 
-      {/* Modal */}
-      <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="skills-form-modal"
-        aria-describedby="form-to-add-skills"
+      {/* Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        aria-labelledby="skills-form-dialog-title"
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Add Skill
-          </Typography>
+        <DialogTitle id="skills-form-dialog-title" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+          Add Skills
+        </DialogTitle>
+        <DialogContent>
           <SkillsForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSubmit={handleSubmit}
-            handleCancel={handleCloseModal}
+            existingSkills={skillsList}
+            onAddSkills={handleAddSkills}
+            handleCancel={() => setOpenDialog(false)}
           />
-        </Box>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       {/* Snackbar */}
       <Snackbar
@@ -130,52 +85,34 @@ const SkillsTab = ({ employeeData }) => {
       </Snackbar>
 
       {/* Skills Display */}
-      {skillsArray && skillsArray.length > 0 ? (
-        <Box sx={{ width: "100%", p: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 600,
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}
-          >
-            Skills & Expertise
-          </Typography>
-          <Box sx={{ 
-            backgroundColor: theme.palette.grey[50],
-            p: 3,
-            borderRadius: 2,
-            border: `1px solid ${theme.palette.grey[200]}`
-          }}>
-            {skillsArray.map((skill, index) => (
-              <Typography
+      {skillsList && skillsList.length > 0 ? (
+        <Box sx={{ width: '100%', p: { xs: 1, sm: 3 } }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {skillsList.map((skill, index) => (
+              <Card
                 key={index}
-                variant="body1"
-                color="text.primary"
+                elevation={3}
                 sx={{
-                  lineHeight: 1.6,
-                  mb: index < skillsArray.length - 1 ? 2 : 0,
-                  p: 2,
-                  backgroundColor: 'white',
-                  borderRadius: 1,
-                  border: `1px solid ${theme.palette.grey[200]}`,
-                  position: 'relative',
-                  '&:before': {
-                    content: `"${index + 1}."`,
-                    position: 'absolute',
-                    left: -16,
-                    top: 8,
-                    fontWeight: 'bold',
-                    color: theme.palette.primary.main,
-                  }
+                  width: '100%',
+                  maxWidth: 600,
+                  mx: 'auto',
+                  px: { xs: 2, sm: 3 },
+                  py: { xs: 2, sm: 2.5 },
+                  borderRadius: 3,
+                  boxShadow: theme.shadows[2],
+                  
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                 }}
               >
-                {skill}
-              </Typography>
+                <CardContent sx={{ p: 0, width: '100%' }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5, fontSize: '1.05rem', color: theme.palette.text }}>
+                    {skill}
+                  </Typography>
+                </CardContent>
+              </Card>
             ))}
           </Box>
         </Box>
@@ -199,9 +136,80 @@ const SkillsTab = ({ employeeData }) => {
           </Typography>
         </Box>
       )}
-      
     </Box>
   );
 };
+
+// New SkillsForm for single multiline input
+function SkillsForm({ existingSkills, onAddSkills, handleCancel }) {
+  // Combine existing skills into a single string (one per line)
+  const initialSkillsText = (existingSkills && existingSkills.length > 0)
+    ? existingSkills.join('\n')
+    : '';
+
+  return (
+    <Formik
+      initialValues={{ skills: initialSkillsText }}
+      onSubmit={(values, { resetForm }) => {
+        const lines = values.skills.split('\n').map(line => line.trim()).filter(Boolean);
+        const newLines = lines.filter(line => !existingSkills.includes(line));
+        if (newLines.length > 0 && onAddSkills) {
+          onAddSkills(newLines);
+        }
+        resetForm();
+      }}
+    >
+      {({ resetForm }) => (
+        <Form>
+          <Stack>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 0, sm: 2 },
+              }}
+            >
+              <InputItem>
+                <TextInput
+                  name="skills"
+                  label="Skills"
+                  multiline
+                  rows={4}
+                  placeholder="Enter your skills (one per line)"
+                />
+              </InputItem>
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: { xs: 'center', md: 'flex-end' },
+                pb: 2,
+                gap: 2,
+              }}
+            >
+              <Button
+                color="text.primary"
+                type="reset"
+                onClick={() => {
+                  resetForm();
+                  handleCancel && handleCancel();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+              >
+                Submit
+              </Button>
+            </Box>
+          </Stack>
+        </Form>
+      )}
+    </Formik>
+  );
+}
 
 export default SkillsTab;

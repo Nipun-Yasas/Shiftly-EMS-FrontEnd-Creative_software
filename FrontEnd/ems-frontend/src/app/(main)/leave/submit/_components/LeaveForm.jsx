@@ -12,6 +12,8 @@ import InputItem from '../../../../_components/inputs/InputItem';
 import TextInput from '../../../../_components/inputs/TextInput';
 import SelectInput from '../../../../_components/inputs/SelectInput';
 import DateInput from '../../../../_components/inputs/DateInput';
+import axiosInstance from '../../../../_utils/axiosInstance';
+import { API_PATHS } from '../../../../_utils/apiPaths';
 
 const leaveOptions = [
   { id: 1, name: 'Casual Leave', value: 'casual' },
@@ -69,8 +71,21 @@ const LeaveForm = ({ onSubmitSuccess }) => {
         onSubmit={async (values, { resetForm }) => {
           try {
             setIsSubmitting(true);
-            values.leave_type = selectedLeave.value;
-            await new Promise((res) => setTimeout(res, 1000));
+            // Ensure leaveType is a string, not an object
+            const leaveTypeValue = typeof values.leave_type === 'object' && values.leave_type !== null
+              ? values.leave_type.value
+              : values.leave_type;
+            const payload = {
+              leaveType: leaveTypeValue,
+              leaveFrom: values.leave_from,
+              leaveTo: values.leave_to,
+              duration: values.duration,
+              coverPersonName: values.cover_person,
+              reportToName: values.report_to,
+              reason: values.reason,
+              leaveStatus: 'PENDING',
+            };
+            await axiosInstance.post(API_PATHS.LEAVES.ADD_MY_LEAVE, payload);
             resetForm();
             setSelectedLeave(leaveOptions[0]);
             onSubmitSuccess();
@@ -106,6 +121,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                       label="Leave Type"
                       options={leaveOptions}
                       getOptionLabel={(option) => option.name || ""}
+                      
                     />
                   </InputItem>
                 </Box>

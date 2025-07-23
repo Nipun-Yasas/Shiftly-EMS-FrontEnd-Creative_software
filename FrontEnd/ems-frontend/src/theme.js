@@ -55,17 +55,19 @@ const theme = createTheme({
         text: {
           primary: '#1A1A1A',
           secondary: '#4D4D4D',
-        }
-        ,
+        },
         avatarname: {
           main: '#1A3C5E',
           contrastText: '#ffffff',
-        }
-        ,
+        },
         viewButton: {
           main: '#FFF1F2',
           contrastText: '#ffffff',
-        }
+        },
+        background: {
+          default: '#fafafa',
+          paper: '#fff',
+        },
       }
     },
     dark: {
@@ -112,23 +114,22 @@ const theme = createTheme({
           dark: '#ffffff',
           contrastText: '#000000',
         },
-        textblack: {
-          main: '#ffffff',
-          contrastText: '#000000',
-        },
         avatarname: {
           main: '#F5F7FA',
           contrastText: '#ffffff',
-        }
-        ,
+        },
         viewButton: {
-          main: 'FFC1DA',
+          main: '#FFC1DA',
           contrastText: '#ffffff',
         },
         text: {
           primary: '#FFFFFF',
           secondary: '#B0B0B0',
-        }
+        },
+        background: {
+          default: '#181a20',
+          paper: '#232323',
+        },
       }
     },
   },
