@@ -43,47 +43,36 @@ export default function EventForm(props) {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      console.log("Form values received:", values);
-      
-      // Map frontend form data to backend DTO format
-      const eventData = {
-        title: values.title,
-        eventType: values.eventType?.name || values.eventType,
-        enableDate: values.enableDate,
-        expireDate: values.expireDate,
-        createdBy: 1, // This should come from user context/auth
-        fileName: values.fileName,
-        filePath: values.filePath,
-      };
+      const data = new FormData();
+      data.append('title', values.title);
+      data.append('eventType', values.eventType?.name || values.eventType);
+      data.append('enableDate', values.enableDate?.slice(0, 10)); // send only YYYY-MM-DD
+      data.append('expireDate', values.expireDate?.slice(0, 10)); // send only YYYY-MM-DD
+      // If you want to send status, add it here (optional)
+      // data.append('status', values.status || 'PENDING');
+      if (values.banner) {
+        data.append('image', values.banner); // Use 'image' as the field name!
+      }
 
-      console.log("Sending to backend:", eventData);
-      
-      const response = await axiosInstance.post(API_PATHS.EVENTS.ADD_EVENT, eventData);
-      console.log("Backend response:", response.data);
-      
-      showSnackbar("Event submitted successfully! Awaiting admin approval.", "success");
-      setOpenSubmit(true);
+      const response = await axiosInstance.post(
+        API_PATHS.EVENTS.ADD_EVENT,
+        data,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      alert('Event submitted! ID: ' + response.data.id);
       resetForm();
       setFileName("");
       setPreview(null);
       if (bannerRef.current) {
         bannerRef.current.value = "";
       }
-      
     } catch (error) {
-      console.error("Error creating event:", error);
-      console.error("Error response:", error.response?.data);
-      
-      let errorMessage = "Failed to submit event";
+      let errorMsg = 'Failed to submit event.';
       if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.status === 500) {
-        errorMessage = "Server error. Please try again later.";
-      } else if (error.response?.status === 400) {
-        errorMessage = "Invalid event data. Please check all required fields.";
+        errorMsg = error.response.data.message;
       }
-      
-      showSnackbar(errorMessage, "error");
+      alert(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -97,8 +86,7 @@ export default function EventForm(props) {
           eventType: null,
           enableDate: null,
           expireDate: null,
-          fileName: "",
-          filePath: "",
+          banner: null,
         }}
         validate={(values) => {
           const errors = {};
@@ -124,7 +112,7 @@ export default function EventForm(props) {
         }}
         onSubmit={handleSubmit}
       >
-        {({ validateForm, resetForm, isSubmitting }) => (
+        {({ validateForm, resetForm, isSubmitting, setFieldValue }) => (
           <Form>
             <Stack spacing={3}>
               <InputItem>
@@ -160,6 +148,7 @@ export default function EventForm(props) {
                 setFileName={setFileName}
                 preview={preview}
                 setPreview={setPreview}
+                onChange={(file) => setFieldValue('banner', file)}
               />
 
               <Box

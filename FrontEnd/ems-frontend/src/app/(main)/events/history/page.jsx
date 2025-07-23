@@ -74,34 +74,32 @@ export default function EventHistory() {
     setSnackbar({ open: true, message, severity });
   };
 
-  const fetchUserEvents = async () => {
+  const fetchAllEvents = async () => {
     setLoading(true);
     try {
-      // This should come from user context/auth
-      const employeeId = 1; // Placeholder
-      
-      console.log("Fetching user events for employee:", employeeId);
-      
-      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_MY_EVENTS(employeeId));
-      console.log("Backend response:", response.data);
-      
+      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_ALL_EVENTS);
       if (response.data && Array.isArray(response.data)) {
-        setEvents(response.data);
+        // Map backend fields to DataGrid fields
+        const mapped = response.data.map(event => ({
+          id: event.id,
+          title: event.title,
+          eventType: event.eventType,
+          enableDate: event.enableDate,
+          expireDate: event.expireDate,
+          status: event.status,
+          fileName: event.imageUrl ? (
+            <a href={`http://localhost:8080${event.imageUrl}`} target="_blank" rel="noopener noreferrer">Download</a>
+          ) : 'No file',
+        }));
+        setEvents(mapped);
       } else {
-        console.warn("Invalid response format or no data");
         setEvents([]);
       }
     } catch (error) {
-      console.error("Error fetching user events:", error);
-      console.error("Error details:", error.response?.data);
-      
-      let errorMessage = "Failed to fetch your events";
+      let errorMessage = "Failed to fetch events";
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
-      } else if (error.response?.status === 404) {
-        errorMessage = "No events found for your account.";
       }
-      
       showSnackbar(errorMessage, "error");
       setEvents([]);
     } finally {
@@ -110,7 +108,7 @@ export default function EventHistory() {
   };
 
   useEffect(() => {
-    fetchUserEvents();
+    fetchAllEvents();
   }, []);
 
   return (
