@@ -44,7 +44,12 @@ export default function ProjectManagementPage() {
 
   // Use custom hooks for departments and teams
   const { departments, loading: loadingDepartments, error: departmentsError } = useDepartments();
-  const { teams, loading: loadingTeams, error: teamsError } = useTeams();
+  
+  // State for selected department to filter teams
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  
+  // Fetch teams based on selected department (or all teams if no department selected)
+  const { teams, loading: loadingTeams, error: teamsError } = useTeams(selectedDepartmentId);
 
   const initialFormValues = {
     projectName: "",
@@ -58,11 +63,17 @@ export default function ProjectManagementPage() {
 
   const getEditInitialValues = (project) => {
     if (project) {
+      const selectedDept = departments.find((d) => d.name === project.departmentName) || null;
+      
+      // Set the department ID for team filtering when editing
+      if (selectedDept) {
+        setSelectedDepartmentId(selectedDept.id);
+      }
+      
       return {
         projectName: project.projectName || "",
         description: project.description || "",
-        department:
-          departments.find((d) => d.name === project.departmentName) || null,
+        department: selectedDept,
         teamName: teams.find((t) => t.name === project.teamName) || null,
         startDate: project.startDate || null,
         deadline: project.deadline || null,
@@ -76,10 +87,8 @@ export default function ProjectManagementPage() {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      console.log("Fetching projects from:", API_PATHS.PROJECTS.GET_ALL_PROJECTS);
       
       const response = await axiosInstance.get(API_PATHS.PROJECTS.GET_ALL_PROJECTS);
-      console.log("Backend response:", response.data);
       
       if (response.data && Array.isArray(response.data)) {
         // Map backend data to frontend format
@@ -94,15 +103,11 @@ export default function ProjectManagementPage() {
           progress: project.progress || 0,
         }));
         
-        console.log("Mapped projects:", mappedProjects);
         setProjects(mappedProjects);
       } else {
-        console.warn("Invalid response format or no data");
         setProjects([]);
       }
     } catch (error) {
-      console.error("Error fetching projects:", error);
-      console.error("Error details:", error.response?.data);
       
       showSnackbar("Failed to fetch projects from server", "error");
       
@@ -126,16 +131,6 @@ export default function ProjectManagementPage() {
   // Handle form submission for Add Project tab
   const handleAddSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      console.log("Form values received:", values);
-      console.log("Department value:", values.department);
-      console.log("Department type:", typeof values.department);
-      console.log("Department ID:", values.department?.id);
-      console.log("Team value:", values.teamName);
-      console.log("Team type:", typeof values.teamName);
-      console.log("Team ID:", values.teamName?.id);
-      console.log("Available departments:", departments);
-      console.log("Available teams:", teams);
-      console.log("Current user:", user);
       
       // Check if user is available
       if (!user || !user.id) {
@@ -155,7 +150,6 @@ export default function ProjectManagementPage() {
       }
       
       if (!departmentId) {
-        console.error("Department validation failed:", values.department);
         showSnackbar("Please select a department", "error");
         setSubmitting(false);
         return;
@@ -172,7 +166,6 @@ export default function ProjectManagementPage() {
       }
       
       if (!teamId) {
-        console.error("Team validation failed:", values.teamName);
         showSnackbar("Please select a team", "error");
         setSubmitting(false);
         return;
@@ -189,13 +182,8 @@ export default function ProjectManagementPage() {
         departmentId: departmentId,
         teamId: teamId,
       };
-
-      console.log("Selected department object:", values.department);
-      console.log("Selected team object:", values.teamName);
-      console.log("Sending to backend:", projectData);
       
       const response = await axiosInstance.post(API_PATHS.PROJECTS.ADD_PROJECT, projectData);
-      console.log("Backend response:", response.data);
       
       showSnackbar("Project created successfully!", "success");
       resetForm();
@@ -203,11 +191,6 @@ export default function ProjectManagementPage() {
       fetchProjects(); // Refresh the project list
       
     } catch (error) {
-      console.error("Error creating project:", error);
-      console.error("Full error object:", JSON.stringify(error, null, 2));
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
-      console.error("Error headers:", error.response?.headers);
       
       let errorMessage = "Failed to create project";
       
@@ -225,8 +208,6 @@ export default function ProjectManagementPage() {
           errorMessage = responseData.details;
         }
         
-        // Log the full response for debugging
-        console.error("Backend error details:", responseData);
       }
       
       if (error.response?.status === 500) {
@@ -246,9 +227,6 @@ export default function ProjectManagementPage() {
   // Handle form submission for Edit Project dialog
   const handleEditSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      console.log("Edit form values:", values);
-      console.log("Editing project:", editingProject);
-      console.log("Current user:", user);
       
       // Check if user is available
       if (!user || !user.id) {
@@ -282,14 +260,9 @@ export default function ProjectManagementPage() {
         teamId: values.teamName.id,
       };
 
-      console.log("Updating project ID:", editingProject.id);
-      console.log("Sending update data:", projectData);
-      
       const response = await axiosInstance.put(
         API_PATHS.PROJECTS.UPDATE_PROJECT(editingProject.id),
-        projectData
-      );
-      console.log("Update response:", response.data);
+        projectData);
       
       showSnackbar("Project updated successfully!", "success");
       resetForm();
@@ -298,8 +271,6 @@ export default function ProjectManagementPage() {
       fetchProjects(); // Refresh the project list
       
     } catch (error) {
-      console.error("Error updating project:", error);
-      console.error("Error response:", error.response?.data);
       
       let errorMessage = "Failed to update project";
       if (error.response?.data?.message) {
@@ -321,7 +292,6 @@ export default function ProjectManagementPage() {
     if (!projectToDelete) return;
 
     try {
-      console.log("Deleting project ID:", projectToDelete.id);
       
       await axiosInstance.delete(API_PATHS.PROJECTS.DELETE_PROJECT(projectToDelete.id));
       
@@ -336,8 +306,6 @@ export default function ProjectManagementPage() {
       fetchProjects();
       
     } catch (error) {
-      console.error("Error deleting project:", error);
-      console.error("Error response:", error.response?.data);
       
       let errorMessage = "Failed to delete project";
       if (error.response?.data?.message) {
@@ -366,6 +334,11 @@ export default function ProjectManagementPage() {
     setEditDialogOpen(true);
   };
 
+  // Function to handle department selection change
+  const handleDepartmentChange = (departmentId) => {
+    setSelectedDepartmentId(departmentId);
+  };
+
   // Handle delete project
   const handleDeleteProject = (project) => {
     setProjectToDelete(project);
@@ -386,19 +359,6 @@ export default function ProjectManagementPage() {
   useEffect(() => {
     fetchProjects();
   }, []);
-
-  // Debug effect to log departments and teams when they load
-  useEffect(() => {
-    if (departments.length > 0) {
-      console.log("Departments loaded:", departments);
-    }
-  }, [departments]);
-
-  useEffect(() => {
-    if (teams.length > 0) {
-      console.log("Teams loaded:", teams);
-    }
-  }, [teams]);
 
   return (
     <Paper
@@ -454,6 +414,7 @@ export default function ProjectManagementPage() {
             teams={teams}
             loadingDepartments={loadingDepartments}
             loadingTeams={loadingTeams}
+            onDepartmentChange={handleDepartmentChange}
             disabled={loadingDepartments || loadingTeams || departments.length === 0 || teams.length === 0}
           />
         </TabPanel>
@@ -463,6 +424,7 @@ export default function ProjectManagementPage() {
           onClose={() => {
             setEditDialogOpen(false);
             setEditingProject(null);
+            setSelectedDepartmentId(null); // Reset department filter when closing
           }}
           onSubmit={handleEditSubmit}
           editingProject={editingProject}
@@ -471,6 +433,7 @@ export default function ProjectManagementPage() {
           teams={teams}
           loadingDepartments={loadingDepartments}
           loadingTeams={loadingTeams}
+          onDepartmentChange={handleDepartmentChange}
           getEditInitialValues={getEditInitialValues}
         />
 

@@ -3,10 +3,24 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useField, useFormikContext } from "formik";
 
-export default function SelectInput({ name, options, getOptionLabel, label, ...props }) {
+export default function SelectInput({ name, options, getOptionLabel, label, onChange, ...props }) {
     
   const { setFieldValue, setFieldTouched, touched, errors, values } = useFormikContext();
   const [field] = useField(name);
+
+  const handleChange = (e, selectedOption) => {
+    setFieldValue(name, selectedOption);
+    
+    // Delay setting touched to prevent immediate validation
+    setTimeout(() => {
+      setFieldTouched(name, true, false);
+    }, 100);
+    
+    // Call the custom onChange handler if provided
+    if (onChange) {
+      onChange(selectedOption);
+    }
+  };
 
   return (
     <Autocomplete
@@ -15,10 +29,7 @@ export default function SelectInput({ name, options, getOptionLabel, label, ...p
       options={options}
       getOptionLabel={getOptionLabel}
       value={values[name]}
-      onChange={(e, selectedOption) => {
-        setFieldValue(name, selectedOption);
-        setFieldTouched(name, true, false);
-      }}
+      onChange={handleChange}
       onBlur={() => setFieldTouched(name, true, true)}
       renderInput={(params) => (
         <TextField

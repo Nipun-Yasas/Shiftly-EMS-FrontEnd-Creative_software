@@ -12,6 +12,7 @@ export default function AddTab({
   teams = [],
   loadingDepartments = false,
   loadingTeams = false,
+  onDepartmentChange,
 }) {
   return (
     <Box sx={{ p: 3, align: "space-between", height: "100%" }}>
@@ -19,8 +20,10 @@ export default function AddTab({
         initialValues={initialFormValues}
         validationSchema={projectValidationSchema}
         onSubmit={onSubmit}
+        validateOnChange={false}
+        validateOnBlur={true}
       >
-        {({ isSubmitting, resetForm }) => (
+        {({ isSubmitting, resetForm, values, setFieldValue }) => (
           <Form>
             <ProjectForm
               isSubmitting={isSubmitting}
@@ -31,6 +34,9 @@ export default function AddTab({
               teams={teams}
               loadingDepartments={loadingDepartments}
               loadingTeams={loadingTeams}
+              onDepartmentChange={onDepartmentChange}
+              values={values}
+              setFieldValue={setFieldValue}
             />
           </Form>
         )}

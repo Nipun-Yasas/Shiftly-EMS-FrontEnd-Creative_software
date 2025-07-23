@@ -10,7 +10,6 @@ import SelectInput from "../../../../_components/inputs/SelectInput";
 import InputItem from "../../../../_components/inputs/InputItem";
 import DateInput from "../../../../_components/inputs/DateInput";
 
-import AddIcon from "@mui/icons-material/Add";
 
 export const projectValidationSchema = Yup.object({
   projectName: Yup.string()
@@ -19,8 +18,8 @@ export const projectValidationSchema = Yup.object({
   description: Yup.string()
     .min(10, "Description must be at least 10 characters")
     .required("Description is required"),
-  department: Yup.object().required("Department is required"),
-  teamName: Yup.object().required("Team name is required"),
+  department: Yup.object().nullable().required("Department is required"),
+  teamName: Yup.object().nullable(),
   startDate: Yup.date().required("Start date is required"),
   deadline: Yup.date()
     .min(Yup.ref("startDate"), "Deadline must be after start date")
@@ -41,7 +40,36 @@ export default function ProjectForm({
   teams = [],
   loadingDepartments = false,
   loadingTeams = false,
+  onDepartmentChange = null,
+  values = null,
+  setFieldValue = null,
 }) {
+  
+  // Handle department selection change
+  const handleDepartmentSelect = (selectedDepartment) => {
+    
+    if (selectedDepartment && onDepartmentChange) {
+      // Clear team selection when department changes
+      if (setFieldValue) {
+        // Use setTimeout to ensure the department value is set first
+        setTimeout(() => {
+          setFieldValue('teamName', null);
+        }, 0);
+      }
+      // Notify parent component about department change
+      onDepartmentChange(selectedDepartment.id);
+    } 
+  };
+
+  // Handle team selection change
+  const handleTeamSelect = (selectedTeam) => {
+   
+    if (selectedTeam && setFieldValue) {
+      setTimeout(() => {
+        console.log("Team value should be set now");
+      }, 50);
+    }
+  };
   return (
     <Stack>
       <Box
@@ -65,7 +93,8 @@ export default function ProjectForm({
           label={loadingDepartments ? "Loading Departments..." : "Department"}
           options={departments}
           getOptionLabel={(option) => option.label}
-          disabled={loadingDepartments || isSubmitting} />
+          disabled={loadingDepartments || isSubmitting}
+          onChange={(value) => handleDepartmentSelect(value)} />
       </InputItem>
         </Box>
     <Box
@@ -82,7 +111,8 @@ export default function ProjectForm({
             label={loadingTeams ? "Loading Teams..." : "Team Name"}
             options={teams}
             getOptionLabel={(option) => option.label}
-            disabled={loadingTeams || isSubmitting} />
+            disabled={loadingTeams || isSubmitting}
+            onChange={(value) => handleTeamSelect(value)} />
         </InputItem>
 
         <InputItem>
@@ -135,20 +165,6 @@ export default function ProjectForm({
           width: "100%",
         }}
       >
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={isSubmitting || loadingDepartments || loadingTeams}
-          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-        >
-          {isSubmitting
-            ? isEdit
-              ? "Updating..."
-              : "Adding..."
-            : isEdit
-              ? "Update Project"
-              : "Add Project"}
-        </Button>
 
         {onCancel && (
           <Button
@@ -171,6 +187,21 @@ export default function ProjectForm({
             Reset
           </Button>
         )}
+
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={isSubmitting || loadingDepartments || loadingTeams}
+          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+        >
+          {isSubmitting
+            ? isEdit
+              ? "Updating..."
+              : "Adding..."
+            : isEdit
+              ? "Update Project"
+              : "Add Project"}
+        </Button>
 
         
       </Box>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Formik } from "formik";
 import { Form } from "formik";
@@ -21,6 +21,8 @@ import SelectInput from "../../../_components/inputs/SelectInput";
 import InputItem from "../../../_components/inputs/InputItem";
 import DateInput from "../../../_components/inputs/DateInput";
 import { useDepartments } from "../../../_hooks/useDepartments";
+import { useTeams } from "../../../_hooks/useTeams";
+import { UserContext } from "../../../context/UserContext";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 
@@ -28,31 +30,6 @@ const genderOptions = [
   { id: "Male", name: "Male", label: "Male" },
   { id: "Female", name: "Female", label: "Female" },
   { id: "Other", name: "Other", label: "Other" },
-];
-
-const designationOptions = [
-  {
-    id: "Software Engineer",
-    name: "Software Engineer",
-    label: "Software Engineer",
-  },
-  {
-    id: "Senior Software Engineer",
-    name: "Senior Software Engineer",
-    label: "Senior Software Engineer",
-  },
-  { id: "Project Manager", name: "Project Manager", label: "Project Manager" },
-  { id: "Team Lead", name: "Team Lead", label: "Team Lead" },
-  {
-    id: "Business Analyst",
-    name: "Business Analyst",
-    label: "Business Analyst",
-  },
-  { id: "QA Engineer", name: "QA Engineer", label: "QA Engineer" },
-  { id: "DevOps Engineer", name: "DevOps Engineer", label: "DevOps Engineer" },
-  { id: "UI/UX Designer", name: "UI/UX Designer", label: "UI/UX Designer" },
-  { id: "Data Analyst", name: "Data Analyst", label: "Data Analyst" },
-  { id: "HR Specialist", name: "HR Specialist", label: "HR Specialist" },
 ];
 
 const validationSchema = Yup.object({
@@ -70,7 +47,7 @@ const validationSchema = Yup.object({
     .min(2, "Location must be at least 2 characters")
     .max(100, "Location must be less than 100 characters")
     .required("Location is required"),
-  designation: Yup.object().nullable(), // Make designation optional
+  team: Yup.object().nullable(), // Make team optional
   skills: Yup.string().max(1000, "Skills must be less than 1000 characters"),
   education: Yup.string().max(
     1000,
@@ -82,14 +59,72 @@ const validationSchema = Yup.object({
   ),
 });
 
-const EmployeeUpdatePage = () => {
+export default function EmployeeUpdatePage() {
   const theme = useTheme();
   const router = useRouter();
+  const { user } = useContext(UserContext);
   const { departments, loading: loadingDepartments } = useDepartments();
+
+  // Get user's department ID from context - try multiple possible paths
+  const getUserDepartmentId = () => {
+    if (!user) return null;
+
+    // First try to get direct department ID
+    const directId =
+      user.departmentId ||
+      user.department?.id ||
+      user.department?.departmentId ||
+      user.dept?.id ||
+      user.deptId;
+
+    if (directId) {
+      return directId;
+    }
+
+    // If no direct ID, try to find department ID by name
+    if (user.department && typeof user.department === "string") {
+      // user.department is a string like "DIPS"
+      const foundDept = departments.find(
+        (dept) =>
+          dept.name === user.department || dept.label === user.department
+      );
+      return foundDept?.id || foundDept?.departmentId || null;
+    }
+
+    return null;
+  };
+
+  const userDepartmentId = getUserDepartmentId();
+
+  // Debug logging
+  console.log("=== TEAM FILTERING DEBUG ===");
+  console.log("User:", user);
+  console.log("User department:", user?.department);
+  console.log("User department ID:", userDepartmentId);
+  console.log("Departments:", departments);
+  console.log("Loading departments:", loadingDepartments);
+  console.log("========================");
+
+  // Only fetch teams when departments are loaded (needed for department name lookup)
+  const shouldFetchTeams = !loadingDepartments && departments.length > 0;
+  const teamsDepartmentId = shouldFetchTeams ? userDepartmentId : null;
+
+  // Fetch teams filtered by user's department
+  const { teams, loading: loadingTeams } = useTeams(teamsDepartmentId);
+
+  // Debug logging for teams
+  console.log("=== TEAMS DEBUG ===");
+  console.log("Teams department ID:", teamsDepartmentId);
+  console.log("Should fetch teams:", shouldFetchTeams);
+  console.log("Teams:", teams);
+  console.log("Loading teams:", loadingTeams);
+  console.log("================");
+
   const [loading, setLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // Track editing state
 
   useEffect(() => {
     fetchEmployeeProfile();
@@ -98,15 +133,35 @@ const EmployeeUpdatePage = () => {
   const fetchEmployeeProfile = async () => {
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
+
       const response = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
+
       if (response.data) {
         setEmployeeData(response.data);
+        setIsEditing(true);
       }
     } catch (error) {
-      console.error("Error fetching employee profile:", error);
-      // If no profile exists, that's fine - we'll create a new one
-      if (error.response && error.response.status !== 404) {
-        setError("Error loading employee profile. Please try again.");
+      // Only log unexpected errors (not 404s for new users)
+      if (error.response?.status !== 404) {
+        console.error("Unexpected error fetching employee profile:", error);
+      }
+
+      if (error.response && error.response.status === 404) {
+        // This is expected for new users creating their first profile
+        setIsEditing(false);
+        setEmployeeData(null);
+        // Don't set error state for expected 404 - this is normal for new users
+      } else if (error.response && error.response.status === 401) {
+        setError(
+          "You are not authorized to access this profile. Please log in again."
+        );
+      } else if (error.response && error.response.status === 403) {
+        setError("You don't have permission to access this profile.");
+      } else if (error.request) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Error loading profile data. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -125,9 +180,20 @@ const EmployeeUpdatePage = () => {
         designation:
           designationOptions.find((d) => d.name === employeeData.designation) ||
           null,
-        skills: Array.isArray(employeeData.skills) ? employeeData.skills.join('\n') : (employeeData.skills || ""),
-        education: Array.isArray(employeeData.education) ? employeeData.education.join('\n') : (employeeData.education || ""),
-        experience: Array.isArray(employeeData.experience) ? employeeData.experience.join('\n') : (employeeData.experience || ""),
+        team:
+          teams.find(
+            (t) =>
+              t.id === employeeData.teamId || t.name === employeeData.teamName
+          ) || null,
+        skills: Array.isArray(employeeData.skills)
+          ? employeeData.skills.join("\n")
+          : employeeData.skills || "",
+        education: Array.isArray(employeeData.education)
+          ? employeeData.education.join("\n")
+          : employeeData.education || "",
+        experience: Array.isArray(employeeData.experience)
+          ? employeeData.experience.join("\n")
+          : employeeData.experience || "",
       };
     }
     return {
@@ -136,7 +202,7 @@ const EmployeeUpdatePage = () => {
       gender: null,
       dob: "",
       location: "",
-      designation: null,
+      team: null,
       skills: "",
       education: "",
       experience: "",
@@ -156,9 +222,17 @@ const EmployeeUpdatePage = () => {
         dob: values.dob,
         location: values.location,
         designation: values.designation?.name || values.designation,
-        skills: values.skills ? values.skills.split('\n').filter(skill => skill.trim() !== '') : [],
-        education: values.education ? values.education.split('\n').filter(edu => edu.trim() !== '') : [],
-        experience: values.experience ? values.experience.split('\n').filter(exp => exp.trim() !== '') : [],
+        teamId: values.team?.id || null, // Send team ID
+        teamName: values.team?.name || null, // Send team name for reference
+        skills: values.skills
+          ? values.skills.split("\n").filter((skill) => skill.trim() !== "")
+          : [],
+        education: values.education
+          ? values.education.split("\n").filter((edu) => edu.trim() !== "")
+          : [],
+        experience: values.experience
+          ? values.experience.split("\n").filter((exp) => exp.trim() !== "")
+          : [],
       };
 
       console.log("Sending payload:", employeePayload); // Debug log
@@ -225,18 +299,12 @@ const EmployeeUpdatePage = () => {
     >
       <Box sx={{ textAlign: "center", mb: 4 }}>
         <PersonIcon
-          sx={{ fontSize: 60, color: theme.palette.primary.main, mb: 2 }}
+          sx={{ fontSize: 60, color: theme.palette.primary.main, my: 2 }}
         />
-        <Typography
-          variant="h4"
-          sx={{ mb: 1, color: theme.palette.text }}
-        >
+        <Typography variant="h4" sx={{ mb: 1, color: theme.palette.text }}>
           {employeeData ? "Update Employee Profile" : "Create Employee Profile"}
         </Typography>
-        <Typography
-          variant="body1"
-          sx={{ color: theme.palette.text }}
-        >
+        <Typography variant="body1" sx={{ color: theme.palette.text }}>
           {employeeData
             ? "Update your employee information below"
             : "Complete your employee profile to access all features"}
@@ -311,6 +379,18 @@ const EmployeeUpdatePage = () => {
                   }}
                 >
                   <InputItem>
+                    <SelectInput
+                      name="team"
+                      label="Team"
+                      options={teams}
+                      getOptionLabel={(option) => option.label}
+                      disabled={isSubmitting || loadingTeams}
+                      placeholder={
+                        loadingTeams ? "Loading teams..." : "Select a team"
+                      }
+                    />
+                  </InputItem>
+                  <InputItem>
                     <DateInput
                       name="dob"
                       label="Date of Birth"
@@ -362,28 +442,26 @@ const EmployeeUpdatePage = () => {
                       disabled={isSubmitting}
                     />
                   </InputItem>
-
-                  
                 </Box>
                 <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      flexDirection: { xs: "column", sm: "row" },
-                      gap: { xs: 0, sm: 2 },
-                    }}
-                  >
-                    <InputItem>
-                      <TextInput
-                        name="experience"
-                        label="Experience"
-                        multiline
-                        rows={4}
-                        placeholder="Describe your work experience, roles, responsibilities, etc. (one per line)"
-                        disabled={isSubmitting}
-                      />
-                    </InputItem>
-                  </Box>
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: { xs: 0, sm: 2 },
+                  }}
+                >
+                  <InputItem>
+                    <TextInput
+                      name="experience"
+                      label="Experience"
+                      multiline
+                      rows={4}
+                      placeholder="Describe your work experience, roles, responsibilities, etc. (one per line)"
+                      disabled={isSubmitting}
+                    />
+                  </InputItem>
+                </Box>
                 <Box
                   sx={{
                     display: "flex",
@@ -394,19 +472,19 @@ const EmployeeUpdatePage = () => {
                 >
                   <Button
                     variant="text"
-                    color="primary"
+                    color="text.primary"
                     onClick={handleBack}
                     disabled={isSubmitting}
-                    sx={{ px: 4,
-                      
-                     }}
+                    sx={{ px: 4 }}
                   >
                     Cancel
                   </Button>
                   <Button
                     variant="contained"
                     onClick={submitForm}
-                    disabled={isSubmitting || loadingDepartments}
+                    disabled={
+                      isSubmitting || loadingDepartments || loadingTeams
+                    }
                     startIcon={
                       isSubmitting ? (
                         <CircularProgress size={20} />
@@ -430,6 +508,4 @@ const EmployeeUpdatePage = () => {
       </Formik>
     </Paper>
   );
-};
-
-export default EmployeeUpdatePage;
+}
