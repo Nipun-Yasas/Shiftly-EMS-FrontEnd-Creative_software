@@ -9,6 +9,7 @@ export default function ReadTab({
   onViewDetails,
   onMarkAsRead,
   onMarkAsUnread,
+  onDownloadFile, // Make sure this prop is included
 }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
@@ -18,6 +19,7 @@ export default function ReadTab({
         onViewDetails={onViewDetails}
         onMarkAsRead={onMarkAsRead}
         onMarkAsUnread={onMarkAsUnread}
+        onDownloadFile={onDownloadFile} // Pass it to ReferDataGrid
       />
     </Box>
   );
