@@ -14,11 +14,7 @@ import SelectInput from "../../../_components/inputs/SelectInput";
 import FileUpload from "../../../_components/inputs/FileUpload";
 import axiosInstance from '../../../_utils/axiosInstance';
 import { REFERRAL_API } from '../../../_utils/apiPaths';
-
-const vacancyOptions = [
-  { id: 1, name: "Software Engineer" },
-  { id: 2, name: "HR" },
-];
+import { useVacancies } from '../../../_hooks/useVacancies';
 
 export default function ReferForm(props) {
   const { setOpenSubmit, initialValues, onSubmit, isEditMode = false } = props;
@@ -27,6 +23,8 @@ export default function ReferForm(props) {
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.resume || "");
   const [submitting, setSubmitting] = useState(false);
+
+  const { vacancies, loading: vacanciesLoading } = useVacancies();
 
   // New: handle backend submission
   const handleBackendSubmit = async (values, { resetForm }) => {
@@ -104,9 +102,10 @@ export default function ReferForm(props) {
                <InputItem> 
                 <SelectInput
                   name="vacancy"
-                  options={vacancyOptions}
+                  options={vacancies}
                   getOptionLabel={(option) => option.name || ""}
-                  label="Vacancy"
+                  label={vacanciesLoading ? "Loading vacancies..." : "Vacancy"}
+                  disabled={vacanciesLoading}
                 />
                </InputItem>
            </Box>

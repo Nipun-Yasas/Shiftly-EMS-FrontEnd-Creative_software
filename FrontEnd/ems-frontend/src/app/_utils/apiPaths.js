@@ -75,9 +75,17 @@ export const API_PATHS = {
     UPDATE_PROFILE: '/api/v1/shiftly/ems/employee/profile',
     SELF_UPDATE: '/api/v1/shiftly/ems/employee/self-update',
   },
+  CLAIMS: {
+    GET_CLAIMS_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/claims/user/${userId}`,
+    CREATE_CLAIM: '/api/v1/shiftly/ems/claims/add',
+  },
+  VACANCIES: {
+    GET_ALL_VACANCIES: '/api/v1/shiftly/ems/vacancies/all',
+  },
 };
 
 export const REFERRAL_API = {
   SUBMIT: '/api/v1/shiftly/ems/referrals/add',
   GET_ALL: '/api/v1/shiftly/ems/referrals/all',
+  GET_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/referrals/user/${userId}`,
 };

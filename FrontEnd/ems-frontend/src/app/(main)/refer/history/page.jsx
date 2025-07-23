@@ -24,11 +24,12 @@ export default function ReferHistory() {
     const fetchReferrals = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get(REFERRAL_API.GET_ALL);
+        const userId = 2; // Replace with dynamic user ID as needed
+        const response = await axiosInstance.get(REFERRAL_API.GET_BY_USER_ID(userId));
         // Map backend fields to frontend DataGrid fields
         const mapped = response.data.map(ref => ({
           id: ref.id,
-          vacancy: ref.vacancyName,
+          vacancy: ref.vacancyName || ref.vacancyId,
           applicant_name: ref.applicantName,
           applicant_email: ref.applicantEmail,
           message: ref.message,
