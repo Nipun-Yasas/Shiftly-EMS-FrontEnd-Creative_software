@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Paper,
-  Box,
-  Typography,
-  Button,
-  Chip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Alert,
-  useTheme
-} from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Alert from '@mui/material/Alert';
+import { useTheme } from '@mui/material/styles';
 import {
   VideoCall,
   Schedule,

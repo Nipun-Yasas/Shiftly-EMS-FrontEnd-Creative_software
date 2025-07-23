@@ -27,11 +27,7 @@ import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
 import UserDataStatus from '../../_components/UserDataStatus';
 import { getGreeting } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
-import saveUserData from '../../_utils/localStorageUtils';
-import getUserData from '../../_utils/localStorageUtils';
-import migrateUserData from '../../_utils/localStorageUtils';
-import cleanupOldBackups from '../../_utils/localStorageUtils';
-import initializeUserSession from '../../_utils/localStorageUtils';
+import { saveUserData, getUserData, migrateUserData, cleanupOldBackups, initializeUserSession } from '../../_utils/localStorageUtils';
 import ScheduleMeetingDialog from './_components/ScheduleMeetingDialog';
 import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 
@@ -451,7 +447,7 @@ const Dashboard = () => {
       
       {/* Performance and ToDo Cards - Side by Side at Top */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12} md={6}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
           <ProgressCard
             progress={progress}
             goals={goals}
@@ -459,7 +455,10 @@ const Dashboard = () => {
             setAddGoalDialogOpen={setAddGoalDialogOpen}
           />
         </Grid>
-        <Grid item xs={12} md={6} ref={rightCardRef}>
+        <Grid 
+          sx={{ gridColumn: { xs: 'span 12', sm: 'span 6' } }}
+          ref={rightCardRef}
+        >
           <ToDoCard
             toDoItems={toDoItems}
             handleAddToDo={handleAddToDo}
@@ -480,27 +479,27 @@ const Dashboard = () => {
 
       {/* Quick Actions Tools - Full Width Below */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12}>
+        <Grid sx={{ gridColumn: { xs: 'span 12' } }}>
           <PerformanceAnalyticsCard />
         </Grid>
       </Grid>
 
       {/* Events and Star Points Cards - Side by Side */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12} lg={9}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 9' } }}>
           <EventsCard 
             events={demoEventsState} 
             onViewAll={() => router.push('/events')}
           />
         </Grid>
-        <Grid item xs={12} lg={3}>
+        <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 3' } }}>
           <StarPointsCard starPoints={starPoints} starDialogOpen={starDialogOpen} setStarDialogOpen={setStarDialogOpen} />
         </Grid>
       </Grid>
 
       {/* Meetings History Card - Full Width */}
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
-        <Grid item xs={12}>
+        <Grid sx={{ gridColumn: { xs: 'span 12' } }}>
           <MeetingsHistoryCard onScheduleMeeting={() => setScheduleMeetingOpen(true)} />
         </Grid>
       </Grid>

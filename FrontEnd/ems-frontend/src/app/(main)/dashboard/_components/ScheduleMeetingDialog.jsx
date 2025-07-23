@@ -223,7 +223,7 @@ const ScheduleMeetingDialog = ({ open, onClose }) => {
 
         <Grid container spacing={3}>
           {/* Meeting Details */}
-          <Grid item xs={12} md={6}>
+          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextField
                 label="Meeting Title"
@@ -287,22 +287,20 @@ const ScheduleMeetingDialog = ({ open, onClose }) => {
           </Grid>
 
           {/* Time and Duration */}
-          <Grid item xs={12} md={6}>
+          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateTimePicker
                   label="Start Time"
                   value={meetingData.startTime}
                   onChange={(value) => handleInputChange('startTime', value)}
-                  renderInput={(params) => (
+                  textField={
                     <TextField
-                      {...params}
                       fullWidth
                       required
                       error={!!errors.startTime}
                       helperText={errors.startTime}
                       InputProps={{
-                        ...params.InputProps,
                         startAdornment: (
                           <InputAdornment position="start">
                             <Schedule color="action" />
@@ -316,7 +314,7 @@ const ScheduleMeetingDialog = ({ open, onClose }) => {
                         }
                       }}
                     />
-                  )}
+                  }
                 />
               </LocalizationProvider>
 

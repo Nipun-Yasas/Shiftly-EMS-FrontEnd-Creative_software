@@ -164,9 +164,7 @@ const UserDataStatus = () => {
           />
         </Stack>
 
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)' }}>
-          User ID: {userId.substring(0, 20)}...
-        </Typography>
+       
 
         <Collapse in={expanded}>
           <Divider sx={{ my: 1 }} />
@@ -196,7 +194,7 @@ const UserDataStatus = () => {
                         </Typography>
                       }
                       secondary={
-                        <Box>
+                        <span>
                           <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)' }}>
                             {dataStatus.text} • {formatBytes(size)}
                           </Typography>
@@ -205,7 +203,7 @@ const UserDataStatus = () => {
                               {data.length} items
                             </Typography>
                           )}
-                        </Box>
+                        </span>
                       }
                     />
                   </ListItem>

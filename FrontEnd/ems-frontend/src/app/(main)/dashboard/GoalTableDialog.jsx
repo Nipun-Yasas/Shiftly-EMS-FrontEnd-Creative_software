@@ -94,7 +94,7 @@ const GoalTableDialog = ({ open, onClose, goals, setGoals }) => {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <Typography variant="h6">My Goals</Typography>
+          My Goals
           <Button
             variant="contained"
             startIcon={<Add />}
