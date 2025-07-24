@@ -22,7 +22,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function EventsCard({ events, onViewAll }) {
+export default function EventsCard({ events, onViewAll, loading = false }) {
   const theme = useTheme();
   const router = useRouter();
   const [hoveredEvent, setHoveredEvent] = useState(null);
@@ -58,7 +58,7 @@ export default function EventsCard({ events, onViewAll }) {
     return icons[category] || icons.default;
   };
 
-  if (!mounted) {
+  if (!mounted || loading) {
     return (
       <Paper elevation={4} sx={{
         p: 0,
@@ -76,7 +76,7 @@ export default function EventsCard({ events, onViewAll }) {
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Event sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
           <Typography variant="h6" sx={{ fontFamily: 'var(--font-poppins)', fontWeight: 700 }}>
-            Loading Events...
+            {loading ? 'Loading Events...' : 'Loading Events...'}
           </Typography>
         </Box>
       </Paper>
@@ -171,7 +171,34 @@ export default function EventsCard({ events, onViewAll }) {
         flexDirection: 'column',
         gap: 2
       }}>
-        {events.slice(0, 3).map((event) => (
+        {events.length === 0 ? (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            py: 4,
+            textAlign: 'center'
+          }}>
+            <Event sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
+            <Typography variant="h6" sx={{ 
+              fontFamily: 'var(--font-poppins)', 
+              fontWeight: 600, 
+              color: 'text.secondary',
+              mb: 1
+            }}>
+              No Approved Events
+            </Typography>
+            <Typography variant="body2" sx={{ 
+              color: 'text.secondary', 
+              fontFamily: 'var(--font-lexend)',
+              fontWeight: 400
+            }}>
+              No approved events are currently available
+            </Typography>
+          </Box>
+        ) : (
+          events.slice(0, 3).map((event) => (
           <Card
             key={event.id}
             sx={{
@@ -258,7 +285,8 @@ export default function EventsCard({ events, onViewAll }) {
               </CardContent>
             </Box>
           </Card>
-        ))}
+          ))
+        )}
         
         {/* View All Button */}
         {events.length > 3 && (

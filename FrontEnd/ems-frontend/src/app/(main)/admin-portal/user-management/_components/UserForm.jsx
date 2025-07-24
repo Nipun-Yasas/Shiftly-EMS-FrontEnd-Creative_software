@@ -270,9 +270,10 @@ export default function UserForm({
         <SelectInput
           name="department"
           label={loadingDepartments ? "Loading Departments..." : "Department"}
-          options={departments}
-          getOptionLabel={(option) => option.label}
+          options={departments || []}
+          getOptionLabel={(option) => option.label || option.name}
           disabled={loadingDepartments}
+          placeholder={departments.length === 0 ? "No departments available" : "Select department"}
         />
       </InputItem>
 

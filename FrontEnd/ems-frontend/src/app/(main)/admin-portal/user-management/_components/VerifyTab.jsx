@@ -97,7 +97,24 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
         }}
       >
         <Box sx={{ width: { xs: "100%", md: "670px" } }}>
-          <UserDataGrid loading={loading} rows={users} columns={columns} />
+          {users.length === 0 && !loading ? (
+            <Box 
+              sx={{ 
+                textAlign: 'center', 
+                py: 4,
+                color: 'text.secondary'
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                No users awaiting verification
+              </Typography>
+              <Typography variant="body2">
+                All registered users have been verified. New user registrations will appear here.
+              </Typography>
+            </Box>
+          ) : (
+            <UserDataGrid loading={loading} rows={users} columns={columns} />
+          )}
         </Box>
       </Box>
     </Box>

@@ -60,6 +60,25 @@ export default function ClaimsDataGrid({
       ),
     },
     {
+      field: "claimUrl",
+      headerName: "File",
+      width: 120,
+      sortable: false,
+      renderCell: (params) => 
+        params.value ? (
+          <a 
+            href={`http://localhost:8080${params.value}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', color: 'primary.main' }}
+          >
+            Download
+          </a>
+        ) : (
+          <span style={{ color: '#999' }}>No file</span>
+        ),
+    },
+    {
       field: "actions",
       headerName: "Actions",
       width: 130,

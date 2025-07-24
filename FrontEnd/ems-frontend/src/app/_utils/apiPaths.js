@@ -81,10 +81,17 @@ export const API_PATHS = {
     GET_ADMINS_BY_DEPARTMENT: (departmentName) => `/api/v1/shiftly/ems/employee/admins-by-department/${departmentName}`,
   },
   CLAIMS: {
+    // Employee endpoints
     GET_CLAIMS_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/claims/user/${userId}`,
     CREATE_CLAIM: '/api/v1/shiftly/ems/claims/add',
     UPDATE_CLAIM: (id) => `/api/v1/shiftly/ems/claims/update/${id}`,
     DELETE_CLAIM: (id) => `/api/v1/shiftly/ems/claims/delete/${id}`,
+    
+    // Admin endpoints
+    GET_ALL_CLAIMS: '/api/v1/shiftly/ems/claims/all',
+    APPROVE_CLAIM: (id) => `/api/v1/shiftly/ems/claims/approve/${id}`,
+    REJECT_CLAIM: (id) => `/api/v1/shiftly/ems/claims/reject/${id}`,
+    GET_CLAIM_BY_ID: (id) => `/api/v1/shiftly/ems/claims/${id}`,
   },
   VACANCIES: {
     GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
@@ -111,4 +118,8 @@ export const API_PATHS = {
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
   },
+  DEPARTMENTS: {
+
+  GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
+},
 };

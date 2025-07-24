@@ -40,7 +40,7 @@ export default function ClaimHistory(){
           col3: claim.claimType,
           col4: claim.description,
           claimDate: claim.claimDate ? dayjs(claim.claimDate).format("MMM DD, YYYY") : "-", // Use claimDate from backend
-          col5: claim.status,
+          col5: claim.status ? claim.status.charAt(0).toUpperCase() + claim.status.slice(1).toLowerCase() : "Pending", // Normalize status format
           claimFile: claim.claimUrl,
           raw: claim,
         }));

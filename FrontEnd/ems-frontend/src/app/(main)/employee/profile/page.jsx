@@ -21,6 +21,7 @@ import { UserContext } from "../../../context/UserContext";
 
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
+import { getProfilePicture } from "../../../_utils/profilePictureUtils";
 
 const Employee = () => {
   const theme = useTheme();
@@ -29,6 +30,9 @@ const Employee = () => {
   const [employeeData, setEmployeeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Get user's profile picture from localStorage
+  const userProfilePicture = getProfilePicture(user?.id || user?.username);
 
   useEffect(() => {
     checkEmployeeProfile();
@@ -110,7 +114,7 @@ const Employee = () => {
         >
           <Box sx={{ position: "relative" }}>
             <Avatar
-              src="/profilePic.jpg"
+              src={userProfilePicture || "/profilePic.jpg"}
               alt="Employee Profile Picture"
               sx={{
                 width: { xs: 80, sm: 93, md: 100 },

@@ -20,6 +20,7 @@ import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
 import InputItem from "../../../_components/inputs/InputItem";
 import DateInput from "../../../_components/inputs/DateInput";
+import ProfilePictureUpload from "../../../_components/inputs/ProfilePictureUpload";
 import { useDepartments } from "../../../_hooks/useDepartments";
 import { useTeams } from "../../../_hooks/useTeams";
 import { UserContext } from "../../../context/UserContext";
@@ -32,6 +33,7 @@ const genderOptions = [
   { id: "Female", name: "Female", label: "Female" },
   { id: "Other", name: "Other", label: "Other" },
 ];
+
 
 const validationSchema = Yup.object({
   firstName: Yup.string()
@@ -58,6 +60,7 @@ const validationSchema = Yup.object({
     1000,
     "Experience must be less than 1000 characters"
   ),
+  profilePicture: Yup.mixed(), // Allow profile picture to be optional
 });
 
 export default function EmployeeUpdatePage() {
@@ -174,6 +177,7 @@ export default function EmployeeUpdatePage() {
         experience: Array.isArray(employeeData.experience)
           ? employeeData.experience.join("\n")
           : employeeData.experience || "",
+        profilePicture: null, // This will be handled by ProfilePictureUpload component
       };
     }
     return {
@@ -186,6 +190,7 @@ export default function EmployeeUpdatePage() {
       skills: "",
       education: "",
       experience: "",
+      profilePicture: null,
     };
   };
 
@@ -324,6 +329,20 @@ export default function EmployeeUpdatePage() {
                 >
                   Personal Information
                 </Typography>
+
+                {/* Profile Picture Upload */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mb: 3,
+                  }}
+                >
+                  <ProfilePictureUpload
+                    name="profilePicture"
+                    label="Profile Picture"
+                  />
+                </Box>
 
                 <Box
                   sx={{

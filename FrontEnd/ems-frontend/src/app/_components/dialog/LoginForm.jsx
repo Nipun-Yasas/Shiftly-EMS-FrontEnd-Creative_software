@@ -68,6 +68,13 @@ export default function LoginForm(props) {
       }
       
     } catch (error) {
+      // Handle network errors first
+      if (error.isNetworkError || error.message === 'Network Error' || !error.response) {
+        setError("Cannot connect to server. Please check if the backend server is running at http://localhost:8080");
+        setSubmitting(false);
+        return;
+      }
+
       // Only log unexpected errors, not known issues like unverified users (403)
       const isUnverifiedUser = error.response && error.response.status === 403;
       const is500Error = error.response && error.response.status === 500;

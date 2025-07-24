@@ -23,6 +23,7 @@ import { UserContext } from '../../context/UserContext';
 import axiosInstance from '../../_utils/axiosInstance';
 import { API_PATHS } from '../../_utils/apiPaths';
 import { handleUserLogout } from '../../_utils/localStorageUtils';
+import { getProfilePicture } from '../../_utils/profilePictureUtils';
 
 
 const UserMenu = () => {
@@ -32,14 +33,22 @@ const UserMenu = () => {
     const [employees, setEmployees] = useState([]);
     const [error, setError] = useState(null);
 
+    // Get user's profile picture from localStorage
+    const userProfilePicture = getProfilePicture(user?.id || user?.username);
+
   const handleLogout = async () => {
     try {
-      // Call logout API
+      // Call logout API - but don't fail if server is down
       await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
     } catch (error) {
-      console.error("Logout error:", error);
+      // Handle network errors gracefully
+      if (error.isNetworkError || error.message === 'Network Error' || !error.response) {
+        console.warn("Server unavailable during logout - proceeding with client-side logout");
+      } else {
+        console.error("Logout error:", error);
+      }
     } finally {
-      // Clear all authentication data
+      // Always clear authentication data regardless of server response
       clearUser();
       localStorage.removeItem('user');
       localStorage.removeItem('token');
@@ -98,11 +107,11 @@ const UserMenu = () => {
       >
         <Stack direction="row" spacing={1} alignItems="center">
           <Avatar
-            src="/profilePic.jpg"
+            src={userProfilePicture || "/profilePic.jpg"}
             alt="User Avatar"
             sx={{ width: 44, height: 44, bgcolor: '#1976d2' }}
           >
-            {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+            {!userProfilePicture && user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
           </Avatar>
           <Typography
             variant="body1"
