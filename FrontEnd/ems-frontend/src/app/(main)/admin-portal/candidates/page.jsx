@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Paper,
   Typography,
@@ -21,6 +21,7 @@ import ReadTab from './_components/ReadTab';
 import AllTab from './_components/AllTab';
 import DetailsDialog from './_components/DetailsDialog';
 import ReferDialog from './_components/ReferDialog';
+import { UserContext } from "../../../context/UserContext";
 
 export default function CandidateSubmissionPage() {
   const [tabValue, setTabValue] = useState(0);
@@ -33,6 +34,7 @@ export default function CandidateSubmissionPage() {
   const [openReferDialog, setOpenReferDialog] = useState(false);
   const [referActionType, setReferActionType] = useState('approve');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     fetchCandidates();
@@ -48,7 +50,7 @@ export default function CandidateSubmissionPage() {
         lastName: item.applicantName.split(' ').slice(1).join(' ') || '',
         email: item.applicantEmail,
         position: item.vacancyName || 'N/A',
-        department: 'N/A', // Not available in backend
+        department: item.departmentName || 'N/A',
         experience: 'N/A', // Not available in backend
         education: 'N/A', // Not available in backend
         submissionDate: new Date().toISOString(), // Backend doesn't have this field
@@ -60,7 +62,8 @@ export default function CandidateSubmissionPage() {
         readBy: null,
         readAt: null,
         vacancyId: item.vacancyId,
-        userId: item.userId
+        userId: item.userId,
+        departmentName: item.departmentName
       }));
       setCandidates(transformedData);
     } catch (error) {
@@ -285,7 +288,7 @@ export default function CandidateSubmissionPage() {
         <TabPanel value={tabValue} index={2}>
           <AllTab 
             {...tabProps} 
-            candidates={getFilteredRefers("all")}
+            candidates={candidates}
             filterStatus={filterStatus}
             onFilterChange={handleFilterChange}
           />

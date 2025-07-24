@@ -26,6 +26,7 @@ export default function EmployeeTab({
             onViewTimesheets={onViewTimesheets}
             showTeamColumn={true}
             showProjectColumn={true}
+            localeText={{ noRowsLabel: "No employees found." }}
           />
         </Box>
       </Box>
