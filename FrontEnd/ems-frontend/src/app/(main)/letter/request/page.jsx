@@ -1,111 +1,65 @@
 'use client';
 
 import { useState } from 'react';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+import { useTheme } from '@mui/material';
 
-import LetterRequestModal from '../components/LetterRequestModal';
-import SearchField from '../components/SearchField';
-import theme from '@/theme';
-
-const letterTypes = [
-  'EPF/ETF Name Change Letter',
-  'Letter for Skill Assessment',
-  'Salary Undertaking Letter',
-  'Salary Confirmation Letter',
-  'Employment Confirmation Letter',
-];
+import LetterTypeSelector from '../components/LetterTypeSelector';
+import LetterRequestForm from '../components/LetterRequestForm';
+import LetterGenerationInterface from '../components/LetterGenerationInterface';
 
 const RequestLetter = () => {
-  const [searchQuery, setSearchTerm] = useState('');
-  const [selectedLetter, setSelectedLetter] = useState(null);
+  const theme = useTheme();
+  const [currentStep, setCurrentStep] = useState('selection'); // 'selection', 'form', 'generation'
+  const [selectedLetterType, setSelectedLetterType] = useState(null);
+  const [formData, setFormData] = useState(null);
 
-  const filteredLetters = letterTypes.filter((letter) =>
-    letter.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleLetterTypeSelect = (letterType) => {
+    setSelectedLetterType(letterType);
+    setCurrentStep('form');
+  };
+
+  const handleFormSubmit = (data) => {
+    setFormData(data.formData);
+    setCurrentStep('generation');
+  };
+
+  const handleBackToSelection = () => {
+    setCurrentStep('selection');
+    setSelectedLetterType(null);
+    setFormData(null);
+  };
+
+  const handleBackToForm = () => {
+    setCurrentStep('form');
+    setFormData(null);
+  };
+
+  const handleStartOver = () => {
+    setCurrentStep('selection');
+    setSelectedLetterType(null);
+    setFormData(null);
+  };
 
   return (
     <>
-      <Paper
-        elevation={3}
-        square={false}
-        sx={{
-          justifyItems: "center",
-          alignContent: "center",
-          height: "100%",
-          width: "100%"
-        }}
-      >
-        <Box sx={{ width: "100%", px: 5 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 3 }}>
-              <Typography
-                variant="h7"
-                sx={{ fontFamily: 'var(--font-poppins)', color: theme.palette.text }}
-              >
-                Available Letter Types
-              </Typography>
-            
-            <SearchField
-              value={searchQuery}
-              onChange={setSearchTerm}
-              onSearch={handleSearch}
-            />
-          </Box>
+      {currentStep === 'selection' && (
+        <LetterTypeSelector onSelectLetterType={handleLetterTypeSelect} />
+      )}
 
-          <Box>
-            
+      {currentStep === 'form' && (
+        <LetterRequestForm
+          letterType={selectedLetterType}
+          onBack={handleBackToSelection}
+          onGenerate={handleFormSubmit}
+        />
+      )}
 
-            <Stack spacing={2}>
-              {filteredLetters.length > 0 ? (
-                filteredLetters.map((letter) => (
-                  <Box
-                    key={letter}
-                    sx={{
-                      backgroundColor: '#0000000F',
-                      borderRadius: 2,
-                      px: 3,
-                      py: 2,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Typography sx={{
-                      color:theme.palette.text,
-                    }}>{letter}</Typography>
-                    <Button
-                      onClick={() => setSelectedLetter(letter)}
-                      sx={{
-                        backgroundColor: theme.palette.primary.main,
-                        color: 'white',
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        '&:hover': {
-                          backgroundColor: theme.palette.secondary.main,
-                          color:theme.palette.text,
-                        },
-                      }}
-                    >
-                      Request
-                    </Button>
-                  </Box>
-                ))
-              ) : (
-                <Typography>No matching letters found.</Typography>
-              )}
-            </Stack>
-          </Box>
-        </Box>
-      </Paper>
-
-      {selectedLetter && (
-        <LetterRequestModal
-          letterType={selectedLetter}
-          open={Boolean(selectedLetter)}
-          onClose={() => setSelectedLetter(null)}
+      {currentStep === 'generation' && (
+        <LetterGenerationInterface
+          letterType={selectedLetterType}
+          formData={formData}
+          onBack={handleBackToForm}
+          onStartOver={handleStartOver}
         />
       )}
     </>
