@@ -14,22 +14,16 @@ export const useDepartments = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Fetching departments from:", API_PATHS.DEPARTMENTS.GET_ALL_DEPARTMENTS);
       const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_ALL_DEPARTMENTS);
-      
-      console.log("Raw departments response:", response.data);
-      
+
       // Transform department data to match the expected format
       const departmentData = response.data.map(dept => ({
         id: dept.departmentId,  // Map departmentId to id
         name: dept.name,
         label: dept.name // Use name as label
       }));
-      
-      console.log("Transformed departments:", departmentData);
       setDepartments(departmentData);
     } catch (error) {
-      console.error("Error fetching departments:", error);
       setError(error);
       setDepartments([]);
     } finally {

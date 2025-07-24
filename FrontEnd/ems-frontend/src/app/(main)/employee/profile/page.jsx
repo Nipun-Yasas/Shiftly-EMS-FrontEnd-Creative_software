@@ -46,12 +46,11 @@ const Employee = () => {
         setHasEmployeeProfile(true);
       }
     } catch (error) {
-      console.error("Error fetching employee profile:", error);
       if (error.response && error.response.status === 404) {
-        // Employee profile doesn't exist
         setHasEmployeeProfile(false);
         setError("Employee profile not found. Please create your profile.");
       } else {
+        // Log only unexpected errors
         setError("Error loading employee profile. Please try again.");
       }
     } finally {

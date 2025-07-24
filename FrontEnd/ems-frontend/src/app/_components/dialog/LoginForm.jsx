@@ -15,6 +15,8 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 import TextInput from "../inputs/TextInput";
 import PasswordInput from "../inputs/PasswordInput";
@@ -26,6 +28,7 @@ import { API_PATHS } from "../../_utils/apiPaths";
 export default function LoginForm(props) {
   const { openLogin, setOpenLogin, openSignUp } = props;
   const [error, setError] = useState(null);
+  const [showUnverifiedSnackbar, setShowUnverifiedSnackbar] = useState(false);
 
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +37,6 @@ export default function LoginForm(props) {
   const initialValues = {
     username: "",
     password: "",
-    remember: false,
   };
 
   const validationSchema = Yup.object({
@@ -79,7 +81,31 @@ export default function LoginForm(props) {
       }
       
     } catch (error) {
-      console.error('Login error:', error);
+      // Only log unexpected errors, not known issues like unverified users (403)
+      const isUnverifiedUser = error.response && error.response.status === 403;
+      const is500Error = error.response && error.response.status === 500;
+      
+      if (!isUnverifiedUser && !is500Error) {
+        console.error('Login error:', error);
+        console.log('Error response:', error.response?.data);
+      }
+      
+      // Handle different error scenarios
+      if (error.response && error.response.status === 403) {
+        // For 403 errors, it's an unverified user (don't log as this is expected)
+        setShowUnverifiedSnackbar(true);
+        setOpenLogin(false);
+      } else if (error.response && error.response.status === 500) {
+        // Keep 500 handling for backward compatibility
+        setShowUnverifiedSnackbar(true);
+        setOpenLogin(false);
+      } else if (error.response && error.response.status === 401) {
+        setError("Invalid username or password.");
+      } else if (error.response && error.response.status === 400) {
+        setError("Invalid request. Please check your credentials.");
+      } else {
+        setError("Login failed. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -91,18 +117,19 @@ export default function LoginForm(props) {
   };
 
   return (
-    <Dialog
-      open={openLogin}
-      onClose={(event, reason) => {
-        // Only close if not submitting and not caused by escape key when disabled
-        if (reason !== 'escapeKeyDown') {
-          setError(null);
-          setOpenLogin(false);
-        }
-      }}
-      fullWidth
-      maxWidth="xs"
-    >
+    <>
+      <Dialog
+        open={openLogin}
+        onClose={(event, reason) => {
+          // Only close if not submitting and not caused by escape key when disabled
+          if (reason !== 'escapeKeyDown') {
+            setError(null);
+            setOpenLogin(false);
+          }
+        }}
+        fullWidth
+        maxWidth="xs"
+      >
       <DialogContent>
         <IconButton
           onClick={handleClose}
@@ -217,5 +244,22 @@ export default function LoginForm(props) {
         </Formik>
       </DialogContent>
     </Dialog>
+
+    {/* Unverified User Snackbar */}
+    <Snackbar
+      open={showUnverifiedSnackbar}
+      autoHideDuration={6000}
+      onClose={() => setShowUnverifiedSnackbar(false)}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+    >
+      <Alert 
+        onClose={() => setShowUnverifiedSnackbar(false)} 
+        severity="warning"
+        sx={{ width: '100%' }}
+      >
+        Your account is not verified yet. Please wait for admin verification before logging in.
+      </Alert>
+    </Snackbar>
+    </>
   );
 }

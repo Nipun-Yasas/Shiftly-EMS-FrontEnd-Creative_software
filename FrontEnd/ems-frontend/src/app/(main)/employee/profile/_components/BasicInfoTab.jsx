@@ -105,6 +105,28 @@ const BasicInfoTab = ({ employeeData }) => {
                 label="Location"
                 value={employeeData?.location || ""}
               />
+              
+              <ReadonlyTextInput
+                label="Team"
+                value={employeeData?.teamName || ""}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 0, sm: 2 },
+              }}
+            >
+              <ReadonlyTextInput
+                label="Reporting Person"
+                value={user?.reportingPerson || ""}
+              />
+              <ReadonlyTextInput
+                label="Reporting Person Email"
+                value={user?.reportingPersonEmail || ""}
+              />
             </Box>
           </Stack>
         </Box>

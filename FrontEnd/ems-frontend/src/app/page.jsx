@@ -10,8 +10,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
-import LoginForm from "./_components/dialog/Login";
-import SignUpForm from "./_components/dialog/SignUp";
+import LoginForm from "./_components/dialog/LoginForm";
+import SignUpForm from "./_components/dialog/SignUpForm";
 import LandingCard from "./_components/landing/LandingCard";
 import CollagePhoto from "./_components/landing/CollagePhoto";
 import companyLogo from "../../public/creative_software_logo.png";

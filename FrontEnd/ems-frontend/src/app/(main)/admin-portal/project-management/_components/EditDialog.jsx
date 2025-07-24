@@ -19,6 +19,7 @@ export default function EditDialog({
   teams = [],
   loadingDepartments = false,
   loadingTeams = false,
+  onDepartmentChange,
   getEditInitialValues,
 }) {
   return (
@@ -43,8 +44,10 @@ export default function EditDialog({
           validationSchema={projectValidationSchema}
           onSubmit={onSubmit}
           enableReinitialize
+          validateOnChange={false}
+          validateOnBlur={true}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Box sx={{ mt: 1 }}>
                 <ProjectForm
@@ -55,6 +58,9 @@ export default function EditDialog({
                   teams={teams}
                   loadingDepartments={loadingDepartments}
                   loadingTeams={loadingTeams}
+                  onDepartmentChange={onDepartmentChange}
+                  values={values}
+                  setFieldValue={setFieldValue}
                 />
               </Box>
             </Form>
