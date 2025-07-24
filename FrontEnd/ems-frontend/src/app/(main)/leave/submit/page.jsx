@@ -35,29 +35,52 @@ export default function RequestLeave() {
     // add more as needed
   };
 
-  // Fetch leave history and calculate remaining leaves
+  const TOTAL_ANNUAL_LEAVES = 10;
+  const TOTAL_CASUAL_LEAVES = 5;
+  const TOTAL_VACATION_LEAVES = 7;
+
   const fetchAndCalculate = async () => {
     try {
       const res = await axiosInstance.get(API_PATHS.LEAVES.GET_MY_LEAVES);
       const history = res.data || [];
-      // Count used leaves by type (using mapped display name)
-      const used = {};
+
+      // Annual Leave: sum all durations
+      let usedAnnual = 0;
+      // Casual Leave: sum only casual
+      let usedCasual = 0;
+      // Vacation Leave: sum only vacation
+      let usedVacation = 0;
+
       history.forEach(l => {
-        // Map backend type to display name
-        const rawType = l.leaveType?.toLowerCase();
-        const type = LEAVE_TYPE_MAP[rawType] || l.leaveType;
         const duration = Number(l.duration) || 1;
-        used[type] = (used[type] || 0) + duration;
+        usedAnnual += duration;
+        if (l.leaveType?.toLowerCase() === "casual") usedCasual += duration;
+        if (l.leaveType?.toLowerCase() === "vacation") usedVacation += duration;
       });
-      // Calculate remaining
-      const calculated = TOTAL_LEAVES.map(t => ({
-        type: t.type,
-        count: Math.max(0, t.total - (used[t.type] || 0)),
-        hexColor: t.hexColor
-      }));
-      setLeaves(calculated);
+
+      setLeaves([
+        {
+          type: "Annual Leave",
+          count: Math.max(0, TOTAL_ANNUAL_LEAVES - usedAnnual),
+          hexColor: "#D81B60"
+        },
+        {
+          type: "Casual Leave",
+          count: Math.max(0, TOTAL_CASUAL_LEAVES - usedCasual),
+          hexColor: "#2563EB"
+        },
+        {
+          type: "Vacation Leave",
+          count: Math.max(0, TOTAL_VACATION_LEAVES - usedVacation),
+          hexColor: "#00BFAE"
+        }
+      ]);
     } catch (e) {
-      setLeaves(TOTAL_LEAVES.map(t => ({ type: t.type, count: t.total, hexColor: t.hexColor })));
+      setLeaves([
+        { type: "Annual Leave", count: TOTAL_ANNUAL_LEAVES, hexColor: "#D81B60" },
+        { type: "Casual Leave", count: TOTAL_CASUAL_LEAVES, hexColor: "#2563EB" },
+        { type: "Vacation Leave", count: TOTAL_VACATION_LEAVES, hexColor: "#00BFAE" }
+      ]);
     }
   };
 

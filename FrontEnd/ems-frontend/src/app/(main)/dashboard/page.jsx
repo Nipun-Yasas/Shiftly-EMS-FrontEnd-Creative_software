@@ -23,7 +23,8 @@ import ProgressCard from './_components/ProgressCard';
 import ToDoCard from './_components/ToDoCard';
 import EventsCard from './_components/EventsCard';
 import PerformanceAnalyticsCard from './_components/PerformanceAnalyticsCard';
-import UserDataStatus from '../../_components/UserDataStatus';
+import UserDataStatus from './_components/UserDataStatus';
+import ShowUserDataStatusButton from './_components/ShowUserStatusButton';
 import { getGreeting } from './_components/dashboardUtils';
 import { useRouter } from 'next/navigation';
 import { saveUserData, getUserData, migrateUserData, cleanupOldBackups, initializeUserSession } from '../../_utils/localStorageUtils';
@@ -450,6 +451,10 @@ useEffect(() => {
 
   return (
     <Box sx={{ p: 3,  minHeight: '100vh', width: '100%', position: 'relative' }}>
+      {/* Move the ShowUserDataStatusButton to the bottom right */}
+      <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1200 }}>
+        <ShowUserDataStatusButton />
+      </Box>
       <GreetingHeader greeting={greeting} name={userName} />
       
       {/* Performance and ToDo Cards - Side by Side at Top */}
@@ -541,7 +546,7 @@ useEffect(() => {
       />
       
       {/* User Data Status Component */}
-      <UserDataStatus />
+      {/* <UserDataStatus /> */}
     </Box>
   );
 };
