@@ -31,7 +31,6 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   '&.Approved': {
     color: '#ffffff',
     backgroundColor: '#2e7d32', // Green background like in the image
-    border: '1px solid #2e7d32',
   },
   '&.Rejected': {
     color: '#ffffff',
@@ -63,7 +62,6 @@ const Status = React.memo((props) => {
       icon={icon}
       size="small"
       label={label}
-      variant="outlined"
     />
   );
 });

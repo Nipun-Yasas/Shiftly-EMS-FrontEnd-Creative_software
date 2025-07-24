@@ -335,16 +335,6 @@ export default function ClaimsManagementPage() {
   return (
     <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
-        {/* Debug: Show current user info */}
-        {user && (
-          <Box sx={{ mb: 2, p: 1, bgcolor: 'info.light', borderRadius: 1 }}>
-            <Typography variant="body2" color="info.contrastText">
-              Viewing as: {user.role} | Department: {user.department || 'N/A'} | 
-              Showing: {user.role === 'SUPER_ADMIN' ? 'All departments' : `${user.department} department only`}
-            </Typography>
-          </Box>
-        )}
-        
         {/* Show loading if user context is not ready */}
         {!user ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
