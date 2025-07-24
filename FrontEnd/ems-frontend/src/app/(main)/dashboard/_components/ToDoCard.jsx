@@ -52,13 +52,13 @@ export default function ToDoCard({
       borderRadius: 3,
       height: '100%',
       width: '100%',
-      background: theme => theme.palette.background.paper,
+      background: theme => theme.palette.background,
     }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6" sx={{ fontFamily: 'var(--font-poppins)', fontWeight: 600, color: 'text.primary' }}>
           My To Do Items
         </Typography>
-        <IconButton size="small" sx={{ color: theme => theme.palette.primary.main }} onClick={() => setAddDialogOpen(true)} aria-label="Add new to-do item">
+        <IconButton size="small" sx={{ color: theme => theme.palette.primary }} onClick={() => setAddDialogOpen(true)} aria-label="Add new to-do item">
           <Add />
         </IconButton>
       </Box>

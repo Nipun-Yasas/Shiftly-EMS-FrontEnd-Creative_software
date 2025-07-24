@@ -39,9 +39,9 @@ import {
   clearAllUserData,
   getDataTimestamp,
   isDataFresh
-} from '../_utils/localStorageUtils';
+} from '../../../_utils/localStorageUtils';
 
-const UserDataStatus = () => {
+const UserDataStatus = ({ visible = true, onClose }) => {
   const [expanded, setExpanded] = useState(false);
   const [userData, setUserData] = useState({});
   const [userKeys, setUserKeys] = useState([]);
@@ -118,6 +118,8 @@ const UserDataStatus = () => {
     }
   };
 
+  if (!visible) return null;
+
   return (
     <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000, maxWidth: 400 }}>
       <Paper 
@@ -145,6 +147,11 @@ const UserDataStatus = () => {
             <IconButton size="small" onClick={() => setExpanded(!expanded)} sx={{ color: 'text.secondary' }}>
               {expanded ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
+            {onClose && (
+              <Button size="small" onClick={onClose} sx={{ ml: 1 }}>
+                Close
+              </Button>
+            )}
           </Box>
         </Box>
 
