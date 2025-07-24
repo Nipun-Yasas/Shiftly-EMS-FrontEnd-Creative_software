@@ -179,9 +179,44 @@ export default function DetailsDialog({
                               <AttachFile />
                             </Avatar>
                           </ListItemAvatar>
-                          <ListItemText primary={file} />
+                          <ListItemText 
+                            primary={
+                              file.startsWith('/') || file.startsWith('http') ? (
+                                <a 
+                                  href={file.startsWith('/') ? `http://localhost:8080${file}` : file} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  style={{ textDecoration: 'none', color: 'inherit' }}
+                                >
+                                  {file.split('/').pop() || 'Download File'}
+                                </a>
+                              ) : file
+                            } 
+                          />
                         </ListItem>
                       ))}
+                    </List>
+                  ) : selectedClaim.claimUrl ? (
+                    <List dense>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <AttachFile />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText 
+                          primary={
+                            <a 
+                              href={`http://localhost:8080${selectedClaim.claimUrl}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              style={{ textDecoration: 'none', color: 'inherit' }}
+                            >
+                              Download Claim File
+                            </a>
+                          } 
+                        />
+                      </ListItem>
                     </List>
                   ) : (
                     <Typography variant="body2" color="text.secondary">

@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 import Select from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DoneIcon from '@mui/icons-material/Done';
@@ -24,16 +24,19 @@ const StyledChip = styled(Chip)(({ theme }) => ({
     color: 'inherit',
   },
   '&.Pending': {
-    color: (theme.vars || theme).palette.info.dark,
-    border: `1px solid ${(theme.vars || theme).palette.info.main}`,
+    color: '#ffffff',
+    backgroundColor: '#ed6c02', // Orange background like in the image
+    border: '1px solid #ed6c02',
   },
   '&.Approved': {
-    color: (theme.vars || theme).palette.success.dark,
-    border: `1px solid ${(theme.vars || theme).palette.success.main}`,
+    color: '#ffffff',
+    backgroundColor: '#2e7d32', // Green background like in the image
+    border: '1px solid #2e7d32',
   },
   '&.Rejected': {
-    color: (theme.vars || theme).palette.error.dark,
-    border: `1px solid ${(theme.vars || theme).palette.error.main}`,
+    color: '#ffffff',
+    backgroundColor: '#d32f2f', // Red background like in the image
+    border: '1px solid #d32f2f',
   },
 }));
 
@@ -42,7 +45,7 @@ const Status = React.memo((props) => {
 
   let icon = null;
   if (status === 'Rejected') {
-    icon = <ReportProblemIcon className="icon" />;
+    icon = <CloseIcon className="icon" />;
   } else if (status === 'Pending') {
     icon = <AutorenewIcon className="icon" />;
   } else if (status === 'Approved') {
@@ -64,6 +67,8 @@ const Status = React.memo((props) => {
     />
   );
 });
+
+Status.displayName = 'Status';
 
 function EditStatus(props) {
   const { id, value, field } = props;
@@ -110,10 +115,10 @@ function EditStatus(props) {
       {STATUS_OPTIONS.map((option) => {
         let IconComponent = null;
         if (option === 'Rejected') {
-          IconComponent = ReportProblemIcon;
-        } else if (option === 'Open') {
-          IconComponent = InfoIcon;
-        } else if (option === 'Filled') {
+          IconComponent = CloseIcon;
+        } else if (option === 'Pending') {
+          IconComponent = AutorenewIcon;
+        } else if (option === 'Approved') {
           IconComponent = DoneIcon;
         }
 

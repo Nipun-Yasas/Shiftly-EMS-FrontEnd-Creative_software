@@ -100,12 +100,47 @@ export default function ClaimsManagementPage() {
   const fetchClaims = async () => {
     try {
       setLoading(true);
-      // For demo purposes, use sample data
-      // const response = await axiosInstance.get(API_PATHS.CLAIMS);
-      // setClaims(response.data.data || []);
+      console.log("Fetching claims from backend...");
+      
+      const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_ALL_CLAIMS);
+      console.log("Backend claims response:", response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        // Map backend data to frontend format
+        const mappedClaims = response.data.map(claim => ({
+          id: claim.id,
+          employee_name: `Employee ${claim.userId}`, // Will need to fetch employee details later
+          employeeEmail: `employee${claim.userId}@company.com`, // Placeholder
+          department: "Unknown", // Not in backend DTO, will need to fetch
+          type: claim.claimType,
+          description: claim.description,
+          amount: Math.floor(Math.random() * 1000) + 100, // Placeholder amount until backend includes it
+          claimDate: claim.claimDate,
+          submission_date: claim.createdAt || new Date().toISOString(),
+          status: claim.status.toLowerCase(),
+          attachments: claim.claimUrl ? [claim.claimUrl] : [],
+          approvedBy: claim.status === 'APPROVED' ? 'Admin' : null,
+          approvedAt: claim.status === 'APPROVED' ? new Date().toISOString() : null,
+          rejectionReason: claim.status === 'REJECTED' ? 'Claim rejected by admin' : null,
+          // Backend specific fields
+          userId: claim.userId,
+          claimUrl: claim.claimUrl,
+        }));
+        
+        console.log("Mapped claims:", mappedClaims);
+        setClaims(mappedClaims);
+      } else {
+        console.warn("Invalid response format or no data");
+        setClaims([]);
+      }
+    } catch (error) {
+      console.error("Error fetching claims:", error);
+      console.error("Error details:", error.response?.data);
+      
+      showSnackbar("Failed to fetch claims from server", "error");
+      
+      // Fallback to sample data for demo
       setClaims(sampleClaims);
-    } catch (err) {
-      console.error("Error fetching claims:", err);
     } finally {
       setLoading(false);
     }
@@ -116,28 +151,28 @@ export default function ClaimsManagementPage() {
     if (!selectedClaim || !approvalAction) return;
 
     try {
-      // Replace with actual API call
-      // await axiosInstance.put(`/api/claims/${selectedClaim.id}/${approvalAction}`, {
-      //   reason: approvalReason
-      // });
+      console.log(`${approvalAction}ing claim:`, selectedClaim.id);
+      
+      // Call appropriate API endpoint based on action
+      let response;
+      if (approvalAction === "approve") {
+        response = await axiosInstance.put(API_PATHS.CLAIMS.APPROVE_CLAIM(selectedClaim.id));
+      } else {
+        response = await axiosInstance.put(API_PATHS.CLAIMS.REJECT_CLAIM(selectedClaim.id));
+      }
+      
+      console.log("Approval response:", response.data);
 
-      const updatedStatus =
-        approvalAction === "approve" ? "approved" : "rejected";
-
+      // Update local state with the response from backend
       setClaims((prev) =>
         prev.map((claim) =>
           claim.id === selectedClaim.id
             ? {
                 ...claim,
-                status: updatedStatus,
-                approvedBy:
-                  approvalAction === "approve" ? "Current Admin" : null,
-                approvedAt:
-                  approvalAction === "approve"
-                    ? new Date().toISOString()
-                    : null,
-                rejectionReason:
-                  approvalAction === "reject" ? approvalReason : null,
+                status: response.data.status.toLowerCase(),
+                approvedBy: response.data.status === 'APPROVED' ? "Current Admin" : null,
+                approvedAt: response.data.status === 'APPROVED' ? new Date().toISOString() : null,
+                rejectionReason: response.data.status === 'REJECTED' ? approvalReason || "Claim rejected by admin" : null,
               }
             : claim
         )
@@ -149,9 +184,24 @@ export default function ClaimsManagementPage() {
       );
       setApprovalDialogOpen(false);
       setOpenDetailDialog(false);
+      
+      // Refresh claims to get latest data
+      fetchClaims();
+      
     } catch (error) {
       console.error(`Error ${approvalAction}ing claim:`, error);
-      showSnackbar(`Error ${approvalAction}ing claim`, "error");
+      console.error("Error response:", error.response?.data);
+      
+      let errorMessage = `Error ${approvalAction}ing claim`;
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 404) {
+        errorMessage = "Claim not found. It may have been deleted.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error while processing the request.";
+      }
+      
+      showSnackbar(errorMessage, "error");
     }
   };
 

@@ -33,6 +33,7 @@ import MeetingsHistoryCard from './_components/MeetingsHistoryCard';
 import axios from 'axios';
 import axiosInstance from '../../_utils/axiosInstance';
 import { UserContext } from '../../context/UserContext';
+import { API_PATHS } from '../../_utils/apiPaths';
 
 // Note: Ensure --font-poppins and --font-lexend are defined in global CSS
 
@@ -125,14 +126,6 @@ const initialGoals = [
   },
 ];
 
-const demoEvents = [
-  { id: 1, title: "PUBG Tournament By Red Bull", date: "Jul 26 - Jul 27, 2025", participants: 128, joined: true, imageUrl: "/images/project1.jpg", category: "Gaming" },
-  { id: 2, title: "Apex Legends Tournament By Xbox", date: "Jul 27 - Jul 29, 2025", participants: 64, joined: false, imageUrl: "/images/project2.jpg", category: "Gaming" },
-  { id: 3, title: "Rocket League Finals", date: "Aug 01 - Aug 02, 2025", participants: 102, joined: true, imageUrl: "/images/project3.jpg", category: "Sports" },
-  { id: 4, title: "Call of Duty: Warzone", date: "Aug 03 - Aug 05, 2025", participants: 256, joined: false, imageUrl: "/images/project4.jpg", category: "Gaming" },
-];
-
-
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -156,7 +149,8 @@ const Dashboard = () => {
   const [cardRight, setCardRight] = useState(null); // Initialize as null
   const [currentTime, setCurrentTime] = useState(null); // null for SSR, set after mount
   const [goalStreak, setGoalStreak] = useState(0);
-  const [demoEventsState, setDemoEventsState] = useState(demoEvents);
+  const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [scheduleMeetingOpen, setScheduleMeetingOpen] = useState(false);
   const [userName, setUserName] = useState('');
@@ -169,6 +163,7 @@ useEffect(() => {
     if (user && user.id) {
       loadToDoData(user.id);
       loadGoalsData(user.id);
+      fetchApprovedEvents(); // Fetch approved events
     }
     cleanupOldBackups();
   } catch (error) {
@@ -192,6 +187,36 @@ useEffect(() => {
       .catch(() => setUserName(''));
   }
 }, [user]);
+
+  // Fetch approved events from API
+  const fetchApprovedEvents = async () => {
+    setEventsLoading(true);
+    try {
+      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_ALL_EVENTS);
+      if (response.data && Array.isArray(response.data)) {
+        // Filter only approved events and transform to match EventsCard expected format
+        const approvedEvents = response.data
+          .filter(event => event.status === 'APPROVED')
+          .map(event => ({
+            id: event.id,
+            title: event.title,
+            date: `${dayjs(event.enableDate).format('MMM DD')} - ${dayjs(event.expireDate).format('MMM DD, YYYY')}`,
+            participants: Math.floor(Math.random() * 200) + 50, // Placeholder - adjust if participants data is available
+            joined: false, // Placeholder - adjust if join status is available
+            imageUrl: event.imageUrl ? `http://localhost:8080${event.imageUrl}` : "/images/project1.jpg",
+            category: event.eventType || "Event"
+          }));
+        setEvents(approvedEvents);
+      } else {
+        setEvents([]);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setEvents([]);
+    } finally {
+      setEventsLoading(false);
+    }
+  };
 
   // Function to load ToDo data with proper error handling
   const loadToDoData = (currentUserId) => {
@@ -370,7 +395,7 @@ useEffect(() => {
   };
 
   const handleToggleEvent = (eventId) => {
-    setDemoEventsState(prev => prev.map(event => event.id === eventId ? { ...event, joined: !event.joined } : event));
+    setEvents(prev => prev.map(event => event.id === eventId ? { ...event, joined: !event.joined } : event));
   };
 
   // Calculate progress based on goals
@@ -500,8 +525,9 @@ useEffect(() => {
       <Grid container spacing={3} sx={{ width: '100%', px: { xs: 1, sm: 2, md: 3 }, mb: 3 }}>
         <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 9' } }}>
           <EventsCard 
-            events={demoEventsState} 
+            events={events} 
             onViewAll={() => router.push('/events')}
+            loading={eventsLoading}
           />
         </Grid>
         <Grid sx={{ gridColumn: { xs: 'span 12', lg: 'span 3' } }}>
