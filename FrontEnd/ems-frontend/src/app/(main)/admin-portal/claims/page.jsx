@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -8,9 +8,13 @@ import Tabs from "@mui/material/Tabs";
 import Badge from "@mui/material/Badge";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { UserContext } from "../../../context/UserContext";
+import useUserAuth from "../../../_hooks/useUserAuth";
 
 import PendingTab from "./_components/PendingTab";
 import ApprovedTab from "./_components/ApprovedTab";
@@ -21,6 +25,9 @@ import ClaimDialog from "./_components/ClaimDialog";
 import TabPanel from "../../../_components/main/TabPanel";
 
 export default function ClaimsManagementPage() {
+  const { user } = useContext(UserContext);
+  useUserAuth(); // Ensure user authentication
+  
   const [tabValue, setTabValue] = useState(0);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,13 +101,34 @@ export default function ClaimsManagementPage() {
 
   // Fetch claims data
   useEffect(() => {
-    fetchClaims();
-  }, []);
+    // Check if user has admin privileges (SUPER_ADMIN or ADMIN role)
+    if (user && user.roles) {
+      const isSuperAdmin = Array.isArray(user.roles) 
+        ? user.roles.includes('SUPER_ADMIN')
+        : user.roles === 'SUPER_ADMIN' || user.role === 'SUPER_ADMIN';
+      
+      const isAdmin = Array.isArray(user.roles)
+        ? user.roles.includes('ADMIN')
+        : user.roles === 'ADMIN' || user.role === 'ADMIN';
+      
+      if (isSuperAdmin || isAdmin) {
+        console.log("User has admin privileges, fetching claims for:", user.roles);
+        fetchClaims();
+      } else {
+        console.warn("User does not have admin privileges:", user.roles);
+        setClaims([]);
+        setLoading(false);
+      }
+    } else {
+      console.log("Waiting for user context...");
+    }
+  }, [user]); // Depend on user to refetch when user context changes
 
   const fetchClaims = async () => {
     try {
       setLoading(true);
       console.log("Fetching claims from backend...");
+      console.log("Current user:", user);
       
       const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_ALL_CLAIMS);
       console.log("Backend claims response:", response.data);
@@ -109,15 +137,15 @@ export default function ClaimsManagementPage() {
         // Map backend data to frontend format
         const mappedClaims = response.data.map(claim => ({
           id: claim.id,
-          employee_name: `Employee ${claim.userId}`, // Will need to fetch employee details later
-          employeeEmail: `employee${claim.userId}@company.com`, // Placeholder
-          department: "Unknown", // Not in backend DTO, will need to fetch
+          employee_name: claim.employeeName || claim.username || `Employee ${claim.userId}`,
+          employeeEmail: claim.employeeEmail || `employee${claim.userId}@company.com`,
+          department: claim.department || "Unknown",
           type: claim.claimType,
           description: claim.description,
           amount: Math.floor(Math.random() * 1000) + 100, // Placeholder amount until backend includes it
           claimDate: claim.claimDate,
           submission_date: claim.createdAt || new Date().toISOString(),
-          status: claim.status.toLowerCase(),
+          status: claim.status ? claim.status.toLowerCase() : 'pending',
           attachments: claim.claimUrl ? [claim.claimUrl] : [],
           approvedBy: claim.status === 'APPROVED' ? 'Admin' : null,
           approvedAt: claim.status === 'APPROVED' ? new Date().toISOString() : null,
@@ -126,21 +154,78 @@ export default function ClaimsManagementPage() {
           userId: claim.userId,
           claimUrl: claim.claimUrl,
         }));
+
+        // Apply role-based filtering on frontend (since backend might not have it yet)
+        let filteredClaims = mappedClaims;
         
-        console.log("Mapped claims:", mappedClaims);
-        setClaims(mappedClaims);
+        if (user && user.roles) {
+          console.log("Applying role-based filtering for:", user.roles, "Department:", user.department);
+          
+          // Check if user has SUPER_ADMIN role
+          const isSuperAdmin = Array.isArray(user.roles) 
+            ? user.roles.includes('SUPER_ADMIN')
+            : user.roles === 'SUPER_ADMIN' || user.role === 'SUPER_ADMIN';
+          
+          // Check if user has ADMIN role
+          const isAdmin = Array.isArray(user.roles)
+            ? user.roles.includes('ADMIN')
+            : user.roles === 'ADMIN' || user.role === 'ADMIN';
+          
+          if (isSuperAdmin) {
+            // Super admin can see all claims from all departments
+            filteredClaims = mappedClaims;
+            console.log("Super admin - showing all claims:", filteredClaims.length);
+          } else if (isAdmin && user.department) {
+            // Regular admin can only see claims from same department
+            filteredClaims = mappedClaims.filter(claim => {
+              const match = claim.department === user.department;
+              console.log(`Claim ${claim.id} department: ${claim.department}, User department: ${user.department}, Match: ${match}`);
+              return match;
+            });
+            console.log(`Admin filter applied - showing ${filteredClaims.length} of ${mappedClaims.length} claims`);
+          } else {
+            // User has no admin privileges or no department - show no claims
+            console.log("User has no admin privileges - showing no claims");
+            filteredClaims = [];
+          }
+        } else {
+          console.log("No user roles found - showing all claims");
+        }
+        
+        console.log("Final filtered claims:", filteredClaims);
+        setClaims(filteredClaims);
       } else {
         console.warn("Invalid response format or no data");
         setClaims([]);
       }
     } catch (error) {
       console.error("Error fetching claims:", error);
-      console.error("Error details:", error.response?.data);
+      console.error("Error response:", error.response);
+      console.error("Error message:", error.message);
       
-      showSnackbar("Failed to fetch claims from server", "error");
+      // More detailed error logging
+      if (error.response) {
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", error.response.data);
+        console.error("Response headers:", error.response.headers);
+      }
       
-      // Fallback to sample data for demo
-      setClaims(sampleClaims);
+      showSnackbar(`Failed to fetch claims: ${error.message}`, "error");
+      
+      // Fallback to sample data for demo (also apply filtering)
+      let filteredSampleClaims = sampleClaims;
+      if (user && user.role) {
+        if (user.role === 'SUPER_ADMIN') {
+          filteredSampleClaims = sampleClaims;
+        } else if (user.role === 'ADMIN') {
+          filteredSampleClaims = sampleClaims.filter(claim => 
+            claim.department === user.department
+          );
+        } else {
+          filteredSampleClaims = [];
+        }
+      }
+      setClaims(filteredSampleClaims);
     } finally {
       setLoading(false);
     }
@@ -250,33 +335,52 @@ export default function ClaimsManagementPage() {
   return (
     <Paper elevation={2} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
-        <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab
-            label={
-              <Badge badgeContent={pendingCount} color="warning">
-                Pending
-              </Badge>
-            }
-          />
-          <Tab label="Approved" />
-          <Tab label="Rejected" />
-          <Tab label="All Claims" />
-        </Tabs>
+        {/* Debug: Show current user info */}
+        {user && (
+          <Box sx={{ mb: 2, p: 1, bgcolor: 'info.light', borderRadius: 1 }}>
+            <Typography variant="body2" color="info.contrastText">
+              Viewing as: {user.role} | Department: {user.department || 'N/A'} | 
+              Showing: {user.role === 'SUPER_ADMIN' ? 'All departments' : `${user.department} department only`}
+            </Typography>
+          </Box>
+        )}
+        
+        {/* Show loading if user context is not ready */}
+        {!user ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <Tabs value={tabValue} onChange={handleTabChange}>
+              <Tab
+                label={
+                  <Badge badgeContent={pendingCount} color="warning">
+                    Pending
+                  </Badge>
+                }
+              />
+              <Tab label="Approved" />
+              <Tab label="Rejected" />
+              <Tab label="All Claims" />
+            </Tabs>
 
-        <TabPanel value={tabValue} index={0}>
-          <PendingTab {...tabProps} claims={getFilteredClaims("pending")} />
-        </TabPanel>
+            <TabPanel value={tabValue} index={0}>
+              <PendingTab {...tabProps} claims={getFilteredClaims("pending")} />
+            </TabPanel>
 
-        <TabPanel value={tabValue} index={1}>
-          <ApprovedTab {...tabProps} claims={getFilteredClaims("approved")} />
-        </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <ApprovedTab {...tabProps} claims={getFilteredClaims("approved")} />
+            </TabPanel>
 
-        <TabPanel value={tabValue} index={2}>
-          <RejectedTab {...tabProps} claims={getFilteredClaims("rejected")} />
-        </TabPanel>
-        <TabPanel value={tabValue} index={3}>
-          <AllTab {...tabProps} claims={getFilteredClaims("all")} />
-        </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+              <RejectedTab {...tabProps} claims={getFilteredClaims("rejected")} />
+            </TabPanel>
+            <TabPanel value={tabValue} index={3}>
+              <AllTab {...tabProps} claims={getFilteredClaims("all")} />
+            </TabPanel>
+          </>
+        )}
 
         {/* Claim Details Dialog */}
         <DetailsDialog

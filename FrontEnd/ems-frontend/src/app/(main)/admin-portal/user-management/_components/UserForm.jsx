@@ -111,7 +111,12 @@ export default function UserForm({
   onCancel = null,
   submitForm = null,
 }) {
-  const { departments, loading: loadingDepartments } = useDepartments();
+  const { departments, loading: loadingDepartments, error } = useDepartments();
+
+  // Debug logging
+  console.log("UserForm - Departments:", departments);
+  console.log("UserForm - Loading:", loadingDepartments);
+  console.log("UserForm - Error:", error);
 
   return (
     <Stack spacing={2}>
@@ -130,9 +135,10 @@ export default function UserForm({
         <SelectInput
           name="department"
           label={loadingDepartments ? "Loading Departments..." : "Department"}
-          options={departments}
-          getOptionLabel={(option) => option.label}
+          options={departments || []}
+          getOptionLabel={(option) => option.label || option.name}
           disabled={loadingDepartments}
+          placeholder={departments.length === 0 ? "No departments available" : "Select department"}
         />
       </InputItem>
 
