@@ -11,62 +11,13 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { getStatusIcon, getStatusColor } from "../../admin-portal/_helpers/colorhelper";
 import dayjs from "dayjs";
-import EditDialog from './EditDialog';
 import DeleteDialog from './DeleteDialog';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UserContext } from '../../../context/UserContext';
-
-const columns = [
-  { 
-    field: "id", 
-    headerName: "Event ID", 
-    width: 100 
-  },
-  { 
-    field: "title", 
-    headerName: "Event Title", 
-    width: 200 
-  },
-  { 
-    field: "eventType", 
-    headerName: "Event Type", 
-    width: 150 
-  },
-  { 
-    field: "enableDate", 
-    headerName: "Start Date", 
-    width: 150,
-    renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
-  },
-  { 
-    field: "expireDate", 
-    headerName: "End Date", 
-    width: 150,
-    renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 150,
-    renderCell: (params) => (
-      <Chip
-        icon={getStatusIcon(params.value.toLowerCase())}
-        label={params.value}
-        color={getStatusColor(params.value.toLowerCase())}
-        size="small"
-      />
-    ),
-  },
-  { 
-    field: "fileName", 
-    headerName: "Attached File", 
-    width: 150,
-    renderCell: (params) => params.value || "No file"
-  },
-];
+import DownloadIcon from '@mui/icons-material/Download';
+import Button from '@mui/material/Button';
 
 export default function EventHistory() {
   const [events, setEvents] = useState([]);
@@ -76,7 +27,6 @@ export default function EventHistory() {
     message: "",
     severity: "success",
   });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const { user } = useContext(UserContext);
@@ -100,9 +50,7 @@ export default function EventHistory() {
           enableDate: event.enableDate,
           expireDate: event.expireDate,
           status: event.status,
-          fileName: event.imageUrl ? (
-            <a href={`http://localhost:8080${event.imageUrl}`} target="_blank" rel="noopener noreferrer">Download</a>
-          ) : 'No file',
+          fileName: event.imageUrl ? event.imageUrl : '',
           raw: event,
         }));
         setEvents(mapped);
@@ -126,11 +74,6 @@ export default function EventHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleEdit = (event) => {
-    setSelectedEvent(event.raw);
-    setEditDialogOpen(true);
-  };
-
   const handleDelete = (event) => {
     setSelectedEvent(event.raw);
     setDeleteDialogOpen(true);
@@ -146,27 +89,33 @@ export default function EventHistory() {
     showSnackbar('Event deleted successfully!', 'success');
   };
 
+  // Move columns array inside the component so handleDelete is in scope
   const columns = [
     { 
+      field: "id", 
+      headerName: "Event ID", 
+      width: 100 
+    },
+    { 
       field: "title", 
-      headerNme: "Event Title", 
-      width: 160 
+      headerName: "Event Title", 
+      width: 200 
     },
     { 
       field: "eventType", 
       headerName: "Event Type", 
-      width: 160 
+      width: 150 
     },
     { 
       field: "enableDate", 
       headerName: "Start Date", 
-      width: 170,
+      width: 150,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
     },
     { 
       field: "expireDate", 
       headerName: "End Date", 
-      width: 170,
+      width: 150,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
     },
     {
@@ -186,7 +135,31 @@ export default function EventHistory() {
       field: "fileName", 
       headerName: "Attached File", 
       width: 150,
-      renderCell: (params) => params.value || "No file"
+      renderCell: (params) => {
+        const imageUrl = params.row?.raw?.imageUrl;
+        if (!imageUrl) return "No file";
+        const fullUrl = `http://localhost:8080${imageUrl}`;
+        return (
+          <Button
+            component="a"
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            variant="outlined"
+            size="small"
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
+          >
+            Download
+          </Button>
+        );
+      }
     },
     {
       field: "actions",
@@ -196,11 +169,6 @@ export default function EventHistory() {
       headerClassName: "last-column",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-          <Tooltip title="Edit">
-            <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Delete">
             <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
               <DeleteIcon />
@@ -232,7 +200,14 @@ export default function EventHistory() {
           <DataGrid
             rows={events}
             columns={columns}
-            
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 20]}
           />
         )}
       </Box>
@@ -251,12 +226,6 @@ export default function EventHistory() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-      <EditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        event={selectedEvent}
-        onUpdate={handleUpdateEvent}
-      />
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

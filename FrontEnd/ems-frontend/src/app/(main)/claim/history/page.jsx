@@ -11,18 +11,17 @@ import {
   } from './status';
 import dayjs from "dayjs";
 import { UserContext } from '../../../context/UserContext';
-import EditDialog from './EditDialog';
 import DeleteDialog from './DeleteDialog';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
+import DownloadIcon from '@mui/icons-material/Download';
+import Button from '@mui/material/Button';
 
 export default function ClaimHistory(){
   const [rows, setRows] = useState([]);
   const { user } = useContext(UserContext);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
@@ -50,11 +49,6 @@ export default function ClaimHistory(){
     fetchClaims();
   }, [user?.id]);
 
-  const handleEdit = (claim) => {
-    setSelectedClaim(claim.raw);
-    setEditDialogOpen(true);
-  };
-
   const handleDelete = (claim) => {
     setSelectedClaim(claim.raw);
     setDeleteDialogOpen(true);
@@ -79,7 +73,24 @@ export default function ClaimHistory(){
       width: 180,
       renderCell: (params) =>
         params.value ? (
-          <a href={`http://localhost:8080${params.value}`} target="_blank" rel="noopener noreferrer">Download</a>
+          <Button
+            component="a"
+            href={`http://localhost:8080${params.value}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            variant="outlined"
+            size="small"
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
+          >
+            Download
+          </Button>
         ) : (
           "No file"
         ),
@@ -92,11 +103,6 @@ export default function ClaimHistory(){
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-          <Tooltip title="Edit">
-            <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Delete">
             <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
               <DeleteIcon />
@@ -119,16 +125,17 @@ export default function ClaimHistory(){
         <DataGrid
           rows={rows}
           columns={columns}
-         
+          pageSize={10}
+          rowsPerPageOptions={[5, 10, 20]}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 20]}
         />
       </Box>
       </Paper>
-      <EditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        claim={selectedClaim}
-        onUpdate={handleUpdateClaim}
-      />
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

@@ -277,14 +277,14 @@ export default function TimesheetRecord() {
             columns={columns}
             height="auto"
             pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
+            rowsPerPageOptions={[5, 10, 20]}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },
               },
             }}
-            pageSizeOptions={[10, 50, 100]}
+            pageSizeOptions={[5, 10, 20]}
+            disableSelectionOnClick
           />
         ) : (
           <Box sx={{ 

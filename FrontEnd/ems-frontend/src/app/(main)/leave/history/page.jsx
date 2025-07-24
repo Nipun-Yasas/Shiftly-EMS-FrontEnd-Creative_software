@@ -250,14 +250,14 @@ export default function LeaveHistory() {
           loading={loading}
           height="auto"
           pageSize={10}
-          rowsPerPageOptions={[10]}
-          disableSelectionOnClick
+          rowsPerPageOptions={[5, 10, 20]}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
             },
           }}
-          pageSizeOptions={[10, 50, 100]}
+          pageSizeOptions={[5, 10, 20]}
+          disableSelectionOnClick
         />
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
