@@ -122,4 +122,8 @@ export const API_PATHS = {
 
   GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
 },
+  TIMESHEETS: {
+    ADD: "/api/v1/shiftly/ems/timesheets/add",
+    BY_USER: (userId) => `/api/v1/shiftly/ems/timesheets/user/${userId}`,
+  },
 };

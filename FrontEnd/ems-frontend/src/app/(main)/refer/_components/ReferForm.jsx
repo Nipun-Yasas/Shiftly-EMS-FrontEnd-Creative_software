@@ -33,38 +33,11 @@ export default function ReferForm(props) {
     setSnackbar({ open: true, message, severity });
   };
 
-  // New: handle backend submission
-  const handleBackendSubmit = async (values, { resetForm }) => {
-    setSubmitting(true);
-    try {
-      const data = new FormData();
-      data.append('vacancyId', values.vacancy?.id || '');
-      data.append('applicantName', values.applicantName);
-      data.append('applicantEmail', values.applicantEmail);
-      data.append('message', values.message);
-      if (values.resume) {
-        data.append('file', values.resume);
-      }
-      const response = await axiosInstance.post(API_PATHS.REFERRALS.ADD, data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      showSnackbar('Referral submitted! ID: ' + response.data.id, 'success');
-      resetForm();
-      setFileName("");
-      setPreview(null);
-      if (resumeRef.current) {
-        resumeRef.current.value = "";
-      }
-    } catch (error) {
-      showSnackbar('Failed to submit referral.', 'error');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+  // Pure presentational form: onSubmit is handled by parent
   return (
     <>
       <Formik
+        enableReinitialize
         initialValues={initialValues || {
           vacancy: null,
           applicantName: "",
@@ -86,12 +59,12 @@ export default function ReferForm(props) {
           if (!values.message) {
             errors.message = "Message is required";
           }
-          if (!values.resume) {
+          if (!values.resume && !isEditMode) {
             errors.resume = "resume is required";
           }
           return errors;
         }}
-        onSubmit={handleBackendSubmit}
+        onSubmit={onSubmit}
       >
         {({ errors, validateForm, resetForm }) => (
           <Form>
@@ -211,7 +184,6 @@ export default function ReferForm(props) {
                   <Button
                     type="submit"
                     variant="contained"
-                    // disabled={Object.keys(errors).length > 0}
                     onClick={() => {
                       validateForm();
                     }}
