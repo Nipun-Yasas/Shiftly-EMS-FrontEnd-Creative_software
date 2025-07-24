@@ -19,12 +19,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import dayjs from "dayjs";
+import CloseIcon from "@mui/icons-material/Close";
+
+import TimesheetForm from "./TimesheetForm"; 
 
 
 export default function TimesheetRecord() {
@@ -35,7 +32,6 @@ export default function TimesheetRecord() {
   const [timesheetToDelete, setTimesheetToDelete] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [timesheetToEdit, setTimesheetToEdit] = useState(null);
-  const [editForm, setEditForm] = useState({ date: '', workMode: '', activity: '', hours: '' });
 
   // Fetch timesheet records from the backend
   useEffect(() => {
@@ -66,7 +62,7 @@ export default function TimesheetRecord() {
     if (!timesheetToDelete) return;
     setLoading(true);
     try {
-      await axiosInstance.delete(`/api/v1/shiftly/ems/timesheets/delete/${timesheetToDelete.id}`);
+      await axiosInstance.delete(`${API_PATHS.TIMESHEETS.DELETE}/${timesheetToDelete.id}`);
       setTimesheetRecords(prev => prev.filter(r => r.id !== timesheetToDelete.id));
     } catch (error) {
       console.error("Error deleting timesheet:", error);
@@ -78,45 +74,28 @@ export default function TimesheetRecord() {
 
   const handleEdit = (row) => {
     setTimesheetToEdit(row);
-    setEditForm({
-      date: row.date,
-      workMode: row.workMode,
-      activity: row.activity,
-      hours: row.hours
-    });
     setEditDialogOpen(true);
   };
 
-  const handleEditFormChange = (field, value) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
+  const handleEditSuccess = (data, mode) => {
+    console.log('Timesheet updated successfully:', data);
+    // Update the local state with the edited data
+    setTimesheetRecords((prev) => prev.map((r) => 
+      r.id === timesheetToEdit.id ? {
+        ...r,
+        date: data.date,
+        workMode: data.mode,
+        activity: data.activity,
+        hours: data.hours
+      } : r
+    ));
+    setEditDialogOpen(false);
+    setTimesheetToEdit(null);
   };
 
-  const handleEditSave = async () => {
-    if (!timesheetToEdit) return;
-    setLoading(true);
-    try {
-      const dto = {
-        id: timesheetToEdit.id,
-        date: editForm.date,
-        mode: editForm.workMode,
-        activity: editForm.activity,
-        hours: parseFloat(editForm.hours),
-        status: timesheetToEdit.status
-      };
-      await axiosInstance.put(`/api/v1/shiftly/ems/timesheets/update/${timesheetToEdit.id}`, dto);
-      setTimesheetRecords((prev) => prev.map((r) => r.id === timesheetToEdit.id ? {
-        ...r,
-        date: editForm.date,
-        workMode: editForm.workMode,
-        activity: editForm.activity,
-        hours: editForm.hours
-      } : r));
-      setEditDialogOpen(false);
-      setTimesheetToEdit(null);
-    } catch (error) {
-      console.error("Error updating timesheet:", error);
-    }
-    setLoading(false);
+  const handleEditCancel = () => {
+    setEditDialogOpen(false);
+    setTimesheetToEdit(null);
   };
 
   // Function to determine status color and styling
@@ -168,6 +147,7 @@ export default function TimesheetRecord() {
         display: 'flex', 
         alignItems: 'center', 
         gap: 1,
+        mt:2,
         fontWeight: isOvertime ? 'bold' : 'normal'
       }}>
         <Typography 
@@ -199,16 +179,12 @@ export default function TimesheetRecord() {
     { 
       field: "date", 
       headerName: "Date", 
-      width: 120,
-      headerAlign: 'center',
-      align: 'center'
+      width: 150,
     },
     { 
       field: "workMode", 
       headerName: "Work Mode", 
       width: 120,
-      headerAlign: 'center',
-      align: 'center',
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -224,25 +200,19 @@ export default function TimesheetRecord() {
     { 
       field: "activity", 
       headerName: "Activity", 
-      width: 300,
-      headerAlign: 'left',
-      align: 'left',
+      width: 400,
       renderCell: renderActivity
     },
     { 
       field: "hours", 
       headerName: "Hours", 
-      width: 120,
-      headerAlign: 'center',
-      align: 'center',
+      width: 150,
       renderCell: renderHours
     },
     { 
       field: "status", 
       headerName: "Status", 
-      width: 130,
-      headerAlign: 'center',
-      align: 'center',
+      width: 150,
       renderCell: (params) => getStatusChip(params.value)
     },
     {
@@ -250,7 +220,7 @@ export default function TimesheetRecord() {
       headerName: "Actions",
       align: "center",
       headerClassName: "last-column",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
         <Box
           sx={{
@@ -288,7 +258,7 @@ export default function TimesheetRecord() {
   ];
 
   return (
-    <Paper elevation={1} sx={{ mb: 3 }}>
+    
       <Box sx={{ p: 3 }}>
         {loading ? (
           <Box sx={{ 
@@ -339,10 +309,10 @@ export default function TimesheetRecord() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteConfirmOpen(false)} color="primary">
+            <Button onClick={() => setDeleteConfirmOpen(false)} color="text.primary">
               Cancel
             </Button>
-            <Button onClick={handleDelete} color="error" autoFocus>
+            <Button onClick={handleDelete} variant="contained" color="error" autoFocus>
               Delete
             </Button>
           </DialogActions>
@@ -350,59 +320,52 @@ export default function TimesheetRecord() {
         <Dialog
           open={editDialogOpen}
           onClose={() => setEditDialogOpen(false)}
+          fullWidth
+         
         >
-          <DialogTitle>Edit Timesheet Entry</DialogTitle>
-          <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-              <TextField
-                label="Date"
-                type="date"
-                value={editForm.date}
-                onChange={(e) => handleEditFormChange('date', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                fullWidth
+          <DialogTitle sx={{ 
+            m: 0, 
+            p: 2, 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            borderBottom: 1,
+            borderColor: 'divider'
+          }}>
+            <Typography variant="h6" component="div">
+              Edit Timesheet Entry
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={() => setEditDialogOpen(false)}
+              sx={{
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent sx={{ p: 3 }}>
+            {timesheetToEdit && (
+              <TimesheetForm
+                mode="edit"
+                initialData={{
+                  id: timesheetToEdit.id,
+                  date: timesheetToEdit.date,
+                  workMode: timesheetToEdit.workMode,
+                  activity: timesheetToEdit.activity,
+                  hours: timesheetToEdit.hours,
+                  status: timesheetToEdit.status
+                }}
+                onSuccess={handleEditSuccess}
+                onCancel={handleEditCancel}
+                showTitle={false} 
+                showSummary={true}
+                showActions={true}
               />
-              <FormControl fullWidth>
-                <InputLabel>Work Mode</InputLabel>
-                <Select
-                  value={editForm.workMode}
-                  label="Work Mode"
-                  onChange={(e) => handleEditFormChange('workMode', e.target.value)}
-                >
-                  <MenuItem value="">Select mode</MenuItem>
-                  <MenuItem value="Online">Online</MenuItem>
-                  <MenuItem value="On-site">On-site</MenuItem>
-                  <MenuItem value="Hybrid">Hybrid</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Activity"
-                value={editForm.activity}
-                onChange={(e) => handleEditFormChange('activity', e.target.value)}
-                fullWidth
-                multiline
-                rows={2}
-              />
-              <TextField
-                label="Hours"
-                type="number"
-                value={editForm.hours}
-                onChange={(e) => handleEditFormChange('hours', e.target.value)}
-                fullWidth
-                inputProps={{ min: 0, max: 15, step: 0.25 }}
-              />
-            </Box>
+            )}
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setEditDialogOpen(false)} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleEditSave} color="primary" variant="contained">
-              Save
-            </Button>
-          </DialogActions>
         </Dialog>
       </Box>
-    </Paper>
   );
 } 

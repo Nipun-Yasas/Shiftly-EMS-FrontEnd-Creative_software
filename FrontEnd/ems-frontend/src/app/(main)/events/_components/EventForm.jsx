@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Formik, Form } from "formik";
+import * as Yup from "yup";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -25,12 +26,51 @@ const eventTypeOptions = [
   { id: 6, name: "Workshop" },
 ];
 
+// Yup validation schema
+const validationSchema = Yup.object({
+  title: Yup.string()
+    .min(3, "Event title must be at least 3 characters")
+    .max(100, "Event title must be less than 100 characters")
+    .required("Event title is required"),
+  
+  eventType: Yup.object()
+    .nullable()
+    .required("Event type is required"),
+  
+  enableDate: Yup.date()
+    .nullable()
+    .typeError("Please enter a valid date")
+    .required("Start date is required"),
+  
+  expireDate: Yup.date()
+    .nullable()
+    .typeError("Please enter a valid date")
+    .required("End date is required")
+    .when("enableDate", {
+      is: (enableDate) => enableDate && enableDate instanceof Date && !isNaN(enableDate),
+      then: (schema) => schema.min(Yup.ref("enableDate"), "End date must be after start date"),
+      otherwise: (schema) => schema
+    }),
+  
+  banner: Yup.mixed()
+    .nullable()
+    .test("fileType", "Only JPEG, JPG, and PNG files are allowed", function (value) {
+      if (!value) return true; // Optional file
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      return allowedTypes.includes(value.type);
+    })
+    .test("fileSize", "File size must be less than 5MB", function (value) {
+      if (!value) return true; // Optional file
+      return value.size <= 5 * 1024 * 1024; // 5MB
+    }),
+});
+
 export default function EventForm(props) {
-  const { setOpenSubmit } = props;
+  const { initialValues, onSubmit, isEditMode = false, onCancel } = props;
 
   const bannerRef = useRef(null);
   const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState(initialValues?.banner || "");
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -41,34 +81,45 @@ export default function EventForm(props) {
     setSnackbar({ open: true, message, severity });
   };
 
+  // Handle form submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const data = new FormData();
-      data.append('title', values.title);
-      data.append('eventType', values.eventType?.name || values.eventType);
-      data.append('enableDate', values.enableDate?.slice(0, 10)); // send only YYYY-MM-DD
-      data.append('expireDate', values.expireDate?.slice(0, 10)); // send only YYYY-MM-DD
-      // If you want to send status, add it here (optional)
-      // data.append('status', values.status || 'PENDING');
-      if (values.banner) {
-        data.append('image', values.banner); // Use 'image' as the field name!
-      }
+      if (onSubmit) {
+        // If parent provides onSubmit, use it (for edit mode)
+        await onSubmit(values, { setSubmitting, resetForm });
+      } else {
+        // Default submission logic (for create mode)
+        const data = new FormData();
+        data.append('title', values.title);
+        data.append('eventType', values.eventType?.name || values.eventType);
+        
+        // Format dates properly
+        const enableDate = values.enableDate ? new Date(values.enableDate).toISOString().slice(0, 10) : '';
+        const expireDate = values.expireDate ? new Date(values.expireDate).toISOString().slice(0, 10) : '';
+        
+        data.append('enableDate', enableDate);
+        data.append('expireDate', expireDate);
+        
+        if (values.banner) {
+          data.append('image', values.banner); // Use 'image' as the field name!
+        }
 
-      const response = await axiosInstance.post(
-        API_PATHS.EVENTS.ADD_EVENT,
-        data,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+        const response = await axiosInstance.post(
+          API_PATHS.EVENTS.ADD_EVENT,
+          data,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
 
-      showSnackbar('Event submitted! ID: ' + response.data.id, 'success');
-      resetForm();
-      setFileName("");
-      setPreview(null);
-      if (bannerRef.current) {
-        bannerRef.current.value = "";
+        showSnackbar('Event submitted successfully!', 'success');
+        resetForm();
+        setFileName("");
+        setPreview(null);
+        if (bannerRef.current) {
+          bannerRef.current.value = "";
+        }
       }
     } catch (error) {
-      let errorMsg = 'Failed to submit event.';
+      let errorMsg = isEditMode ? 'Failed to update event.' : 'Failed to submit event.';
       if (error.response?.data?.message) {
         errorMsg = error.response.data.message;
       }
@@ -81,42 +132,26 @@ export default function EventForm(props) {
   return (
     <>
       <Formik
-        initialValues={{
+        enableReinitialize
+        initialValues={initialValues || {
           title: "",
           eventType: null,
           enableDate: null,
           expireDate: null,
           banner: null,
         }}
-        validate={(values) => {
-          const errors = {};
-          if (!values.title) {
-            errors.title = "Event title is required";
-          }
-          if (!values.eventType) {
-            errors.eventType = "Event type is required";
-          }
-          if (!values.enableDate) {
-            errors.enableDate = "Start date is required";
-          }
-          if (!values.expireDate) {
-            errors.expireDate = "End date is required";
-          }
-          // Validate date range
-          if (values.enableDate && values.expireDate) {
-            if (new Date(values.expireDate) <= new Date(values.enableDate)) {
-              errors.expireDate = "End date must be after start date";
-            }
-          }
-          return errors;
-        }}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ validateForm, resetForm, isSubmitting, setFieldValue }) => (
+        {({ resetForm, isSubmitting, setFieldValue }) => (
           <Form>
             <Stack spacing={3}>
               <InputItem>
-                <TextInput name="title" label="Event Title" />
+                <TextInput 
+                  name="title" 
+                  label="Event Title"
+                  helperText="Enter a descriptive title for your event"
+                />
               </InputItem>
 
               <InputItem>
@@ -136,8 +171,16 @@ export default function EventForm(props) {
                   gap: { xs: 0, sm: 2 },
                 }}
               >
-                <DateInput name="enableDate" label="Event Start Date" />
-                <DateInput name="expireDate" label="Event End Date" />
+                <DateInput 
+                  name="enableDate" 
+                  label="Event Start Date"
+                  helperText="When does the event begin?"
+                />
+                <DateInput 
+                  name="expireDate" 
+                  label="Event End Date"
+                  helperText="When does the event end?"
+                />
               </Box>
 
               <FileUpload
@@ -163,11 +206,17 @@ export default function EventForm(props) {
                   color="text.primary"
                   type="reset"
                   onClick={() => {
-                    resetForm();
-                    setFileName("");
-                    setPreview(null);
-                    if (bannerRef.current) {
-                      bannerRef.current.value = "";
+                    if (onCancel) {
+                      // If in edit mode or dialog, close the dialog
+                      onCancel();
+                    } else {
+                      // Default behavior: reset form
+                      resetForm();
+                      setFileName("");
+                      setPreview(null);
+                      if (bannerRef.current) {
+                        bannerRef.current.value = "";
+                      }
                     }
                   }}
                   disabled={isSubmitting}
@@ -179,11 +228,11 @@ export default function EventForm(props) {
                   type="submit"
                   variant="contained"
                   disabled={isSubmitting}
-                  onClick={() => {
-                    validateForm();
-                  }}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Event"}
+                  {isSubmitting 
+                    ? (isEditMode ? "Updating..." : "Submitting...") 
+                    : (isEditMode ? "Update Event" : "Submit Event")
+                  }
                 </Button>
 
               </Box>

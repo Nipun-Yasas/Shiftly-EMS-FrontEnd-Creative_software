@@ -59,10 +59,25 @@ export default function LoginForm(props) {
         updateUser(userDTO);
         setOpenLogin(false); 
         
-        // Redirect to dashboard - global layout hook will handle employee profile check
-        // If user has no employee profile, they'll be automatically redirected to /employee/update
-        // If user has employee profile, they'll proceed to dashboard
-        router.push("/dashboard");
+        // Check if user has employee profile
+        try {
+          const employeeResponse = await axiosInstance.get(
+            `/api/v1/shiftly/ems/employee/user/${userDTO.id}`
+          );
+          
+          // If employee profile exists, redirect to dashboard
+          if (employeeResponse.data) {
+            router.push("/dashboard");
+          }
+        } catch (employeeError) {
+          // If employee profile doesn't exist (404), redirect to employee update
+          if (employeeError.response?.status === 404) {
+            router.push("/employee/update");
+          } else {
+            // For other errors, still redirect to dashboard (fallback)
+            router.push("/dashboard");
+          }
+        }
       } else {
         setError("Login failed: No token received");
       }

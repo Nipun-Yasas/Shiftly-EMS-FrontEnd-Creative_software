@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import Alert from "@mui/material/Alert";
 
 import InputItem from "../../../../_components/inputs/InputItem";
 import TextInput from "../../../../_components/inputs/TextInput";
@@ -89,7 +89,7 @@ export default function ClaimForm() {
               data,
               { headers: { 'Content-Type': 'multipart/form-data' } }
             );
-            showSnackbar('Claim submitted! ID: ' + response.data.id, 'success');
+            showSnackbar('Claim submitted successfully', 'success');
             resetForm();
             setFileName("");
             setPreview(null);
@@ -211,15 +211,14 @@ export default function ClaimForm() {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <MuiAlert
+        <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           sx={{ width: "100%" }}
-          elevation={6}
-          variant="filled"
+          
         >
           {snackbar.message}
-        </MuiAlert>
+        </Alert>
       </Snackbar>
     </>
   );

@@ -148,30 +148,25 @@ export default function EventHistory() {
 
   const columns = [
     { 
-      field: "id", 
-      headerName: "Event ID", 
-      width: 100 
-    },
-    { 
       field: "title", 
-      headerName: "Event Title", 
-      width: 200 
+      headerNme: "Event Title", 
+      width: 160 
     },
     { 
       field: "eventType", 
       headerName: "Event Type", 
-      width: 150 
+      width: 160 
     },
     { 
       field: "enableDate", 
       headerName: "Start Date", 
-      width: 150,
+      width: 170,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
     },
     { 
       field: "expireDate", 
       headerName: "End Date", 
-      width: 150,
+      width: 170,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY")
     },
     {
@@ -198,6 +193,7 @@ export default function EventHistory() {
       headerName: "Actions",
       align: "center",
       width: 120,
+      headerClassName: "last-column",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
           <Tooltip title="Edit">
@@ -236,21 +232,11 @@ export default function EventHistory() {
           <DataGrid
             rows={events}
             columns={columns}
-            pageSize={10}
-            rowsPerPageOptions={[10, 25, 50]}
-            disableSelectionOnClick
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 25, 50]}
-            sx={{ height: 500 }}
+            
           />
         )}
       </Box>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

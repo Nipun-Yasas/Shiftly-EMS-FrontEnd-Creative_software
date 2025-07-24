@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -25,7 +24,7 @@ export default function ClaimSubmission() {
           width: "100%",
         }}
       >
-        <Box sx={{ width: "100%", maxWidth: 1000, mt: 3, px: 2 }}>
+        <Box sx={{ width: "100%", p: 5 }}>
           {/* Remove setOpenSubmit prop */}
           <ClaimForm />
         </Box>

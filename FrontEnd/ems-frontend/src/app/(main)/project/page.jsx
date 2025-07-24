@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Paper, Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import axiosInstance from "../../../../_utils/axiosInstance";
-import SearchBar from "../../../../_components/header/SearchBar";
+import axiosInstance from "../../_utils/axiosInstance";
+import SearchBar from "../../_components/header/SearchBar";
 
 export default function MyProject() {
   const [projects, setProjects] = useState([]);

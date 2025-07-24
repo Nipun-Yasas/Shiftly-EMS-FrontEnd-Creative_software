@@ -1,7 +1,5 @@
 import Box from "@mui/material/Box";
 import Image from "next/image";
-import SearchBar from "./SearchBar";
-import SearchField from "../main/SearchField";
 
 export default function CustomAppTitle() {
   return (
@@ -20,7 +18,6 @@ export default function CustomAppTitle() {
         width={75}
         height={50}
       />
-      <SearchField placeholder="Search"/>
     </Box>
   );
 }

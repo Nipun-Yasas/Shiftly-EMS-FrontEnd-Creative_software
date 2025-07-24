@@ -7,10 +7,8 @@ import Box from "@mui/material/Box";
 
 
 import EventForm from "../_components/EventForm";
-import SubmitDialog from "../../../_components/dialog/SubmitDialog";
 
 export default function page() {
-  const [openSubmit, setOpenSubmit] = useState(false);
 
   return (
     
@@ -26,10 +24,8 @@ export default function page() {
       >
 
         <Box sx={{ width: "100%", px: 5 }}>
-          <EventForm setOpenSubmit={setOpenSubmit} />
+          <EventForm />
         </Box>
-
-      <SubmitDialog openSubmit={openSubmit} setOpenSubmit={setOpenSubmit} />
       
       </Paper>
 

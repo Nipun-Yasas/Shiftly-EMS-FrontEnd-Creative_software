@@ -9,7 +9,6 @@ import axiosInstance  from '../_utils/axiosInstance'
 
 import { useRouter } from "next/navigation";
 
-import next from 'next';
 
 export default function useUserAuth() {
 

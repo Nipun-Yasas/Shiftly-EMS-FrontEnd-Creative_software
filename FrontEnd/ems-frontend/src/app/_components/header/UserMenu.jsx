@@ -155,7 +155,7 @@ const UserMenu = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <Link href="/profile" passHref style={{ textDecoration: "none", color: "inherit" }}>
+        <Link href="/employee/profile" passHref style={{ textDecoration: "none", color: "inherit" }}>
           <MenuItem>
             <ListItemIcon>
               <PersonOutlineIcon fontSize="small" sx={{ color: "#737791" }} />

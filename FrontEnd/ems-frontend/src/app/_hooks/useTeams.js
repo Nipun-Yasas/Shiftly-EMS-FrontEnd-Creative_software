@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { API_PATHS } from "../_utils/apiPaths";
 import axiosInstance from "../_utils/axiosInstance";
@@ -10,7 +10,7 @@ export const useTeams = (departmentId = null) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchTeams = async () => {
+    const fetchTeams = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -44,12 +44,12 @@ export const useTeams = (departmentId = null) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [departmentId]);
 
     useEffect(() => {
         // Only fetch if we have teams endpoint available
         fetchTeams();
-    }, [departmentId]); // Re-fetch when departmentId changes
+    }, [fetchTeams]); // Re-fetch when fetchTeams changes
 
     return {
         teams,

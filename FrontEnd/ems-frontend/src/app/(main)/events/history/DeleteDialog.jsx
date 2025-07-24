@@ -22,14 +22,14 @@ export default function DeleteDialog({ open, onClose, event, onDelete }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Delete Event</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth >
+      <DialogTitle >Delete Event</DialogTitle>
       <DialogContent>
         <Typography>Are you sure you want to delete this event?</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleDelete} color="error">Delete</Button>
+        <Button onClick={onClose} color="text.primary">Cancel</Button>
+        <Button onClick={handleDelete} color="error" variant='contained'>Delete</Button>
       </DialogActions>
     </Dialog>
   );

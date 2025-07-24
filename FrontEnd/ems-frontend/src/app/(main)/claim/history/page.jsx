@@ -7,9 +7,7 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 
 import {
-    renderEditStatus,
     renderStatus,
-    STATUS_OPTIONS,
   } from './status';
 import dayjs from "dayjs";
 import { UserContext } from '../../../context/UserContext';
@@ -71,9 +69,8 @@ export default function ClaimHistory(){
   };
 
   const columns = [
-    { field: "col1", headerName: "Claim Id", width: 150 },
-    { field: "col3", headerName: "Type", width: 150 },
-    { field: "col4", headerName: "Description", width: 200 },
+    { field: "col3", headerName: "Type", width: 160 },
+    { field: "col4", headerName: "Description", width: 250 },
     { field: "claimDate", headerName: "Claim Date", width: 180 },
     { field: "col5", headerName: "Status", width: 150, renderCell: renderStatus },
     {
@@ -91,6 +88,7 @@ export default function ClaimHistory(){
       field: "actions",
       headerName: "Actions",
       align: "center",
+      headerClassName: "last-column",
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
@@ -121,16 +119,7 @@ export default function ClaimHistory(){
         <DataGrid
           rows={rows}
           columns={columns}
-          height="auto"
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          disableSelectionOnClick
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
-          pageSizeOptions={[10, 50, 100]}
+         
         />
       </Box>
       </Paper>

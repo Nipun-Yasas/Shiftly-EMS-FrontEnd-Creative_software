@@ -4,26 +4,19 @@ import { useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import ReferForm from "./ReferForm";
 import { useVacancies } from '../../../_hooks/useVacancies';
-import { Formik, Form } from 'formik';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
 export default function EditReferDialog({ open, onClose, record, onUpdate }) {
-  const [openSubmit, setOpenSubmit] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const { vacancies } = useVacancies();
 
   const handleClose = () => {
-    setOpenSubmit(false);
     onClose();
   };
 
@@ -58,19 +51,23 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
   const handleUpdate = async (values, { setSubmitting }) => {
     try {
       const data = new FormData();
-      data.append('id', record.id);
       data.append('vacancyId', values.vacancy?.id || '');
       data.append('applicantName', values.applicantName);
       data.append('applicantEmail', values.applicantEmail);
       data.append('message', values.message);
       if (values.resume && values.resume instanceof File) {
-        data.append('file', values.resume);
+        data.append('resume', values.resume);
       }
       await onUpdate(record.id, data);
-      setSnackbar({ open: true, message: 'Referral updated!', severity: 'success' });
-      handleClose();
+      setSnackbar({ open: true, message: 'Referral updated successfully!', severity: 'success' });
+      setTimeout(() => handleClose(), 1000);
     } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to update referral.', severity: 'error' });
+      console.error("Update error:", error);
+      setSnackbar({ 
+        open: true, 
+        message: error.response?.data?.message || 'Failed to update referral.', 
+        severity: 'error' 
+      });
     } finally {
       setSubmitting(false);
     }
@@ -80,16 +77,8 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth="md"
       fullWidth
-      PaperComponent={Paper}
-      PaperProps={{
-        elevation: 8,
-        sx: {
-          borderRadius: 2,
-          minHeight: "60vh",
-        },
-      }}
+      
     >
       <DialogTitle
         sx={{
@@ -100,42 +89,21 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
           pb: 2,
         }}
       >
-        <Typography variant="h6" sx={{ fontFamily: "var(--font-poppins)", fontWeight: 600 }}>
-          Edit Referral Record
-        </Typography>
+       Edit Referral Record
+        
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ p: 3 }}>
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            Update the referral information below:
-          </Typography>
-        </Box>
-        <Formik
-          enableReinitialize
+        <ReferForm
           initialValues={getInitialValues()}
           onSubmit={handleUpdate}
-        >
-          {({ handleSubmit }) => (
-            <Form>
-              <ReferForm
-                setOpenSubmit={setOpenSubmit}
-                isEditMode={true}
-              />
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                <Button onClick={handleClose} color="text.primary" sx={{ mr: 2 }}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
-                  Update
-                </Button>
-              </Box>
-            </Form>
-          )}
-        </Formik>
+          onCancel={handleClose}
+          isEditMode={true}
+        />
+
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}

@@ -13,7 +13,6 @@ import CustomAppTitle from "../_components/header/CustomAppTitle";
 import theme from "../../theme";
 import { getNavigationForUser } from "../_utils/navigation";
 import useUserAuth from "../_hooks/useUserAuth";
-import useEmployeeProfileCheck from "../_hooks/useEmployeeProfileCheck";
 import {UserContext} from "../context/UserContext";
 
 export default function Layout({ children }) {
@@ -22,29 +21,20 @@ export default function Layout({ children }) {
   const { user } = useContext(UserContext);
   const router = useRouter();
   const navigation = getNavigationForUser(user);
-  
-  // Check for employee profile and redirect if not found
-  const { isChecking: isCheckingProfile, shouldRender, hasEmployeeProfile } = useEmployeeProfileCheck();
 
   useEffect(() => {
     // Check for both token and user data
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
-    const currentPath = window.location.pathname;
+    
     if (!token && !userData && !user) {
       // No authentication data found, redirect to landing page
       router.push("/");
     }
-    // If authenticated but missing employee profile, block all routes except /employee/update
-    if (user && shouldRender && !isCheckingProfile && hasEmployeeProfile === false) {
-      if (!currentPath.startsWith("/employee/update")) {
-        router.replace("/employee/update");
-      }
-    }
-  }, [user, router, shouldRender, isCheckingProfile, hasEmployeeProfile]);
+  }, [user, router]);
 
-  // Show loading if user data is still being fetched, profile is being checked, or shouldn't render yet
-  if (!user || isCheckingProfile || !shouldRender) {
+  // Show loading if user data is still being fetched
+  if (!user) {
     return (
       <Box
         sx={{

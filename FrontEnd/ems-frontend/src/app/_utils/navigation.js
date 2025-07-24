@@ -129,30 +129,6 @@ const NAVIGATION = [
     segment: 'project',
     title: 'Project',
     icon: <WorkIcon />,
-    children: [
-      {
-        segment: 'all',
-        title: 'All Projects',
-        icon: <WorkHistoryIcon />,
-      },
-      {
-        segment: 'my',
-        title: 'My Project',
-        icon: <PersonIcon />,
-        children: [
-          {
-            segment: 'basic',
-            title: 'Basic Information',
-            icon: <PersonIcon />,
-          },
-          {
-            segment: 'team',
-            title: 'Team',
-            icon: <EngineeringIcon />,
-          }
-        ]
-      }
-    ]
   },
   {
     segment: 'timesheet',
@@ -161,7 +137,7 @@ const NAVIGATION = [
     children: [
       {
         segment: 'submit',
-        title: 'Update Timesheet',
+        title: 'Submit Timesheet',
         icon: <UpdateIcon />,
       },
       {

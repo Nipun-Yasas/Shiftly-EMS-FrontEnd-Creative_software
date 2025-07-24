@@ -22,14 +22,14 @@ export default function DeleteDialog({ open, onClose, claim, onDelete }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Delete Claim</DialogTitle>
       <DialogContent>
         <Typography>Are you sure you want to delete this claim?</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleDelete} color="error">Delete</Button>
+        <Button onClick={onClose} color='text.primary'>Cancel</Button>
+        <Button onClick={handleDelete} color="error" variant="contained">Delete</Button>
       </DialogActions>
     </Dialog>
   );
