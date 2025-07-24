@@ -25,38 +25,67 @@ export default function ReferHistory() {
   const { user } = useContext(UserContext);
   const { vacancies } = useVacancies();
 
+  // Fetch referrals helper
+  const fetchReferrals = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(API_PATHS.REFERRALS.GET_BY_USER_ID(user.id));
+      const mapped = response.data.map(ref => {
+        let vacancyName = ref.vacancyName;
+        if (!vacancyName && ref.vacancyId && vacancies.length > 0) {
+          const found = vacancies.find(v => v.id === ref.vacancyId);
+          vacancyName = found ? found.name : ref.vacancyId;
+        }
+        return {
+          id: ref.id,
+          vacancy: vacancyName || ref.vacancyId,
+          applicant_name: ref.applicantName,
+          applicant_email: ref.applicantEmail,
+          message: ref.message,
+          resume_file_path: ref.fileUrl,
+          status: ref.status,
+        };
+      });
+      setReferData(mapped);
+    } catch (error) {
+      setReferData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user?.id) return;
-    const fetchReferrals = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosInstance.get(API_PATHS.REFERRALS.GET_BY_USER_ID(user.id));
-        // Map backend fields to frontend DataGrid fields
-        const mapped = response.data.map(ref => {
-          let vacancyName = ref.vacancyName;
-          if (!vacancyName && ref.vacancyId && vacancies.length > 0) {
-            const found = vacancies.find(v => v.id === ref.vacancyId);
-            vacancyName = found ? found.name : ref.vacancyId;
-          }
-          return {
-            id: ref.id,
-            vacancy: vacancyName || ref.vacancyId,
-            applicant_name: ref.applicantName,
-            applicant_email: ref.applicantEmail,
-            message: ref.message,
-            resume_file_path: ref.fileUrl,
-            status: ref.status,
-          };
-        });
-        setReferData(mapped);
-      } catch (error) {
-        setReferData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchReferrals();
   }, [user?.id, vacancies]);
+
+  // Edit logic
+  const handleUpdateRecord = async (id, data) => {
+    setLoading(true);
+    try {
+      await axiosInstance.put(API_PATHS.REFERRALS.UPDATE(id), data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      await fetchReferrals();
+    } catch (error) {
+      // fallback: do nothing or show error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete logic
+  const handleDeleteRecord = async (recordToDelete) => {
+    setLoading(true);
+    try {
+      await axiosInstance.delete(API_PATHS.REFERRALS.DELETE(recordToDelete.id));
+      await fetchReferrals();
+    } catch (error) {
+      setReferData(prev => prev.filter(record => record.id !== recordToDelete.id));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -66,20 +95,6 @@ export default function ReferHistory() {
   const handleDelete = (record) => {
     setSelectedRecord(record);
     setDeleteDialogOpen(true);
-  };
-
-  const handleUpdateRecord = (updatedRecord) => {
-    setReferData(prev =>
-      prev.map(record =>
-        record.id === updatedRecord.id ? updatedRecord : record
-      )
-    );
-  };
-
-  const handleDeleteRecord = (recordToDelete) => {
-    setReferData(prev =>
-      prev.filter(record => record.id !== recordToDelete.id)
-    );
   };
 
   const renderActions = (params) => {

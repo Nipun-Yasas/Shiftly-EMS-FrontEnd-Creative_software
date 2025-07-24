@@ -12,42 +12,68 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import ReferForm from "./ReferForm";
+import { useVacancies } from '../../../_hooks/useVacancies';
+import { Formik, Form } from 'formik';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function EditReferDialog({ open, onClose, record, onUpdate }) {
   const [openSubmit, setOpenSubmit] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const { vacancies } = useVacancies();
 
   const handleClose = () => {
     setOpenSubmit(false);
     onClose();
   };
 
-  const handleSubmit = (values) => {
-    
-    // Transform form values to match the data grid structure
-    const updatedRecord = {
-      ...record,
-      vacancy: values.vacancy?.name || values.vacancy,
-      applicant_name: values.applicantName,
-      applicant_email: values.applicantEmail,
-      message: values.message,
-      resume_file_path: values.resume?.name || values.resume,
-    };
-
-    onUpdate(updatedRecord);
-    handleClose();
+  // Helper to get the correct vacancy object for the dropdown
+  const getVacancyObject = (vacancyValue) => {
+    if (!vacancyValue) return null;
+    if (typeof vacancyValue === 'object' && vacancyValue.id) return vacancyValue;
+    return vacancies.find(v => v.id === vacancyValue || v.name === vacancyValue) || null;
   };
 
   // Transform data grid record to form values
   const getInitialValues = () => {
-    if (!record) return {};
-    
+    if (!record) return {
+      id: '',
+      vacancy: null,
+      applicantName: '',
+      applicantEmail: '',
+      message: '',
+      resume: null,
+    };
     return {
-      vacancy: { id: 1, name: record.vacancy }, // Assuming vacancy is a string, map to option object
-      applicantName: record.applicant_name || "",
-      applicantEmail: record.applicant_email || "",
-      message: record.message || "",
+      id: record.id,
+      vacancy: getVacancyObject(record.vacancy),
+      applicantName: record.applicant_name || '',
+      applicantEmail: record.applicant_email || '',
+      message: record.message || '',
       resume: record.resume_file_path || null,
     };
+  };
+
+  // Backend update logic handled here (parent pattern)
+  const handleUpdate = async (values, { setSubmitting }) => {
+    try {
+      const data = new FormData();
+      data.append('id', record.id);
+      data.append('vacancyId', values.vacancy?.id || '');
+      data.append('applicantName', values.applicantName);
+      data.append('applicantEmail', values.applicantEmail);
+      data.append('message', values.message);
+      if (values.resume && values.resume instanceof File) {
+        data.append('file', values.resume);
+      }
+      await onUpdate(record.id, data);
+      setSnackbar({ open: true, message: 'Referral updated!', severity: 'success' });
+      handleClose();
+    } catch (error) {
+      setSnackbar({ open: true, message: 'Failed to update referral.', severity: 'error' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -88,20 +114,43 @@ export default function EditReferDialog({ open, onClose, record, onUpdate }) {
             Update the referral information below:
           </Typography>
         </Box>
-        
-        <ReferForm 
-          setOpenSubmit={setOpenSubmit}
+        <Formik
+          enableReinitialize
           initialValues={getInitialValues()}
-          onSubmit={handleSubmit}
-          isEditMode={true}
-        />
+          onSubmit={handleUpdate}
+        >
+          {({ handleSubmit }) => (
+            <Form>
+              <ReferForm
+                setOpenSubmit={setOpenSubmit}
+                isEditMode={true}
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Button onClick={handleClose} color="text.primary" sx={{ mr: 2 }}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="contained" color="primary" onClick={handleSubmit}>
+                  Update
+                </Button>
+              </Box>
+            </Form>
+          )}
+        </Formik>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </DialogContent>
-
-      <DialogActions sx={{ p: 3, pt: 0 }}>
-        <Button onClick={handleClose} color="text.primary">
-          Cancel
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 } 

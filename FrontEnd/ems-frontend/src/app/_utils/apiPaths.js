@@ -110,4 +110,8 @@ export const API_PATHS = {
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
   },
+  TIMESHEETS: {
+    ADD: "/api/v1/shiftly/ems/timesheets/add",
+    BY_USER: (userId) => `/api/v1/shiftly/ems/timesheets/user/${userId}`,
+  },
 };
