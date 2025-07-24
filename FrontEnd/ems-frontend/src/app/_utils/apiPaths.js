@@ -80,9 +80,10 @@ export const API_PATHS = {
     SELF_UPDATE: "/api/v1/shiftly/ems/employee/self-update",
   },
   CLAIMS: {
-    GET_CLAIMS_BY_USER_ID: (userId) =>
-      `/api/v1/shiftly/ems/claims/user/${userId}`,
-    CREATE_CLAIM: "/api/v1/shiftly/ems/claims/add",
+    GET_CLAIMS_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/claims/user/${userId}`,
+    CREATE_CLAIM: '/api/v1/shiftly/ems/claims/add',
+    UPDATE_CLAIM: (id) => `/api/v1/shiftly/ems/claims/update/${id}`,
+    DELETE_CLAIM: (id) => `/api/v1/shiftly/ems/claims/delete/${id}`,
   },
   VACANCIES: {
     GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",

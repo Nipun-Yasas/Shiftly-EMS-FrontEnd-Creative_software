@@ -7,24 +7,31 @@ import { Formik, Form } from "formik";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
 import FileUpload from "../../../_components/inputs/FileUpload";
 import axiosInstance from '../../../_utils/axiosInstance';
-import { REFERRAL_API } from '../../../_utils/apiPaths';
+import { API_PATHS } from '../../../_utils/apiPaths';
 import { useVacancies } from '../../../_hooks/useVacancies';
 
 export default function ReferForm(props) {
-  const { setOpenSubmit, initialValues, onSubmit, isEditMode = false } = props;
+  const { initialValues, onSubmit, isEditMode = false } = props;
 
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.resume || "");
   const [submitting, setSubmitting] = useState(false);
-
   const { vacancies, loading: vacanciesLoading } = useVacancies();
+
+  // Snackbar state
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   // New: handle backend submission
   const handleBackendSubmit = async (values, { resetForm }) => {
@@ -38,11 +45,10 @@ export default function ReferForm(props) {
       if (values.resume) {
         data.append('file', values.resume);
       }
-      const response = await axiosInstance.post(REFERRAL_API.SUBMIT, data, {
+      const response = await axiosInstance.post(API_PATHS.REFERRALS.ADD, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      alert('Referral submitted! ID: ' + response.data.id);
-      setOpenSubmit && setOpenSubmit(true);
+      showSnackbar('Referral submitted! ID: ' + response.data.id, 'success');
       resetForm();
       setFileName("");
       setPreview(null);
@@ -50,7 +56,7 @@ export default function ReferForm(props) {
         resumeRef.current.value = "";
       }
     } catch (error) {
-      alert('Failed to submit referral.');
+      showSnackbar('Failed to submit referral.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -219,6 +225,20 @@ export default function ReferForm(props) {
           </Form>
         )}
       </Formik>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

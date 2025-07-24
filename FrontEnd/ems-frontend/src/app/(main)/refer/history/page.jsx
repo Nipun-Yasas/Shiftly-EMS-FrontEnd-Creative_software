@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -11,7 +11,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditReferDialog from "../_components/EditReferDialog";
 import DeleteConfirmDialog from "../_components/DeleteConfirmDialog";
 import axiosInstance from '../../../_utils/axiosInstance';
-import { REFERRAL_API } from '../../../_utils/apiPaths';
+import { API_PATHS } from '../../../_utils/apiPaths';
+import { UserContext } from '../../../context/UserContext';
+import { useVacancies } from '../../../_hooks/useVacancies';
 
 export default function ReferHistory() {
   const [referData, setReferData] = useState([]);
@@ -20,22 +22,32 @@ export default function ReferHistory() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
+  const { user } = useContext(UserContext);
+  const { vacancies } = useVacancies();
+
   useEffect(() => {
+    if (!user?.id) return;
     const fetchReferrals = async () => {
       setLoading(true);
       try {
-        const userId = 2; // Replace with dynamic user ID as needed
-        const response = await axiosInstance.get(REFERRAL_API.GET_BY_USER_ID(userId));
+        const response = await axiosInstance.get(API_PATHS.REFERRALS.GET_BY_USER_ID(user.id));
         // Map backend fields to frontend DataGrid fields
-        const mapped = response.data.map(ref => ({
-          id: ref.id,
-          vacancy: ref.vacancyName || ref.vacancyId,
-          applicant_name: ref.applicantName,
-          applicant_email: ref.applicantEmail,
-          message: ref.message,
-          resume_file_path: ref.fileUrl,
-          status: ref.status,
-        }));
+        const mapped = response.data.map(ref => {
+          let vacancyName = ref.vacancyName;
+          if (!vacancyName && ref.vacancyId && vacancies.length > 0) {
+            const found = vacancies.find(v => v.id === ref.vacancyId);
+            vacancyName = found ? found.name : ref.vacancyId;
+          }
+          return {
+            id: ref.id,
+            vacancy: vacancyName || ref.vacancyId,
+            applicant_name: ref.applicantName,
+            applicant_email: ref.applicantEmail,
+            message: ref.message,
+            resume_file_path: ref.fileUrl,
+            status: ref.status,
+          };
+        });
         setReferData(mapped);
       } catch (error) {
         setReferData([]);
@@ -44,7 +56,7 @@ export default function ReferHistory() {
       }
     };
     fetchReferrals();
-  }, []);
+  }, [user?.id, vacancies]);
 
   const handleEdit = (record) => {
     setSelectedRecord(record);

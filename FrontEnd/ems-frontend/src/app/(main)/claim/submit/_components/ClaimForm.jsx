@@ -5,6 +5,8 @@ import { Formik, Form } from "formik";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 import InputItem from "../../../../_components/inputs/InputItem";
 import TextInput from "../../../../_components/inputs/TextInput";
@@ -21,12 +23,15 @@ const claimtypeOptions = [
   { id: 2, name: "Insuarance" },
 ];
 
-export default function ClaimForm(props){
-  const { setOpenSubmit } = props;
-
+export default function ClaimForm() {
   const claimfileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   // Fetch claims by user ID on mount (example: userId = 2)
   useEffect(() => {
@@ -34,9 +39,7 @@ export default function ClaimForm(props){
       try {
         const userId = 2; // Replace with dynamic user ID as needed
         const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(userId));
-        console.log("Claims for user", userId, response.data);
       } catch (error) {
-        console.error("Failed to fetch claims by user ID:", error);
       }
     };
     fetchClaims();
@@ -86,8 +89,7 @@ export default function ClaimForm(props){
               data,
               { headers: { 'Content-Type': 'multipart/form-data' } }
             );
-            alert('Claim submitted! ID: ' + response.data.id);
-            setOpenSubmit(true);
+            showSnackbar('Claim submitted! ID: ' + response.data.id, 'success');
             resetForm();
             setFileName("");
             setPreview(null);
@@ -99,7 +101,7 @@ export default function ClaimForm(props){
             if (error.response?.data?.message) {
               errorMsg = error.response.data.message;
             }
-            alert(errorMsg);
+            showSnackbar(errorMsg, 'error');
           }
         }}
       >
@@ -203,6 +205,22 @@ export default function ClaimForm(props){
           </Form>
         )}
       </Formik>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <MuiAlert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+          elevation={6}
+          variant="filled"
+        >
+          {snackbar.message}
+        </MuiAlert>
+      </Snackbar>
     </>
   );
 };
