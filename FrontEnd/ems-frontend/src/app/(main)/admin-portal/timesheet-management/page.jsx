@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -12,93 +12,14 @@ import TeamTab from "./_components/TeamTab";
 import ProjectTab from "./_components/ProjectTab";
 import TabPanel from "../../../_components/main/TabPanel";
 import TimesheetDialog from "./_components/TimesheetDialog";
-
-// Constants for mock data
-const MOCK_EMPLOYEES = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@company.com",
-    team: "Development",
-    project: "Web Platform",
-    department: "Engineering",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@company.com",
-    team: "Design",
-    project: "Mobile App",
-    department: "Design",
-  },
-  {
-    id: 3,
-    name: "Robert Johnson",
-    email: "robert.johnson@company.com",
-    team: "Development",
-    project: "Web Platform",
-    department: "Engineering",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    email: "emily.davis@company.com",
-    team: "QA",
-    project: "Mobile App",
-    department: "Quality Assurance",
-  },
-  {
-    id: 5,
-    name: "Michael Wilson",
-    email: "michael.wilson@company.com",
-    team: "Design",
-    project: "Web Platform",
-    department: "Design",
-  },
-];
-
-const MOCK_TIMESHEETS = [
-  {
-    id: 101,
-    date: "2024-08-31",
-    projectTask: "E_Interview",
-    workMode: "Online",
-    activity: "Development",
-    hours: "8.00",
-    status: "Pending",
-  },
-  {
-    id: 102,
-    date: "2024-08-30",
-    projectTask: "Web_Platform",
-    workMode: "On-site",
-    activity: "Development",
-    hours: "7.50",
-    status: "Pending",
-  },
-  {
-    id: 103,
-    date: "2024-10-03",
-    projectTask: "Bench_Engineering",
-    workMode: "Online",
-    activity: "Training",
-    hours: "6.00",
-    status: "Pending",
-  },
-  {
-    id: 104,
-    date: "2024-09-20",
-    projectTask: "Web_Platform",
-    workMode: "On-site",
-    activity: "Meeting",
-    hours: "8.00",
-    status: "Pending",
-  },
-];
+import { UserContext } from "../../../context/UserContext";
+import axiosInstance from "../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../_utils/apiPaths";
 
 export default function TimesheetAdminReview(){
   const [tabValue, setTabValue] = useState(0);
   const [employees, setEmployees] = useState([]);
+  const { user } = useContext(UserContext);
 
   // State for timesheet details
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -114,8 +35,30 @@ export default function TimesheetAdminReview(){
 
   // Initialize employees with mock data on component mount
   useEffect(() => {
-    setEmployees(MOCK_EMPLOYEES);
-  }, []);
+    if (user) {
+      // Use user details from context to fill the table
+      setEmployees([
+        {
+          id: user.id || user.employeeId || user.userId,
+          name: user.name || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unnamed',
+          department: user.department || user.departmentName || '',
+          team: user.team || user.teamName || '',
+          project: user.project || user.projectName || '',
+        },
+      ]);
+    } else {
+      // Fallback: fetch all employees from API
+      const fetchEmployees = async () => {
+        try {
+          const res = await axiosInstance.get(API_PATHS.ADMIN_USER.GET_ALL_USERS);
+          setEmployees(res.data);
+        } catch (err) {
+          // handle error
+        }
+      };
+      fetchEmployees();
+    }
+  }, [user]);
 
 
   const getTeamGroupedEmployees = () => {
@@ -146,9 +89,12 @@ export default function TimesheetAdminReview(){
   };
 
 
+  // When viewing timesheets, only show those for the selected employee
   const handleViewTimesheets = (employee) => {
     setSelectedEmployee(employee);
-    setEmployeeTimesheets(MOCK_TIMESHEETS);
+    // Filter MOCK_TIMESHEETS to only those for this employee (by userId)
+    const timesheetsForEmployee = MOCK_TIMESHEETS.filter(ts => ts.userId === employee.id);
+    setEmployeeTimesheets(timesheetsForEmployee);
     setTimesheetDialogOpen(true);
   };
 
@@ -195,6 +141,19 @@ export default function TimesheetAdminReview(){
     setNotification((prev) => ({ ...prev, open: false }));
   };
 
+  // Filter employees for Employee View: only those in admin's department
+  const filteredEmployees = employees.filter(emp => {
+    // Check department match
+    const departmentMatch = user && emp.department && user.department && emp.department === user.department;
+    // Optionally exclude the admin themselves (uncomment next line if needed)
+    // const notAdmin = emp.id !== user.id;
+    return departmentMatch; // && notAdmin;
+  });
+
+  console.log("EMPLOYEES FOR GRIDS", employees);
+  console.log("TEAM GROUPED", getTeamGroupedEmployees());
+  console.log("PROJECT GROUPED", getProjectGroupedEmployees());
+
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
@@ -210,7 +169,7 @@ export default function TimesheetAdminReview(){
 
         <TabPanel value={tabValue} index={0}>
           <EmployeeTab
-            employees={employees}
+            employees={filteredEmployees}
             onViewTimesheets={handleViewTimesheets}
           />
         </TabPanel>

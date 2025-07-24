@@ -12,8 +12,8 @@ export default function TeamTab({
 }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
-      {Object.entries(teamGroupedEmployees).map(([team, teamEmployees]) => (
-        <Box>
+      {Object.entries(teamGroupedEmployees).map(([team, teamEmployees], idx) => (
+        <Box key={team || idx}>
           <Typography variant="h6">{team} Team</Typography>
           <Typography variant="body2">
             {teamEmployees.length} employee(s) pending timesheet(s)
@@ -33,6 +33,7 @@ export default function TeamTab({
                 onViewTimesheets={onViewTimesheets}
                 showTeamColumn={false}
                 showProjectColumn={true}
+                localeText={{ noRowsLabel: "No employees found." }}
               />
             </Box>
           </Box>
