@@ -32,6 +32,7 @@ const genderOptions = [
   { id: "Other", name: "Other", label: "Other" },
 ];
 
+
 const validationSchema = Yup.object({
   firstName: Yup.string()
     .min(2, "First name must be at least 2 characters")
@@ -177,9 +178,6 @@ export default function EmployeeUpdatePage() {
           genderOptions.find((g) => g.name === employeeData.gender) || null,
         dob: employeeData.dob || "",
         location: employeeData.location || "",
-        designation:
-          designationOptions.find((d) => d.name === employeeData.designation) ||
-          null,
         team:
           teams.find(
             (t) =>
@@ -221,7 +219,6 @@ export default function EmployeeUpdatePage() {
         gender: values.gender?.name || values.gender,
         dob: values.dob,
         location: values.location,
-        designation: values.designation?.name || values.designation,
         teamId: values.team?.id || null, // Send team ID
         teamName: values.team?.name || null, // Send team name for reference
         skills: values.skills

@@ -25,6 +25,7 @@ export default function OrgChart() {
         }}
       >
         <Avatar
+          src="/organization/shushena.jpg"
           sx={{
             width: 90,
             height: 90,
@@ -60,10 +61,10 @@ export default function OrgChart() {
         }}
       >
         {[
-          { name: "Channa De Silva", role: "Software Engineering Director" },
-          { name: "Damitha Liyanage", role: "Software Engineering Director" },
-          { name: "Asma Cader", role: "Director Marketing" },
-          { name: "Dinithi Abeygunawardena", role: "Head of Human Resources" },
+          { name: "Channa De Silva", role: "Software Engineering Director", image: "/organization/channa.jpg" },
+          { name: "Damitha Liyanage", role: "Software Engineering Director", image: "/organization/dmaitha.jpg" },
+          { name: "Asma Cader", role: "Director Marketing", image: "/organization/asma.jpg" },
+          { name: "Dinithi Abeygunawardena", role: "Head of Human Resources", image: "/organization/dinithi.jpg" },
         ].map((member, index) => (
           <Box
             key={index}
@@ -75,6 +76,7 @@ export default function OrgChart() {
             }}
           >
             <Avatar
+              src={member.image}
               sx={{
                 width: 70,
                 height: 70,

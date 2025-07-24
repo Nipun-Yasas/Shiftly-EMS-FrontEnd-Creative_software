@@ -110,4 +110,8 @@ export const API_PATHS = {
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
   },
+  DEPARTMENTS: {
+
+  GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
+},
 };

@@ -34,12 +34,17 @@ const UserMenu = () => {
 
   const handleLogout = async () => {
     try {
-      // Call logout API
+      // Call logout API - but don't fail if server is down
       await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
     } catch (error) {
-      console.error("Logout error:", error);
+      // Handle network errors gracefully
+      if (error.isNetworkError || error.message === 'Network Error' || !error.response) {
+        console.warn("Server unavailable during logout - proceeding with client-side logout");
+      } else {
+        console.error("Logout error:", error);
+      }
     } finally {
-      // Clear all authentication data
+      // Always clear authentication data regardless of server response
       clearUser();
       localStorage.removeItem('user');
       localStorage.removeItem('token');
