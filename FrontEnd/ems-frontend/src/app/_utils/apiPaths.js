@@ -78,6 +78,7 @@ export const API_PATHS = {
     GET_PROFILE: "/api/v1/shiftly/ems/employee/profile",
     UPDATE_PROFILE: "/api/v1/shiftly/ems/employee/profile",
     SELF_UPDATE: "/api/v1/shiftly/ems/employee/self-update",
+    GET_ADMINS_BY_DEPARTMENT: (departmentName) => `/api/v1/shiftly/ems/employee/admins-by-department/${departmentName}`,
   },
   CLAIMS: {
     GET_CLAIMS_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/claims/user/${userId}`,

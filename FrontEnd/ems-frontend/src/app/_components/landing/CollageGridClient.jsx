@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import CollagePhoto from './_components/landing/CollagePhoto';
-import { PHOTO_WIDTH, PHOTO_HEIGHT, MAX_PHOTOS } from './_utils/constants';
-import { useWindowSize } from './_hooks/useWindowSize';
+import CollagePhoto from './CollagePhoto';
+import { PHOTO_WIDTH, PHOTO_HEIGHT, MAX_PHOTOS } from '../../_utils/constants';
+import { useWindowSize } from '../../_hooks/useWindowSize';
 
 export default function CollageGridClient() {
   const { width, height } = useWindowSize();

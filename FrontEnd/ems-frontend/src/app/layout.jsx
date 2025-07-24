@@ -8,7 +8,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
 import LinearProgress from "@mui/material/LinearProgress";
 import UserProvider from "./context/UserContext";
-
+import ClientThemeProvider from "./_components/landing/ClientThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,6 +43,7 @@ export default function RootLayout({ children }) {
       className={`${inter.className} ${poppins.variable} ${roboto.variable} ${lexend.variable}`}
     >
       <body suppressHydrationWarning={true}>
+        <ClientThemeProvider>
           <UserProvider>
             <AppRouterCacheProvider>
               <React.Suspense fallback={<LinearProgress />}>
@@ -50,7 +51,7 @@ export default function RootLayout({ children }) {
               </React.Suspense>
             </AppRouterCacheProvider>
           </UserProvider>
-        
+        </ClientThemeProvider>
       </body>
     </html>
   );

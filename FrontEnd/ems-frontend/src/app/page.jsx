@@ -29,7 +29,7 @@ import {
 } from "./_utils/constants";
 import dynamic from "next/dynamic";
 
-const CollageGridClient = dynamic(() => import("./CollageGridClient"), {
+const CollageGridClient = dynamic(() => import("./_components/landing/CollageGridClient"), {
   ssr: false,
 });
 

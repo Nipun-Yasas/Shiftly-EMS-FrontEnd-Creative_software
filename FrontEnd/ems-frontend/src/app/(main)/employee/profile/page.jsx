@@ -17,7 +17,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useTheme } from "@mui/material/styles";
 
 import TabBar from "./_components/TabBar";
-import EmployeeNotFound from "./_components/EmployeeNotFound";
 import { UserContext } from "../../../context/UserContext";
 
 import axiosInstance from "../../../_utils/axiosInstance";
@@ -30,7 +29,6 @@ const Employee = () => {
   const [employeeData, setEmployeeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [hasEmployeeProfile, setHasEmployeeProfile] = useState(false);
 
   useEffect(() => {
     checkEmployeeProfile();
@@ -43,12 +41,12 @@ const Employee = () => {
 
       if (response.data) {
         setEmployeeData(response.data);
-        setHasEmployeeProfile(true);
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setHasEmployeeProfile(false);
-        setError("Employee profile not found. Please create your profile.");
+        // If no employee profile found, redirect to update page
+        router.push("/employee/update");
+        return;
       } else {
         // Log only unexpected errors
         setError("Error loading employee profile. Please try again.");
@@ -75,15 +73,6 @@ const Employee = () => {
       >
         <CircularProgress />
       </Box>
-    );
-  }
-
-  if (!hasEmployeeProfile) {
-    return (
-      <EmployeeNotFound
-        handleUpdateProfile={handleUpdateProfile}
-        error={error}
-      />
     );
   }
 
@@ -290,6 +279,14 @@ const Employee = () => {
 };
 
 const EmployeePage = () => {
+  const router = useRouter();
+  const { user } = useContext(UserContext);
+  // If user context is missing, or user is authenticated but has no employee profile, redirect
+  useEffect(() => {
+    if (!user) {
+      router.replace("/employee/update");
+    }
+  }, [user, router]);
   return (
     <Suspense fallback={<CircularProgress />}>
       <Employee />

@@ -59,23 +59,10 @@ export default function LoginForm(props) {
         updateUser(userDTO);
         setOpenLogin(false); 
         
-        // Check if user has employee profile
-        try {
-          const employeeResponse = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
-          
-          // If employee profile exists, redirect to dashboard
-          if (employeeResponse.data) {
-            router.push("/dashboard");
-          }
-        } catch (employeeError) {
-          // If employee profile doesn't exist (404 or other error), redirect to profile creation
-          if (employeeError.response && employeeError.response.status === 404) {
-            router.push("/employee/profile");
-          } else {
-            // For other errors, still redirect to profile creation as fallback
-            router.push("/employee/profile");
-          }
-        }
+        // Redirect to dashboard - global layout hook will handle employee profile check
+        // If user has no employee profile, they'll be automatically redirected to /employee/update
+        // If user has employee profile, they'll proceed to dashboard
+        router.push("/dashboard");
       } else {
         setError("Login failed: No token received");
       }
@@ -206,13 +193,7 @@ export default function LoginForm(props) {
                   type="submit"
                   disabled={isSubmitting}
                   variant="contained"
-                  sx={{
-                    py: 1,
-                    backgroundColor: '#E90A4D',
-                    '&:hover': {
-                      backgroundColor: '#D00940'
-                    }
-                  }}
+                 
                 >
                   {isSubmitting ? "Logging in..." : "Login"}
                 </Button>

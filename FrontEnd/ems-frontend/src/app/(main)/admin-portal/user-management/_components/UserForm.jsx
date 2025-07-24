@@ -1,15 +1,20 @@
 "use client";
 
+import React, { useContext } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import * as Yup from "yup";
+import { useFormikContext } from "formik";
 
 import SelectInput from "../../../../_components/inputs/SelectInput";
 import TextInput from "../../../../_components/inputs/TextInput";
 import InputItem from "../../../../_components/inputs/InputItem";
 import { useDepartments } from "../../../../_hooks/useDepartments";
+import { UserContext } from "../../../../context/UserContext";
+import axiosInstance from "../../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../../_utils/apiPaths";
 
 const roles = [
   { id: 1, name: "ADMIN", label: "Admin" },
@@ -112,9 +117,144 @@ export default function UserForm({
   submitForm = null,
 }) {
   const { departments, loading: loadingDepartments } = useDepartments();
+  const { user } = useContext(UserContext);
+  const { values, setFieldValue } = useFormikContext();
+  const [fetchingAdminProfile, setFetchingAdminProfile] = React.useState(false);
+  const [fetchingDepartmentAdmin, setFetchingDepartmentAdmin] = React.useState(false);
+  const [adminProfileCache, setAdminProfileCache] = React.useState(null);
+  const [departmentAdminCache, setDepartmentAdminCache] = React.useState({});
+
+  // Component to handle role-based auto-fill
+  const RoleBasedAutoFill = () => {
+    // Auto-fill reporting fields when admin or user role is selected
+    React.useEffect(() => {
+      const fetchReportingDetails = async () => {
+        if (values.roleId && user) {
+          // Only auto-fill if fields are empty to avoid overwriting manual entries
+          if (!values.reportingPerson && !values.reportingPersonEmail) {
+            
+            if (values.roleId.name === "ADMIN") {
+              // For ADMIN role: Use superadmin's employee profile details
+              try {
+                setFetchingAdminProfile(true);
+                
+                // Check cache first to avoid unnecessary API calls
+                let employeeData = adminProfileCache;
+                
+                if (!employeeData) {
+                  // Fetch current admin's employee profile to get firstName and lastName
+                  const response = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
+                  employeeData = response.data;
+                  setAdminProfileCache(employeeData); // Cache the result
+                }
+                
+                if (employeeData) {
+                  // Use firstName + lastName from employee profile
+                  const reportingPersonName = employeeData.firstName && employeeData.lastName 
+                    ? `${employeeData.firstName} ${employeeData.lastName}`
+                    : user.username || "Admin User";
+                  
+                  // Set reporting person from employee profile and email from user context
+                  setFieldValue("reportingPerson", reportingPersonName);
+                  setFieldValue("reportingPersonEmail", user.email || "");
+                } else {
+                  // Fallback to user context if no employee profile found
+                  const reportingPersonName = user.firstName && user.lastName 
+                    ? `${user.firstName} ${user.lastName}`
+                    : user.username || "Admin User";
+                  
+                  setFieldValue("reportingPerson", reportingPersonName);
+                  setFieldValue("reportingPersonEmail", user.email || "");
+                }
+              } catch (error) {
+                // If employee profile fetch fails, fallback to user context
+                console.log("Could not fetch admin employee profile, using user context as fallback");
+                const reportingPersonName = user.firstName && user.lastName 
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.username || "Admin User";
+                
+                setFieldValue("reportingPerson", reportingPersonName);
+                setFieldValue("reportingPersonEmail", user.email || "");
+              } finally {
+                setFetchingAdminProfile(false);
+              }
+            }
+            
+            else if (values.roleId.name === "USER" && values.department) {
+              // For USER role: Use department admin details
+              try {
+                setFetchingDepartmentAdmin(true);
+                
+                const departmentName = values.department.name || values.department.label;
+                
+                // Check cache first
+                let departmentAdmins = departmentAdminCache[departmentName];
+                
+                if (!departmentAdmins) {
+                  // Fetch department admins
+                  const response = await axiosInstance.get(
+                    API_PATHS.EMPLOYEE.GET_ADMINS_BY_DEPARTMENT(departmentName)
+                  );
+                  departmentAdmins = response.data;
+                  
+                  // Cache the result
+                  setDepartmentAdminCache(prev => ({
+                    ...prev,
+                    [departmentName]: departmentAdmins
+                  }));
+                }
+                
+                if (departmentAdmins && (departmentAdmins.firstName || departmentAdmins.lastName || departmentAdmins.email)) {
+                  // Backend now sends a single object with firstName, lastName, and email
+                  const reportingPersonName = departmentAdmins.firstName && departmentAdmins.lastName 
+                    ? `${departmentAdmins.firstName} ${departmentAdmins.lastName}`
+                    : departmentAdmins.firstName || departmentAdmins.lastName || "Department Admin";
+                  
+                  // Only auto-fill if fields are empty
+                  if (!values.reportingPerson) {
+                    setFieldValue("reportingPerson", reportingPersonName);
+                  }
+                  if (!values.reportingPersonEmail) {
+                    setFieldValue("reportingPersonEmail", departmentAdmins.email || "");
+                  }
+                } else {
+                  console.warn(`No admin found for department: ${departmentName}`);
+                  
+                  // Cache empty result to avoid repeated requests
+                  setDepartmentAdminCache(prev => ({
+                    ...prev,
+                    [departmentName]: null
+                  }));
+                }
+              } catch (error) {
+                console.log("Could not fetch department admin details:", error);
+                // Don't set fallback values for USER role if department admin fetch fails
+              } finally {
+                setFetchingDepartmentAdmin(false);
+              }
+            }
+          }
+        }
+        // Clear fields if role is changed to something that doesn't auto-fill
+        else if (values.roleId && !["ADMIN", "USER"].includes(values.roleId.name)) {
+          // Only clear if they were auto-filled (check if they contain known emails)
+          if (values.reportingPersonEmail === user?.email || values.reportingPersonEmail) {
+            setFieldValue("reportingPerson", "");
+            setFieldValue("reportingPersonEmail", "");
+          }
+        }
+      };
+
+      fetchReportingDetails();
+    }, [values.roleId, values.department]);
+
+    return null; // This component doesn't render anything
+  };
 
   return (
     <Stack spacing={2}>
+      <RoleBasedAutoFill />
+      
       {!isEdit && (
         <InputItem>
           <SelectInput
@@ -150,6 +290,20 @@ export default function UserForm({
           name="reportingPerson"
           label="Reporting Person"
           placeholder="Enter reporting person's name"
+          helperText={
+            fetchingAdminProfile 
+              ? "Fetching admin profile..." 
+              : fetchingDepartmentAdmin
+                ? "Fetching department admin..."
+                : (values.roleId && values.roleId.name === "ADMIN" 
+                    ? "Auto-filled from admin employee profile" 
+                    : values.roleId && values.roleId.name === "USER"
+                      ? (values.department && departmentAdminCache[values.department.name || values.department.label] === null
+                          ? "⚠️ No department admin found - please fill manually"
+                          : "Auto-filled from department admin")
+                      : "")
+          }
+          disabled={fetchingAdminProfile || fetchingDepartmentAdmin}
         />
       </InputItem>
 
@@ -159,6 +313,15 @@ export default function UserForm({
           label="Reporting Email"
           type="email"
           placeholder="Enter reporting person's email"
+          helperText={
+            values.roleId && values.roleId.name === "ADMIN" 
+              ? "Auto-filled from admin user account" 
+              : values.roleId && values.roleId.name === "USER"
+                ? (values.department && departmentAdminCache[values.department.name || values.department.label] === null
+                    ? "⚠️ No department admin found - please fill manually"
+                    : "Auto-filled from department admin")
+                : ""
+          }
         />
       </InputItem>
 

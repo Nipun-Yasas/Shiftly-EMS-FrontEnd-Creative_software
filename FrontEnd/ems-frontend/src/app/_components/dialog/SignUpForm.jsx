@@ -197,11 +197,7 @@ export default function SignUpForm(props) {
                     type="submit"
                     disabled={isSubmitting}
                     variant="contained"
-                    sx={{
-                      width: { xs: "100%", sm: "auto" },
-                      fontSize: { xs: "0.875rem", sm: "1rem" },
-                      backgroundColor: '#E90A4D', color: '#fff'
-                    }}
+                    
                   >
                     {isSubmitting ? "Signing up..." : "Sign Up"}
                   </Button>

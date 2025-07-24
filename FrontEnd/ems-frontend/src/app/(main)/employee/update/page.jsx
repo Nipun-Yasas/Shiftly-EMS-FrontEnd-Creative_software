@@ -25,6 +25,7 @@ import { useTeams } from "../../../_hooks/useTeams";
 import { UserContext } from "../../../context/UserContext";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
+import { employeeProfileCache } from "../../../_utils/employeeProfileCache";
 
 const genderOptions = [
   { id: "Male", name: "Male", label: "Male" },
@@ -96,29 +97,12 @@ export default function EmployeeUpdatePage() {
 
   const userDepartmentId = getUserDepartmentId();
 
-  // Debug logging
-  console.log("=== TEAM FILTERING DEBUG ===");
-  console.log("User:", user);
-  console.log("User department:", user?.department);
-  console.log("User department ID:", userDepartmentId);
-  console.log("Departments:", departments);
-  console.log("Loading departments:", loadingDepartments);
-  console.log("========================");
-
   // Only fetch teams when departments are loaded (needed for department name lookup)
   const shouldFetchTeams = !loadingDepartments && departments.length > 0;
   const teamsDepartmentId = shouldFetchTeams ? userDepartmentId : null;
 
   // Fetch teams filtered by user's department
   const { teams, loading: loadingTeams } = useTeams(teamsDepartmentId);
-
-  // Debug logging for teams
-  console.log("=== TEAMS DEBUG ===");
-  console.log("Teams department ID:", teamsDepartmentId);
-  console.log("Should fetch teams:", shouldFetchTeams);
-  console.log("Teams:", teams);
-  console.log("Loading teams:", loadingTeams);
-  console.log("================");
 
   const [loading, setLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState(null);
@@ -144,7 +128,6 @@ export default function EmployeeUpdatePage() {
     } catch (error) {
       // Only log unexpected errors (not 404s for new users)
       if (error.response?.status !== 404) {
-        console.error("Unexpected error fetching employee profile:", error);
       }
 
       if (error.response && error.response.status === 404) {
@@ -177,9 +160,6 @@ export default function EmployeeUpdatePage() {
           genderOptions.find((g) => g.name === employeeData.gender) || null,
         dob: employeeData.dob || "",
         location: employeeData.location || "",
-        designation:
-          designationOptions.find((d) => d.name === employeeData.designation) ||
-          null,
         team:
           teams.find(
             (t) =>
@@ -221,7 +201,6 @@ export default function EmployeeUpdatePage() {
         gender: values.gender?.name || values.gender,
         dob: values.dob,
         location: values.location,
-        designation: values.designation?.name || values.designation,
         teamId: values.team?.id || null, // Send team ID
         teamName: values.team?.name || null, // Send team name for reference
         skills: values.skills
@@ -234,8 +213,6 @@ export default function EmployeeUpdatePage() {
           ? values.experience.split("\n").filter((exp) => exp.trim() !== "")
           : [],
       };
-
-      console.log("Sending payload:", employeePayload); // Debug log
 
       let response;
       if (employeeData?.employeeId) {
@@ -252,17 +229,15 @@ export default function EmployeeUpdatePage() {
         );
       }
 
-      console.log("Response:", response.data); // Debug log
-
       if (response.data) {
-        setSuccess("Employee profile updated successfully!");
+        setSuccess("Employee profile created successfully!");
+        // Update the employee profile cache so the layout will allow navigation
+        employeeProfileCache.setStatus(true);
         setTimeout(() => {
-          router.push("/employee/profile");
+          router.push("/dashboard");
         }, 2000);
       }
     } catch (error) {
-      console.error("Error updating employee profile:", error);
-      console.error("Error response:", error.response?.data); // Debug log
       if (error.response?.data?.message) {
         setError(error.response.data.message);
       } else {
@@ -274,7 +249,15 @@ export default function EmployeeUpdatePage() {
   };
 
   const handleBack = () => {
-    router.push("/employee/profile");
+    // If user has an existing profile, go back to profile page
+    // If user is creating a new profile, they can't go back (they'll be blocked anyway)
+    if (isEditing) {
+      router.push("/employee/profile");
+    } else {
+      // For new users, don't allow going back as they need to complete their profile
+      // Maybe redirect to dashboard or just stay on the same page
+      router.push("/dashboard");
+    }
   };
 
   if (loading) {
@@ -395,6 +378,7 @@ export default function EmployeeUpdatePage() {
                       name="dob"
                       label="Date of Birth"
                       disabled={isSubmitting}
+                      disablePast={false}
                     />
                   </InputItem>
 
