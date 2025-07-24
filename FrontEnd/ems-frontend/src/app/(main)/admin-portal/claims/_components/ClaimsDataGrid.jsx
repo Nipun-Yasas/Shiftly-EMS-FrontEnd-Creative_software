@@ -4,12 +4,12 @@ import React from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
 import Cancel from "@mui/icons-material/Cancel";
-
-import Visibility from "@mui/icons-material/Visibility";
 import CheckCircle from "@mui/icons-material/CheckCircle";
+import Download from "@mui/icons-material/Download";
 
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
@@ -20,30 +20,23 @@ export default function ClaimsDataGrid({
   claims,
   loading,
   height = "auto",
-  onViewClaim,
   onApprovalAction,
   showApprovalActions = false,
 }) {
   const claimColumns = [
-    { field: "employee_name", headerName: "Employee", width: 170 },
+    { field: "employee_name", headerName: "Employee", width: 150 },
     { field: "department", headerName: "Department", width: 150 },
-    { field: "type", headerName: "Type", width: 140 },
-    {
-      field: "amount",
-      headerName: "Amount",
-      width: 120,
-      renderCell: (params) => `$${params.value?.toFixed(2)}`,
-    },
+    { field: "type", headerName: "Type", width: 110 },
     {
       field: "claimDate",
       headerName: "Claim Date",
-      width: 120,
+      width: 140,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
     },
     {
       field: "submission_date",
       headerName: "Submitted",
-      width: 120,
+      width: 140,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
     },
     {
@@ -66,14 +59,20 @@ export default function ClaimsDataGrid({
       sortable: false,
       renderCell: (params) => 
         params.value ? (
-          <a 
-            href={`http://localhost:8080${params.value}`} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ textDecoration: 'none', color: 'primary.main' }}
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Download />}
+            onClick={() => window.open(`http://localhost:8080${params.value}`, '_blank')}
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
           >
             Download
-          </a>
+          </Button>
         ) : (
           <span style={{ color: '#999' }}>No file</span>
         ),
@@ -81,8 +80,8 @@ export default function ClaimsDataGrid({
     {
       field: "actions",
       headerName: "Actions",
-      width: 130,
-      sortable: false,
+      width: 110,
+      headerClassName: "last-column",
       renderCell: (params) => (
         <Box
           sx={{
@@ -93,15 +92,6 @@ export default function ClaimsDataGrid({
             justifyContent: "center",
           }}
         >
-          <Tooltip title="View Details">
-            <IconButton
-              size="small"
-              onClick={() => onViewClaim && onViewClaim(params.row)}
-              color="primary"
-            >
-              <Visibility />
-            </IconButton>
-          </Tooltip>
           {showApprovalActions && params.row.status === "pending" && (
             <>
               <Tooltip title="Approve Claim">

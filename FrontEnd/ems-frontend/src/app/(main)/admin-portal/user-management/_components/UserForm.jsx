@@ -35,7 +35,6 @@ const designations = [
   { id: 11, name: "Accountant", label: "Accountant" },
 ];
 
-
 // Validation schemas
 export const editValidationSchema = Yup.object({
   department: Yup.object().required("Department is required"),
@@ -50,7 +49,7 @@ export const editValidationSchema = Yup.object({
 });
 
 export const assignValidationSchema = Yup.object({
- roleId: Yup.object().required("Role is required"),
+  roleId: Yup.object().required("Role is required"),
   department: Yup.object().required("Department is required"),
   designation: Yup.object().required("Designation is required"),
   reportingPerson: Yup.string()
@@ -88,7 +87,6 @@ export const getEditInitialValues = (editingUser, departments = []) => {
         ) || null,
       reportingPerson: editingUser.reportingPerson || "",
       reportingPersonEmail: editingUser.reportingPersonEmail || "",
-      
     };
   }
   return {
@@ -120,9 +118,13 @@ export default function UserForm({
   const { user } = useContext(UserContext);
   const { values, setFieldValue } = useFormikContext();
   const [fetchingAdminProfile, setFetchingAdminProfile] = React.useState(false);
-  const [fetchingDepartmentAdmin, setFetchingDepartmentAdmin] = React.useState(false);
+  const [fetchingDepartmentAdmin, setFetchingDepartmentAdmin] =
+    React.useState(false);
+  const [fetchingDepartmentFirstUser, setFetchingDepartmentFirstUser] =
+    React.useState(false);
   const [adminProfileCache, setAdminProfileCache] = React.useState(null);
   const [departmentAdminCache, setDepartmentAdminCache] = React.useState({});
+  const [departmentFirstUserCache, setDepartmentFirstUserCache] = React.useState({});
 
   // Component to handle role-based auto-fill
   const RoleBasedAutoFill = () => {
@@ -132,98 +134,116 @@ export default function UserForm({
         if (values.roleId && user) {
           // Only auto-fill if fields are empty to avoid overwriting manual entries
           if (!values.reportingPerson && !values.reportingPersonEmail) {
-            
             if (values.roleId.name === "ADMIN") {
               // For ADMIN role: Use superadmin's employee profile details
               try {
                 setFetchingAdminProfile(true);
-                
+
                 // Check cache first to avoid unnecessary API calls
                 let employeeData = adminProfileCache;
-                
+
                 if (!employeeData) {
                   // Fetch current admin's employee profile to get firstName and lastName
-                  const response = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
+                  const response = await axiosInstance.get(
+                    API_PATHS.EMPLOYEE.GET_PROFILE
+                  );
                   employeeData = response.data;
                   setAdminProfileCache(employeeData); // Cache the result
                 }
-                
+
                 if (employeeData) {
                   // Use firstName + lastName from employee profile
-                  const reportingPersonName = employeeData.firstName && employeeData.lastName 
-                    ? `${employeeData.firstName} ${employeeData.lastName}`
-                    : user.username || "Admin User";
-                  
+                  const reportingPersonName =
+                    employeeData.firstName && employeeData.lastName
+                      ? `${employeeData.firstName} ${employeeData.lastName}`
+                      : user.username || "Admin User";
+
                   // Set reporting person from employee profile and email from user context
                   setFieldValue("reportingPerson", reportingPersonName);
                   setFieldValue("reportingPersonEmail", user.email || "");
                 } else {
                   // Fallback to user context if no employee profile found
-                  const reportingPersonName = user.firstName && user.lastName 
-                    ? `${user.firstName} ${user.lastName}`
-                    : user.username || "Admin User";
-                  
+                  const reportingPersonName =
+                    user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user.username || "Admin User";
+
                   setFieldValue("reportingPerson", reportingPersonName);
                   setFieldValue("reportingPersonEmail", user.email || "");
                 }
               } catch (error) {
                 // If employee profile fetch fails, fallback to user context
-                console.log("Could not fetch admin employee profile, using user context as fallback");
-                const reportingPersonName = user.firstName && user.lastName 
-                  ? `${user.firstName} ${user.lastName}`
-                  : user.username || "Admin User";
-                
+                console.log(
+                  "Could not fetch admin employee profile, using user context as fallback"
+                );
+                const reportingPersonName =
+                  user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user.username || "Admin User";
+
                 setFieldValue("reportingPerson", reportingPersonName);
                 setFieldValue("reportingPersonEmail", user.email || "");
               } finally {
                 setFetchingAdminProfile(false);
               }
-            }
-            
-            else if (values.roleId.name === "USER" && values.department) {
+            } else if (values.roleId.name === "USER" && values.department) {
               // For USER role: Use department admin details
               try {
                 setFetchingDepartmentAdmin(true);
-                
-                const departmentName = values.department.name || values.department.label;
-                
+
+                const departmentName =
+                  values.department.name || values.department.label;
+
                 // Check cache first
                 let departmentAdmins = departmentAdminCache[departmentName];
-                
+
                 if (!departmentAdmins) {
                   // Fetch department admins
                   const response = await axiosInstance.get(
                     API_PATHS.EMPLOYEE.GET_ADMINS_BY_DEPARTMENT(departmentName)
                   );
                   departmentAdmins = response.data;
-                  
+
                   // Cache the result
-                  setDepartmentAdminCache(prev => ({
+                  setDepartmentAdminCache((prev) => ({
                     ...prev,
-                    [departmentName]: departmentAdmins
+                    [departmentName]: departmentAdmins,
                   }));
                 }
-                
-                if (departmentAdmins && (departmentAdmins.firstName || departmentAdmins.lastName || departmentAdmins.email)) {
+
+                if (
+                  departmentAdmins &&
+                  (departmentAdmins.firstName ||
+                    departmentAdmins.lastName ||
+                    departmentAdmins.email)
+                ) {
                   // Backend now sends a single object with firstName, lastName, and email
-                  const reportingPersonName = departmentAdmins.firstName && departmentAdmins.lastName 
-                    ? `${departmentAdmins.firstName} ${departmentAdmins.lastName}`
-                    : departmentAdmins.firstName || departmentAdmins.lastName || "Department Admin";
-                  
+                  const reportingPersonName =
+                    departmentAdmins.firstName && departmentAdmins.lastName
+                      ? `${departmentAdmins.firstName} ${departmentAdmins.lastName}`
+                      : departmentAdmins.firstName ||
+                        departmentAdmins.lastName ||
+                        "Department Admin";
+
                   // Only auto-fill if fields are empty
                   if (!values.reportingPerson) {
                     setFieldValue("reportingPerson", reportingPersonName);
                   }
                   if (!values.reportingPersonEmail) {
-                    setFieldValue("reportingPersonEmail", departmentAdmins.email || "");
+                    setFieldValue(
+                      "reportingPersonEmail",
+                      departmentAdmins.email || ""
+                    );
                   }
                 } else {
-                  console.warn(`No admin found for department: ${departmentName}`);
-                  
+                  console.warn(
+                    `No admin found for department: ${departmentName}`
+                  );
+
                   // Cache empty result to avoid repeated requests
-                  setDepartmentAdminCache(prev => ({
+                  setDepartmentAdminCache((prev) => ({
                     ...prev,
-                    [departmentName]: null
+                    [departmentName]: null,
                   }));
                 }
               } catch (error) {
@@ -236,9 +256,15 @@ export default function UserForm({
           }
         }
         // Clear fields if role is changed to something that doesn't auto-fill
-        else if (values.roleId && !["ADMIN", "USER"].includes(values.roleId.name)) {
+        else if (
+          values.roleId &&
+          !["ADMIN", "USER"].includes(values.roleId.name)
+        ) {
           // Only clear if they were auto-filled (check if they contain known emails)
-          if (values.reportingPersonEmail === user?.email || values.reportingPersonEmail) {
+          if (
+            values.reportingPersonEmail === user?.email ||
+            values.reportingPersonEmail
+          ) {
             setFieldValue("reportingPerson", "");
             setFieldValue("reportingPersonEmail", "");
           }
@@ -248,13 +274,73 @@ export default function UserForm({
       fetchReportingDetails();
     }, [values.roleId, values.department]);
 
+    // Auto-fill reporting fields when department is selected (for verify user form)
+    React.useEffect(() => {
+      const fetchDepartmentFirstUser = async () => {
+        if (values.department && !isEdit) {
+          // Only auto-fill if fields are empty to avoid overwriting manual entries
+          if (!values.reportingPerson && !values.reportingPersonEmail) {
+            try {
+              setFetchingDepartmentFirstUser(true);
+
+              const departmentName = values.department.name || values.department.label;
+
+              // Check cache first
+              let firstUser = departmentFirstUserCache[departmentName];
+
+              if (!firstUser) {
+                // Fetch first user by department
+                const response = await axiosInstance.get(
+                  API_PATHS.DEPARTMENTS.GET_FIRST_USER_BY_DEPARTMENT(departmentName)
+                );
+                firstUser = response.data;
+
+                // Cache the result
+                setDepartmentFirstUserCache((prev) => ({
+                  ...prev,
+                  [departmentName]: firstUser,
+                }));
+              }
+
+              if (firstUser && firstUser.username && firstUser.email) {
+                // Auto-fill reporting person with username and email from the response
+                setFieldValue("reportingPerson", firstUser.username);
+                setFieldValue("reportingPersonEmail", firstUser.email);
+              } else {
+                console.warn(`No first user found for department: ${departmentName}`);
+                
+                // Cache empty result to avoid repeated requests
+                setDepartmentFirstUserCache((prev) => ({
+                  ...prev,
+                  [departmentName]: null,
+                }));
+              }
+            } catch (error) {
+              console.log("Could not fetch department first user details:", error);
+              
+              // Cache null to avoid repeated failed requests
+              const departmentName = values.department.name || values.department.label;
+              setDepartmentFirstUserCache((prev) => ({
+                ...prev,
+                [departmentName]: null,
+              }));
+            } finally {
+              setFetchingDepartmentFirstUser(false);
+            }
+          }
+        }
+      };
+
+      fetchDepartmentFirstUser();
+    }, [values.department, isEdit]);
+
     return null; // This component doesn't render anything
   };
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={1}>
       <RoleBasedAutoFill />
-      
+
       {!isEdit && (
         <InputItem>
           <SelectInput
@@ -273,7 +359,11 @@ export default function UserForm({
           options={departments || []}
           getOptionLabel={(option) => option.label || option.name}
           disabled={loadingDepartments}
-          placeholder={departments.length === 0 ? "No departments available" : "Select department"}
+          placeholder={
+            departments.length === 0
+              ? "No departments available"
+              : "Select department"
+          }
         />
       </InputItem>
 
@@ -292,19 +382,30 @@ export default function UserForm({
           label="Reporting Person"
           placeholder="Enter reporting person's name"
           helperText={
-            fetchingAdminProfile 
-              ? "Fetching admin profile..." 
+            fetchingAdminProfile
+              ? "Fetching admin profile..."
               : fetchingDepartmentAdmin
                 ? "Fetching department admin..."
-                : (values.roleId && values.roleId.name === "ADMIN" 
-                    ? "Auto-filled from admin employee profile" 
+                : fetchingDepartmentFirstUser
+                  ? "Fetching department reporting person..."
+                  : values.roleId && values.roleId.name === "ADMIN"
+                    ? "Auto-filled from admin employee profile"
                     : values.roleId && values.roleId.name === "USER"
-                      ? (values.department && departmentAdminCache[values.department.name || values.department.label] === null
-                          ? "⚠️ No department admin found - please fill manually"
-                          : "Auto-filled from department admin")
-                      : "")
+                      ? values.department &&
+                        departmentAdminCache[
+                          values.department.name || values.department.label
+                        ] === null
+                        ? "⚠️ No department admin found - please fill manually"
+                        : "Auto-filled from department admin"
+                      : !isEdit && values.department
+                        ? departmentFirstUserCache[
+                            values.department.name || values.department.label
+                          ] === null
+                          ? "⚠️ No reporting person found for this department"
+                          : "Auto-filled from department reporting person"
+                        : ""
           }
-          disabled={fetchingAdminProfile || fetchingDepartmentAdmin}
+          disabled={fetchingAdminProfile || fetchingDepartmentAdmin || fetchingDepartmentFirstUser}
         />
       </InputItem>
 
@@ -315,13 +416,22 @@ export default function UserForm({
           type="email"
           placeholder="Enter reporting person's email"
           helperText={
-            values.roleId && values.roleId.name === "ADMIN" 
-              ? "Auto-filled from admin user account" 
+            values.roleId && values.roleId.name === "ADMIN"
+              ? "Auto-filled from admin user account"
               : values.roleId && values.roleId.name === "USER"
-                ? (values.department && departmentAdminCache[values.department.name || values.department.label] === null
-                    ? "⚠️ No department admin found - please fill manually"
-                    : "Auto-filled from department admin")
-                : ""
+                ? values.department &&
+                  departmentAdminCache[
+                    values.department.name || values.department.label
+                  ] === null
+                  ? "⚠️ No department admin found - please fill manually"
+                  : "Auto-filled from department admin"
+                : !isEdit && values.department
+                  ? departmentFirstUserCache[
+                      values.department.name || values.department.label
+                    ] === null
+                    ? "⚠️ No reporting email found for this department"
+                    : "Auto-filled from department reporting person"
+                  : ""
           }
         />
       </InputItem>
@@ -332,11 +442,8 @@ export default function UserForm({
           justifyContent: { xs: "center", sm: "flex-end" },
           gap: 2,
           width: "100%",
-          pt: 2,
         }}
       >
-        
-
         {onCancel && (
           <Button color="text.primary" variant="text" onClick={onCancel}>
             Cancel

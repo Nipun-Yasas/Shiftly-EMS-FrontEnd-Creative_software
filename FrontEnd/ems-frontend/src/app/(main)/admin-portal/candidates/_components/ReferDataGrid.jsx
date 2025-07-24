@@ -17,8 +17,7 @@ export default function ReferDataGrid({
   onMarkAsUnread
 }) {
   const candidateColumns = [
-    { field: "firstName", headerName: "First Name", width: 130 },
-    { field: "lastName", headerName: "Last Name", width: 130 },
+    { field: "firstName", headerName: "Name", width: 130 },
     { field: "email", headerName: "Email", width: 210 },
     { field: "position", headerName: "Position", width: 180 },
     {
@@ -100,8 +99,6 @@ export default function ReferDataGrid({
       rows={rows}
       columns={candidateColumns}
       pageSize={10}
-      rowsPerPageOptions={[5, 10, 20]}
-      loading={loading}
     />
   );
 }

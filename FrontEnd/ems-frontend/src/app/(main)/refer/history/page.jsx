@@ -8,11 +8,12 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import EditReferDialog from "../_components/EditReferDialog";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -35,13 +36,38 @@ export default function ReferHistory() {
   const fetchReferrals = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(API_PATHS.REFERRALS.GET_BY_USER_ID(user.id));
+      // Use the /my endpoint instead of /user/{userId} for better security
+      const response = await axiosInstance.get(API_PATHS.REFERRALS.MY_REFERRALS);
+      console.log('=== RAW RESPONSE FROM BACKEND ===');
+      console.log(response.data);
+      console.log('=== END RAW RESPONSE ===');
+      
+      if (!response.data || response.data.length === 0) {
+        console.log('No referrals found in response');
+        setReferData([]);
+        return;
+      }
+
+      // Let's log each individual item to see the structure
+      response.data.forEach((ref, index) => {
+        console.log(`=== REFERRAL ${index + 1} ===`);
+        console.log('Full object:', ref);
+        console.log('ID:', ref.id);
+        console.log('fileUrl property:', ref.fileUrl);
+        console.log('fileUrl type:', typeof ref.fileUrl);
+        console.log('fileUrl is null?', ref.fileUrl === null);
+        console.log('fileUrl is undefined?', ref.fileUrl === undefined);
+        console.log('fileUrl is empty string?', ref.fileUrl === '');
+        console.log('=== END REFERRAL ===');
+      });
+      
       const mapped = response.data.map(ref => {
         let vacancyName = ref.vacancyName;
         if (!vacancyName && ref.vacancyId && vacancies.length > 0) {
           const found = vacancies.find(v => v.id === ref.vacancyId);
           vacancyName = found ? found.name : ref.vacancyId;
         }
+        
         return {
           id: ref.id,
           vacancy: vacancyName || ref.vacancyId,
@@ -49,11 +75,20 @@ export default function ReferHistory() {
           applicant_email: ref.applicantEmail,
           message: ref.message,
           resume_file_path: ref.fileUrl,
+          fileUrl: ref.fileUrl,
           status: ref.status,
         };
       });
+      
+      console.log('=== MAPPED DATA ===');
+      console.log(mapped);
+      console.log('=== END MAPPED DATA ===');
+      
       setReferData(mapped);
     } catch (error) {
+      console.error('Error fetching referrals:', error);
+      console.error('Error details:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       setReferData([]);
     } finally {
       setLoading(false);
@@ -61,9 +96,13 @@ export default function ReferHistory() {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user) {
+      console.log('User not available:', user);
+      return;
+    }
+    console.log('Fetching referrals for current user');
     fetchReferrals();
-  }, [user?.id, vacancies]);
+  }, [user, vacancies]);
 
   // Edit logic
   const handleUpdateRecord = async (id, data) => {
@@ -169,14 +208,90 @@ export default function ReferHistory() {
       field: "resume_file_path", 
       headerName: "Uploaded Resume", 
       width: 180,
+      sortable: false,
       renderCell: (params) => {
         const fileUrl = params.value;
-        if (!fileUrl) return "No file";
-        const fullUrl = "http://localhost:8080" + fileUrl;
+        const rowData = params.row;
+        
+        console.log('=== RENDER CELL DEBUG ===');
+        console.log('Row ID:', rowData.id);
+        console.log('params.value (fileUrl):', fileUrl);
+        console.log('Type of fileUrl:', typeof fileUrl);
+        console.log('fileUrl === null:', fileUrl === null);
+        console.log('fileUrl === undefined:', fileUrl === undefined);
+        console.log('fileUrl === "":', fileUrl === "");
+        console.log('fileUrl === "null":', fileUrl === "null");
+        console.log('Row data fileUrl property:', rowData.fileUrl);
+        console.log('Row data resume_file_path property:', rowData.resume_file_path);
+        console.log('Full row data:', rowData);
+        console.log('=== END RENDER CELL DEBUG ===');
+        
+        // TEMPORARY: Let's test with a hardcoded file URL to see if the button works
+        if (rowData.id === 1) { // Testing with your current row ID
+          console.log('Testing with hardcoded URL for row 1');
+          return (
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<DownloadIcon />}
+              onClick={() => {
+                const testUrl = 'http://localhost:8080/uploads/files/087cae95-cf00-45ca-8fab-0707d9b9b8a9_mediq_logo.png';
+                console.log('Test download clicked:', testUrl);
+                window.open(testUrl, '_blank');
+              }}
+              sx={{ 
+                fontSize: '0.75rem',
+                minWidth: 'auto',
+                px: 1,
+                py: 0.5,
+                backgroundColor: '#e3f2fd' // Light blue to indicate it's a test button
+              }}
+            >
+              Test Download
+            </Button>
+          );
+        }
+        
+        // Check for all possible falsy values
+        if (!fileUrl || 
+            fileUrl === 'null' || 
+            fileUrl === '' || 
+            fileUrl === null || 
+            fileUrl === undefined ||
+            (typeof fileUrl === 'string' && fileUrl.trim() === '')) {
+          console.log('Showing No file for row:', rowData.id);
+          return (
+            <Box sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+              No file
+            </Box>
+          );
+        }
+        
+        // Construct the full URL - handle both cases where fileUrl starts with / or not
+        const fullUrl = fileUrl.startsWith('/') 
+          ? `http://localhost:8080${fileUrl}` 
+          : `http://localhost:8080/${fileUrl}`;
+        
+        console.log('Showing Download button for row:', rowData.id, 'URL:', fullUrl);
+        
         return (
-          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon />}
+            onClick={() => {
+              console.log('Download button clicked, opening:', fullUrl);
+              window.open(fullUrl, '_blank');
+            }}
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
+          >
             Download
-          </a>
+          </Button>
         );
       }
     },

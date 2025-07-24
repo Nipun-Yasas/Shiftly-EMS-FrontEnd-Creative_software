@@ -83,13 +83,34 @@ export default function ReferForm(props) {
         await onSubmit(values, { setSubmitting, resetForm });
       } else {
         // Default submission logic
+        if (!values.resume) {
+          showSnackbar("Please select a resume file before submitting.", "error");
+          return;
+        }
+
         const formData = new FormData();
         formData.append('vacancyId', values.vacancy?.id || values.vacancy);
         formData.append('applicantName', values.applicantName);
         formData.append('applicantEmail', values.applicantEmail);
         formData.append('message', values.message);
         if (values.resume) {
-          formData.append('resume', values.resume);
+          formData.append('file', values.resume); // Backend expects 'file' parameter
+        }
+
+        console.log('Submitting FormData:');
+        console.log('vacancyId:', values.vacancy?.id || values.vacancy);
+        console.log('applicantName:', values.applicantName);
+        console.log('applicantEmail:', values.applicantEmail);
+        console.log('message:', values.message);
+        console.log('file:', values.resume);
+        console.log('file name:', values.resume?.name);
+        console.log('file size:', values.resume?.size);
+        console.log('file type:', values.resume?.type);
+
+        // Log FormData contents (for debugging)
+        console.log('FormData entries:');
+        for (let pair of formData.entries()) {
+          console.log(pair[0] + ': ', pair[1]);
         }
 
         const response = await axiosInstance.post(API_PATHS.REFERRALS.ADD, formData, {
@@ -99,6 +120,7 @@ export default function ReferForm(props) {
         });
 
         if (response.status === 200 || response.status === 201) {
+          console.log('Referral submission successful:', response.data);
           showSnackbar("Referral submitted successfully!", "success");
           resetForm();
           setFileName("");
@@ -110,14 +132,30 @@ export default function ReferForm(props) {
           if (setOpenSubmit) {
             setTimeout(() => setOpenSubmit(true), 500);
           }
+        } else {
+          console.log('Unexpected response status:', response.status);
+          showSnackbar("Unexpected response from server", "warning");
         }
       }
     } catch (error) {
       console.error("Submission error:", error);
-      showSnackbar(
-        error.response?.data?.message || "Failed to submit referral. Please try again.",
-        "error"
-      );
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response status:", error.response?.status);
+      
+      let errorMessage = "Failed to submit referral. Please try again.";
+      
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      }
+      
+      showSnackbar(errorMessage, "error");
     } finally {
       setSubmitting(false);
     }
@@ -228,7 +266,6 @@ export default function ReferForm(props) {
                     setFileName={setFileName}
                     preview={preview}
                     setPreview={setPreview}
-                    onChange={(file) => setFieldValue("resume", file)}
                   />
                 </InputItem>
               </Box>

@@ -119,9 +119,9 @@ export const API_PATHS = {
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
   },
   DEPARTMENTS: {
-
-  GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
-},
+    GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
+    GET_FIRST_USER_BY_DEPARTMENT: (department) => `/users/first-by-department/${department}`,
+  },
   TIMESHEETS: {
     ADD: "/api/v1/shiftly/ems/timesheets/add",
     UPDATE: "/api/v1/shiftly/ems/timesheets/update",

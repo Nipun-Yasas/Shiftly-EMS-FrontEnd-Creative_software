@@ -9,9 +9,7 @@ export default function AllTab({
   onViewDetails,
   onMarkAsRead,
   onMarkAsUnread,
-  onDownloadFile, // Make sure this prop is included
-  filterStatus,
-  onFilterChange,
+  onDownloadFile, 
 }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>

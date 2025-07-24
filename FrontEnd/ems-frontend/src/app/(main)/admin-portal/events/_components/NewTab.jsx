@@ -12,7 +12,7 @@ export default function NewTab({
   onApprovalAction,
 }) {
   return (
-    <Box sx={{ p: 2, mb: 3 }}>
+    <Box sx={{ p: 3, mb: 3 }}>
       <EventDataGrid
         loading={loading}
         events={events.filter((e) => e.status === "pending")}

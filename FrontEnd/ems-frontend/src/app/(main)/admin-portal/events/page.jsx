@@ -15,7 +15,6 @@ import axiosInstance from "../../../_utils/axiosInstance";
 import TabPanel from "../../../_components/main/TabPanel";
 import NewTab from "./_components/NewTab";
 import AllTab from "./_components/AllTab";
-import DetailsDialog from "./_components/DetailsDialog";
 import EventDialog from "./_components/EventDialog";
 
 export default function EventSubmissionPage() {
@@ -172,6 +171,7 @@ export default function EventSubmissionPage() {
           approvedBy: event.status === 'APPROVED' ? 'Admin' : null,
           approvedAt: event.status === 'APPROVED' ? new Date().toISOString() : null,
           rejectionReason: event.status === 'REJECTED' ? 'Event rejected by admin' : null,
+          imageUrl: event.imageUrl, // Add the imageUrl field from backend
           // Backend specific fields
           createdBy: event.createdBy,
           fileName: event.fileName,
@@ -315,13 +315,6 @@ export default function EventSubmissionPage() {
         <TabPanel value={tabValue} index={1}>
           <AllTab {...tabProps} events={getFilteredEvents()} />
         </TabPanel>
-
-        <DetailsDialog
-          open={openDetailDialog}
-          onClose={() => setOpenDetailDialog(false)}
-          selectedEvent={selectedEvent}
-          onApprovalAction={handleApprovalAction}
-        />
 
         <EventDialog
           open={openApprovalDialog}

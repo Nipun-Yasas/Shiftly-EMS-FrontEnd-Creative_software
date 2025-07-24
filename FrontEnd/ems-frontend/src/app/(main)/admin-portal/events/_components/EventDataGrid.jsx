@@ -4,12 +4,13 @@ import React from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
 
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import Download from "@mui/icons-material/Download";
 
 import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
@@ -19,15 +20,25 @@ import { getStatusIcon, getStatusColor } from "../../_helpers/colorhelper";
 export default function EventDataGrid({
   loading,
   events,
-  onViewDetails,
   onApprovalAction,
   showApprovalActions = true,
 }) {
   const eventColumns = [
+    
+    { field: "title", headerName: "Event Title", width: 200 },
+    { field: "organizer", headerName: "Name", width: 170 },
+    { field: "department", headerName: "Department", width: 160 },
+    { field: "eventType", headerName: "Type", width: 160 },
+    {
+      field: "startDate",
+      headerName: "Event Date",
+      width: 150,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
     {
       field: "status",
       headerName: "Status",
-      width: 120,
+      width: 110,
       renderCell: (params) => (
         <Chip
           icon={getStatusIcon(params.value)}
@@ -37,46 +48,44 @@ export default function EventDataGrid({
         />
       ),
     },
-    { field: "title", headerName: "Event Title", width: 200 },
-    { field: "organizer", headerName: "Organizer", width: 150 },
-    { field: "department", headerName: "Department", width: 120 },
-    { field: "eventType", headerName: "Type", width: 120 },
     {
-      field: "startDate",
-      headerName: "Event Date",
+      field: "imageUrl",
+      headerName: "Banner",
       width: 120,
-      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
-    },
-    {
-      field: "expectedAttendees",
-      headerName: "Attendees",
-      width: 100,
-      align: "center",
-    },
-    {
-      field: "budget",
-      headerName: "Budget",
-      width: 100,
-      renderCell: (params) => `$${params.value?.toLocaleString()}`,
+      sortable: false,
+      renderCell: (params) => {
+        const imageUrl = params.value;
+        
+        return imageUrl && imageUrl.trim() !== "" ? (
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Download />}
+            onClick={() => window.open(`http://localhost:8080${imageUrl}`, '_blank')}
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
+          >
+            Download
+          </Button>
+        ) : (
+          <span style={{ color: '#999' }}>No banner</span>
+        );
+      },
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 200,
-      headerClassName: "actions-header",
+      width: 100,
+      headerClassName: "last-column",
       align: "center",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
-          <Tooltip title="View Details">
-            <IconButton
-              size="small"
-              onClick={() => onViewDetails(params.row)}
-              color="primary"
-            >
-              <VisibilityIcon />
-            </IconButton>
-          </Tooltip>
-          {showApprovalActions && params.row.status === "pending" && (
+          
+          {showApprovalActions && (params.row.status === "pending" || params.row.status === "PENDING") && (
             <>
               <Tooltip title="Approve Event">
                 <IconButton

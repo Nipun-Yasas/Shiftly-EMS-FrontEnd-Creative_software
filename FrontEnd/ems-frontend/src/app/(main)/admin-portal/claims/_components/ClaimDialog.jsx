@@ -45,7 +45,7 @@ export default function ClaimApprovalDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose}  fullWidth>
       <DialogTitle>
         <Box
           sx={{
@@ -62,37 +62,14 @@ export default function ClaimApprovalDialog({
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent >
         {selectedClaim && (
           <Box>
-            <Typography variant="h6" gutterBottom>
-              {selectedClaim.employee_name} - {selectedClaim.type}
-            </Typography>
             <Typography variant="body1" gutterBottom>
-              Amount: ${selectedClaim.amount?.toFixed(2)}
+              are you sure you want to {action} the claim for{" "}
+              {selectedClaim.employee_name}?
             </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {selectedClaim.description}
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label={
-                action === "approve"
-                  ? "Approval Notes (optional)"
-                  : "Rejection Reason (optional)"
-              }
-              variant="outlined"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={
-                action === "approve"
-                  ? "Any additional notes..."
-                  : "Please provide a reason for rejection..."
-              }
-              sx={{ mt: 2 }}
-            />
+            
           </Box>
         )}
       </DialogContent>

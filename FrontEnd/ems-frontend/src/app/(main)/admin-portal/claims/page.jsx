@@ -8,7 +8,6 @@ import Tabs from "@mui/material/Tabs";
 import Badge from "@mui/material/Badge";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
@@ -20,7 +19,6 @@ import PendingTab from "./_components/PendingTab";
 import ApprovedTab from "./_components/ApprovedTab";
 import RejectedTab from "./_components/RejectedTab";
 import AllTab from "./_components/AllTab";
-import DetailsDialog from "./_components/DetailsDialog";
 import ClaimDialog from "./_components/ClaimDialog";
 import TabPanel from "../../../_components/main/TabPanel";
 
@@ -43,61 +41,6 @@ export default function ClaimsManagementPage() {
     severity: "success",
   });
 
-  // Sample claims data - replace with actual API calls
-  const sampleClaims = [
-    {
-      id: 1,
-      employee_name: "John Smith",
-      employeeEmail: "john.smith@company.com",
-      department: "Engineering",
-      type: "Medical",
-      description: "Routine medical checkup and prescription costs",
-      amount: 250.0,
-      claimDate: "2025-07-10T00:00:00",
-      submission_date: "2025-07-12T14:30:00",
-      status: "pending",
-      attachments: ["medical-receipt-001.pdf", "prescription-receipt.pdf"],
-      approvedBy: null,
-      approvedAt: null,
-      rejectionReason: null,
-    },
-    {
-      id: 2,
-      employee_name: "Sarah Johnson",
-      employeeEmail: "sarah.johnson@company.com",
-      department: "Marketing",
-      type: "Travel",
-      description: "Business trip expenses for client meeting in New York",
-      amount: 1200.5,
-      claimDate: "2025-07-08T00:00:00",
-      submission_date: "2025-07-09T10:15:00",
-      status: "approved",
-      attachments: [
-        "flight-receipt.pdf",
-        "hotel-receipt.pdf",
-        "taxi-receipts.pdf",
-      ],
-      approvedBy: "Admin User",
-      approvedAt: "2025-07-10T11:30:00",
-      rejectionReason: null,
-    },
-    {
-      id: 3,
-      employee_name: "Mike Chen",
-      employeeEmail: "mike.chen@company.com",
-      department: "IT",
-      type: "Equipment",
-      description: "Laptop repair and maintenance",
-      amount: 450.0,
-      claimDate: "2025-07-05T00:00:00",
-      submission_date: "2025-07-06T09:20:00",
-      status: "rejected",
-      attachments: ["repair-invoice.pdf"],
-      approvedBy: null,
-      approvedAt: null,
-      rejectionReason: "Equipment not covered under current policy",
-    },
-  ];
 
   // Fetch claims data
   useEffect(() => {
@@ -371,14 +314,6 @@ export default function ClaimsManagementPage() {
             </TabPanel>
           </>
         )}
-
-        {/* Claim Details Dialog */}
-        <DetailsDialog
-          open={openDetailDialog}
-          selectedClaim={selectedClaim}
-          onClose={() => setOpenDetailDialog(false)}
-          onApprovalAction={handleApprovalAction}
-        />
 
         {/* Claim Dialog */}
         <ClaimDialog

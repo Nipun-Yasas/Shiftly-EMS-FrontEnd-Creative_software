@@ -6,7 +6,8 @@ import Receipt from "@mui/icons-material/Receipt";
 
 
 export const getStatusColor = (status) => {
-  switch (status) {
+  const normalizedStatus = status?.toLowerCase();
+  switch (normalizedStatus) {
     case 'approved':
       return 'success';
     case 'rejected':
@@ -19,7 +20,8 @@ export const getStatusColor = (status) => {
 };
 
 export const getStatusIcon = (status) => {
-  switch (status) {
+  const normalizedStatus = status?.toLowerCase();
+  switch (normalizedStatus) {
     case "approved":
       return <CheckCircle />;
     case "rejected":
