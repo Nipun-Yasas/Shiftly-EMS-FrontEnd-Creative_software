@@ -176,17 +176,7 @@ export default function QuickActionsCard() {
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // API Tester Tool State
-  const [apiUrl, setApiUrl] = useState('https://jsonplaceholder.typicode.com/posts/1');
-  const [apiMethod, setApiMethod] = useState('GET');
-  const [apiHeaders, setApiHeaders] = useState('{"Content-Type": "application/json"}');
-  const [apiBody, setApiBody] = useState('{"title": "Sample Post", "body": "This is a test post"}');
-  const [apiResponse, setApiResponse] = useState('');
-  const [isApiLoading, setIsApiLoading] = useState(false);
-  const [savedApiRequests, setSavedApiRequests] = useState([]);
-  const [selectedApiRequest, setSelectedApiRequest] = useState(null);
-  const [isEditingApi, setIsEditingApi] = useState(false);
-  
+ 
   // Password Generator Tool State
   const [passwordLength, setPasswordLength] = useState(12);
   const [includeUppercase, setIncludeUppercase] = useState(true);
@@ -228,7 +218,6 @@ export default function QuickActionsCard() {
     setIsClient(true);
     // Load saved data from localStorage using user-specific functions
     const savedSnippetsData = getUserData('codeSnippets');
-    const savedApiRequestsData = getUserData('apiRequests');
     const savedPasswordsData = getUserData('savedPasswords');
     const savedJsonSnippetsData = getUserData('jsonSnippets');
     const savedColorsData = getUserData('savedColors');
@@ -236,9 +225,6 @@ export default function QuickActionsCard() {
     
     if (savedSnippetsData) {
       setSavedSnippets(savedSnippetsData);
-    }
-    if (savedApiRequestsData) {
-      setSavedApiRequests(savedApiRequestsData);
     }
     if (savedPasswordsData) {
       setSavedPasswords(savedPasswordsData);
@@ -288,12 +274,6 @@ export default function QuickActionsCard() {
     }
   }, [savedSnippets, mounted]);
 
-  // Save API requests to localStorage whenever they change
-  useEffect(() => {
-    if (mounted) {
-      saveUserData('apiRequests', savedApiRequests);
-    }
-  }, [savedApiRequests, mounted]);
 
   // Save passwords to localStorage whenever they change
   useEffect(() => {
@@ -524,13 +504,6 @@ export default function QuickActionsCard() {
       component: 'CodeSnippetTool'
     },
     {
-      id: 'api-tester',
-      title: 'API Tester',
-      icon: <FilterList />,
-      description: 'Test API endpoints quickly',
-      component: 'ApiTesterTool'
-    },
-    {
       id: 'password-generator',
       title: 'Password Gen',
       icon: <Security />,
@@ -575,7 +548,6 @@ export default function QuickActionsCard() {
   const handleExportData = () => {
     const exportData = {
       snippets: savedSnippets,
-      apiRequests: savedApiRequests,
       passwords: savedPasswords,
       jsonSnippets: savedJsonSnippets,
       colors: savedColors,
@@ -617,7 +589,6 @@ export default function QuickActionsCard() {
             const data = JSON.parse(e.target.result);
             
             if (data.snippets) setSavedSnippets(data.snippets);
-            if (data.apiRequests) setSavedApiRequests(data.apiRequests);
             if (data.passwords) setSavedPasswords(data.passwords);
             if (data.jsonSnippets) setSavedJsonSnippets(data.jsonSnippets);
             if (data.colors) setSavedColors(data.colors);
@@ -647,7 +618,6 @@ export default function QuickActionsCard() {
   const handleClearAllData = () => {
     if (window.confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
       setSavedSnippets([]);
-      setSavedApiRequests([]);
       setSavedPasswords([]);
       setSavedJsonSnippets([]);
       setSavedColors([]);
@@ -656,7 +626,6 @@ export default function QuickActionsCard() {
       
       // Clear localStorage
       localStorage.removeItem('codeSnippets');
-      localStorage.removeItem('apiRequests');
       localStorage.removeItem('savedPasswords');
       localStorage.removeItem('jsonSnippets');
       localStorage.removeItem('savedColors');
@@ -1267,37 +1236,6 @@ export default function QuickActionsCard() {
     }
   };
 
-  const testApi = async () => {
-    if (!apiUrl) {
-      setSnackbarMessage('Please enter a URL');
-      setSnackbarOpen(true);
-      return;
-    }
-    
-    setIsApiLoading(true);
-    try {
-      const headers = apiHeaders ? JSON.parse(apiHeaders) : {};
-      const body = apiBody ? JSON.parse(apiBody) : null;
-      
-      const response = await fetch(apiUrl, {
-        method: apiMethod,
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers
-        },
-        body: body ? JSON.stringify(body) : undefined
-      });
-      
-      const responseText = await response.text();
-      setApiResponse(`Status: ${response.status} ${response.statusText}\n\n${responseText}`);
-      addActivity(`Tested ${apiMethod} API: ${apiUrl}`, 'development');
-    } catch (error) {
-      setApiResponse('Error: ' + error.message);
-    } finally {
-      setIsApiLoading(false);
-    }
-  };
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     setSnackbarMessage('Copied to clipboard!');
@@ -1377,65 +1315,6 @@ export default function QuickActionsCard() {
         )
       );
     }, 3600000);
-  };
-
-  // API Tester functions
-  const saveApiRequest = () => {
-    if (!apiUrl.trim()) {
-      setSnackbarMessage('Please provide an API URL');
-      setSnackbarOpen(true);
-      return;
-    }
-
-    const newRequest = {
-      id: selectedApiRequest ? selectedApiRequest.id : Date.now(),
-      name: `API Request ${savedApiRequests.length + 1}`,
-      url: apiUrl.trim(),
-      method: apiMethod,
-      headers: apiHeaders.trim(),
-      body: apiBody.trim(),
-      createdAt: selectedApiRequest ? selectedApiRequest.createdAt : new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (isEditingApi && selectedApiRequest) {
-      setSavedApiRequests(prev => prev.map(r => r.id === selectedApiRequest.id ? newRequest : r));
-      setSnackbarMessage('API request updated successfully');
-      addActivity(`Updated API request: ${newRequest.name}`, 'development');
-    } else {
-      setSavedApiRequests(prev => [newRequest, ...prev]);
-      setSnackbarMessage('API request saved successfully');
-      addActivity(`Saved API request: ${newRequest.name}`, 'development');
-    }
-
-    setSnackbarOpen(true);
-  };
-
-  const loadApiRequest = (request) => {
-    setApiUrl(request.url);
-    setApiMethod(request.method);
-    setApiHeaders(request.headers);
-    setApiBody(request.body);
-    setSelectedApiRequest(request);
-    setIsEditingApi(true);
-  };
-
-  const deleteApiRequest = (requestId) => {
-    const requestToDelete = savedApiRequests.find(r => r.id === requestId);
-    setSavedApiRequests(prev => prev.filter(r => r.id !== requestId));
-    if (selectedApiRequest && selectedApiRequest.id === requestId) {
-      setApiUrl('');
-      setApiMethod('GET');
-      setApiHeaders('');
-      setApiBody('');
-      setSelectedApiRequest(null);
-      setIsEditingApi(false);
-    }
-    setSnackbarMessage('API request deleted successfully');
-    if (requestToDelete) {
-      addActivity(`Deleted API request: ${requestToDelete.name}`, 'development');
-    }
-    setSnackbarOpen(true);
   };
 
   // Password Generator functions
@@ -2758,258 +2637,6 @@ export default function QuickActionsCard() {
                                 variant="outlined"
                                 color="error"
                                 onClick={() => deleteSnippet(snippet.id)}
-                                sx={{
-                                  borderColor: theme.palette.error.main,
-                                  color: theme.palette.error.main,
-                                  fontSize: '0.75rem',
-                                  minWidth: 'auto',
-                                  px: 1,
-                                  
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </Box>
-                          </Box>
-                        ))
-                      )}
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
-
-            {/* API Tester Tool */}
-            {activeTool === 'api-tester' && (
-              <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: 'var(--font-poppins)', color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.text.primary }}>
-                  API Tester
-                </Typography>
-                
-                <Grid container spacing={3}>
-                  {/* Left side - Form */}
-                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
-                        {isEditingApi ? 'Edit API Request' : 'New API Request'}
-                      </Typography>
-                    </Box>
-                    
-                    <TextField
-                      label="API URL"
-                      fullWidth
-                      value={apiUrl}
-                      onChange={(e) => setApiUrl(e.target.value)}
-                      placeholder="https://api.example.com/endpoint"
-                      sx={{ 
-                        mb: 2,
-                        
-                        border: `1px solid ${theme.palette.divider}`,
-                        
-                        
-                      }}
-                    />
-                    
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel sx={{ color: theme.palette.text }}>Method</InputLabel>
-                      <Select
-                        value={apiMethod}
-                        onChange={(e) => setApiMethod(e.target.value)}
-                        label="Method"
-                        sx={{
-                          
-                          border: `1px solid ${theme.palette.divider}`,
-                         
-                          
-                          
-                          
-                        }}
-                      >
-                        <MenuItem value="GET">GET</MenuItem>
-                        <MenuItem value="POST">POST</MenuItem>
-                        <MenuItem value="PUT">PUT</MenuItem>
-                        <MenuItem value="DELETE">DELETE</MenuItem>
-                        <MenuItem value="PATCH">PATCH</MenuItem>
-                      </Select>
-                    </FormControl>
-                    
-                    <TextField
-                      label="Headers (JSON)"
-                      multiline
-                      rows={3}
-                      fullWidth
-                      value={apiHeaders}
-                      onChange={(e) => setApiHeaders(e.target.value)}
-                      placeholder='{"Authorization": "Bearer token"}'
-                      sx={{
-
-                        border: `1px solid ${theme.palette.divider}`,
-                        
-                        
-                      }}
-                    />
-                    
-                    <TextField
-                      label="Request Body (JSON)"
-                      multiline
-                      rows={3}
-                      fullWidth
-                      value={apiBody}
-                      onChange={(e) => setApiBody(e.target.value)}
-                      placeholder='{"key": "value"}'
-                      sx={{
-                        border: `1px solid ${theme.palette.divider}`,
-                          
-                          
-
-                      
-                        
-                      }}
-                    />
-                    
-                    <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-                      <Button 
-                        variant="contained" 
-                        startIcon={isApiLoading ? <CircularProgress size={16} /> : <Send />}
-                        onClick={testApi}
-                        disabled={isApiLoading || !apiUrl.trim()}
-                        sx={{ minWidth: 100 }}
-                      >
-                        {isApiLoading ? 'Testing...' : 'Test API'}
-                      </Button>
-                      
-                      <Button 
-                        variant="outlined" 
-                        onClick={saveApiRequest}
-                        disabled={!apiUrl.trim()}
-                        sx={{
-                          borderColor: theme.palette.divider,
-                          color: theme.palette.text,
-                          bgcolor: (!apiUrl.trim()) 
-                            ? theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
-                            : 'transparent',
-                          
-                        }}
-                      >
-                        {isEditingApi ? 'Update' : 'Save'}
-                      </Button>
-                    </Box>
-                    
-                    {apiResponse && (
-                      <TextField
-                        label="Response"
-                        multiline
-                        rows={6}
-                        fullWidth
-                        value={apiResponse}
-                        InputProps={{ readOnly: true }}
-                        sx={{
-                          mt: 2,
-                          border: `1px solid ${theme.palette.divider}`,
-                          
-                          
-                        }}
-                      />
-                    )}
-                  </Grid>
-                  
-                  {/* Right side - Saved Requests */}
-                  <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }}>
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, color:  theme.palette.text }}>
-                        Saved Requests ({savedApiRequests.length})
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ 
-                      maxHeight: 500, 
-                      overflowY: 'auto',
-                      border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: 1,
-                      
-                    }}>
-                      {savedApiRequests.length === 0 ? (
-                        <Box sx={{ p: 2, textAlign: 'center' }}>
-                          <Typography variant="body2" sx={{ color: theme.palette.text }}>
-                            No saved API requests yet
-                          </Typography>
-                        </Box>
-                      ) : (
-                        savedApiRequests.map((request) => (
-                          <Box
-                            key={request.id}
-                            sx={{
-                              p: 2,
-                              borderBottom: `1px solid ${theme.palette.divider}`,
-                              
-                              '&:last-child': {
-                                borderBottom: 'none',
-                              }
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                              <Typography variant="subtitle2" sx={{ 
-                                fontWeight: 600, 
-                                color: theme.palette.text,
-                                flex: 1,
-                                mr: 1
-                              }}>
-                                {request.name}
-                              </Typography>
-                              <Chip 
-                                label={request.method} 
-                                size="small" 
-                                sx={{ 
-                                  fontSize: '0.75rem',
-                                  height: 20,
-                                  bgcolor: request.method === 'GET' ? 'success.main' : 
-                                          request.method === 'POST' ? 'primary.main' :
-                                          request.method === 'PUT' ? 'warning.main' :
-                                          request.method === 'DELETE' ? 'error.main' : 'info.main',
-                                  color: theme.palette.text
-                                }} 
-                              />
-                            </Box>
-                            
-                            <Typography variant="caption" sx={{ 
-                              color:  theme.palette.text,
-                              display: 'block',
-                              mb: 1,
-                              fontFamily: 'monospace',
-                              wordBreak: 'break-all'
-                            }}>
-                              {request.url}
-                            </Typography>
-                            
-                            <Typography variant="caption" sx={{ 
-                              color:  theme.palette.text,
-                              display: 'block',
-                              mb: 1
-                            }}>
-                              {new Date(request.updatedAt).toLocaleDateString()}
-                            </Typography>
-                            
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <Button 
-                                size="small" 
-                                variant="outlined"
-                                onClick={() => loadApiRequest(request)}
-                                sx={{
-                                  borderColor: theme.palette.divider,
-                                  color:  theme.palette.text,
-                                  fontSize: '0.75rem',
-                                  minWidth: 'auto',
-                                  px: 1,
-                                  
-                                }}
-                              >
-                                Load
-                              </Button>
-                              <Button 
-                                size="small" 
-                                variant="outlined"
-                                color="error"
-                                onClick={() => deleteApiRequest(request.id)}
                                 sx={{
                                   borderColor: theme.palette.error.main,
                                   color: theme.palette.error.main,
