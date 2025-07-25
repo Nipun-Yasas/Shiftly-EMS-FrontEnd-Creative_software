@@ -1,24 +1,22 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
-import EmployeeTab from "./_components/EmployeeTab";
-import TeamTab from "./_components/TeamTab";
-import ProjectTab from "./_components/ProjectTab";
-import TabPanel from "../../../_components/main/TabPanel";
+import TimesheetDataGrid from "./_components/TimesheetDataGrid";
 import TimesheetDialog from "./_components/TimesheetDialog";
 import { UserContext } from "../../../context/UserContext";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 
-export default function TimesheetAdminReview(){
-  const [tabValue, setTabValue] = useState(0);
-  const [employees, setEmployees] = useState([]);
+export default function TimesheetAdminReview() {
+  const [allTimesheets, setAllTimesheets] = useState([]);
+  const [distinctUsers, setDistinctUsers] = useState([]);
   const { user } = useContext(UserContext);
 
   // State for timesheet details
@@ -33,105 +31,194 @@ export default function TimesheetAdminReview(){
     severity: "success",
   });
 
-  // Initialize employees with mock data on component mount
-  useEffect(() => {
-    if (user) {
-      // Use user details from context to fill the table
-      setEmployees([
-        {
-          id: user.id || user.employeeId || user.userId,
-          name: user.name || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unnamed',
-          department: user.department || user.departmentName || '',
-          team: user.team || user.teamName || '',
-          project: user.project || user.projectName || '',
-        },
-      ]);
-    } else {
-      // Fallback: fetch all employees from API
-      const fetchEmployees = async () => {
-        try {
-          const res = await axiosInstance.get(API_PATHS.ADMIN_USER.GET_ALL_USERS);
-          setEmployees(res.data);
-        } catch (err) {
-          // handle error
-        }
-      };
-      fetchEmployees();
-    }
-  }, [user]);
+  // State for loading and error
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  // Fetch all timesheets and extract distinct users
+  const fetchTimesheets = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axiosInstance.get(API_PATHS.TIMESHEETS.GET_ALL);
+      const timesheets = res.data.map((ts) => ({
+        ...ts,
+        name:
+          ts.name ||
+          ts.fullName ||
+          ((ts.firstName || "") + " " + (ts.lastName || "")).trim() ||
+          "Unnamed",
+        department: ts.departmentName || ts.department || "",
+        team: ts.team || ts.teamName || "",
+        project: ts.project || ts.projectName || "",
+        workMode: ts.mode || "",
+        status: ts.status
+          ? ts.status.charAt(0) + ts.status.slice(1).toLowerCase()
+          : "",
+      }));
+
+      setAllTimesheets(timesheets);
+
+      // Extract distinct users from timesheets
+      const userMap = new Map();
+      timesheets.forEach((timesheet) => {
+        const userId = timesheet.userId || timesheet.employeeId;
+        if (userId && !userMap.has(userId)) {
+          userMap.set(userId, {
+            id: userId,
+            userId: userId,
+            name: timesheet.name,
+            department: timesheet.department,
+            team: timesheet.team,
+            // Get the latest timesheet entry for this user
+            lastSubmissionDate: timesheet.date || timesheet.submissionDate,
+            totalHours: 0, // Will be calculated
+            pendingCount: 0, // Will be calculated
+            approvedCount: 0, // Will be calculated
+          });
+        }
+      });
+
+      // Calculate totals for each user
+      const users = Array.from(userMap.values()).map((user) => {
+        const userTimesheets = timesheets.filter(
+          (ts) => (ts.userId || ts.employeeId) === user.userId
+        );
+
+        user.totalHours = userTimesheets.reduce(
+          (sum, ts) => sum + (parseFloat(ts.hours) || 0),
+          0
+        );
+        user.pendingCount = userTimesheets.filter(
+          (ts) => ts.status === "Pending"
+        ).length;
+        user.approvedCount = userTimesheets.filter(
+          (ts) => ts.status === "Approved"
+        ).length;
+        user.totalEntries = userTimesheets.length;
+
+        return user;
+      });
+
+      setDistinctUsers(users);
+    } catch (err) {
+      console.error("Error fetching timesheets:", err);
+      setAllTimesheets([]);
+      setDistinctUsers([]);
+      setError("Failed to fetch timesheet data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTimesheets();
+  }, [fetchTimesheets]);
 
   const getTeamGroupedEmployees = () => {
     const teams = {};
-    employees.forEach((employee) => {
-      if (!teams[employee.team]) {
-        teams[employee.team] = [];
+    distinctUsers.forEach((user) => {
+      if (!teams[user.team]) {
+        teams[user.team] = [];
       }
-      teams[employee.team].push(employee);
+      teams[user.team].push(user);
     });
     return teams;
   };
 
-  const getProjectGroupedEmployees = () => {
-    const projects = {};
-    
-    employees.forEach((employee) => {
-      if (!projects[employee.project]) {
-        projects[employee.project] = [];
-      }
-      projects[employee.project].push(employee);
-    });
-    return projects;
-  };
+  // Handle viewing all timesheets for a specific user
+  const handleViewUserTimesheets = async (selectedUser) => {
+    try {
+      // Filter timesheets for the selected user from existing data
+      const userTimesheets = allTimesheets.filter(
+        (ts) => (ts.userId || ts.employeeId) === selectedUser.userId
+      );
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-
-  // When viewing timesheets, only show those for the selected employee
-  const handleViewTimesheets = (employee) => {
-    setSelectedEmployee(employee);
-    // Filter MOCK_TIMESHEETS to only those for this employee (by userId)
-    const timesheetsForEmployee = MOCK_TIMESHEETS.filter(ts => ts.userId === employee.id);
-    setEmployeeTimesheets(timesheetsForEmployee);
-    setTimesheetDialogOpen(true);
+      setSelectedEmployee(selectedUser);
+      setEmployeeTimesheets(userTimesheets);
+      setTimesheetDialogOpen(true);
+    } catch (err) {
+      console.error("Error loading user timesheets:", err);
+      setNotification({
+        open: true,
+        message: "Failed to load timesheet records",
+        severity: "error",
+      });
+    }
   };
 
   const handleCloseTimesheetDialog = () => {
     setTimesheetDialogOpen(false);
   };
 
-  const handleApproveTimesheet = (timesheetId) => {
-    setEmployeeTimesheets((prevTimesheets) =>
-      prevTimesheets.map((timesheet) =>
-        timesheet.id === timesheetId
-          ? { ...timesheet, status: "Approved" }
-          : timesheet
-      )
-    );
+  const handleApproveTimesheet = async (timesheetId) => {
+    try {
+      // Update in local state
+      setEmployeeTimesheets((prevTimesheets) =>
+        prevTimesheets.map((timesheet) =>
+          timesheet.id === timesheetId
+            ? { ...timesheet, status: "Approved" }
+            : timesheet
+        )
+      );
 
-    setNotification({
-      open: true,
-      message: "Timesheet entry approved successfully",
-      severity: "success",
-    });
+      // Update in all timesheets state
+      setAllTimesheets((prevTimesheets) =>
+        prevTimesheets.map((timesheet) =>
+          timesheet.id === timesheetId
+            ? { ...timesheet, status: "Approved" }
+            : timesheet
+        )
+      );
+
+      setNotification({
+        open: true,
+        message: "Timesheet entry approved successfully",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("Error approving timesheet:", err);
+      setNotification({
+        open: true,
+        message: "Failed to approve timesheet",
+        severity: "error",
+      });
+    }
   };
 
-  const handleRejectTimesheet = (timesheetId) => {
-    setEmployeeTimesheets((prevTimesheets) =>
-      prevTimesheets.map((timesheet) =>
-        timesheet.id === timesheetId
-          ? { ...timesheet, status: "Rejected" }
-          : timesheet
-      )
-    );
+  const handleRejectTimesheet = async (timesheetId) => {
+    try {
+      // Update in local state
+      setEmployeeTimesheets((prevTimesheets) =>
+        prevTimesheets.map((timesheet) =>
+          timesheet.id === timesheetId
+            ? { ...timesheet, status: "Rejected" }
+            : timesheet
+        )
+      );
 
-    setNotification({
-      open: true,
-      message: "Timesheet entry rejected",
-      severity: "error",
-    });
+      // Update in all timesheets state
+      setAllTimesheets((prevTimesheets) =>
+        prevTimesheets.map((timesheet) =>
+          timesheet.id === timesheetId
+            ? { ...timesheet, status: "Rejected" }
+            : timesheet
+        )
+      );
+
+      setNotification({
+        open: true,
+        message: "Timesheet entry rejected",
+        severity: "error",
+      });
+    } catch (err) {
+      console.error("Error rejecting timesheet:", err);
+      setNotification({
+        open: true,
+        message: "Failed to reject timesheet",
+        severity: "error",
+      });
+    }
   };
 
   const handleCloseNotification = (event, reason) => {
@@ -141,52 +228,56 @@ export default function TimesheetAdminReview(){
     setNotification((prev) => ({ ...prev, open: false }));
   };
 
-  // Filter employees for Employee View: only those in admin's department
-  const filteredEmployees = employees.filter(emp => {
+  // Filter users for Employee View: only those in admin's department
+  const filteredUsers = distinctUsers.filter((userItem) => {
     // Check department match
-    const departmentMatch = user && emp.department && user.department && emp.department === user.department;
+    const departmentMatch =
+      user &&
+      userItem.department &&
+      user.department &&
+      userItem.department === user.department;
     // Optionally exclude the admin themselves (uncomment next line if needed)
-    // const notAdmin = emp.id !== user.id;
+    // const notAdmin = userItem.userId !== user.id;
     return departmentMatch; // && notAdmin;
   });
 
-  console.log("EMPLOYEES FOR GRIDS", employees);
-  console.log("TEAM GROUPED", getTeamGroupedEmployees());
-  console.log("PROJECT GROUPED", getProjectGroupedEmployees());
+  const handleTimesheetUpdate = useCallback(() => {
+    // Refresh the timesheet data when a status is updated
+    fetchTimesheets();
+  }, [fetchTimesheets]);
 
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
-      <Box sx={{ p: 2 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          aria-label="timesheet management tabs"
+      <Box sx={{ p: 3, mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
         >
-          <Tab label="Employee View" />
-          <Tab label="Team View" />
-          <Tab label="Project View" />
-        </Tabs>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: "bold", color: "text.primary" }}
+          >
+            Timesheet Management
+          </Typography>
+        </Box>
 
-        <TabPanel value={tabValue} index={0}>
-          <EmployeeTab
-            employees={filteredEmployees}
-            onViewTimesheets={handleViewTimesheets}
+        {loading ? (
+          <CircularProgress />
+        ) : error ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        ) : (
+          <TimesheetDataGrid
+            data={distinctUsers}
+            type="users"
+            onViewTimesheets={handleViewUserTimesheets}
           />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <TeamTab
-            teamGroupedEmployees={getTeamGroupedEmployees()}
-            onViewTimesheets={handleViewTimesheets}
-          />
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={2}>
-          <ProjectTab
-            projectGroupedEmployees={getProjectGroupedEmployees()}
-            onViewTimesheets={handleViewTimesheets}
-          />
-        </TabPanel>
+        )}
 
         <TimesheetDialog
           open={timesheetDialogOpen}
@@ -195,6 +286,7 @@ export default function TimesheetAdminReview(){
           employeeTimesheets={employeeTimesheets}
           onApprove={handleApproveTimesheet}
           onReject={handleRejectTimesheet}
+          onUpdate={handleTimesheetUpdate} // Pass the update handler
         />
 
         <Snackbar
@@ -214,4 +306,4 @@ export default function TimesheetAdminReview(){
       </Box>
     </Paper>
   );
-};
+}

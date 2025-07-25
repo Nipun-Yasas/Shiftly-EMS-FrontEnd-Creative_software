@@ -110,37 +110,85 @@ export default function TimesheetForm({
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      // Debug user context
+      console.log("Current user context:", user);
+      
+      // Validate user context
+      if (!user?.id) {
+        console.error("User context missing or invalid:", user);
+        showMessage("User authentication required. Please log in again.", "error");
+        return;
+      }
+
       const dto = {
-        userId: user?.id,
+        userId: user.id,
         date: dayjs(values.date).format("YYYY-MM-DD"),
         mode: values.workMode?.name || values.workMode,
-        activity: values.activity,
+        activity: values.activity.trim(),
         hours: parseFloat(values.hours),
       };
 
+      console.log("Submitting timesheet with data:", dto);
+      console.log("API endpoint:", mode === "edit" ? API_PATHS.TIMESHEETS.UPDATE(initialData?.id) : API_PATHS.TIMESHEETS.ADD);
+
+      let response;
       if (mode === "edit" && initialData?.id) {
         dto.id = initialData.id;
-        await axiosInstance.put(
-          `${API_PATHS.TIMESHEETS.UPDATE}/${initialData.id}`,
+        response = await axiosInstance.put(
+          API_PATHS.TIMESHEETS.UPDATE(initialData.id),
           dto
         );
         showMessage("Timesheet updated successfully!", "success");
       } else {
-        await axiosInstance.post(API_PATHS.TIMESHEETS.ADD, dto);
+        response = await axiosInstance.post(API_PATHS.TIMESHEETS.ADD, dto);
         showMessage("Timesheet submitted successfully!", "success");
         resetForm();
       }
 
-      // Call success callback
-      onSuccess(dto, mode);
+      console.log("Timesheet submission response:", response.data);
+      
+      // Call success callback with response data
+      onSuccess(response.data || dto, mode);
     } catch (error) {
       console.error(
         `Error ${mode === "edit" ? "updating" : "submitting"} timesheet:`,
         error
       );
-      const errorMsg =
-        error.response?.data?.message ||
-        `Error ${mode === "edit" ? "updating" : "submitting"} timesheet. Please try again.`;
+      
+      // Enhanced error handling
+      let errorMsg = `Error ${mode === "edit" ? "updating" : "submitting"} timesheet. Please try again.`;
+      
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status;
+        const data = error.response.data;
+        
+        console.log("Error response:", {
+          status,
+          data,
+          headers: error.response.headers,
+          config: error.config
+        });
+        
+        if (status === 401) {
+          errorMsg = "Authentication failed. Please log in again.";
+        } else if (status === 403) {
+          errorMsg = "You don't have permission to perform this action.";
+        } else if (status === 400) {
+          errorMsg = data?.message || "Invalid data submitted. Please check your entries.";
+        } else if (status === 500) {
+          errorMsg = "Server error occurred. Please try again later.";
+        } else if (data?.message) {
+          errorMsg = data.message;
+        }
+      } else if (error.request) {
+        // Network error
+        console.log("Network error:", error.request);
+        errorMsg = "Network error. Please check your connection and try again.";
+      } else {
+        console.log("Other error:", error.message);
+      }
+      
       showMessage(errorMsg, "error");
     } finally {
       setSubmitting(false);
@@ -170,13 +218,14 @@ export default function TimesheetForm({
         {({ values, isSubmitting, resetForm }) => (
           <Form>
             <Stack spacing={3}>
-              <InputItem sx={{ flex: 1 }}>
+              {/* Date Input - align left for DailyTimeEntry */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <DateInput
                   name="date"
                   label="Select Date"
                   disablePast={mode === "create"}
                 />
-              </InputItem>
+              </Box>
 
               {/* Work Mode and Hours */}
               <Box
