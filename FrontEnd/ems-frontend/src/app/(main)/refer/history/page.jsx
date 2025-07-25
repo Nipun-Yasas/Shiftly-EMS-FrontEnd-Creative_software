@@ -332,7 +332,14 @@ export default function ReferHistory() {
           <DataGrid
             rows={referData}
             columns={columns}
-            
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 20]}
           />
         )}
       </Box>
