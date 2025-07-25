@@ -15,6 +15,7 @@ import Stack from "@mui/material/Stack";
 import { useTheme } from "@mui/material/styles";
 import PersonIcon from "@mui/icons-material/Person";
 import SaveIcon from "@mui/icons-material/Save";
+import Snackbar from '@mui/material/Snackbar';
 
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
@@ -27,6 +28,7 @@ import { UserContext } from "../../../context/UserContext";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { employeeProfileCache } from "../../../_utils/employeeProfileCache";
+import { getProfilePicture } from "../../../_utils/profilePictureUtils";
 
 const genderOptions = [
   { id: "Male", name: "Male", label: "Male" },
@@ -60,7 +62,7 @@ const validationSchema = Yup.object({
     1000,
     "Experience must be less than 1000 characters"
   ),
-  profilePicture: Yup.mixed(), // Allow profile picture to be optional
+  // profilePicture: Yup.mixed(), // Remove validation for profile picture
 });
 
 export default function EmployeeUpdatePage() {
@@ -112,6 +114,7 @@ export default function EmployeeUpdatePage() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Track editing state
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     fetchEmployeeProfile();
@@ -155,6 +158,9 @@ export default function EmployeeUpdatePage() {
   };
 
   const getInitialValues = () => {
+    // Always use the localStorage image if available
+    const userId = employeeData?.id || employeeData?.username || user?.id || user?.username;
+    const localProfilePicture = getProfilePicture(userId);
     if (employeeData) {
       return {
         firstName: employeeData.firstName || "",
@@ -177,7 +183,7 @@ export default function EmployeeUpdatePage() {
         experience: Array.isArray(employeeData.experience)
           ? employeeData.experience.join("\n")
           : employeeData.experience || "",
-        profilePicture: null, // This will be handled by ProfilePictureUpload component
+        profilePicture: localProfilePicture || employeeData.profilePicture || null,
       };
     }
     return {
@@ -190,8 +196,16 @@ export default function EmployeeUpdatePage() {
       skills: "",
       education: "",
       experience: "",
-      profilePicture: null,
+      profilePicture: localProfilePicture || null,
     };
+  };
+
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -236,6 +250,7 @@ export default function EmployeeUpdatePage() {
 
       if (response.data) {
         setSuccess("Employee profile created successfully!");
+        showSnackbar("Profile updated successfully!", "success");
         // Update the employee profile cache so the layout will allow navigation
         employeeProfileCache.setStatus(true);
         setTimeout(() => {
@@ -245,8 +260,10 @@ export default function EmployeeUpdatePage() {
     } catch (error) {
       if (error.response?.data?.message) {
         setError(error.response.data.message);
+        showSnackbar(error.response.data.message, "error");
       } else {
         setError("Error updating employee profile. Please try again.");
+        showSnackbar("Error updating employee profile. Please try again.", "error");
       }
     } finally {
       setSubmitting(false);
@@ -300,22 +317,24 @@ export default function EmployeeUpdatePage() {
       </Box>
 
       {/* Alerts */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
 
-      {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {success}
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
         </Alert>
-      )}
+      </Snackbar>
 
       {/* Form */}
       <Formik
         initialValues={getInitialValues()}
         validationSchema={validationSchema}
+        context={{ employeeData }}
         onSubmit={handleSubmit}
         enableReinitialize
       >

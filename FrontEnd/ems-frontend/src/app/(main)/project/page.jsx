@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Paper, Box, Typography } from "@mui/material";
+import { Paper, Box, Typography, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axiosInstance from "../../_utils/axiosInstance";
-import SearchBar from "../../_components/header/SearchBar";
+
 
 export default function MyProject() {
   const [projects, setProjects] = useState([]);
@@ -31,9 +31,9 @@ export default function MyProject() {
     { field: "description", headerName: "Description", flex: 2 },
     { field: "teamName", headerName: "Team", flex: 1 },
     { field: "departmentName", headerName: "Department", flex: 1 },
-    { field: "startDate", headerName: "Start Date", flex: 0.5 },
-    { field: "endDate", headerName: "End Date", flex: 0.5 },
-    { field: "progress", headerName: "Progress (%)", flex: 0.7,headerClassName: "last-column", },
+    { field: "startDate", headerName: "Start Date", flex: 1 },
+    { field: "endDate", headerName: "End Date", flex: 1},
+    { field: "progress", headerName: "Progress (%)", flex: 1,headerClassName: "last-column", },
   ];
 
   const filteredProjects = projects.filter((project) =>
@@ -50,10 +50,13 @@ export default function MyProject() {
           My Projects
         </Typography>
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <SearchBar
+          <TextField
             label="Search Projects"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 250 }}
           />
         </Box>
         {error && (

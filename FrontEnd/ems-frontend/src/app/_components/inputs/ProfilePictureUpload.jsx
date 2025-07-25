@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { Box, Button, Typography, IconButton, Avatar, CircularProgress } from "@mui/material";
 import { useField, useFormikContext } from "formik";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
@@ -28,6 +28,13 @@ export default function ProfilePictureUpload({
   // Get saved profile picture from localStorage or use currentImage
   const savedProfilePicture = getProfilePicture(user?.id || user?.username);
   const [preview, setPreview] = useState(savedProfilePicture || currentImage);
+
+  // Ensure Formik field is set if preview exists (prevents null validation error)
+  useEffect(() => {
+    if (preview) {
+      setFieldValue(name, preview, false);
+    }
+  }, [preview, name, setFieldValue]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];

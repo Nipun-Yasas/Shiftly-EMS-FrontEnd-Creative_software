@@ -20,6 +20,8 @@ import axiosInstance from '../../../_utils/axiosInstance';
 import { API_PATHS } from '../../../_utils/apiPaths';
 import { UserContext } from '../../../context/UserContext';
 import { useVacancies } from '../../../_hooks/useVacancies';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function ReferHistory() {
   const [referData, setReferData] = useState([]);
@@ -27,6 +29,7 @@ export default function ReferHistory() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const { user } = useContext(UserContext);
   const { vacancies } = useVacancies();
@@ -121,6 +124,40 @@ export default function ReferHistory() {
     }
   };
 
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Download function for resume files
+  const handleDownloadFile = async (fileUrl, fileName = 'resume.pdf') => {
+    try {
+      if (!fileUrl) {
+        showSnackbar('No file available for download', 'warning');
+        return;
+      }
+      const fullUrl = "http://localhost:8080" + fileUrl;
+      const response = await axiosInstance.get(fullUrl, {
+        responseType: 'blob',
+        headers: { 'Accept': 'application/octet-stream' }
+      });
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSnackbar('File downloaded successfully', 'success');
+    } catch (error) {
+      showSnackbar('Error downloading file. Please try again.', 'error');
+    }
+  };
+
   const renderActions = (params) => {
     return (
       <Box sx={{ display: 'flex', gap: 1,mt:1 }}>
@@ -172,11 +209,11 @@ export default function ReferHistory() {
       renderCell: (params) => {
         const fileUrl = params.value;
         if (!fileUrl) return "No file";
-        const fullUrl = "http://localhost:8080" + fileUrl;
+        const fileName = fileUrl.split('/').pop() || 'resume.pdf';
         return (
-          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
+          <Button size="small" variant="outlined" onClick={() => handleDownloadFile(fileUrl, fileName)}>
             Download
-          </a>
+          </Button>
         );
       }
     },
@@ -260,6 +297,17 @@ export default function ReferHistory() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
     </Paper>
   );

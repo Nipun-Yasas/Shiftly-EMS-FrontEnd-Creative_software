@@ -124,8 +124,10 @@ export const API_PATHS = {
 },
   TIMESHEETS: {
     ADD: "/api/v1/shiftly/ems/timesheets/add",
-    UPDATE: "/api/v1/shiftly/ems/timesheets/update",
-    DELETE: "/api/v1/shiftly/ems/timesheets/delete",
+    UPDATE: (id) => `/api/v1/shiftly/ems/timesheets/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/timesheets/delete/${id}`,
+    GET_ALL: "/api/v1/shiftly/ems/timesheets/all",
     BY_USER: (userId) => `/api/v1/shiftly/ems/timesheets/user/${userId}`,
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/timesheets/status/${id}`,
   },
 };
