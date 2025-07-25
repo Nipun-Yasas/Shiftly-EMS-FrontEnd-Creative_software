@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Paper, Box } from "@mui/material";
 import AvailableLeaves from "./_components/AvailableLeaves";
 import LeaveForm from "./_components/LeaveForm";
-import SuccessModal from "./_components/SuccessModal";
+import SuccessSnackbar from "./_components/SuccessModal";
 import { usePathname } from 'next/navigation';
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 
 export default function RequestLeave() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [leaves, setLeaves] = useState([]);
   const router = useRouter();
   const pathname = usePathname();
@@ -92,9 +92,9 @@ export default function RequestLeave() {
   // Handler for after leave submission
   const handleSubmitSuccess = async () => {
     await fetchAndCalculate(); // Refetch and update leaves immediately
-    setModalOpen(true);
+    setShowSuccess(true);
     setTimeout(() => {
-      setModalOpen(false);
+      setShowSuccess(false);
       router.push('/leave/history');
     }, 1500);
   };
@@ -115,7 +115,7 @@ export default function RequestLeave() {
           <LeaveForm onSubmitSuccess={handleSubmitSuccess} />
         </Box>
       </Paper>
-      <SuccessModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <SuccessSnackbar isOpen={showSuccess} onClose={() => setShowSuccess(false)} />
     </Box>
   );
 }

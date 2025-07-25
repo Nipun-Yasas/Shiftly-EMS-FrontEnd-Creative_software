@@ -208,16 +208,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                     gap: 2,
                     pt: 2,
                   }}
-                >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Submitting..." : "Request Leave"}
-                  </Button>
-
-                  <Button
+                ><Button
                     type="reset"
                     color="text.primary"
                     onClick={() => {
@@ -226,6 +217,16 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   >
                     Cancel
                   </Button>
+                  
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Request Leave"}
+                  </Button>
+
+                  
                 </Box>
               </Stack>
             </Form>

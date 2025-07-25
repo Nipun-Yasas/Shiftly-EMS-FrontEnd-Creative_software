@@ -253,7 +253,7 @@ export default function ReferHistory() {
         return (
           <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
             Download
-          </Button>
+          </a>
         );
       }
     },

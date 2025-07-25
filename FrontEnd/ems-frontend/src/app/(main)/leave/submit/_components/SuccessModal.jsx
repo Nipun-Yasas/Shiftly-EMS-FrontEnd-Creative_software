@@ -1,58 +1,28 @@
 'use client';
 
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 
 
-const SuccessModal = ({ isOpen, onClose }) => {
+const SuccessSnackbar = ({ isOpen, onClose }) => {
   const theme = useTheme();
-
   return (
-    <Dialog
+    <Snackbar
       open={isOpen}
+      autoHideDuration={4000}
       onClose={onClose}
-      maxWidth="xs"
-      fullWidth
-      aria-labelledby="success-dialog-title"
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          boxShadow: 6,
-          bgcolor: 'background.paper',
-          color: 'text.primary',
-        },
-      }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
-      <DialogTitle id="success-dialog-title" sx={{ fontWeight: 700 }}>
-        Leave Request Submitted Successfully!
-      </DialogTitle>
-      <DialogContent>
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          Your leave request has been submitted and is pending approval.
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={onClose}
-          variant="contained"
-          sx={{
-            color: theme.palette.text.primary,
-            bgcolor: theme.palette.grey[200],
-            '&:hover': {
-              bgcolor: theme.palette.grey[300],
-            },
-          }}
-        >
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <Alert
+        onClose={onClose}
+        severity="success"
+        sx={{ width: '100%', fontWeight: 500, bgcolor: theme.palette.background.paper, color: theme.palette.text.primary }}
+      >
+        Leave request submitted successfully! Your leave request is pending approval.
+      </Alert>
+    </Snackbar>
   );
 };
 
-export default SuccessModal;
+export default SuccessSnackbar;

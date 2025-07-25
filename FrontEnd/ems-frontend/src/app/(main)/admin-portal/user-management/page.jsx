@@ -55,7 +55,10 @@ export default function UserManagementPage() {
       setLoading(true);
     }
     try {
-      console.log("Fetching users from:", API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES);
+      console.log(
+        "Fetching users from:",
+        API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES
+      );
       const response = await axiosInstance.get(
         API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES
       );
@@ -67,7 +70,10 @@ export default function UserManagementPage() {
       const currentUserId = user?.id;
       const currentUserEmail = user?.email;
 
-      console.log("Current user:", { id: currentUserId, email: currentUserEmail });
+      console.log("Current user:", {
+        id: currentUserId,
+        email: currentUserEmail,
+      });
       console.log("All users before filtering:", allUsers);
 
       // Filter out the current logged-in user from all users
@@ -87,7 +93,9 @@ export default function UserManagementPage() {
 
       console.log("Verified users:", verifiedUsers);
       console.log("Unverified users:", unverifiedUsers);
-      console.log(`Summary: ${allUsers.length} total users, ${verifiedUsers.length} verified, ${unverifiedUsers.length} unverified`);
+      console.log(
+        `Summary: ${allUsers.length} total users, ${verifiedUsers.length} verified, ${unverifiedUsers.length} unverified`
+      );
 
       setUsers(verifiedUsers);
       setUnverifiedUsers(unverifiedUsers);
@@ -96,18 +104,24 @@ export default function UserManagementPage() {
       console.error("Error response:", error.response);
       console.error("Error status:", error.response?.status);
       console.error("Error data:", error.response?.data);
-      
+
       let errorMessage = "Error fetching users. Please try again.";
       if (error.response?.status === 404) {
-        errorMessage = "Users endpoint not found. Please check your backend configuration.";
-      } else if (error.response?.status === 401 || error.response?.status === 403) {
-        errorMessage = "Access denied. You may not have permission to view users.";
+        errorMessage =
+          "Users endpoint not found. Please check your backend configuration.";
+      } else if (
+        error.response?.status === 401 ||
+        error.response?.status === 403
+      ) {
+        errorMessage =
+          "Access denied. You may not have permission to view users.";
       } else if (error.response?.status === 500) {
         errorMessage = "Server error occurred while fetching users.";
       } else if (!error.response) {
-        errorMessage = "Cannot connect to server. Please check if the backend is running.";
+        errorMessage =
+          "Cannot connect to server. Please check if the backend is running.";
       }
-      
+
       showSnackbar(errorMessage, "error");
       setUsers([]);
       setUnverifiedUsers([]);
@@ -328,6 +342,7 @@ export default function UserManagementPage() {
           open={snackbar.open}
           autoHideDuration={6000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
           <Alert
             onClose={() => setSnackbar({ ...snackbar, open: false })}

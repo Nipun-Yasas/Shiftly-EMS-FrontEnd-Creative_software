@@ -28,9 +28,10 @@ export default function EditTimesheetDialog({
     <Dialog 
       open={open} 
       onClose={onClose}
+      fullWidth
       
     >
-      <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <DialogTitle sx={{ mt: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         Edit Timesheet Entry
         <IconButton
           aria-label="close"
