@@ -10,7 +10,6 @@ import Tabs from '@mui/material/Tabs';
 
 import BasicInfoTab from './BasicInfoTab';
 import PersonalInfoTab from './PersonalInfoTab';
-import ProjectTab from './ProjectTab';
 import ExperienceTab from './ExperienceTab';
 import EducationTab from './EducationTab';
 import SkillsTab from './SkillsTab';
@@ -19,10 +18,9 @@ import TabPanel from '../../../../_components/main/TabPanel';
 const tabs = [
   { label: "Basic Info", value: 0, component: BasicInfoTab },
   { label: "Personal Info", value: 1, component: PersonalInfoTab },
-  { label: "Projects", value: 2, component: ProjectTab },
-  { label: "Experience", value: 3, component: ExperienceTab },
-  { label: "Education", value: 4, component: EducationTab },
-  { label: "Skills", value: 5, component: SkillsTab },
+  { label: "Experience", value: 2, component: ExperienceTab },
+  { label: "Education", value: 3, component: EducationTab },
+  { label: "Skills", value: 4, component: SkillsTab },
 ];
 
 const TabBar = ({ theme, employeeData }) => {

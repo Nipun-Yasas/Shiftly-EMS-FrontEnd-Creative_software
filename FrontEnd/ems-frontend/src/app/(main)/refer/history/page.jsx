@@ -21,6 +21,8 @@ import axiosInstance from '../../../_utils/axiosInstance';
 import { API_PATHS } from '../../../_utils/apiPaths';
 import { UserContext } from '../../../context/UserContext';
 import { useVacancies } from '../../../_hooks/useVacancies';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function ReferHistory() {
   const [referData, setReferData] = useState([]);
@@ -28,6 +30,7 @@ export default function ReferHistory() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const { user } = useContext(UserContext);
   const { vacancies } = useVacancies();
@@ -160,6 +163,40 @@ export default function ReferHistory() {
     }
   };
 
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Download function for resume files
+  const handleDownloadFile = async (fileUrl, fileName = 'resume.pdf') => {
+    try {
+      if (!fileUrl) {
+        showSnackbar('No file available for download', 'warning');
+        return;
+      }
+      const fullUrl = "http://localhost:8080" + fileUrl;
+      const response = await axiosInstance.get(fullUrl, {
+        responseType: 'blob',
+        headers: { 'Accept': 'application/octet-stream' }
+      });
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showSnackbar('File downloaded successfully', 'success');
+    } catch (error) {
+      showSnackbar('Error downloading file. Please try again.', 'error');
+    }
+  };
+
   const renderActions = (params) => {
     return (
       <Box sx={{ display: 'flex', gap: 1,mt:1 }}>
@@ -211,85 +248,10 @@ export default function ReferHistory() {
       sortable: false,
       renderCell: (params) => {
         const fileUrl = params.value;
-        const rowData = params.row;
-        
-        console.log('=== RENDER CELL DEBUG ===');
-        console.log('Row ID:', rowData.id);
-        console.log('params.value (fileUrl):', fileUrl);
-        console.log('Type of fileUrl:', typeof fileUrl);
-        console.log('fileUrl === null:', fileUrl === null);
-        console.log('fileUrl === undefined:', fileUrl === undefined);
-        console.log('fileUrl === "":', fileUrl === "");
-        console.log('fileUrl === "null":', fileUrl === "null");
-        console.log('Row data fileUrl property:', rowData.fileUrl);
-        console.log('Row data resume_file_path property:', rowData.resume_file_path);
-        console.log('Full row data:', rowData);
-        console.log('=== END RENDER CELL DEBUG ===');
-        
-        // TEMPORARY: Let's test with a hardcoded file URL to see if the button works
-        if (rowData.id === 1) { // Testing with your current row ID
-          console.log('Testing with hardcoded URL for row 1');
-          return (
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DownloadIcon />}
-              onClick={() => {
-                const testUrl = 'http://localhost:8080/uploads/files/087cae95-cf00-45ca-8fab-0707d9b9b8a9_mediq_logo.png';
-                console.log('Test download clicked:', testUrl);
-                window.open(testUrl, '_blank');
-              }}
-              sx={{ 
-                fontSize: '0.75rem',
-                minWidth: 'auto',
-                px: 1,
-                py: 0.5,
-                backgroundColor: '#e3f2fd' // Light blue to indicate it's a test button
-              }}
-            >
-              Test Download
-            </Button>
-          );
-        }
-        
-        // Check for all possible falsy values
-        if (!fileUrl || 
-            fileUrl === 'null' || 
-            fileUrl === '' || 
-            fileUrl === null || 
-            fileUrl === undefined ||
-            (typeof fileUrl === 'string' && fileUrl.trim() === '')) {
-          console.log('Showing No file for row:', rowData.id);
-          return (
-            <Box sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
-              No file
-            </Box>
-          );
-        }
-        
-        // Construct the full URL - handle both cases where fileUrl starts with / or not
-        const fullUrl = fileUrl.startsWith('/') 
-          ? `http://localhost:8080${fileUrl}` 
-          : `http://localhost:8080/${fileUrl}`;
-        
-        console.log('Showing Download button for row:', rowData.id, 'URL:', fullUrl);
-        
+        if (!fileUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + fileUrl;
         return (
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<DownloadIcon />}
-            onClick={() => {
-              console.log('Download button clicked, opening:', fullUrl);
-              window.open(fullUrl, '_blank');
-            }}
-            sx={{ 
-              fontSize: '0.75rem',
-              minWidth: 'auto',
-              px: 1,
-              py: 0.5
-            }}
-          >
+          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
             Download
           </Button>
         );
@@ -382,6 +344,17 @@ export default function ReferHistory() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
     </Paper>
   );

@@ -62,10 +62,12 @@ export default function TimesheetRecord() {
     if (!timesheetToDelete) return;
     setLoading(true);
     try {
-      await axiosInstance.delete(`${API_PATHS.TIMESHEETS.DELETE}/${timesheetToDelete.id}`);
+      await axiosInstance.delete(API_PATHS.TIMESHEETS.DELETE(timesheetToDelete.id));
       setTimesheetRecords(prev => prev.filter(r => r.id !== timesheetToDelete.id));
+      console.log("Timesheet deleted successfully");
     } catch (error) {
       console.error("Error deleting timesheet:", error);
+      // You might want to show an error message to the user here
     }
     setLoading(false);
     setDeleteConfirmOpen(false);

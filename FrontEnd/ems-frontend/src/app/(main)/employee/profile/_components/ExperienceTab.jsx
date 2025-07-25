@@ -150,16 +150,12 @@ const ExperienceTab = ({ employeeData }) => {
             minHeight: 200
           }}
         >
-          <SentimentDissatisfiedIcon color="disabled" sx={{ fontSize: 60, mb: 2 }} />
           <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
             No Experience Information Available
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
             Work experience will be displayed here once added to the profile.
           </Typography>
-          <Fab color="primary" size="medium" onClick={handleOpenDialog}>
-            <AddIcon />
-          </Fab>
         </Box>
       )}
       
