@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useTheme } from '@mui/material';
 
-import LetterTypeSelector from '../components/LetterTypeSelector';
-import LetterRequestForm from '../components/LetterRequestForm';
-import LetterGenerationInterface from '../components/LetterGenerationInterface';
+import LetterTypeSelector from './components/LetterTypeSelector';
+import LetterRequestForm from './components/LetterRequestForm';
+import LetterGenerationInterface from './components/LetterGenerationInterface';
 
 const RequestLetter = () => {
   const theme = useTheme();

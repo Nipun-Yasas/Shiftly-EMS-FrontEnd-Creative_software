@@ -158,18 +158,7 @@ const NAVIGATION = [
     segment: 'letter',
     title: 'Letter',
     icon: <EmailIcon />,
-    children: [
-      {
-        segment: 'request',
-        title: 'Request Letter',
-        icon: <HistoryEduOutlinedIcon />,
-      },
-      {
-        segment: 'history',
-        title: 'Request History',
-        icon: <MarkAsUnreadOutlinedIcon />,
-      }
-    ]
+   
   },
   {
     segment: 'leave',
