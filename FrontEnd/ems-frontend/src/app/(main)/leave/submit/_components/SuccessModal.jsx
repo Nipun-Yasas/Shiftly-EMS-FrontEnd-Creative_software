@@ -12,7 +12,7 @@ const SuccessSnackbar = ({ isOpen, onClose }) => {
       open={isOpen}
       autoHideDuration={4000}
       onClose={onClose}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
       <Alert
         onClose={onClose}
