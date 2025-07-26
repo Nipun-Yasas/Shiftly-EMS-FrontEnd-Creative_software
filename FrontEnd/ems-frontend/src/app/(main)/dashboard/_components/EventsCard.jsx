@@ -270,17 +270,6 @@ export default function EventsCard({ events, onViewAll, loading = false }) {
                     </Typography>
                   </Box>
                   
-                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                     <People sx={{ fontSize: 16, color: 'text.secondary' }} />
-                     <Typography variant="body2" sx={{ 
-                       color: 'text.secondary', 
-                       fontFamily: 'var(--font-lexend)',
-                       fontWeight: 500,
-                       fontSize: '0.875rem'
-                     }}>
-                       {event.participants} Participants
-                     </Typography>
-                   </Box>
                  </Box>
               </CardContent>
             </Box>

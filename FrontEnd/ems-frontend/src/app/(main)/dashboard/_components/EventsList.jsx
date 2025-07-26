@@ -34,9 +34,8 @@ export default function EventsList({ demoEventsState, handleToggleEvent }) {
               <Typography variant="h6" sx={{ mb: 1, fontFamily: 'var(--font-poppins)', fontWeight: 700, color: 'text.primary' }}>{event.title}</Typography>
               <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 500 }}><strong>Date:</strong> {event.date}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.main', fontSize: 14, mr: 1, color: '#fff' }}>👥</Avatar>
-                <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'var(--font-lexend)', fontWeight: 700 }}><strong>{event.participants}</strong> Participants</Typography>
-                {event.joined && <Chip label="Joined" size="small" sx={{ ml: 2, fontWeight: 700, fontFamily: 'var(--font-lexend)', bgcolor: 'success.main', color: '#fff' }} />}
+                {/* Removed participants avatar and count */}
+                {event.joined && <Chip label="Joined" size="small" sx={{ ml: 0, fontWeight: 700, fontFamily: 'var(--font-lexend)', bgcolor: 'success.main', color: '#fff' }} />}
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                 <Button
