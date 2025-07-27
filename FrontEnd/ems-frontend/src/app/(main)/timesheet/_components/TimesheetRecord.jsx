@@ -6,6 +6,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
+import { styled } from '@mui/material/styles';
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { UserContext } from "../../../context/UserContext";
@@ -20,6 +21,8 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DoneIcon from '@mui/icons-material/Done';
 
 import TimesheetForm from "./TimesheetForm"; 
 
@@ -100,26 +103,49 @@ export default function TimesheetRecord() {
     setTimesheetToEdit(null);
   };
 
+  // Styled status chip for Timesheet Status (same as claim history)
+  const StyledChip = styled(Chip)(({ theme }) => ({
+    justifyContent: 'left',
+    '& .icon': {
+      color: 'inherit',
+    },
+    '&.Pending': {
+      color: '#ffffff',
+      backgroundColor: '#ed6c02',
+      border: '1px solid #ed6c02',
+    },
+    '&.Approved': {
+      color: '#ffffff',
+      backgroundColor: '#2e7d32',
+    },
+    '&.Rejected': {
+      color: '#ffffff',
+      backgroundColor: '#d32f2f',
+      border: '1px solid #d32f2f',
+    },
+  }));
+
   // Function to determine status color and styling
-  const getStatusChip = (status) => {
-    const statusConfig = {
-      "Approved": { color: "success", label: "Approved" },
-      "Pending": { color: "warning", label: "Pending" },
-      "Rejected": { color: "error", label: "Rejected" }
-    };
-
-    const config = statusConfig[status] || { color: "default", label: status };
-
+  const renderStatus = (params) => {
+    let status = params.value;
+    if (!status) return null;
+    // Capitalize first letter, lowercase the rest
+    status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    let icon = null;
+    if (status === 'Rejected') {
+      icon = <CloseIcon className="icon" />;
+    } else if (status === 'Pending') {
+      icon = <AutorenewIcon className="icon" />;
+    } else if (status === 'Approved') {
+      icon = <DoneIcon className="icon" />;
+    }
+    let label = status;
     return (
-      <Chip
-        label={config.label}
-        color={config.color}
+      <StyledChip
+        className={status}
+        icon={icon}
         size="small"
-        sx={{
-          borderRadius: 2,
-          fontWeight: 'bold',
-          fontSize: '0.75rem'
-        }}
+        label={label}
       />
     );
   };
@@ -187,17 +213,32 @@ export default function TimesheetRecord() {
       field: "workMode", 
       headerName: "Work Mode", 
       width: 120,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          variant="outlined"
-          size="small"
-          sx={{
-            borderRadius: 2,
-            fontSize: '0.75rem'
-          }}
-        />
-      )
+      renderCell: (params) => {
+        const mode = params.value;
+        let color = '';
+        if (mode === 'Online') {
+          color = '#1976d2'; // blue
+        } else if (mode === 'On-site') {
+          color = '#388e3c'; // green
+        } else if (mode === 'Hybrid') {
+          color = '#ed6c02'; // orange
+        } else {
+          color = '#757575'; // gray
+        }
+        return (
+          <Chip
+            label={mode}
+            size="small"
+            sx={{
+              color: '#fff',
+              backgroundColor: color,
+              fontWeight: 600,
+              borderRadius: 2,
+              fontSize: '0.75rem',
+            }}
+          />
+        );
+      }
     },
     { 
       field: "activity", 
@@ -215,7 +256,7 @@ export default function TimesheetRecord() {
       field: "status", 
       headerName: "Status", 
       width: 150,
-      renderCell: (params) => getStatusChip(params.value)
+      renderCell: renderStatus
     },
     {
       field: "actions",

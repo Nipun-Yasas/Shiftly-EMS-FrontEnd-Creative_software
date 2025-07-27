@@ -23,6 +23,11 @@ import { UserContext } from '../../../context/UserContext';
 import { useVacancies } from '../../../_hooks/useVacancies';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
+import { styled } from '@mui/material/styles';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function ReferHistory() {
   const [referData, setReferData] = useState([]);
@@ -222,6 +227,61 @@ export default function ReferHistory() {
     );
   };
 
+  // Styled status chip for Referral State (same as claim history)
+  const StyledChip = styled(Chip)(({ theme }) => ({
+    justifyContent: 'left',
+    '& .icon': {
+      color: 'inherit',
+    },
+    '&.Pending': {
+      color: '#ffffff',
+      backgroundColor: '#ed6c02',
+      border: '1px solid #ed6c02',
+    },
+    '&.Unread': {
+      color: '#ffffff',
+      backgroundColor: '#ed6c02',
+      border: '1px solid #ed6c02',
+    },
+    '&.Approved': {
+      color: '#ffffff',
+      backgroundColor: '#2e7d32',
+    },
+    '&.Read': {
+      color: '#ffffff',
+      backgroundColor: '#2e7d32',
+    },
+    '&.Rejected': {
+      color: '#ffffff',
+      backgroundColor: '#d32f2f',
+      border: '1px solid #d32f2f',
+    },
+  }));
+
+  const renderReferralStatus = (params) => {
+    let status = params.value;
+    if (!status) return null;
+    // Capitalize first letter, lowercase the rest
+    status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    let icon = null;
+    if (status === 'Rejected') {
+      icon = <CloseIcon className="icon" />;
+    } else if (status === 'Pending' || status === 'Unread') {
+      icon = <AutorenewIcon className="icon" />;
+    } else if (status === 'Approved' || status === 'Read') {
+      icon = <DoneIcon className="icon" />;
+    }
+    let label = status;
+    return (
+      <StyledChip
+        className={status}
+        icon={icon}
+        size="small"
+        label={label}
+      />
+    );
+  };
+
   const columns = [
     { field: "vacancy", headerName: "Vacancy", width: 150 },
     { field: "applicant_name", headerName: "Candidate Name", width: 150 },
@@ -245,37 +305,34 @@ export default function ReferHistory() {
       field: "resume_file_path", 
       headerName: "Uploaded Resume", 
       width: 180,
-      sortable: false,
       renderCell: (params) => {
         const fileUrl = params.value;
         if (!fileUrl) return "No file";
         const fullUrl = "http://localhost:8080" + fileUrl;
         return (
-          <a href={fullUrl} target="_blank" rel="noopener noreferrer" download>
+          <Button
+            component="a"
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            variant="outlined"
+            size="small"
+            sx={{ 
+              fontSize: '0.75rem',
+              minWidth: 'auto',
+              px: 1,
+              py: 0.5
+            }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
+          >
             Download
-          </a>
+          </Button>
         );
       }
     },
     { field: "status", headerName: "Referral State", width: 120,
-      
-      renderCell: (params) => {
-        const status = params.value?.toLowerCase();
-        let color = "text.secondary"; 
-
-        if (status === "unread") {
-          color = "warning.main";
-        } else if (status === "read") {
-          color = "success.main";
-        }
-        
-        return (
-          <Box sx={{ color: color, fontWeight: 600 }}>
-            {params.value}
-          </Box>
-        );
-      }
-    },
+      renderCell: renderReferralStatus },
     {
       field: "actions",
       headerName: "Actions",

@@ -16,7 +16,6 @@ export default function TimesheetSubmitPage() {
       }}
     >
       <Box sx={{ width: "100%", px: 5 }}>
-        <TimesheetDebug />
         <TimesheetForm/>
       </Box>
 
