@@ -49,20 +49,6 @@ export const API_PATHS = {
     UPDATE_EVENT: "/api/calendar/events",
     DELETE_EVENT: "/api/calendar/events",
   },
-  EVENTS: {
-    // Admin endpoints
-    GET_ALL_EVENTS: "/api/v1/shiftly/ems/events/all",
-    APPROVE_EVENT: (id) => `/api/v1/shiftly/ems/events/approve/${id}`,
-    REJECT_EVENT: (id) => `/api/v1/shiftly/ems/events/reject/${id}`,
-    GET_EVENT_BY_ID: (id) => `/api/v1/shiftly/ems/events/${id}`,
-
-    // Employee endpoints
-    ADD_EVENT: "/api/v1/shiftly/ems/events/add",
-    UPDATE_EVENT: (id) => `/api/v1/shiftly/ems/events/update/${id}`,
-    DELETE_EVENT: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
-    GET_MY_EVENTS: (employeeId) =>
-      `/api/v1/shiftly/ems/events/my/${employeeId}`,
-  },
   DEPARTMENTS: {
     GET_ALL_DEPARTMENTS: "/api/v1/shiftly/ems/departments/all",
   },
@@ -97,15 +83,6 @@ export const API_PATHS = {
     GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
   },
 
-  REFERRALS: {
-    ADD: "/api/v1/shiftly/ems/referrals/add",
-    MY_REFERRALS: "/api/v1/shiftly/ems/referrals/my",
-    ALL_REFERRALS: "/api/v1/shiftly/ems/referrals/all",
-    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/referrals/status/${id}`,
-    UPDATE: (id) => `/api/v1/shiftly/ems/referrals/update/${id}`,
-    DELETE: (id) => `/api/v1/shiftly/ems/referrals/delete/${id}`,
-    GET_BY_USER_ID: (userId) => `/api/v1/shiftly/ems/referrals/user/${userId}`,
-  },
   LEAVES: {
     GET_MY_LEAVES: "/api/v1/shiftly/ems/leaves/my",
     UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
@@ -129,5 +106,30 @@ export const API_PATHS = {
     GET_ALL: "/api/v1/shiftly/ems/timesheets/all",
     BY_USER: (userId) => `/api/v1/shiftly/ems/timesheets/user/${userId}`,
     UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/timesheets/status/${id}`,
+  },
+  EVENTS: {
+    // Admin endpoints
+    GET_ALL_EVENTS: "/api/v1/shiftly/ems/events/all",
+    APPROVE_EVENT: (id) => `/api/v1/shiftly/ems/events/approve/${id}`,
+    REJECT_EVENT: (id) => `/api/v1/shiftly/ems/events/reject/${id}`,
+    GET_EVENT_BY_ID: (id) => `/api/v1/shiftly/ems/events/${id}`,
+
+    // Employee endpoints
+    ADD_EVENT: "/api/v1/shiftly/ems/events/add",
+    UPDATE_EVENT: (id) => `/api/v1/shiftly/ems/events/update/${id}`,
+    DELETE_EVENT: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
+    GET_MY_EVENTS: (employeeId) =>
+      `/api/v1/shiftly/ems/events/my/${employeeId}`,
+  },
+  REFERRALS: {
+    //admin endpoints
+    ALL_REFERRALS: "/api/v1/shiftly/ems/referrals/all",
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/referrals/status/${id}`,
+    
+    // employee endpoints
+    ADD: "/api/v1/shiftly/ems/referrals/add",
+    MY_REFERRALS: "/api/v1/shiftly/ems/referrals/my",
+    UPDATE: (id) => `/api/v1/shiftly/ems/referrals/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/referrals/delete/${id}`,
   },
 };

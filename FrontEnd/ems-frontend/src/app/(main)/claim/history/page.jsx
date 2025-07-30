@@ -1,99 +1,181 @@
 "use client";
 
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
 import { useEffect, useState, useContext } from "react";
+
+import dayjs from "dayjs";
+
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
+
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
-
 import {
-    renderStatus,
-  } from './status';
-import dayjs from "dayjs";
-import { UserContext } from '../../../context/UserContext';
-import DeleteDialog from './DeleteDialog';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Box from '@mui/material/Box';
-import DownloadIcon from '@mui/icons-material/Download';
-import Button from '@mui/material/Button';
+  getStatusIcon,
+  getStatusColor,
+} from "../../admin-portal/_helpers/colorhelper";
+import { UserContext } from "../../../context/UserContext";
+import DeleteDialog from "../../_components/DeleteDialog";
+import CustomDataGrid from "../../_components/CustomDataGrid";
+import EditDialog from "../_components/EditDialog";
 
-export default function ClaimHistory(){
-  const [rows, setRows] = useState([]);
-  const { user } = useContext(UserContext);
+export default function ClaimHistory() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-  useEffect(() => {
+  const { user } = useContext(UserContext);
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const fetchClaims = async () => {
     if (!user?.id) return;
-    const fetchClaims = async () => {
+    setLoading(true);
       try {
-        const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(user.id));
-        // Map backend claims to DataGrid row format
-        const mappedRows = response.data.map((claim) => ({
-          id: claim.id,
-          col1: claim.id,
-          col3: claim.claimType,
-          col4: claim.description,
-          claimDate: claim.claimDate ? dayjs(claim.claimDate).format("MMM DD, YYYY") : "-", // Use claimDate from backend
-          col5: claim.status ? claim.status.charAt(0).toUpperCase() + claim.status.slice(1).toLowerCase() : "Pending", // Normalize status format
-          claimFile: claim.claimUrl,
-          raw: claim,
-        }));
-        setRows(mappedRows);
+        const response = await axiosInstance.get(
+          API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(user.id)
+        );
+       if (!response.data || response.data.length === 0) {
+        setData([]);
+        return;
+      }
+      setData(response.data);
       } catch (error) {
-        console.error("Failed to fetch claims:", error);
+        showSnackbar(
+        error.response?.data?.message || "Failed to fetch data",
+        "error"
+      );
+      setData([]);
+      } finally {
+        setLoading(false);
       }
     };
+  
+    useEffect(() => {
+    if (!user) {
+      return;
+    }
     fetchClaims();
-  }, [user?.id]);
+  }, [user]);
 
-  const handleDelete = (claim) => {
-    setSelectedClaim(claim.raw);
+
+  const handleEdit = (record) => {
+    setSelectedRecord(record);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (record) => {
+    setSelectedRecord(record);
     setDeleteDialogOpen(true);
   };
 
-  const handleUpdateClaim = (updatedClaim) => {
-    setRows((prev) => prev.map(row => row.id === updatedClaim.id ? { ...row, ...updatedClaim, raw: updatedClaim } : row));
+  const handleUpdateRecord = async (id, data) => {
+    setLoading(true);
+    try {
+      await axiosInstance.put(API_PATHS.CLAIMS.UPDATE(id), data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      await fetchReferrals();
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to update record",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteClaim = (deletedClaim) => {
-    setRows((prev) => prev.filter(row => row.id !== deletedClaim.id));
+  const confirmDelete = async () => {
+    if (!selectedRecord) return;
+
+    setLoading(true);
+    try {
+      await axiosInstance.delete(API_PATHS.CLAIMS.DELETE(selectedRecord.id));
+      await fetchClaims();
+      showSnackbar("Claim deleted successfully.", "success");
+    } catch (error) {
+      showSnackbar("Failed to delete claim. Removed locally.", "warning");
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setSelectedRecord(null);
+    }
   };
 
   const columns = [
-    { field: "col3", headerName: "Type", width: 160 },
-    { field: "col4", headerName: "Description", width: 250 },
-    { field: "claimDate", headerName: "Claim Date", width: 180 },
-    { field: "col5", headerName: "Status", width: 150, renderCell: renderStatus },
+    { field: "claimType", headerName: "Type", width: 180 },
+    { field: "description", headerName: "Description", width: 350 },
     {
-      field: "claimFile",
+      field: "claimDate",
+      headerName: "Claim Date",
+      width: 150,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: "claimUrl",
       headerName: "Claim File",
-      width: 180,
-      renderCell: (params) =>
-        params.value ? (
+      width: 150,
+      renderCell: (params) =>{
+         const claimUrl = params.value;
+        if (!claimUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + claimUrl;
+        return(
           <Button
             component="a"
-            href={`http://localhost:8080${params.value}`}
+            href={fullUrl}
             target="_blank"
             rel="noopener noreferrer"
             download
             variant="outlined"
             size="small"
-            sx={{ 
-              fontSize: '0.75rem',
-              minWidth: 'auto',
+            sx={{
+              fontSize: "0.75rem",
+              minWidth: "auto",
               px: 1,
-              py: 0.5
+              py: 0.5,
             }}
             startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
           >
             Download
           </Button>
-        ) : (
-          "No file"
-        ),
+        );
+      }
     },
     {
       field: "actions",
@@ -102,9 +184,30 @@ export default function ClaimHistory(){
       headerClassName: "last-column",
       width: 120,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
+          <Tooltip title="Edit">
+            <IconButton
+              size="small"
+              onClick={() => handleEdit(params.row)}
+              sx={{ color: "primary.main" }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Delete">
-            <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+            <IconButton
+              size="small"
+              onClick={() => handleDelete(params.row)}
+              sx={{ color: "error.main" }}
+            >
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -114,34 +217,56 @@ export default function ClaimHistory(){
   ];
 
   return (
-    <>
-      <Paper elevation={3}
+    <Paper
+      elevation={3}
       sx={{
-        height: '100%',
-        width: '100%',
+        height: "100%",
+        width: "100%",
       }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          p: 5,
+        }}
       >
-      <Box sx={{ width: "100%", p: 5 }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[5, 10, 20]}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-        />
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <CustomDataGrid data={data} columns={columns} />
+        )}
       </Box>
-      </Paper>
+
+      <EditDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        record={selectedRecord}
+        onUpdate={handleUpdateRecord}
+      />
+
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        claim={selectedClaim}
-        onDelete={handleDeleteClaim}
+        claim={selectedRecord}
+        onConfirm={confirmDelete}
+        loading={loading}
       />
-    </>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={500}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Paper>
   );
 }

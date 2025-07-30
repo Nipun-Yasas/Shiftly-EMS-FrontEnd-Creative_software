@@ -10,17 +10,18 @@ export default function Loading() {
     <Box
       sx={{
         width: '100%',
-        height: '100vh',
+        height: '100%',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',   
+        alignItems: 'center',
+        m:5,
+        p:5
       }}
     >
       <Skeleton
-        
         variant="rectangular"
-        width={500}
-        height={500}
+        width={400}
+        height={400}
       />
     </Box>
   );

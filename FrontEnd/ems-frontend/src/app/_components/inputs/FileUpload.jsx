@@ -69,7 +69,7 @@ export default function FormikFileUpload({
             </Typography>
           </Box>
         )}
-        <Box width="50%">
+        <Box sx={{width:{xs:'100%',sm:'50%'}}}>
           <input
             ref={fileInputRef}
             type="file"

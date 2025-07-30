@@ -8,22 +8,26 @@ import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-import InputItem from "../../../../_components/inputs/InputItem";
-import TextInput from "../../../../_components/inputs/TextInput";
-import SelectInput from "../../../../_components/inputs/SelectInput";
-import FileUpload from "../../../../_components/inputs/FileUpload";
-import DateInput from "../../../../_components/inputs/DateInput";
+import InputItem from "../../../_components/inputs/InputItem";
+import TextInput from "../../../_components/inputs/TextInput";
+import SelectInput from "../../../_components/inputs/SelectInput";
+import FileUpload from "../../../_components/inputs/FileUpload";
+import DateInput from "../../../_components/inputs/DateInput";
 
-import { API_PATHS } from "../../../../_utils/apiPaths";
-import axiosInstance from "../../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../_utils/apiPaths";
+import axiosInstance from "../../../_utils/axiosInstance";
 import dayjs from "dayjs";
+import * as Yup from "yup";
 
 const claimtypeOptions = [
   { id: 1, name: "Medical" },
   { id: 2, name: "Insuarance" },
 ];
 
-export default function ClaimForm() {
+export default function ClaimForm({edit = false,
+  onSubmit,
+  onCancel,
+  initialValues}) {
   const claimfileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState("");
@@ -33,11 +37,28 @@ export default function ClaimForm() {
     setSnackbar({ open: true, message, severity });
   };
 
+  // Yup validation schema
+  const validationSchema = Yup.object({
+    claimtype: Yup.object().nullable().required("Select a claim type"),
+    claimdate: Yup.date().typeError("Claim date is required").required("Claim date is required"),
+    description: Yup.string().required("Description is required"),
+    claimfile: Yup.mixed()
+      .required("Claim file is required")
+      .test("fileType", "Only PDF, JPEG, or PNG files are allowed", function (value) {
+        if (!value) return false;
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+        return allowedTypes.includes(value.type);
+      })
+      .test("fileSize", "File must be less than 2MB", function (value) {
+        if (!value) return true;
+        return value.size <= 2 * 1024 * 1024;
+      }),
+  });
+
   // Fetch claims by user ID on mount (example: userId = 2)
   useEffect(() => {
     const fetchClaims = async () => {
       try {
-        const userId = 2; // Replace with dynamic user ID as needed
         const response = await axiosInstance.get(API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(userId));
       } catch (error) {
       }
@@ -54,24 +75,10 @@ export default function ClaimForm() {
           description: "",
           claimfile: null,
         }}
-        validate={(values) => {
-          const errors = {};
-          if (!values.claimtype) {
-            errors.claimtype = "Select a claim type";
-          }
-          if (!values.claimdate) {
-            errors.claimdate = "Claim date name is required";
-          }
-          if (!values.description) {
-            errors.description = "Description is required";
-          }
-          if (!values.claimfile) {
-            errors.claimfile = "Claim file is required";
-          }
-          return errors;
-        }}
-        onSubmit={async (values, { resetForm }) => {
+        validationSchema={validationSchema}
+        onSubmit={async (values, { setSubmitting, resetForm }) => {
           try {
+            setSubmitting(true);
             const data = new FormData();
             data.append('claimType', values.claimtype?.name || values.claimtype);
             data.append('description', values.description);
@@ -102,10 +109,12 @@ export default function ClaimForm() {
               errorMsg = error.response.data.message;
             }
             showSnackbar(errorMsg, 'error');
+          } finally {
+            setSubmitting(false);
           }
         }}
       >
-        {({ validateForm, resetForm }) => (
+        {({ isSubmitting,validateForm, resetForm }) => (
           <Form>
             <Stack>
               <Box
@@ -116,7 +125,7 @@ export default function ClaimForm() {
                   my: 2,
                 }}
               >
-                <DateInput name="claimdate" label="Claim Date" />
+                <DateInput name="claimdate" label="Claim Date" disablePast={true}/>
               </Box>
 
               <Box
@@ -194,11 +203,15 @@ export default function ClaimForm() {
                 <Button
                   type="submit"
                   variant="contained"
-                  onClick={() => {
-                    validateForm();
-                  }}
+                  disabled={isSubmitting}
                 >
-                  Add
+                  {isSubmitting
+                    ? edit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : edit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
               </Box>
             </Stack>
@@ -207,7 +220,7 @@ export default function ClaimForm() {
       </Formik>
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

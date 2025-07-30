@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -17,7 +18,6 @@ import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { useVacancies } from "../../../_hooks/useVacancies";
 
-// Yup validation schema
 const validationSchema = Yup.object({
   vacancy: Yup.object().nullable().required("Vacancy is required"),
 
@@ -37,38 +37,42 @@ const validationSchema = Yup.object({
 
   resume: Yup.mixed()
     .test("required", "Resume is required", function (value) {
-      const { isEditMode } = this.options.context || {};
-      if (isEditMode) return true; // Skip validation in edit mode
+      const { edit } = this.options.context || {};
+      if (edit) return true;
       return value !== null && value !== undefined;
     })
     .test("fileType", "Only JPEG and PDF files are allowed", function (value) {
-      if (!value) return true; // Skip if no file (will be caught by required test)
+      if (!value) return true;
+      if (!(value instanceof File)) return true;
       const allowedTypes = ["application/pdf", "image/jpeg"];
       return allowedTypes.includes(value.type);
     })
     .test("fileSize", "PDF files must be less than 1MB", function (value) {
-      if (!value) return true; // Skip if no file
+      if (!value) return true;
+      if (!(value instanceof File)) return true;
       if (value.type === "application/pdf") {
-        return value.size <= 1 * 1024 * 1024; // 1MB for PDF
+        return value.size <= 1 * 1024 * 1024;
       }
-      return true; // No size limit for JPEG
+      return true;
     }),
 });
 
-export default function ReferForm(props) {
-  const { initialValues, onSubmit, isEditMode = false, setOpenSubmit, onCancel } = props;
-
+export default function ReferForm({
+  edit = false,
+  onSubmit,
+  onCancel,
+  initialValues,
+}) {
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.resume || "");
   const { vacancies, loading: vacanciesLoading } = useVacancies();
-
-  // Snackbar state
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
@@ -77,50 +81,30 @@ export default function ReferForm(props) {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       setSubmitting(true);
-      
       if (onSubmit) {
         // If parent provides onSubmit, use it
-        await onSubmit(values, { setSubmitting, resetForm });
-      } else {
-        // Default submission logic
-        if (!values.resume) {
-          showSnackbar("Please select a resume file before submitting.", "error");
-          return;
-        }
+        await onSubmit(values, { resetForm });
+      }
 
-        const formData = new FormData();
-        formData.append('vacancyId', values.vacancy?.id || values.vacancy);
-        formData.append('applicantName', values.applicantName);
-        formData.append('applicantEmail', values.applicantEmail);
-        formData.append('message', values.message);
-        if (values.resume) {
-          formData.append('file', values.resume); // Backend expects 'file' parameter
-        }
+      const formData = new FormData();
+      formData.append("vacancyId", values.vacancy?.id || values.vacancy);
+      formData.append("applicantName", values.applicantName);
+      formData.append("applicantEmail", values.applicantEmail);
+      formData.append("message", values.message);
+      if (values.resume) {
+        formData.append("file", values.resume);
 
-        console.log('Submitting FormData:');
-        console.log('vacancyId:', values.vacancy?.id || values.vacancy);
-        console.log('applicantName:', values.applicantName);
-        console.log('applicantEmail:', values.applicantEmail);
-        console.log('message:', values.message);
-        console.log('file:', values.resume);
-        console.log('file name:', values.resume?.name);
-        console.log('file size:', values.resume?.size);
-        console.log('file type:', values.resume?.type);
+        const response = await axiosInstance.post(
+          API_PATHS.REFERRALS.ADD,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-        // Log FormData contents (for debugging)
-        console.log('FormData entries:');
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ': ', pair[1]);
-        }
-
-        const response = await axiosInstance.post(API_PATHS.REFERRALS.ADD, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        if (response.status === 200 || response.status === 201) {
-          console.log('Referral submission successful:', response.data);
+        if (response.status === 200) {
           showSnackbar("Referral submitted successfully!", "success");
           resetForm();
           setFileName("");
@@ -128,44 +112,21 @@ export default function ReferForm(props) {
           if (resumeRef.current) {
             resumeRef.current.value = "";
           }
-          // Open submit dialog if provided
-          if (setOpenSubmit) {
-            setTimeout(() => setOpenSubmit(true), 500);
-          }
-        } else {
-          console.log('Unexpected response status:', response.status);
-          showSnackbar("Unexpected response from server", "warning");
         }
       }
     } catch (error) {
-      console.error("Submission error:", error);
-      console.error("Error response:", error.response);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error response status:", error.response?.status);
-      
-      let errorMessage = "Failed to submit referral. Please try again.";
-      
-      if (error.response?.data) {
-        if (typeof error.response.data === 'string') {
-          errorMessage = error.response.data;
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.response.data.error) {
-          errorMessage = error.response.data.error;
-        }
-      }
-      
-      showSnackbar(errorMessage, "error");
+      showSnackbar(
+        error.response?.data?.message || "Failed to submit event.",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Pure presentational form: onSubmit is handled by parent
   return (
     <>
       <Formik
-        enableReinitialize
         initialValues={
           initialValues || {
             vacancy: null,
@@ -177,9 +138,9 @@ export default function ReferForm(props) {
         }
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-        context={{ isEditMode }} // Pass isEditMode to validation context
+        context={{ edit }}
       >
-        {({ isSubmitting, resetForm, setFieldValue }) => (
+        {({ isSubmitting, resetForm }) => (
           <Form>
             <Stack>
               <Box
@@ -201,11 +162,10 @@ export default function ReferForm(props) {
                     disabled={vacanciesLoading}
                   />
                 </InputItem>
-                 <InputItem>
+                <InputItem>
                   <TextInput
                     name="applicantName"
                     label="Enter applicant name"
-                    helperText="Full name of the person you're referring"
                   />
                 </InputItem>
               </Box>
@@ -221,13 +181,9 @@ export default function ReferForm(props) {
                   <TextInput
                     name="applicantEmail"
                     label="Enter applicant email"
-                    helperText="Valid email address of the applicant"
                   />
                 </InputItem>
-               
               </Box>
-
-              
 
               <Box
                 sx={{
@@ -244,31 +200,21 @@ export default function ReferForm(props) {
                     multiline
                     minRows={1}
                     maxRows={4}
-                    helperText="Write a message to about the applicant"
                   />
                 </InputItem>
               </Box>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: { xs: "column", sm: "row" },
-                  gap: { xs: 0, sm: 2 },
-                }}
-              >
-                <InputItem>
-                  <FileUpload
-                    name="resume"
-                    label="Upload Resume"
-                    fileTypes=".pdf,.jpg,.jpeg"
-                    fileName={fileName}
-                    setFileName={setFileName}
-                    preview={preview}
-                    setPreview={setPreview}
-                  />
-                </InputItem>
-              </Box>
+              <InputItem>
+                <FileUpload
+                  name="resume"
+                  label="Upload Resume"
+                  fileTypes=".pdf,.jpg,.jpeg"
+                  fileName={fileName}
+                  setFileName={setFileName}
+                  preview={preview}
+                  setPreview={setPreview}
+                />
+              </InputItem>
 
               <InputItem>
                 <Box
@@ -283,10 +229,8 @@ export default function ReferForm(props) {
                     type="reset"
                     onClick={() => {
                       if (onCancel) {
-                        // If in edit mode or dialog, close the dialog
                         onCancel();
                       } else {
-                        // Default behavior: reset form
                         resetForm();
                         setFileName("");
                         setPreview(null);
@@ -305,10 +249,10 @@ export default function ReferForm(props) {
                     disabled={isSubmitting}
                   >
                     {isSubmitting
-                      ? isEditMode
+                      ? edit
                         ? "Updating..."
                         : "Submitting..."
-                      : isEditMode
+                      : edit
                         ? "Update"
                         : "Submit"}
                   </Button>
@@ -320,7 +264,7 @@ export default function ReferForm(props) {
       </Formik>
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={500}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

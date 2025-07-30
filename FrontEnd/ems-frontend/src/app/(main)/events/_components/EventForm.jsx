@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -32,42 +33,48 @@ const validationSchema = Yup.object({
     .min(3, "Event title must be at least 3 characters")
     .max(100, "Event title must be less than 100 characters")
     .required("Event title is required"),
-  
-  eventType: Yup.object()
-    .nullable()
-    .required("Event type is required"),
-  
+
+  eventType: Yup.object().nullable().required("Event type is required"),
+
   enableDate: Yup.date()
     .nullable()
     .typeError("Please enter a valid date")
     .required("Start date is required"),
-  
+
   expireDate: Yup.date()
     .nullable()
     .typeError("Please enter a valid date")
     .required("End date is required")
     .when("enableDate", {
-      is: (enableDate) => enableDate && enableDate instanceof Date && !isNaN(enableDate),
-      then: (schema) => schema.min(Yup.ref("enableDate"), "End date must be after start date"),
-      otherwise: (schema) => schema
+      is: (enableDate) =>
+        enableDate && enableDate instanceof Date && !isNaN(enableDate),
+      then: (schema) =>
+        schema.min(Yup.ref("enableDate"), "End date must be after start date"),
+      otherwise: (schema) => schema,
     }),
-  
+
   banner: Yup.mixed()
-    .nullable()
-    .test("fileType", "Only JPEG, JPG, and PNG files are allowed", function (value) {
-      if (!value) return true; // Optional file
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-      return allowedTypes.includes(value.type);
-    })
+    .test(
+      "fileType",
+      "Only JPEG, JPG, and PNG files are allowed",
+      function (value) {
+        if (!value) return true; // Optional file
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+        return allowedTypes.includes(value.type);
+      }
+    )
     .test("fileSize", "File size must be less than 5MB", function (value) {
       if (!value) return true; // Optional file
       return value.size <= 5 * 1024 * 1024; // 5MB
     }),
 });
 
-export default function EventForm(props) {
-  const { initialValues, onSubmit, isEditMode = false, onCancel } = props;
-
+export default function EventForm({
+  edit = false,
+  onSubmit,
+  onCancel,
+  initialValues,
+}) {
   const bannerRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.banner || "");
@@ -84,33 +91,38 @@ export default function EventForm(props) {
   // Handle form submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      setSubmitting(true);
       if (onSubmit) {
-        // If parent provides onSubmit, use it (for edit mode)
-        await onSubmit(values, { setSubmitting, resetForm });
-      } else {
-        // Default submission logic (for create mode)
-        const data = new FormData();
-        data.append('title', values.title);
-        data.append('eventType', values.eventType?.name || values.eventType);
-        
-        // Format dates properly
-        const enableDate = values.enableDate ? new Date(values.enableDate).toISOString().slice(0, 10) : '';
-        const expireDate = values.expireDate ? new Date(values.expireDate).toISOString().slice(0, 10) : '';
-        
-        data.append('enableDate', enableDate);
-        data.append('expireDate', expireDate);
-        
-        if (values.banner) {
-          data.append('image', values.banner); // Use 'image' as the field name!
-        }
+        await onSubmit(values, { resetForm });
+      }
+      // Default submission logic (for create mode)
+      const data = new FormData();
+      data.append("title", values.title);
+      data.append("eventType", values.eventType?.name || values.eventType);
 
-        const response = await axiosInstance.post(
-          API_PATHS.EVENTS.ADD_EVENT,
-          data,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        );
+      // Format dates properly
+      const enableDate = values.enableDate
+        ? new Date(values.enableDate).toISOString().slice(0, 10)
+        : "";
+      const expireDate = values.expireDate
+        ? new Date(values.expireDate).toISOString().slice(0, 10)
+        : "";
 
-        showSnackbar('Event submitted successfully!', 'success');
+      data.append("enableDate", enableDate);
+      data.append("expireDate", expireDate);
+
+      if (values.banner) {
+        data.append("image", values.banner);
+      }
+
+      const response = await axiosInstance.post(
+        API_PATHS.EVENTS.ADD_EVENT,
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      if (response.status === 201) {
+        showSnackbar("Event submitted successfully!", "success");
         resetForm();
         setFileName("");
         setPreview(null);
@@ -119,11 +131,10 @@ export default function EventForm(props) {
         }
       }
     } catch (error) {
-      let errorMsg = isEditMode ? 'Failed to update event.' : 'Failed to submit event.';
-      if (error.response?.data?.message) {
-        errorMsg = error.response.data.message;
-      }
-      showSnackbar(errorMsg, 'error');
+      showSnackbar(
+        error.response?.data?.message || "Failed to submit event.",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -132,8 +143,7 @@ export default function EventForm(props) {
   return (
     <>
       <Formik
-        enableReinitialize
-        initialValues={initialValues || {
+        initialValues={{
           title: "",
           eventType: null,
           enableDate: null,
@@ -142,16 +152,13 @@ export default function EventForm(props) {
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        context={{ edit }}
       >
         {({ resetForm, isSubmitting, setFieldValue }) => (
           <Form>
             <Stack spacing={3}>
               <InputItem>
-                <TextInput 
-                  name="title" 
-                  label="Event Title"
-                  helperText="Enter a descriptive title for your event"
-                />
+                <TextInput name="title" label="Event Title" />
               </InputItem>
 
               <InputItem>
@@ -171,28 +178,28 @@ export default function EventForm(props) {
                   gap: { xs: 0, sm: 2 },
                 }}
               >
-                <DateInput 
-                  name="enableDate" 
+                <DateInput
+                  name="enableDate"
                   label="Event Start Date"
-                  helperText="When does the event begin?"
+                  disablePast={true}
                 />
-                <DateInput 
-                  name="expireDate" 
+                <DateInput
+                  name="expireDate"
                   label="Event End Date"
-                  helperText="When does the event end?"
+                  disablePast={true}
                 />
               </Box>
-
-              <FileUpload
-                name="banner"
-                label="Upload Event Banner (Optional)"
-                fileTypes=".jpg,.jpeg,.png"
-                fileName={fileName}
-                setFileName={setFileName}
-                preview={preview}
-                setPreview={setPreview}
-                onChange={(file) => setFieldValue('banner', file)}
-              />
+              <InputItem>
+                <FileUpload
+                  name="banner"
+                  label="Upload Event Banner"
+                  fileTypes=".jpg,.jpeg,.png"
+                  fileName={fileName}
+                  setFileName={setFileName}
+                  preview={preview}
+                  setPreview={setPreview}
+                />
+              </InputItem>
 
               <Box
                 sx={{
@@ -207,10 +214,8 @@ export default function EventForm(props) {
                   type="reset"
                   onClick={() => {
                     if (onCancel) {
-                      // If in edit mode or dialog, close the dialog
                       onCancel();
                     } else {
-                      // Default behavior: reset form
                       resetForm();
                       setFileName("");
                       setPreview(null);
@@ -223,28 +228,29 @@ export default function EventForm(props) {
                 >
                   Cancel
                 </Button>
-                
+
                 <Button
                   type="submit"
                   variant="contained"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting 
-                    ? (isEditMode ? "Updating..." : "Submitting...") 
-                    : (isEditMode ? "Update Event" : "Submit Event")
-                  }
+                  {isSubmitting
+                    ? edit
+                      ? "Updating..."
+                      : "Submitting..."
+                    : edit
+                      ? "Update"
+                      : "Submit"}
                 </Button>
-
               </Box>
             </Stack>
           </Form>
         )}
       </Formik>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={500}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
