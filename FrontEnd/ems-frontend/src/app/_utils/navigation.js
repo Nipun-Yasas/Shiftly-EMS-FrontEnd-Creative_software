@@ -8,13 +8,9 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import EmailIcon from '@mui/icons-material/Email';
-import MarkAsUnreadOutlinedIcon from '@mui/icons-material/MarkAsUnreadOutlined';
-import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
 import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import WorkIcon from "@mui/icons-material/Work";
-import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
-import EngineeringIcon from '@mui/icons-material/Engineering';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
@@ -32,6 +28,9 @@ import FreeCancellationOutlinedIcon from '@mui/icons-material/FreeCancellationOu
 import HistoryOutlined from '@mui/icons-material/HistoryOutlined';
 import PersonAddOutlined from '@mui/icons-material/PersonAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import BusinessIcon from '@mui/icons-material/Business';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
 export function getNavigationForUser(user) {
   const roles = user?.roles?.map((r) => r.toLowerCase()) || [];
@@ -60,6 +59,11 @@ const NAVIGATION = [
         icon: <ManageAccountsOutlinedIcon />,
       },
       {
+        segment: 'department-management',
+        title: 'Department Management',
+        icon: <BusinessIcon />,
+      },
+      {
         segment: 'project-management',
         title: 'Project Management',
         icon: <WorkOutlineIcon />,
@@ -68,6 +72,11 @@ const NAVIGATION = [
         segment: 'timesheet-management',
         title: 'Timesheet Management',
         icon: <WorkHistoryOutlinedIcon />,
+      },
+      {
+        segment: 'letters',
+        title: 'Generate letters',
+        icon: <MailOutlineIcon />,
       },
       {
         segment: 'leaves',
@@ -88,6 +97,11 @@ const NAVIGATION = [
         segment: 'candidates',
         title: 'Candidates',
         icon: <GroupAddOutlinedIcon />,
+      },
+      {
+        segment: 'vacancies',
+        title: 'Vacancies',
+        icon: <PeopleOutlineIcon />,
       }
     ]
   },

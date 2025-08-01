@@ -26,7 +26,7 @@ import { API_PATHS } from "../../_utils/apiPaths";
 
 export default function SignUpForm(props) {
   const { openSignUp, setOpenSignUp, openLogin } = props;
-  
+
   const [error, setError] = useState(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 
@@ -50,16 +50,18 @@ export default function SignUpForm(props) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setError(null);
-    
+
     try {
-      
       const payload = {
         username: values.username,
         email: values.email,
-        password: values.password
+        password: values.password,
       };
-      
-      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, payload);
+
+      const response = await axiosInstance.post(
+        API_PATHS.AUTH.REGISTER,
+        payload
+      );
       // Close signup dialog, show success message, and open login dialog
       setOpenSignUp(false);
       setShowSuccessSnackbar(true);
@@ -67,18 +69,23 @@ export default function SignUpForm(props) {
       setTimeout(() => {
         openLogin();
       }, 500);
-      
     } catch (error) {
       // Only log unexpected errors, not 409 conflicts (username/email exists)
       if (error.response?.status !== 409) {
         console.error("Signup error:", error);
       }
-      
+
       if (error.response && error.response.status === 409) {
         // Handle username/email already exists (409 Conflict)
-        const errorMessage = error.response.data?.message || "Username or email already exists. Please try with different credentials.";
+        const errorMessage =
+          error.response.data?.message ||
+          "Username or email already exists. Please try with different credentials.";
         setError(errorMessage);
-      } else if (error.response && error.response.data && error.response.data.message) {
+      } else if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         setError(error.response.data.message);
       } else {
         setError("Something went wrong. Please try again.");
@@ -136,11 +143,11 @@ export default function SignUpForm(props) {
             <X size={24} />
           </IconButton>
 
-        {error && (
-          <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
-            {error}
-          </Typography>
-        )}
+          {error && (
+            <Typography color="error.main" sx={{ fontSize: "0.875rem" }}>
+              {error}
+            </Typography>
+          )}
 
           <Formik
             initialValues={initialValues}
@@ -151,7 +158,7 @@ export default function SignUpForm(props) {
               <Form>
                 <Stack spacing={{ xs: 1, sm: 2 }} alignItems="center">
                   <FormItem>
-                    <TextInput name="username" label="Username"  />
+                    <TextInput name="username" label="Username" />
                   </FormItem>
                   <FormItem>
                     <TextInput name="email" label="Email" />
@@ -182,11 +189,15 @@ export default function SignUpForm(props) {
                       gap: 1,
                     }}
                   >
-                   
-
                     <Link href="/change-password">
                       <Typography
-                        sx={{ fontSize: { xs: "0.875rem", sm: "1rem",color: '#E90A4D'} }}
+                        sx={{
+                          fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem",
+                            color: "#E90A4D",
+                          },
+                        }}
                       >
                         Forgot Password?
                       </Typography>
@@ -197,7 +208,6 @@ export default function SignUpForm(props) {
                     type="submit"
                     disabled={isSubmitting}
                     variant="contained"
-                    
                   >
                     {isSubmitting ? "Signing up..." : "Sign Up"}
                   </Button>
@@ -217,19 +227,20 @@ export default function SignUpForm(props) {
                       Already have an account?{" "}
                     </Typography>
                     <Button
-                    variant="text"
-                      onClick={() => {setOpenSignUp(false);
+                      variant="text"
+                      onClick={() => {
+                        setOpenSignUp(false);
                         openLogin();
                       }}
                       className="hover:cursor-pointer"
                     >
                       <Typography
                         sx={{
-                        fontSize: "0.875rem",
-                        color: '#E90A4D',
-                        opacity: isSubmitting ? 0.5 : 1,
-                        textTransform: 'none'
-                      }}
+                          fontSize: "0.875rem",
+                          color: "primary.main",
+                          opacity: isSubmitting ? 0.5 : 1,
+                          textTransform: "none",
+                        }}
                       >
                         Sign Up
                       </Typography>
@@ -247,14 +258,15 @@ export default function SignUpForm(props) {
         open={showSuccessSnackbar}
         autoHideDuration={6000}
         onClose={() => setShowSuccessSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert 
-          onClose={() => setShowSuccessSnackbar(false)} 
+        <Alert
+          onClose={() => setShowSuccessSnackbar(false)}
           severity="success"
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
-          Account created successfully! Please wait for admin verification before logging in.
+          Account created successfully! Please wait for admin verification
+          before logging in.
         </Alert>
       </Snackbar>
     </>
