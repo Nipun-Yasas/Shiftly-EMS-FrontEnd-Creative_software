@@ -53,33 +53,33 @@ export default function ClaimHistory() {
   const fetchClaims = async () => {
     if (!user?.id) return;
     setLoading(true);
-      try {
-        const response = await axiosInstance.get(
-          API_PATHS.CLAIMS.GET_CLAIMS_BY_USER_ID(user.id)
-        );
-       if (!response.data || response.data.length === 0) {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.CLAIMS.GET_MY_CLAIMS
+      );
+
+      if (!response.data || response.data.length === 0) {
         setData([]);
         return;
       }
       setData(response.data);
-      } catch (error) {
-        showSnackbar(
+    } catch (error) {
+      showSnackbar(
         error.response?.data?.message || "Failed to fetch data",
         "error"
       );
       setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    useEffect(() => {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (!user) {
       return;
     }
     fetchClaims();
   }, [user]);
-
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -97,12 +97,13 @@ export default function ClaimHistory() {
       await axiosInstance.put(API_PATHS.CLAIMS.UPDATE(id), data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      await fetchReferrals();
+      await fetchClaims();
     } catch (error) {
       showSnackbar(
         error.response?.data?.message || "Failed to update record",
         "error"
       );
+      throw error; // Re-throw to let EditDialog handle the error
     } finally {
       setLoading(false);
     }
@@ -117,7 +118,10 @@ export default function ClaimHistory() {
       await fetchClaims();
       showSnackbar("Claim deleted successfully.", "success");
     } catch (error) {
-      showSnackbar("Failed to delete claim. Removed locally.", "warning");
+      showSnackbar(
+        error.response?.data?.message || "Failed to delete claim",
+        "error"
+      );
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);
@@ -235,7 +239,7 @@ export default function ClaimHistory() {
         {loading ? (
           <CircularProgress />
         ) : (
-          <CustomDataGrid data={data} columns={columns} />
+          <CustomDataGrid rows={data} columns={columns} />
         )}
       </Box>
 
@@ -249,7 +253,6 @@ export default function ClaimHistory() {
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        claim={selectedRecord}
         onConfirm={confirmDelete}
         loading={loading}
       />

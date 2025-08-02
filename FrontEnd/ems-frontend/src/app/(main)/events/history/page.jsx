@@ -54,7 +54,7 @@ export default function EventHistory() {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_ALL_EVENTS);
+      const response = await axiosInstance.get(API_PATHS.EVENTS.GET_MY_EVENTS);
 
       if (!response.data || response.data.length === 0) {
         setData([]);
@@ -101,6 +101,7 @@ export default function EventHistory() {
         error.response?.data?.message || "Failed to update record",
         "error"
       );
+      throw error; // Re-throw to let EditDialog handle the error
     } finally {
       setLoading(false);
     }

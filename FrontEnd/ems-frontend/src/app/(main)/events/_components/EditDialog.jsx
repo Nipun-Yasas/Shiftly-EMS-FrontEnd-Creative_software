@@ -73,7 +73,7 @@ export default function EditDialog({ open, onClose, record, onUpdate }) {
       eventType: getEventTypeObject(record.eventType),
       enableDate: formatDateForInput(record.enableDate),
       expireDate: formatDateForInput(record.expireDate),
-      banner: null,
+      banner: record.imageUrl || null,
     };
   };
 
@@ -94,25 +94,24 @@ export default function EditDialog({ open, onClose, record, onUpdate }) {
       data.append("enableDate", enableDate);
       data.append("expireDate", expireDate);
 
-      if (values.banner) {
+      // Only append image if it's a new file (not the existing URL)
+      if (values.banner && values.banner instanceof File) {
         data.append("image", values.banner);
       }
 
-      const response = await axiosInstance.put(
-        API_PATHS.EVENTS.UPDATE_EVENT(record.id),
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      showSnackbar("Event updated successfully!", "success");
-      onUpdate && onUpdate(response.data);
+      await onUpdate(record.id, data);
+      setSnackbar({
+        open: true,
+        message: "Event updated successfully!",
+        severity: "success",
+      });
       setTimeout(() => onClose(), 600);
     } catch (error) {
-      showSnackbar(
-        error.response?.data?.message ||
-          "Failed to update event. Please try again.",
-        "error"
-      );
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to update event. Please try again.",
+        severity: "error",
+      });
     } finally {
       setSubmitting(false);
     }

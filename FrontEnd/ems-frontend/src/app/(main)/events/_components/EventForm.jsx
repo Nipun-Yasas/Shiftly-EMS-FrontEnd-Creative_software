@@ -59,12 +59,14 @@ const validationSchema = Yup.object({
       "Only JPEG, JPG, and PNG files are allowed",
       function (value) {
         if (!value) return true; // Optional file
+        if (!(value instanceof File)) return true; // Skip validation for existing URLs
         const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
         return allowedTypes.includes(value.type);
       }
     )
     .test("fileSize", "File size must be less than 5MB", function (value) {
       if (!value) return true; // Optional file
+      if (!(value instanceof File)) return true; // Skip validation for existing URLs
       return value.size <= 5 * 1024 * 1024; // 5MB
     }),
 });
@@ -94,7 +96,9 @@ export default function EventForm({
       setSubmitting(true);
       if (onSubmit) {
         await onSubmit(values, { resetForm });
+        return; // Exit early if parent handles submission
       }
+      
       // Default submission logic (for create mode)
       const data = new FormData();
       data.append("title", values.title);
@@ -116,19 +120,18 @@ export default function EventForm({
       }
 
       const response = await axiosInstance.post(
-        API_PATHS.EVENTS.ADD_EVENT,
+        API_PATHS.EVENTS.ADD,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      if (response.status === 201) {
-        showSnackbar("Event submitted successfully!", "success");
-        resetForm();
-        setFileName("");
-        setPreview(null);
-        if (bannerRef.current) {
-          bannerRef.current.value = "";
-        }
+      // If we reach here, the request was successful
+      showSnackbar("Event submitted successfully!", "success");
+      resetForm();
+      setFileName("");
+      setPreview(null);
+      if (bannerRef.current) {
+        bannerRef.current.value = "";
       }
     } catch (error) {
       showSnackbar(
@@ -143,7 +146,7 @@ export default function EventForm({
   return (
     <>
       <Formik
-        initialValues={{
+        initialValues={initialValues || {
           title: "",
           eventType: null,
           enableDate: null,
@@ -153,6 +156,7 @@ export default function EventForm({
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
         context={{ edit }}
+        enableReinitialize={edit}
       >
         {({ resetForm, isSubmitting, setFieldValue }) => (
           <Form>
