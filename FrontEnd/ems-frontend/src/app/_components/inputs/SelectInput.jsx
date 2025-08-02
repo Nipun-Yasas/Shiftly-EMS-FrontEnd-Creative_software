@@ -28,7 +28,7 @@ export default function SelectInput({ name, options, getOptionLabel, label, onCh
       id={name}
       options={options}
       getOptionLabel={getOptionLabel}
-      value={values[name]}
+      value={values[name] ?? null}
       onChange={handleChange}
       onBlur={() => setFieldTouched(name, true, true)}
       renderInput={(params) => (

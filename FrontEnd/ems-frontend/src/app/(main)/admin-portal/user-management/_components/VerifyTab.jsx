@@ -1,5 +1,7 @@
 "use client";
 
+import dayjs from "dayjs";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -8,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
-import UserDataGrid from "./UserDataGrid";
+import CustomDataGrid from "../../../_components/CustomDataGrid";
 
 export default function VerifyTab({ loading, users, handleAssignUser, onRefresh }) {
   const columns = [
@@ -24,22 +26,7 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
     headerName: "Created Date",
     flex: 1,
     minWidth: 200,
-    renderCell: (params) => {
-      if (!params.value) return "N/A";
-
-      try {
-        const date = new Date(params.value);
-        return date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      } catch (error) {
-        return "Invalid Date";
-      }
-    },
+    renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
   },
     {
       field: "actions",
@@ -113,7 +100,7 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
               </Typography>
             </Box>
           ) : (
-            <UserDataGrid loading={loading} rows={users} columns={columns} />
+            <CustomDataGrid rows={users} columns={columns}/>
           )}
         </Box>
       </Box>

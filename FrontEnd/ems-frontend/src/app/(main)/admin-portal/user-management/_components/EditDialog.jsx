@@ -11,24 +11,17 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { Formik, Form } from "formik";
 
-import UserForm, {
-  editValidationSchema,
-  getEditInitialValues,
-} from "./UserForm";
 import { useDepartments } from "../../../../_hooks/useDepartments";
 
 export default function EditDialog({
   editDialogOpen,
   setOpenDialog,
-  editingUser,
-  setEditingUser,
   handleSubmit,
 }) {
   const { departments } = useDepartments();
   
   const handleClose = () => {
     setOpenDialog(false);
-    setEditingUser(null);
   };
 
   return (
@@ -50,16 +43,12 @@ export default function EditDialog({
       <DialogContent dividers>
         <Box sx={{ mb: 3 }}>
           <Typography variant="body1" sx={{ mb: 1 }}>
-            <strong>Username:</strong> {editingUser?.username}
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            <strong>Email:</strong> {editingUser?.email}
           </Typography>
         </Box>
 
         <Formik
-          initialValues={getEditInitialValues(editingUser, departments)}
-          validationSchema={editValidationSchema}
           onSubmit={handleSubmit}
           enableReinitialize
         >
