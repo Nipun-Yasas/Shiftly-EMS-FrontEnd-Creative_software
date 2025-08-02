@@ -5,8 +5,9 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
 
-import UserDataGrid from "./UserDataGrid";
+import CustomDataGrid from "../../../_components/CustomDataGrid";
 
 export default function AllTab({
   loading,
@@ -36,7 +37,7 @@ export default function AllTab({
       headerName: "Department",
       width: 140,
     },
-    
+
     {
       field: "reportingPerson",
       headerName: "Reporting Person",
@@ -90,8 +91,14 @@ export default function AllTab({
   ];
 
   return (
-    <Box sx={{ p: 3 }}>
-      <UserDataGrid loading={loading} rows={users} columns={columns} />
+    <Box
+      sx={{ display: "flex", justifyContent: "center", width: "100%", p: 5 }}
+    >
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <CustomDataGrid rows={users} columns={columns} />
+      )}
     </Box>
   );
 }

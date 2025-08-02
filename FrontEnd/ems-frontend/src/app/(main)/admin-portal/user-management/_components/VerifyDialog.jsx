@@ -34,21 +34,19 @@ export default function VerifyDialog({
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6">Verify and Assign User</Typography>
+      <DialogTitle  sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: "1px solid #e0e0e0",
+          pb: 2,
+        }}>
+          Verify and Assign User
           <IconButton onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-        </Box>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent>
         <Box sx={{ mb: 3 }}>
           <Typography variant="body1" sx={{ mb: 1 }}>
             <strong>Username:</strong> {assigningUser?.username}
@@ -58,24 +56,8 @@ export default function VerifyDialog({
           </Typography>
         </Box>
 
-        <Formik
-          initialValues={getAssignInitialValues()}
-          validationSchema={assignValidationSchema}
-          onSubmit={handleAssignSubmit}
-          enableReinitialize
-        >
-          {({ isSubmitting, submitForm }) => (
-            <Form>
-              <UserForm
-                showEmployeeNumber={true}
-                isSubmitting={isSubmitting}
-                isEdit={false}
-                onCancel={handleClose}
-                submitForm={submitForm}
-              />
-            </Form>
-          )}
-        </Formik>
+        <UserForm handleAssignSubmit={handleAssignSubmit} onCancel={handleClose} />
+
       </DialogContent>
     </Dialog>
   );

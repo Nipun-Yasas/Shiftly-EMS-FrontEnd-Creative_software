@@ -50,6 +50,9 @@ export const API_PATHS = {
     DELETE_EVENT: "/api/calendar/events",
   },
   DEPARTMENTS: {
+    //super admin end point
+    ADD_DEPARTMENT:'/api/v1/shiftly/ems/departments/add',
+
     GET_ALL_DEPARTMENTS: "/api/v1/shiftly/ems/departments/all",
   },
   TEAMS: {

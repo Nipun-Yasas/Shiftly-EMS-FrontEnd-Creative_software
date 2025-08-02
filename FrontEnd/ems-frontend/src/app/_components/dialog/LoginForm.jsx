@@ -191,8 +191,8 @@ export default function LoginForm(props) {
                   <Link href="/forgotpassword">
                     <Typography
                       sx={{ 
+                        color: 'primary.main',
                         fontSize: "0.875rem",
-                        color: '#E90A4D',
                         opacity: isSubmitting ? 0.5 : 1,
                         pointerEvents: isSubmitting ? 'none' : 'auto'
                       }}
@@ -210,8 +210,17 @@ export default function LoginForm(props) {
                     {error}
                   </Typography>
                 )}
-
-                <Button
+                <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      width: "100%",
+                                      flexDirection: { xs: "column", sm: "row" },
+                                      gap: 1,
+                                    }}
+                                  >
+<Button
                   type="submit"
                   disabled={isSubmitting}
                   variant="contained"
@@ -219,6 +228,8 @@ export default function LoginForm(props) {
                 >
                   {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
+                                  </Box>
+                
 
                 <Box sx={{ textAlign: "center" }}>
                   <Typography sx={{ fontSize: "0.875rem" }}>
