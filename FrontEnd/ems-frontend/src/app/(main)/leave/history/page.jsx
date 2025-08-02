@@ -5,75 +5,9 @@ import { usePathname } from 'next/navigation';
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { DataGrid } from "@mui/x-data-grid";
-import { Paper, Box } from "@mui/material";
+import { Paper, Box, Typography,Snackbar, Alert } from "@mui/material";
 import { IconButton, Tooltip, Dialog, DialogTitle, DialogActions, Button, DialogContent, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-
-const columns = [
-
-  { field: "leave_type", headerName: "Leave Type", width: 150, renderCell: (params) => (<span>{params.value}</span>), },
-  { field: "leave_from", headerName: "Leave From", width: 150 },
-  { field: "leave_to", headerName: "Leave To", width: 150 },
-
-  { field: "reason", headerName: "Reason", width: 150 },
-  { field: "cover_person", headerName: "Cover Person", width: 150 },
-  { field: "leave_status", headerName: "Status", width: 150, renderCell: (params) => (
-      <span
-        style={{
-          padding: "0.5rem 1rem",
-          borderRadius: "9999px",
-          fontSize: "0.875rem",
-          fontWeight: 500,
-          textAlign: "center",
-          backgroundColor: params.value === "Approved" ? "#dcedc8" : "#fff3e0",
-          color: params.value === "Approved" ? "#388e3c" : "#f57c00",
-        }}
-      >
-        {params.value}
-      </span>
-    ),
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    align: "center",
-    headerClassName: "last-column",
-    width: 90,
-    renderCell: (params) => (
-      <Box
-        sx={{
-          display: "flex",
-          gap: 0.5,
-          mt: 1,
-          width: "100%",
-          justifyContent: "center",
-        }}
-      >
-        <Tooltip title="Edit">
-          <IconButton
-            size="small"
-            onClick={() => handleEdit(params.row)}
-            sx={{ color: "primary.main" }}
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton
-            size="small"
-            onClick={() => {
-              setUserToDelete(params.row);
-              setDeleteConfirmOpen(true);
-            }}
-            sx={{ color: "error.main" }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-    ),
-  },
-];
+import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 
 export default function LeaveHistory() {
   const pathname = usePathname();
@@ -89,9 +23,49 @@ export default function LeaveHistory() {
   const [leaveToEdit, setLeaveToEdit] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState({ leave_type: '', leave_from: '', leave_to: '', reason: '', cover_person: '', leave_status: '' });
+  const [totalLeaves, setTotalLeaves] = useState(0);
+  const [pendingLeaves, setPendingLeaves] = useState(0);
+  const [approvedLeaves, setApprovedLeaves] = useState(0);
+  const [rejectedLeaves, setRejectedLeaves] = useState(0);
+  const [pollingInterval, setPollingInterval] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [recentlyUpdated, setRecentlyUpdated] = useState(new Set());
 
   useEffect(() => {
-    setLoading(true);
+    // Initial load
+    fetchLeaveHistory();
+    
+    // Set up polling for real-time updates
+    const interval = setInterval(() => {
+      fetchLeaveHistory(true); // Silent refresh
+    }, 30000); // Poll every 30 seconds
+    
+    setPollingInterval(interval);
+
+    // Cleanup on unmount
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [pathname]);
+
+  // Cleanup polling interval when component unmounts
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
+
+  const fetchLeaveHistory = (silent = false) => {
+    if (!silent) setLoading(true);
+    
     axiosInstance.get(API_PATHS.LEAVES.GET_MY_LEAVES)
       .then((res) => {
         // Map backend data to DataGrid row format
@@ -105,14 +79,89 @@ export default function LeaveHistory() {
           report_to: leave.reportToName || '',
           leave_status: leave.leaveStatus || '',
         }));
+        
+        // Check if there are any status changes for notifications
+        if (silent && rows.length > 0) {
+          checkForStatusUpdates(rows, mappedRows);
+        }
+        
         setRows(mappedRows);
-        setLoading(false);
+        updateLeaveCounts(mappedRows);
+        if (!silent) setLoading(false);
       })
       .catch((err) => {
-        setError("Failed to fetch leave history");
-        setLoading(false);
+        console.error("Failed to fetch leave history:", err);
+        if (!silent) {
+          setError("Failed to fetch leave history");
+          setLoading(false);
+        }
       });
-  }, [pathname]);
+  };
+
+  // Check for status changes and show notifications
+  const checkForStatusUpdates = (oldRows, newRows) => {
+    const updatedIds = new Set();
+    
+    oldRows.forEach(oldLeave => {
+      const newLeave = newRows.find(newL => newL.id === oldLeave.id);
+      if (newLeave && oldLeave.leave_status !== newLeave.leave_status) {
+        updatedIds.add(newLeave.id);
+        
+        // Status changed - show notification
+        const statusText = newLeave.leave_status.toLowerCase();
+        const message = `Your leave request has been ${statusText}`;
+        
+        // Show toast notification
+        const severity = statusText === 'approved' ? 'success' : statusText === 'rejected' ? 'error' : 'info';
+        showSnackbar(message, severity);
+        
+        // Optional: Show browser notification if permission is granted
+        if (Notification.permission === 'granted') {
+          new Notification('Leave Status Update', {
+            body: message,
+            icon: '/shiftly-logo.png'
+          });
+        }
+      }
+    });
+    
+    // Update recently updated set
+    if (updatedIds.size > 0) {
+      setRecentlyUpdated(updatedIds);
+      // Clear the highlight after 10 seconds
+      setTimeout(() => {
+        setRecentlyUpdated(new Set());
+      }, 10000);
+    }
+  };
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Request notification permission on component mount
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Function to update leave counts
+  const updateLeaveCounts = (leaves) => {
+    const total = leaves.length;
+    const pending = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'pending').length;
+    const approved = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'approved').length;
+    const rejected = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'rejected').length;
+    
+    setTotalLeaves(total);
+    setPendingLeaves(pending);
+    setApprovedLeaves(approved);
+    setRejectedLeaves(rejected);
+  };
 
   // Delete logic
   const handleDelete = (row) => {
@@ -122,7 +171,9 @@ export default function LeaveHistory() {
   const confirmDelete = () => {
     axiosInstance.delete(API_PATHS.LEAVES.DELETE_MY_LEAVE(leaveToDelete.id))
       .then(() => {
-        setRows((prev) => prev.filter((r) => r.id !== leaveToDelete.id));
+        const updatedRows = rows.filter((r) => r.id !== leaveToDelete.id);
+        setRows(updatedRows);
+        updateLeaveCounts(updatedRows);
         setDeleteConfirmOpen(false);
         setLeaveToDelete(null);
       })
@@ -160,7 +211,7 @@ export default function LeaveHistory() {
     };
     axiosInstance.put(API_PATHS.LEAVES.UPDATE_MY_LEAVE(leaveToEdit.id), payload)
       .then((res) => {
-        setRows((prev) => prev.map((r) => r.id === leaveToEdit.id ? {
+        const updatedRows = rows.map((r) => r.id === leaveToEdit.id ? {
           ...r,
           leave_type: res.data.leaveType,
           leave_from: res.data.leaveFrom,
@@ -168,7 +219,9 @@ export default function LeaveHistory() {
           reason: res.data.reason,
           cover_person: res.data.coverPersonName,
           leave_status: res.data.leaveStatus,
-        } : r));
+        } : r);
+        setRows(updatedRows);
+        updateLeaveCounts(updatedRows);
         setEditDialogOpen(false);
         setLeaveToEdit(null);
       })
@@ -210,8 +263,8 @@ export default function LeaveHistory() {
           fontSize: "0.875rem",
           fontWeight: 500,
           textAlign: "center",
-          backgroundColor: params.value === "Approved" ? "#dcedc8" : "#fff3e0",
-          color: params.value === "Approved" ? "#388e3c" : "#f57c00",
+          backgroundColor: params.value === "Approved" ? "#dcedc8" : params.value === "Rejected" ? "#ffcdd2" : "#fff3e0",
+          color: params.value === "Approved" ? "#388e3c" : params.value === "Rejected" ? "#d32f2f" : "#f57c00",
         }}
       >
         {params.value}
@@ -223,26 +276,126 @@ export default function LeaveHistory() {
       align: "center",
       headerClassName: "last-column",
       width: 90,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-          <Tooltip title="Edit">
-            <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
+      renderCell: (params) => {
+        const isPending = params.row.leave_status?.toLowerCase() === 'pending';
+        
+        if (!isPending) {
+          // Show no actions for approved or rejected leaves
+          return (
+            <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+              <span style={{ fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
+                No actions
+              </span>
+            </Box>
+          );
+        }
+
+        return (
+          <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+            <Tooltip title="Edit">
+              <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      },
     },
   ];
 
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
+        {/* Leave Statistics */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          mb: 3, 
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            flexWrap: 'wrap',
+            alignItems: 'center'
+          }}>
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 1, 
+              backgroundColor: '#e3f2fd',
+              minWidth: 120,
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1976d2' }}>
+                {totalLeaves}
+              </span>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Total Leaves</div>
+            </Box>
+            
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 1, 
+              backgroundColor: '#fff3e0',
+              minWidth: 120,
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#f57c00' }}>
+                {pendingLeaves}
+              </span>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Pending</div>
+            </Box>
+            
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 1, 
+              backgroundColor: '#dcedc8',
+              minWidth: 120,
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#388e3c' }}>
+                {approvedLeaves}
+              </span>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Approved</div>
+            </Box>
+            
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 1, 
+              backgroundColor: '#ffcdd2',
+              minWidth: 120,
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#d32f2f' }}>
+                {rejectedLeaves}
+              </span>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Rejected</div>
+            </Box>
+          </Box>
+
+          {/* Refresh Button */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="caption" color="textSecondary">
+              Auto-refresh: 30s
+            </Typography>
+            <Tooltip title="Refresh Leave History">
+              <IconButton 
+                onClick={() => fetchLeaveHistory()} 
+                disabled={loading}
+                sx={{ color: 'primary.main' }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+
         {error && <div style={{ color: 'red', marginBottom: 16 }}>{error}</div>}
         <DataGrid
           rows={filteredRows}
@@ -258,6 +411,26 @@ export default function LeaveHistory() {
           }}
           pageSizeOptions={[5, 10, 20]}
           disableSelectionOnClick
+          getRowClassName={(params) => {
+            return recentlyUpdated.has(params.row.id) ? 'recently-updated-row' : '';
+          }}
+          sx={{
+            '& .recently-updated-row': {
+              backgroundColor: '#f3e5f5',
+              animation: 'pulse 2s infinite',
+            },
+            '@keyframes pulse': {
+              '0%': {
+                backgroundColor: '#f3e5f5',
+              },
+              '50%': {
+                backgroundColor: '#e1bee7',
+              },
+              '100%': {
+                backgroundColor: '#f3e5f5',
+              },
+            },
+          }}
         />
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
@@ -330,6 +503,18 @@ export default function LeaveHistory() {
             <Button onClick={confirmEdit} variant="contained">Save</Button>
           </DialogActions>
         </Dialog>
+        
+        {/* Toast Notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </Paper>
   );

@@ -88,6 +88,13 @@ export const API_PATHS = {
     UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
     DELETE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/delete/${id}`,
     ADD_MY_LEAVE: "/api/v1/shiftly/ems/leaves/apply",
+    GET_ALL: "/api/v1/shiftly/ems/leaves/all",
+    // Admin endpoints - using the actual backend implementation
+    GET_ALL_LEAVES_ADMIN: "/api/v1/shiftly/ems/leaves/all",
+    UPDATE_LEAVE_STATUS: (id) => `/api/v1/shiftly/ems/leaves/status/${id}`,
+    // Legacy endpoints (for fallback)
+    APPROVE_LEAVE_ADMIN: (id) => `/api/v1/shiftly/ems/leaves/${id}/approve`,
+    REJECT_LEAVE_ADMIN: (id) => `/api/v1/shiftly/ems/leaves/${id}/reject`,
   },
 
   LETTER: {
