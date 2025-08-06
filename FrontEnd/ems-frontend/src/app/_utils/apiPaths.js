@@ -79,7 +79,7 @@ export const API_PATHS = {
   },
   CLAIMS: {
     // Employee endpoints
-    GET_MY_CLAIMS: "/api/v1/shiftly/ems/claims/my",
+    GET_MY_CLAIMS: (userId) => `/api/v1/shiftly/ems/claims/user/${userId}`,
     ADD: '/api/v1/shiftly/ems/claims/add',
     UPDATE: (id) => `/api/v1/shiftly/ems/claims/update/${id}`,
     DELETE: (id) => `/api/v1/shiftly/ems/claims/delete/${id}`,

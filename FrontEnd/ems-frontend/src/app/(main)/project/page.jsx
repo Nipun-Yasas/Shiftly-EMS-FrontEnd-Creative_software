@@ -46,24 +46,9 @@ export default function MyProject() {
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", px: 5, py: 1 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          My Projects
-        </Typography>
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <TextField
-            label="Search Projects"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            variant="outlined"
-            size="small"
-            sx={{ minWidth: 250 }}
-          />
-        </Box>
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
+        
+       
+       
         <Box style={{ height: 'auto', width: '100%' }}>
           <DataGrid
             rows={filteredProjects}

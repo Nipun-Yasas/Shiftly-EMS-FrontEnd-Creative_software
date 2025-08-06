@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { Formik, Form } from "formik";
 
@@ -16,6 +17,7 @@ import DateInput from "../../../_components/inputs/DateInput";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { notifyClaimChange, CLAIM_EVENTS } from "../../../_utils/claimUtils";
 import dayjs from "dayjs";
 import * as Yup from "yup";
 
@@ -28,12 +30,14 @@ export default function ClaimForm({
   edit = false,
   onSubmit,
   onCancel,
-  initialValues
+  initialValues,
+  redirectToHistory = false
 }) {
   const claimfileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.claimfile || "");
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const router = useRouter();
 
   const showSnackbar = (message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
@@ -89,13 +93,28 @@ export default function ClaimForm({
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
+      console.log('Claim submission response:', response.data); // Debug log
+
       // If we reach here, the request was successful
       showSnackbar('Claim submitted successfully', 'success');
+      
+      // Notify other tabs/windows about the new claim
+      console.log('Notifying claim change...'); // Debug log
+      notifyClaimChange(CLAIM_EVENTS.CLAIM_SUBMITTED, response.data);
+      
       resetForm();
       setFileName("");
       setPreview(null);
       if (claimfileRef.current) {
         claimfileRef.current.value = "";
+      }
+
+      // Optionally redirect to history page after successful submission
+      if (redirectToHistory) {
+        console.log('Redirecting to history page...'); // Debug log
+        setTimeout(() => {
+          router.push('/claim/history?refresh=true');
+        }, 1500); // Wait 1.5 seconds to show the success message
       }
     } catch (error) {
       showSnackbar(
