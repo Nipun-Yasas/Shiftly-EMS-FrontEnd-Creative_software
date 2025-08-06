@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
@@ -16,6 +17,7 @@ import SelectInput from "../../../_components/inputs/SelectInput";
 import FileUpload from "../../../_components/inputs/FileUpload";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
+import { notifyReferralChange, REFERRAL_EVENTS } from "../../../_utils/referralUtils";
 import { useVacancies } from "../../../_hooks/useVacancies";
 
 const validationSchema = Yup.object({
@@ -62,11 +64,13 @@ export default function ReferForm({
   onSubmit,
   onCancel,
   initialValues,
+  redirectToHistory = false,
 }) {
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [fileName, setFileName] = useState(initialValues?.resume || "");
   const { vacancies, loading: vacanciesLoading } = useVacancies();
+  const router = useRouter();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -104,13 +108,28 @@ export default function ReferForm({
           }
         );
 
+        console.log('Referral submission response:', response.data); // Debug log
+
         if (response.status === 200) {
           showSnackbar("Referral submitted successfully!", "success");
+          
+          // Notify other tabs/windows about the new referral
+          console.log('Notifying referral change...'); // Debug log
+          notifyReferralChange(REFERRAL_EVENTS.REFERRAL_SUBMITTED, response.data);
+          
           resetForm();
           setFileName("");
           setPreview(null);
           if (resumeRef.current) {
             resumeRef.current.value = "";
+          }
+
+          // Optionally redirect to history page after successful submission
+          if (redirectToHistory) {
+            console.log('Redirecting to history page...'); // Debug log
+            setTimeout(() => {
+              router.push('/refer/history?refresh=true');
+            }, 1500); // Wait 1.5 seconds to show the success message
           }
         }
       }

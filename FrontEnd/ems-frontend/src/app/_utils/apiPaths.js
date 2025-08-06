@@ -128,7 +128,7 @@ export const API_PATHS = {
     ADD: "/api/v1/shiftly/ems/events/add",
     UPDATE: (id) => `/api/v1/shiftly/ems/events/update/${id}`,
     DELETE: (id) => `/api/v1/shiftly/ems/events/delete/${id}`,
-    GET_MY_EVENTS: "/api/v1/shiftly/ems/events/my",
+    GET_MY_EVENTS: (userId) => `/api/v1/shiftly/ems/events/user/${userId}`,
   },
   
   REFERRALS: {

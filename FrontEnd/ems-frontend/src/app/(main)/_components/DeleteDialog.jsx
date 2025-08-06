@@ -6,16 +6,20 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 
-export default function DeleteDialog({ open,
+export default function DeleteDialog({ 
+  open,
   onClose,
   onConfirm,
-  loading,}) {
+  loading,
+  title = "Delete Event",
+  message = "Are you sure you want to delete this event?"
+}) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth >
-      <DialogTitle >Delete Event</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <Typography>Are you sure you want to delete this event?</Typography>
+        <Typography>{message}</Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="text.primary">Cancel</Button>
@@ -30,4 +34,4 @@ export default function DeleteDialog({ open,
       </DialogActions>
     </Dialog>
   );
-} 
+}

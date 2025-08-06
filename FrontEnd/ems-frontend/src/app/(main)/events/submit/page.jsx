@@ -17,7 +17,7 @@ export default function page() {
       }}
     >
       <Box sx={{ width: "100%", px: 5 }}>
-        <EventForm />
+        <EventForm redirectToHistory={true} />
       </Box>
     </Paper>
   );

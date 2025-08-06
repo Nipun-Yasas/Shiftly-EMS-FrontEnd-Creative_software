@@ -5,9 +5,13 @@ import { usePathname } from 'next/navigation';
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { DataGrid } from "@mui/x-data-grid";
-import { Paper, Box, Typography,Snackbar, Alert } from "@mui/material";
+import { Paper, Box, Typography, Snackbar, Alert, Chip } from "@mui/material";
 import { IconButton, Tooltip, Dialog, DialogTitle, DialogActions, Button, DialogContent, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from "@mui/icons-material";
+import {
+  getStatusIcon,
+  getStatusColor,
+} from "../../admin-portal/_helpers/colorhelper";
 
 export default function LeaveHistory() {
   const pathname = usePathname();
@@ -256,19 +260,12 @@ export default function LeaveHistory() {
     { field: "reason", headerName: "Reason", width: 150 },
     { field: "cover_person", headerName: "Cover Person", width: 150 },
     { field: "leave_status", headerName: "Status", width: 150, renderCell: (params) => (
-      <span
-        style={{
-          padding: "0.5rem 1rem",
-          borderRadius: "9999px",
-          fontSize: "0.875rem",
-          fontWeight: 500,
-          textAlign: "center",
-          backgroundColor: params.value === "Approved" ? "#dcedc8" : params.value === "Rejected" ? "#ffcdd2" : "#fff3e0",
-          color: params.value === "Approved" ? "#388e3c" : params.value === "Rejected" ? "#d32f2f" : "#f57c00",
-        }}
-      >
-        {params.value}
-      </span>
+      <Chip
+        icon={getStatusIcon(params.value.toLowerCase())}
+        label={params.value}
+        color={getStatusColor(params.value.toLowerCase())}
+        size="small"
+      />
     ), },
     {
       field: "actions",
