@@ -6,7 +6,10 @@ import theme from '../../../theme';
 
 export default function ClientThemeProvider({ children }) {
   const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => { setHasMounted(true); }, []);
+  useEffect(() => { setHasMounted(true);
+    const html = document.documentElement;
+    html.setAttribute("data-toolpad-color-scheme", "light");
+   }, []);
   if (!hasMounted) return null;
   return (
     <ThemeProvider theme={theme}>

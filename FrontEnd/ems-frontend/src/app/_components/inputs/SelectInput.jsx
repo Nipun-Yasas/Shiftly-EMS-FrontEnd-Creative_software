@@ -41,7 +41,7 @@ export default function SelectInput({ name, options, getOptionLabel, label, onCh
           fullWidth
           sx={{
             "& label": {
-              color: "text.secondary",
+              color: "text.primary",
             },
           }}
         />

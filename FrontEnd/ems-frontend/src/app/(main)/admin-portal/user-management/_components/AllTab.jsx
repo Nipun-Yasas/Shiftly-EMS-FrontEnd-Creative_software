@@ -35,7 +35,7 @@ export default function AllTab({
     {
       field: "department",
       headerName: "Department",
-      width: 140,
+      width: 130,
     },
 
     {
@@ -46,7 +46,7 @@ export default function AllTab({
     {
       field: "reportingPersonEmail",
       headerName: "Reporting Email",
-      width: 170,
+      width: 160,
     },
     {
       field: "actions",

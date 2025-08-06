@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@tinymce/tinymce-react": "^6.2.1",
-    "html2pdf.js": "^0.10.3"
-  }
-}

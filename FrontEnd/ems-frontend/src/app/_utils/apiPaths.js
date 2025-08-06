@@ -10,12 +10,26 @@ export const API_PATHS = {
   SUPER_ADMIN: {
     GET_ALL_EMPLOYEES: "/superadmin/employees",
     VERIFY_EMPLOYEE: (id) => `/superadmin/employee/${id}/verify`,
+    GET_ALL_ADMINS: "/superadmin/admins/all",
   },
   ADMIN_USER: {
-    GET_ALL_USERS: "/users/all",
+    GET_ALL_USERS: "/superadmin/employees",
+    GET_ALL_ADMINS: "/admins/all",
     GET_USER_BY_ID: (id) => `/users/${id}`,
     UPDATE_USER: (id) => `/users/update/${id}`,
     DELETE_USER: (id) => `/users/delete/${id}`,
+  },
+  DEPARTMENTS: {
+    //super admin end point
+    ADD_DEPARTMENT: "/api/v1/shiftly/ems/departments/add",
+    GET_ALL_DEPARTMENTS: "/api/v1/shiftly/ems/departments/all",
+    GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
+    GET_FIRST_USER_BY_DEPARTMENT: (department) => `/users/first-by-department/${department}`,
+    DEPARTMENT_ADMIN_ASSIGN: (departmentid, userid) => `/api/v1/shiftly/ems/departments/assign/${userid}/department/${departmentid}`,
+    DELETE_DEPARTMENT : (departmentId) => `/api/v1/shiftly/ems/departments/delete/${departmentId}`
+  },
+  VACANCIES: {
+    GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
   },
   CANDIDATES: {
     GET_ALL_SUBMISSIONS: "/api/v1/shiftly/ems/admin/candidates/submissions",
@@ -49,12 +63,6 @@ export const API_PATHS = {
     UPDATE_EVENT: "/api/calendar/events",
     DELETE_EVENT: "/api/calendar/events",
   },
-  DEPARTMENTS: {
-    //super admin end point
-    ADD_DEPARTMENT:'/api/v1/shiftly/ems/departments/add',
-
-    GET_ALL_DEPARTMENTS: "/api/v1/shiftly/ems/departments/all",
-  },
   TEAMS: {
     GET_ALL_TEAMS: "/api/v1/shiftly/ems/teams/all",
   },
@@ -82,10 +90,6 @@ export const API_PATHS = {
     REJECT_CLAIM: (id) => `/api/v1/shiftly/ems/claims/reject/${id}`,
     GET_CLAIM_BY_ID: (id) => `/api/v1/shiftly/ems/claims/${id}`,
   },
-  VACANCIES: {
-    GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
-  },
-
   LEAVES: {
     GET_MY_LEAVES: "/api/v1/shiftly/ems/leaves/my",
     UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
@@ -104,10 +108,6 @@ export const API_PATHS = {
     GENERATE: "/api/v1/shiftly/ems/ai-letter/generate",
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
-  },
-  DEPARTMENTS: {
-    GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
-    GET_FIRST_USER_BY_DEPARTMENT: (department) => `/users/first-by-department/${department}`,
   },
   TIMESHEETS: {
     ADD: "/api/v1/shiftly/ems/timesheets/add",

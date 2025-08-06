@@ -7,6 +7,23 @@ body {
   box-sizing: border-box;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #E90A4D 0%, #E80A4D 100%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #E90A4D 0%, #E80A4D 100%);
+}
+
 .MuiInput-root:hover:not(.Mui-disabled):not(.Mui-error)::before {
   border-bottom: 2px solid #E90A4D;
 }

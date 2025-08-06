@@ -34,7 +34,7 @@ export default function PasswordInput({
       fullWidth
       sx={{
         "& label": {
-          color: "textblack.main",
+          color: "text.primary",
         },
       }}
       slotProps={{

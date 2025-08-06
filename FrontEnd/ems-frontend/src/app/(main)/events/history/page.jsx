@@ -153,7 +153,7 @@ export default function EventHistory() {
     {
       field: "status",
       headerName: "Status",
-      width: 150,
+      width: 140,
       renderCell: (params) => (
         <Chip
           icon={getStatusIcon(params.value.toLowerCase())}

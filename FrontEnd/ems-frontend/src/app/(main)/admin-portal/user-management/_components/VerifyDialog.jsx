@@ -8,12 +8,24 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from "@mui/material/Stack";
+import * as Yup from "yup";
+import SelectInput from "../../../../_components/inputs/SelectInput";
+import InputItem from "../../../../_components/inputs/InputItem";
+
 import { Formik, Form } from "formik";
 
-import UserForm, {
-  assignValidationSchema,
-  getAssignInitialValues,
-} from "./UserForm";
+const roles = [
+  { id: 1, name: "ADMIN", label: "Admin" },
+  { id: 2, name: "USER", label: "User" },
+];
+
+const assignValidationSchema = Yup.object({
+  roleId: Yup.object().required("Role is required"),
+});
+
 
 export default function VerifyDialog({
   assignDialogOpen,
@@ -21,6 +33,7 @@ export default function VerifyDialog({
   assigningUser,
   setAssigningUser,
   handleAssignSubmit,
+  onCancel
 }) {
   const handleClose = () => {
     setAssignDialogOpen(false);
@@ -56,7 +69,49 @@ export default function VerifyDialog({
           </Typography>
         </Box>
 
-        <UserForm handleAssignSubmit={handleAssignSubmit} onCancel={handleClose} />
+        <Formik
+            initialValues={
+              {roleId: null}
+            }
+              validationSchema={assignValidationSchema}
+              onSubmit={handleAssignSubmit}
+              enableReinitialize
+            >
+              {({ isSubmitting, submitForm }) => (
+                <Form>
+                  <Stack spacing={1}>
+                    <InputItem>
+                      <SelectInput
+                        name="roleId"
+                        label="User Role"
+                        options={roles}
+                        getOptionLabel={(option) => option.label}
+                      />
+                    </InputItem>
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      justifyContent={{ xs: "center", sm: "flex-end" }}
+                      width="100%"
+                    >
+                      {onCancel && (
+                        <Button color="text.primary" variant="text" onClick={onCancel}>
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        onClick={submitForm}
+                        variant="contained"
+                        disabled={isSubmitting}
+                        startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+                      >
+                        {isSubmitting ? "Saving..." : "Save"}
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Form>
+              )}
+            </Formik>
 
       </DialogContent>
     </Dialog>

@@ -11,16 +11,15 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { Formik, Form } from "formik";
 
-import { useDepartmentsWithAdmin } from "../../../../_hooks/useDepartmentsWithAdmin";
-import InputItem from "../../../../_components/inputs/InputItem";
-import SelectInput from "../../../../_components/inputs/SelectInput";
+import { useDepartments } from "../../../../_hooks/useDepartments";
+import { Input } from "@mui/material";
 
 export default function EditDialog({
   editDialogOpen,
   setOpenDialog,
   handleSubmit,
 }) {
-  const { departments } = useDepartmentsWithAdmin();
+  const { departments } = useDepartments();
   
   const handleClose = () => {
     setOpenDialog(false);
@@ -36,7 +35,7 @@ export default function EditDialog({
             alignItems: "center",
           }}
         >
-          <Typography variant="h6">Edit User</Typography>
+          <Typography variant="h6">Assign a admin</Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
           </IconButton>
@@ -53,19 +52,14 @@ export default function EditDialog({
         <Formik
           onSubmit={handleSubmit}
           enableReinitialize
-          initialValues={{ departmentName: "" }}
         >
           {({ isSubmitting, submitForm }) => (
             <Form>
               <InputItem>
-              <SelectInput
-                name="departmentId"
-                label="Department"
-                options={departments}
-                getOptionLabel={(option) => option.name}  
-              />
+              <SelectInput>
+                
+              </SelectInput>
               </InputItem>
-
             </Form>
           )}
         </Formik>

@@ -6,12 +6,12 @@ import { API_PATHS } from "../_utils/apiPaths";
 import axiosInstance from "../_utils/axiosInstance";
 
 
-export const useDepartments = () => {
+export const useDepartmentsWithAdmin = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchDepartments = async () => {
+  const fetchDepartmentsWithAdmin = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -21,7 +21,7 @@ export const useDepartments = () => {
         return;
       }
       
-      const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_ALL_DEPARTMENTS);
+      const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_DEPARTMENTS_WITH_ADMIN);
 
       if (response.data && Array.isArray(response.data)) {
         // Transform department data to match the expected format
@@ -50,6 +50,6 @@ export const useDepartments = () => {
     departments,
     loading,
     error,
-    refetch: fetchDepartments
+    refetch: fetchDepartmentsWithAdmin
   };
 };

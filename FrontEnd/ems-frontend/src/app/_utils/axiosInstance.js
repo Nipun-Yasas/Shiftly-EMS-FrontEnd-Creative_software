@@ -13,13 +13,7 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Do not add Authorization header for login or signup
-    if (
-      config.url.endsWith('/auth/login') ||
-      config.url.endsWith('/auth/signup')
-    ) {
-      return config;
-    }
+    
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
