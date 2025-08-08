@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
 import Paper from "@mui/material/Paper";
@@ -16,24 +18,23 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { Formik, Form } from "formik";
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import CustomDataGrid from "../../_components/CustomDataGrid";
-import axiosInstance from "../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../_utils/apiPaths";
 import EditDialog from "./_components/EditDialog";
 import DeleteDialog from "../../_components/DeleteDialog";
 
-const departmentSchema = Yup.object().shape({
-  departmentName: Yup.string().required("Department name is required"),
-  // Add other fields if needed
+import axiosInstance from "../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../_utils/apiPaths";
+import { UserContext } from "../../../context/UserContext";
+
+const designationSchema = Yup.object().shape({
+  designationName: Yup.string().required("Designation name is required"),
 });
 
 export default function page() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [admins, setAdmins] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -43,9 +44,11 @@ export default function page() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
+  const { user } = useContext(UserContext);
+
   const columns = [
+    { field: "designationName", headerName: "Designation Name", width: "200" },
     { field: "departmentName", headerName: "Department Name", width: "200" },
-    { field: "adminUserName", headerName: "Admin user name", width: "200" },
     {
       field: "actions",
       headerName: "Actions",
@@ -78,25 +81,41 @@ export default function page() {
     },
   ];
 
-  const fetchDepartments = async () => {
+  const fetchDesignations = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_ALL);
+      const roles = user?.roles?.map((r) => r.toLowerCase()) || [];
+      let response;
 
-      if (!response.data || response.data.length === 0) {
+      if (roles.includes("super_admin")) {
+        response = await axiosInstance.get(API_PATHS.DESIGNATIONS.GET_ALL);
+        setData(response.data);
+      } else {
+        const deptRes = await axiosInstance.get(
+          API_PATHS.DEPARTMENTS.GET_DEPARTMENT_BY_ADMINID(user?.id)
+        );
+        // CHANGED: endpoint now returns an object; read departmentId from it
+        const departmentId = deptRes?.data?.departmentId;
+        if (!departmentId) {
+          setData([]);
+          setLoading(false);
+          return;
+        }
+        response = await axiosInstance.get(
+          API_PATHS.DESIGNATIONS.GET_ALL_BY_DEPARTMENT(departmentId)
+        );
+      }
+
+      if (!response?.data || response.data.length === 0) {
         setData([]);
         return;
       }
 
-      const mappedData = response.data.map((row) => ({
-        id: row.departmentId,
-        ...row,
-      }));
-
-      setData(mappedData);
+      setData(response.data);
+      console.log("Fetched designations:", response.data);
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to fetch Department",
+        error.response?.data?.message || "Failed to fetch Designation",
         "error"
       );
       setData([]);
@@ -105,70 +124,39 @@ export default function page() {
     }
   };
 
-  const fetchAdminsWithoutDepartment = async () => {
+  useEffect(() => {
+    fetchDesignations();
+  }, []);
+
+  const handleUpdateRecord = async (id, values) => {
+    if (!selectedRecord) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.get(
-        API_PATHS.SUPER_ADMIN.GET_ADMIN_WITHOUT_DEPARTMENTS
-      );
-
-      if (!response.data || response.data.length === 0) {
-        setAdmins([]);
-        return;
-      }
-
-      setAdmins(response.data);
+      await axiosInstance.put(API_PATHS.DESIGNATIONS.UPDATE(id), values);
+      await fetchDesignations();
+      showSnackbar("Designation updated successfully.", "success");
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to fetch admins",
+        error.response?.data?.message || "Failed to update record",
         "error"
       );
-      setAdmins([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchDepartments();
-    fetchAdminsWithoutDepartment();
-  }, []);
-
-  const handleUpdateRecord = async (values, { setSubmitting }) => {
-    if (!selectedRecord || !values.adminuserid) return;
-    try {
-      await axiosInstance.put(
-        API_PATHS.DEPARTMENTS.DEPARTMENT_ADMIN_ASSIGN(
-          selectedRecord.departmentId,
-          values.adminuserid.id
-        )
-      );
-      showSnackbar("Admin assigned successfully", "success");
-      fetchDepartments();
-    } catch (error) {
-      showSnackbar(
-        error.response?.data?.message || "Error assigning admin",
-        "error"
-      );
-    } finally {
-      setSubmitting(false);
-      setEditDialogOpen(false);
-    }
-  };
-
   const confirmDelete = async () => {
     if (!selectedRecord) return;
-
     setLoading(true);
     try {
       await axiosInstance.delete(
-        API_PATHS.DEPARTMENTS.DELETE(selectedRecord.departmentId)
+        API_PATHS.DESIGNATIONS.DELETE(selectedRecord.id)
       );
-      await fetchDepartments();
-      showSnackbar("Department deleted successfully.", "success");
+      await fetchDesignations();
+      showSnackbar("Designation deleted successfully.", "success");
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to delete Department",
+        error.response?.data?.message || "Failed to delete Designation",
         "error"
       );
     } finally {
@@ -181,18 +169,37 @@ export default function page() {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       setSubmitting(true);
+
+      const adminId = user?.id;
+      if (!adminId) {
+        showSnackbar("Admin user ID not found.", "error");
+        setSubmitting(false);
+        return;
+      }
+
+      const deptRes = await axiosInstance.get(
+        API_PATHS.DEPARTMENTS.GET_DEPARTMENT_BY_ADMINID(adminId)
+      );
+      // CHANGED: read departmentId from object
+      const departmentId = deptRes?.data?.departmentId;
+      if (!departmentId) {
+        showSnackbar("Department not found for this admin.", "error");
+        setSubmitting(false);
+        return;
+      }
+
       const response = await axiosInstance.post(
-        API_PATHS.DEPARTMENTS.ADD,
+        API_PATHS.DESIGNATIONS.ADD(departmentId),
         values
       );
       if (response.status === 200) {
-        showSnackbar("Department added successfully", "success");
+        showSnackbar("Designation added successfully", "success");
       }
       resetForm();
-      fetchDepartments();
+      fetchDesignations();
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to add Department",
+        error.response?.data?.message || "You are not a admin of a department",
         "error"
       );
     } finally {
@@ -217,41 +224,43 @@ export default function page() {
   return (
     <Paper elevation={3} sx={{ width: "100%", height: "100%" }}>
       <Box sx={{ p: 3 }}>
-        <Formik
-          initialValues={{ departmentName: "" }}
-          validationSchema={departmentSchema}
-          onSubmit={handleSubmit}
-        >
-          <Form>
-            <Typography variant="h5" color="text.primary">
-            Add a new department
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-
-              <InputItem>
-                <TextInput
-                  name="departmentName"
-                  label="Enter department name"
-                />
-              </InputItem>
-              <Box>
-                <Button variant="contained" type="submit">
-                  Add
-                </Button>
+        {!user?.roles?.map((r) => r.toLowerCase()).includes("super_admin") && (
+          <Formik
+            initialValues={{ designationName: "" }}
+            validationSchema={designationSchema}
+            onSubmit={handleSubmit}
+          >
+            <Form>
+               <Typography variant="h5" color="text.primary">
+                          Add a new designation
+                          </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 2,
+                  mb:5
+                }}
+              >
+                <InputItem>
+                  <TextInput
+                    name="designationName"
+                    label="Enter designation name"
+                  />
+                </InputItem>
+                <Box>
+                  <Button variant="contained" type="submit">
+                    Add
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-          </Form>
-        </Formik>
-        <Typography sx={{mt:5}} variant="h5" color="text.primary">
-            Existing departments
-            </Typography>
+            </Form>
+          </Formik>
+        )}
+        <Typography  variant="h5" color="text.primary">
+                    Existing designations
+                    </Typography>
         <Box
           sx={{
             display: "flex",
@@ -282,9 +291,8 @@ export default function page() {
         onClose={() => setEditDialogOpen(false)}
         record={selectedRecord}
         onUpdate={handleUpdateRecord}
+        validationSchema={designationSchema} // Pass validation schema here
         row={selectedRecord}
-        admins={admins}
-        validationSchema={departmentSchema} // Pass validation schema here
       />
 
       <DeleteDialog
@@ -292,8 +300,8 @@ export default function page() {
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
         loading={loading}
-        title={"Delete Department"}
-        message={`Are you sure you want to delete department "${selectedRecord?.departmentName}" with admin "${selectedRecord?.adminUserName || ''}"?`}
+        title={"Delete Designation"}
+        message={`Are you sure you want to delete the designation "${selectedRecord?.designationName}" in department "${selectedRecord?.departmentName}"? This action cannot be undone.`}
       />
 
       <Snackbar

@@ -14,35 +14,50 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { UserContext } from "../../../context/UserContext";
 
-import AllTab from "./_components/AllTab";
+import AdminsTab from "./_components/AdminsTab";
+import UsersTab from "./_components/UsersTab"
 import VerifyTab from "./_components/VerifyTab";
-import EditDialog from "./_components/EditDialog";
 import VerifyDialog from "./_components/VerifyDialog";
-import DeleteDialog from "./_components/DeleteDialog";
+import DeleteDialog from "../../_components/DeleteDialog";
 import TabPanel from "../../../_components/main/TabPanel";
 
+import { useDepartments } from "../../../_hooks/useDepartments";
+
 export default function UserManagementPage() {
+  const getInitialTabValue = () => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "verify") return 0;
+    if (tabParam === "admins") return 1;
+    if (tabParam === "users") return 2;
+    return 0;
+  };
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useContext(UserContext);
 
-  const getInitialTabValue = () => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam === "verify") return 1;
-    if (tabParam === "verified") return 0;
-    return 0;
-  };
+  // derive roles
+  const roles = (user?.roles || []).map((r) => r.toLowerCase());
+  const isSuperAdmin = roles.includes("super_admin");
 
-  const [tabValue, setTabValue] = useState(getInitialTabValue);
-  const [users, setUsers] = useState([]);
-  const [unverifiedUsers, setUnverifiedUsers] = useState([]);
+  // visible tabs depending on role
+  const tabKeys = isSuperAdmin ? ["verify", "admins", "users"] : ["admins", "users"];
+
+  // compute initial tab index from URL (fallback to first visible tab)
+  const [tabValue, setTabValue] = useState(() => {
+    const tabParam = searchParams.get("tab");
+    const idx = tabKeys.indexOf(tabParam || tabKeys[0]);
+    return idx === -1 ? 0 : idx;
+  });
+  const [unVerified,setUnVerified] = useState([]);
+  const [admins, setAdmins] = useState([]);
+  const [users,setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [editDialogOpen, setOpenDialog] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [assigningUser, setAssigningUser] = useState(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -50,68 +65,75 @@ export default function UserManagementPage() {
   });
   const [refreshInterval, setRefreshInterval] = useState(null);
 
-  const fetchUsers = async (showLoadingState = true) => {
-    if (showLoadingState) {
-      setLoading(true);
-    }
+  const { departments } = useDepartments();
+
+   const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const fetchUnverified = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.get(
-        API_PATHS.SUPER_ADMIN.GET_ALL_EMPLOYEES
+        API_PATHS.SUPER_ADMIN.GET_ALL_UNVERIFIED
       );
-
-      let usersData = response.data;
-      const allUsers = usersData || [];
-
-      const currentUserId = user?.id;
-      const currentUserEmail = user?.email;
-
-
-      // Filter out the current logged-in user from all users
-      const filteredUsers = allUsers.filter((userData) => {
-        // Exclude current user by ID or email
-        return (
-          userData.id !== currentUserId && userData.email !== currentUserEmail
-        );
-      });
-
-      const verifiedUsers = filteredUsers.filter(
-        (user) => user.verified === true
-      );
-      const unverifiedUsers = filteredUsers.filter(
-        (user) => user.verified === false
-      );
-
-      setUsers(verifiedUsers);
-      setUnverifiedUsers(unverifiedUsers);
+      setUnVerified(response.data);
     } catch (error) {
-      showSnackbar(errorMessage, "error");
-      setUsers([]);
-      setUnverifiedUsers([]);
+      showSnackbar("Error fetching unverified User", "error");
+      setUnVerified([]);
     } finally {
-      if (showLoadingState) {
-        setLoading(false);
-      }
+      setLoading(false);
+    }
+  };
+
+
+  const fetchAdmins = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.ADMIN_USER.GET_ALL_ADMINS
+      );
+
+      setAdmins(response.data);
+      console.log(admins);
+    } catch (error) {
+      showSnackbar("Error fetching admins", "error");
+      setAdmins([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.ADMIN_USER.GET_ALL_USERS
+      );
+
+      setUsers(response.data);
+      console.log(users);
+    } catch (error) {
+      showSnackbar("Error fetching users", "error");
+      setUsers([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const updateData = {
-        designation: values.designation?.name || values.designation,
-        department: values.department?.name || values.department,
-        reportingPerson: values.reportingPerson || "",
-        reportingPersonEmail: values.reportingPersonEmail || "",
+      const payload = {
+        designationId: typeof values.designationId === "object" ? values.designationId?.id : values.designationId,
+        departmentId: typeof values.departmentId === "object" ? values.departmentId?.id : values.departmentId,
+        reportingPersonId: user?.id,
       };
 
-      await axiosInstance.put(
-        API_PATHS.ADMIN_USER.UPDATE_USER(editingUser.id),
-        updateData
-      );
+      await axiosInstance.post(API_PATHS.EMPLOYEE.ADD(selectedRecord.id), payload);
       showSnackbar("User updated successfully", "success");
-
-      setOpenDialog(false);
-      setEditingUser(null);
-      fetchUsers();
+      setEditDialogOpen(false);
+      setSelectedRecord(null);
+      fetchAdmins();
     } catch (error) {
       showSnackbar("Error updating user", "error");
     } finally {
@@ -122,7 +144,7 @@ export default function UserManagementPage() {
   const handleAssignSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const verifyData = {
-        role: values.roleId?.name || values.roleId
+        role: values.roleId?.name || values.roleId,
       };
 
       const response = await axiosInstance.put(
@@ -130,15 +152,15 @@ export default function UserManagementPage() {
         verifyData
       );
 
+      fetchUnverified();
+
       showSnackbar("User verified and assigned successfully", "success");
 
-      // Close dialog and reset state
       setAssignDialogOpen(false);
       setAssigningUser(null);
       resetForm();
 
-      // Refresh user data to get updated lists
-      await fetchUsers();
+      await fetchAdmins();
     } catch (error) {
       showSnackbar("Network error. Please check your connection.", "error");
     } finally {
@@ -146,94 +168,83 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!userToDelete) return;
-
+  const deleteUser = async () => {
+    if (!selectedRecord) return;
     try {
+      setLoading(true);
+      const userId = selectedRecord.id ?? selectedRecord.userId;
       await axiosInstance.delete(
-        API_PATHS.ADMIN_USER.DELETE_USER(userToDelete.id)
+        API_PATHS.SUPER_ADMIN.DELETE_USER(userId)
       );
       showSnackbar("User deleted successfully", "success");
-      setUsers(users.filter((user) => user.id !== userToDelete.id));
-      setUnverifiedUsers(
-        unverifiedUsers.filter((user) => user.id !== userToDelete.id)
-      );
+      await fetchUnverified(); 
     } catch (error) {
-      showSnackbar("Network error. Please check your connection.", "error");
+      showSnackbar(error.response?.data?.message || "Failed to delete user", "error");
     } finally {
-      setDeleteConfirmOpen(false);
-      setUserToDelete(null);
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setSelectedRecord(null);
     }
   };
 
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
+
+  const handleEdit = (row) => {
+    setSelectedRecord(row);
+    setEditDialogOpen(true);
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setOpenDialog(true);
+  const handleDelete = (row) => {
+    setSelectedRecord(row);
+    setDeleteConfirmOpen(true);
   };
 
-  const handleAssignUser = (user) => {
-    setAssigningUser(user);
-    setAssignDialogOpen(true);
+  const handleDeleteUser =(row) => {
+    setSelectedRecord(row);
+    setDeleteDialogOpen(true);
   };
 
   const handleRefresh = () => {
-    fetchUsers();
+    fetchAdmins();
   };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-
-    // Update URL parameter based on tab selection
     const params = new URLSearchParams(searchParams.toString());
-    if (newValue === 0) {
-      params.set("tab", "verified");
-    } else if (newValue === 1) {
-      params.set("tab", "verify");
-    }
-
-    // Update URL without page refresh
+    params.set("tab", tabKeys[newValue]); 
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  // Update tab value when URL changes (for direct navigation)
-  useEffect(() => {
-    setTabValue(getInitialTabValue());
-  }, [searchParams]);
+  const handleOpenAssign = (row) => {
+    setAssigningUser(row);
+    setAssignDialogOpen(true);
+  };
 
-  // Set up automatic refresh when on verify tab
   useEffect(() => {
-    // Clear any existing interval
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      setRefreshInterval(null);
-    }
+    const tabParam = searchParams.get("tab") || tabKeys[0];
+    const idx = tabKeys.indexOf(tabParam);
+    setTabValue(idx === -1 ? 0 : idx);
+  }, [searchParams, isSuperAdmin]); 
 
-    // Set up new interval only if on verify tab (tab index 1)
-    if (tabValue === 1) {
-      const interval = setInterval(() => {
-        fetchUsers(false);
+  useEffect(() => {
+    const adminTabIndex = tabKeys.indexOf("admins");
+    let localInterval;
+    if (tabValue === adminTabIndex) {
+      localInterval = setInterval(() => {
+        fetchAdmins(false);
       }, 30000);
-
-      setRefreshInterval(interval);
     }
-
-    // Cleanup function
     return () => {
-      if (refreshInterval) {
-        clearInterval(refreshInterval);
-      }
+      if (localInterval) clearInterval(localInterval);
     };
-  }, [tabValue]);
+  }, [tabValue, tabKeys]);
 
   useEffect(() => {
+    fetchAdmins();
     fetchUsers();
+    {isSuperAdmin && fetchUnverified();}
+    
   }, []);
 
-  // Cleanup interval on component unmount
   useEffect(() => {
     return () => {
       if (refreshInterval) {
@@ -245,41 +256,53 @@ export default function UserManagementPage() {
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          aria-label="user management tabs"
-        >
+        <Tabs value={tabValue} onChange={handleTabChange} aria-label="user management tabs">
+          {isSuperAdmin && <Tab label="Verify Users" />}
+          <Tab label="Verified Admins" />
           <Tab label="Verified Users" />
-          <Tab label="Verify Users" />
         </Tabs>
 
-        <TabPanel value={tabValue} index={0}>
-          <AllTab
+        {isSuperAdmin && (
+          <TabPanel value={tabValue} index={0}>
+            <VerifyTab
+              loading={loading}
+              unVerified={unVerified}
+              onRefresh={handleRefresh}
+              onOpenAssign={handleOpenAssign} 
+            />
+          </TabPanel>
+        )}
+
+        <TabPanel value={tabValue} index={isSuperAdmin ? 1 : 0}>
+          <AdminsTab
             loading={loading}
+            user={user}
+            admins={admins}
+            departments={departments}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            editDialogOpen={editDialogOpen}
+            selectedRecord={selectedRecord}
+            setEditDialogOpen={setEditDialogOpen}
+            deleteDialogOpen={deleteDialogOpen}
+            handleSubmit={handleSubmit}
+          />
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={isSuperAdmin ? 2 : 1}>
+          <UsersTab
+            loading={loading}
+            user={user}
             users={users}
             handleEdit={handleEdit}
-            setUserToDelete={setUserToDelete}
-            setDeleteConfirmOpen={setDeleteConfirmOpen}
+            handleDelete={handleDelete}
+            editDialogOpen={editDialogOpen}
+            selectedRecord={selectedRecord}
+            setEditDialogOpen={setEditDialogOpen}
+            deleteDialogOpen={deleteDialogOpen}
+            handleSubmit={handleSubmit}
           />
         </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <VerifyTab
-            loading={loading}
-            users={unverifiedUsers}
-            handleAssignUser={handleAssignUser}
-            onRefresh={handleRefresh}
-          />
-        </TabPanel>
-
-        <EditDialog
-          editDialogOpen={editDialogOpen}
-          setOpenDialog={setOpenDialog}
-          editingUser={editingUser}
-          setEditingUser={setEditingUser}
-          handleSubmit={handleSubmit}
-        />
 
         <VerifyDialog
           assignDialogOpen={assignDialogOpen}
@@ -287,14 +310,20 @@ export default function UserManagementPage() {
           assigningUser={assigningUser}
           setAssigningUser={setAssigningUser}
           handleAssignSubmit={handleAssignSubmit}
+          onCancel={() => {
+            setAssignDialogOpen(false);
+            setAssigningUser(null);
+          }}
         />
 
-        <DeleteDialog
-          deleteConfirmOpen={deleteConfirmOpen}
-          setDeleteConfirmOpen={setDeleteConfirmOpen}
-          userToDelete={userToDelete}
-          handleDelete={handleDelete}
-        />
+       <DeleteDialog
+      open={deleteDialogOpen}
+      onClose={() => handleDeleteUser}
+      onConfirm={deleteUser}
+      loading={loading}
+      title="Delete User"
+      message={`Are you sure you want to delete the user "${selectedRecord?.username}" (${selectedRecord?.email})? This action cannot be undone.`}
+    />
 
         <Snackbar
           open={snackbar.open}

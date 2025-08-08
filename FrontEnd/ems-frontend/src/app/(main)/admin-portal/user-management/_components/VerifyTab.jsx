@@ -7,12 +7,20 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+
 import RefreshIcon from "@mui/icons-material/Refresh";
+import DeleteIcon from "@mui/icons-material/Delete";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
 import CustomDataGrid from "../../../_components/CustomDataGrid";
 
-export default function VerifyTab({ loading, users, handleAssignUser, onRefresh }) {
+export default function VerifyTab({
+  loading,
+  unVerified,
+  onRefresh,
+  onOpenAssign,
+  handleDeleteUser
+}) {
   const columns = [
     {
       field: "username",
@@ -22,32 +30,44 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
     },
     { field: "email", headerName: "Email", width: 200 },
     {
-    field: "createdAt",
-    headerName: "Created Date",
-    flex: 1,
-    minWidth: 200,
-    renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
-  },
+      field: "createdAt",
+      headerName: "Created Date",
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
     {
       field: "actions",
       headerName: "Actions",
       align: "center",
-
       headerClassName: "last-column",
       width: 100,
       renderCell: (params) => (
-        <Tooltip title="Assign Role & Employee Number">
-          <IconButton
-            size="small"
-            onClick={() => handleAssignUser(params.row)}
-            sx={{ color: "primary.main" }}
-          >
-            <AssignmentIndIcon />
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Tooltip title="Assign Role & Employee Number">
+            <IconButton
+              size="small"
+              onClick={() => onOpenAssign?.(params.row)}
+              sx={{ color: "primary.main" }}
+            >
+              <AssignmentIndIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton
+              size="small"
+              onClick={() => handleDeleteUser(params.row)}
+              sx={{ color: "error.main" }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       ),
     },
   ];
+
+  const hasData = Array.isArray(unVerified) && unVerified.length > 0;
 
   return (
     <Box sx={{ p: 3, mb: 3 }}>
@@ -61,7 +81,7 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
         }}
       >
         <Typography variant="h6" sx={{ color: "text.secondary" }}>
-          Users awaiting verification ({users.length})
+          Users awaiting verification
         </Typography>
         <Tooltip title="Refresh to check for new registrations">
           <Button
@@ -76,31 +96,20 @@ export default function VerifyTab({ loading, users, handleAssignUser, onRefresh 
         </Tooltip>
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Box sx={{ width: { xs: "100%", md: "670px" } }}>
-          {users.length === 0 && !loading ? (
-            <Box 
-              sx={{ 
-                textAlign: 'center', 
-                py: 4,
-                color: 'text.secondary'
-              }}
-            >
+          {!hasData ? (
+            <Box sx={{ textAlign: "center", py: 4, color: "text.secondary" }}>
               <Typography variant="h6" gutterBottom>
                 No users awaiting verification
               </Typography>
               <Typography variant="body2">
-                All registered users have been verified. New user registrations will appear here.
+                All registered users have been verified. New user registrations
+                will appear here.
               </Typography>
             </Box>
           ) : (
-            <CustomDataGrid rows={users} columns={columns}/>
+            <CustomDataGrid rows={unVerified} columns={columns} />
           )}
         </Box>
       </Box>

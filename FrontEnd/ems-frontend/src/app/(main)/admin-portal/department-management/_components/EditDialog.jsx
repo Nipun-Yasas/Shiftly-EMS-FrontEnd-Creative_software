@@ -14,30 +14,8 @@ import { Formik, Form } from "formik";
 
 import InputItem from "../../../../_components/inputs/InputItem";
 import SelectInput from "../../../../_components/inputs/SelectInput";
-import { API_PATHS } from "../../../../_utils/apiPaths";
-import axiosInstance from "../../../../_utils/axiosInstance";
 
-export default function EditDialog({
-  open, onClose, record, onUpdate, admins
-}) {
-  const handleSubmit = async (values, { setSubmitting }) => {
-    if (!record || !values.adminuserid) return;
-    try {
-      await axiosInstance.put(
-        API_PATHS.DEPARTMENTS.DEPARTMENT_ADMIN_ASSIGN(
-          record.departmentId, // department id from selected record
-          values.adminuserid.id // admin id from selected admin
-        )
-      );
-      if (onUpdate) onUpdate(record.departmentId, values); // Optionally refresh data
-      onClose();
-    } catch (error) {
-      console.error("Error assigning admin:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+export default function EditDialog({ open, onClose, onUpdate, admins }) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
@@ -58,9 +36,9 @@ export default function EditDialog({
         <Formik
           enableReinitialize
           initialValues={{ adminuserid: null }}
-          onSubmit={handleSubmit}
+          onSubmit={onUpdate}
         >
-          {({ isSubmitting, submitForm }) => (
+          {({ isSubmitting, submitForm, values }) => (
             <Form>
               <InputItem>
                 <SelectInput
@@ -71,13 +49,19 @@ export default function EditDialog({
                 />
               </InputItem>
               <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={submitForm}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Assigning..." : "Assign"}
-                </Button>
+                {admins && admins.length > 0 ? (
+                  <Button
+                    variant="contained"
+                    onClick={submitForm}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Assigning..." : "Assign"}
+                  </Button>
+                ) : (
+                  <Typography color="text.secondary" sx={{ mt: 2 }}>
+                    No admins without departments
+                  </Typography>
+                )}
               </Box>
             </Form>
           )}

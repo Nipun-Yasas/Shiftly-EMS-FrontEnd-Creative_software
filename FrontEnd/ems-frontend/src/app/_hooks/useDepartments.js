@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { API_PATHS } from "../_utils/apiPaths";
 import axiosInstance from "../_utils/axiosInstance";
 
-
 export const useDepartments = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,26 +14,14 @@ export const useDepartments = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("No authentication token found, using fallback departments");
-        return;
-      }
-      
-      const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_ALL_DEPARTMENTS);
+      const response = await axiosInstance.get(API_PATHS.DEPARTMENTS.GET_ALL);
 
-      if (response.data && Array.isArray(response.data)) {
-        // Transform department data to match the expected format
-        const departmentData = response.data.map(dept => ({
-          id: dept.departmentId,  // Use departmentId from backend
-          name: dept.departmentName,
-          adminid:dept.adminId,
-          label: dept.departmentName // Use name as label
-        }));
-        setDepartments(departmentData);
-      } else {
-        console.warn("Invalid departments response format:", response.data);
-      }
+      const departmentData = response.data.map(dept => ({
+        id: dept.departmentId,
+        name: dept.departmentName,
+        label: dept.departmentName
+      }));
+      setDepartments(departmentData);
     } catch (error) {
       setError(error);
     } finally {
@@ -43,7 +30,7 @@ export const useDepartments = () => {
   };
 
   useEffect(() => {
-    setLoading(false);
+    fetchDepartments();
   }, []);
 
   return {

@@ -8,25 +8,47 @@ export const API_PATHS = {
     GET_CURRENT_USER: "/api/auth/currentuser",
   },
   SUPER_ADMIN: {
-    GET_ALL_EMPLOYEES: "/superadmin/employees",
     VERIFY_EMPLOYEE: (id) => `/superadmin/employee/${id}/verify`,
-    GET_ALL_ADMINS: "/superadmin/admins/all",
+    GET_ALL_UNVERIFIED: "/superadmin/unverified",
+    GET_ADMIN_WITHOUT_DEPARTMENTS: "/superadmin/admins/without-department",
+    DELETE_USER: (id) => `/users/delete/${id}`
   },
   ADMIN_USER: {
-    GET_ALL_USERS: "/superadmin/employees",
-    GET_ALL_ADMINS: "/admins/all",
+    GET_ALL: "/users/all",
+    GET_ALL_ADMINS: "/users/admins/all",
+    GET_ALL_USERS: "/users/all-users",
     GET_USER_BY_ID: (id) => `/users/${id}`,
     UPDATE_USER: (id) => `/users/update/${id}`,
     DELETE_USER: (id) => `/users/delete/${id}`,
   },
+  EMPLOYEE: {
+    ADD: (userId) => `/api/v1/shiftly/ems/employee/add/${userId}`,
+    GET_ALL_EMPLOYEES: "/api/v1/shiftly/ems/employee/all",
+    GET_EMPLOYEE_BY_ID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
+    UPDATE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/update/${id}`,
+    GET_PROFILE: "/api/v1/shiftly/ems/employee/profile",
+    UPDATE_PROFILE: "/api/v1/shiftly/ems/employee/profile",
+    SELF_UPDATE: "/api/v1/shiftly/ems/employee/self-update",
+    GET_ADMINS_BY_DEPARTMENT: (departmentName) => `/api/v1/shiftly/ems/employee/admins-by-department/${departmentName}`,
+  },
   DEPARTMENTS: {
     //super admin end point
-    ADD_DEPARTMENT: "/api/v1/shiftly/ems/departments/add",
-    GET_ALL_DEPARTMENTS: "/api/v1/shiftly/ems/departments/all",
-    GET_USERS_BY_DEPARTMENT: (department) => `/users/by-department/${department}`,
-    GET_FIRST_USER_BY_DEPARTMENT: (department) => `/users/first-by-department/${department}`,
+    ADD: "/api/v1/shiftly/ems/departments/add",
+    GET_ALL: "/api/v1/shiftly/ems/departments/all",
     DEPARTMENT_ADMIN_ASSIGN: (departmentid, userid) => `/api/v1/shiftly/ems/departments/assign/${userid}/department/${departmentid}`,
-    DELETE_DEPARTMENT : (departmentId) => `/api/v1/shiftly/ems/departments/delete/${departmentId}`
+    DELETE : (departmentId) => `/api/v1/shiftly/ems/departments/delete/${departmentId}`,
+
+    GET_DEPARTMENTS_WITH_ADMIN: "/api/v1/shiftly/ems/departments/with-admin",
+    GET_DEPARTMENT_BY_ADMINID: (id) => `/api/v1/shiftly/ems/departments/by-admin/${id}`,
+  },
+  DESIGNATIONS:{
+   ADD:(id) => `/api/v1/shiftly/ems/designations/add/${id}`,
+   GET_ALL: "/api/v1/shiftly/ems/designations/all",
+   GET_ALL_BY_DEPARTMENT: (departmentId) => `/api/v1/shiftly/ems/designations/by-department/${departmentId}`,
+   GET_DESIGNATION_BY_ID: (id) => `/api/v1/shiftly/ems/designations/${id}`,
+   DELETE: (id) => `/api/v1/shiftly/ems/designations/delete/${id}`,
+   UPDATE: (id) => `/api/v1/shiftly/ems/designations/update/${id}`,
   },
   VACANCIES: {
     GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
@@ -65,17 +87,6 @@ export const API_PATHS = {
   },
   TEAMS: {
     GET_ALL_TEAMS: "/api/v1/shiftly/ems/teams/all",
-  },
-  EMPLOYEE: {
-    ADD_EMPLOYEE: "/api/v1/shiftly/ems/employee/add",
-    GET_ALL_EMPLOYEES: "/api/v1/shiftly/ems/employee/all",
-    GET_EMPLOYEE_BY_ID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
-    DELETE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
-    UPDATE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/update/${id}`,
-    GET_PROFILE: "/api/v1/shiftly/ems/employee/profile",
-    UPDATE_PROFILE: "/api/v1/shiftly/ems/employee/profile",
-    SELF_UPDATE: "/api/v1/shiftly/ems/employee/self-update",
-    GET_ADMINS_BY_DEPARTMENT: (departmentName) => `/api/v1/shiftly/ems/employee/admins-by-department/${departmentName}`,
   },
   CLAIMS: {
     // Employee endpoints

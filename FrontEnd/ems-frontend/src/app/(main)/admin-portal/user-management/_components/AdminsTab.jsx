@@ -1,0 +1,200 @@
+"use client";
+import { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+
+import Typography from "@mui/material/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+
+import { Formik, Form } from "formik";
+
+import InputItem from "../../../../_components/inputs/InputItem";
+import SelectInput from "../../../../_components/inputs/SelectInput";
+
+import CustomDataGrid from "../../../_components/CustomDataGrid";
+import axiosInstance from "../../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../../_utils/apiPaths";
+
+export default function AdminsTab({
+  loading,
+  user,
+  admins,
+  departments,
+  handleEdit,
+  handleDelete,
+  editDialogOpen,
+  selectedRecord,
+  handleSubmit,
+  setEditDialogOpen,
+}) {
+  // Fetch designations by selected department
+  const [deptDesignations, setDeptDesignations] = useState([]);
+  const [desigLoading, setDesigLoading] = useState(false);
+
+  const roles = (user?.roles || []).map((r) => r.toLowerCase());
+  const isAdmin = roles.includes("admin") && !roles.includes("super_admin");
+
+  const fetchDesignationsByDepartment = async (departmentId) => {
+    if (!departmentId) {
+      setDeptDesignations([]);
+      return;
+    }
+    try {
+      setDesigLoading(true);
+      const res = await axiosInstance.get(
+        API_PATHS.DESIGNATIONS.GET_ALL_BY_DEPARTMENT(departmentId)
+      );
+      const mapped = (res.data || []).map((d) => ({
+        id: d.id, // backend returns id for designation
+        name: d.designationName,
+        label: d.designationName,
+      }));
+      setDeptDesignations(mapped);
+    } catch (e) {
+      setDeptDesignations([]);
+    } finally {
+      setDesigLoading(false);
+    }
+  };
+
+  // Preload designations when dialog opens with an existing department
+  useEffect(() => {
+    if (editDialogOpen && selectedRecord?.departmentId) {
+      fetchDesignationsByDepartment(selectedRecord.departmentId);
+    } else if (!editDialogOpen) {
+      setDeptDesignations([]);
+    }
+  }, [editDialogOpen, selectedRecord?.departmentId]);
+
+  const columns = [
+    { field: "username", headerName: "Username", width: 120 },
+    { field: "email", headerName: "Email", width: 170 },
+    {
+      field: "roles",
+      headerName: "Role",
+      width: 80,
+      renderCell: (params) => params.value?.[0] || "No role",
+    },
+    { field: "department", headerName: "Department", width: 130 },
+    { field: "designationName", headerName: "Designation", width: 140 },
+    { field: "reportingPerson", headerName: "Reporting Person", width: 140 },
+    { field: "reportingPersonEmail", headerName: "Reporting Email", width: 160 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      align: "center",
+      headerClassName: "last-column",
+      width: 90,
+      renderCell: (params) => (
+        <Box
+          sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}
+        >
+          {!isAdmin && (
+            <>
+              <Tooltip title="Edit">
+                <IconButton
+                  size="small"
+                  onClick={() => handleEdit(params.row)}
+                  sx={{ color: "primary.main" }}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton
+                  size="small"
+                  onClick={() => handleDelete(params.row)}
+                  sx={{ color: "error.main" }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </Box>
+      ),
+    },
+  ];
+
+  return (
+    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", p: 5 }}>
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Typography variant="h6">Edit Admin</Typography>
+            <IconButton onClick={() => setEditDialogOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Formik
+            enableReinitialize
+            initialValues={{
+              departmentId: departments.find((d) => d.id === selectedRecord?.departmentId) || null,
+              designationId: deptDesignations.find((d) => d.id === selectedRecord?.designationId) || null,
+            }}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting, submitForm, setFieldValue, values }) => (
+              <Form>
+                <InputItem>
+                  <SelectInput
+                    name="departmentId"
+                    label="Department"
+                    options={departments}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(opt) => {
+                      // set selected department, clear designation, fetch designations
+                      setFieldValue("departmentId", opt);
+                      setFieldValue("designationId", null);
+                      fetchDesignationsByDepartment(opt?.id);
+                    }}
+                  />
+                </InputItem>
+                <InputItem>
+                  <SelectInput
+                    name="designationId"
+                    label="Designation"
+                    options={deptDesignations}
+                    getOptionLabel={(option) => option.name}
+                    disabled={!values.departmentId || desigLoading}
+                    loading={desigLoading}
+                  />
+                </InputItem>
+                <InputItem>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: { xs: "center", md: "flex-end" },
+                      gap: 2,
+                    }}
+                  >
+                    <Button
+                      onClick={submitForm}
+                      variant="contained"
+                      disabled={isSubmitting}
+                      startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+                    >
+                      {isSubmitting ? "Saving..." : "Save"}
+                    </Button>
+                  </Box>
+                </InputItem>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+      {loading ? <CircularProgress /> : <CustomDataGrid rows={admins} columns={columns} />}
+    </Box>
+  );
+}

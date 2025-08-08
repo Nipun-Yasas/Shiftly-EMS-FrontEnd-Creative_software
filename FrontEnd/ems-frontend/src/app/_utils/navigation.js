@@ -31,16 +31,31 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import BusinessIcon from '@mui/icons-material/Business';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
 
 export function getNavigationForUser(user) {
   const roles = user?.roles?.map((r) => r.toLowerCase()) || [];
+  const isSuperAdmin = roles.includes('super_admin');
+  const isAdmin = roles.includes('admin');
 
-  const isAdmin = roles.includes('admin') || roles.includes('superadmin');
+  return NAVIGATION.map((item) => {
+    // Hide the entire admin-portal for non-admins
+    if (!isAdmin && !isSuperAdmin && item.segment === 'admin-portal') return null;
 
-  return NAVIGATION.filter((item) => {
-    if (!isAdmin && item.segment === 'admin-portal') return false;
-    return true;
-  });
+    if (item.segment === 'admin-portal' && Array.isArray(item.children)) {
+      return {
+        ...item,
+        children: item.children.filter((child) => {
+          if (child.segment === 'department-management' && isAdmin && !isSuperAdmin) {
+            return false;
+          }
+          return true;
+        }),
+      };
+    }
+
+    return item;
+  }).filter(Boolean);
 }
 
 const NAVIGATION = [
@@ -62,6 +77,11 @@ const NAVIGATION = [
         segment: 'department-management',
         title: 'Department Management',
         icon: <BusinessIcon />,
+      },
+      {
+        segment: 'designation-management',
+        title: 'Designation Management',
+        icon: <EngineeringOutlinedIcon />,
       },
       {
         segment: 'project-management',
