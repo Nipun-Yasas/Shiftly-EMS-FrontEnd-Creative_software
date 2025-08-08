@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
@@ -12,6 +13,7 @@ import Alert from "@mui/material/Alert";
 
 import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
+import { notifyEventChange, EVENT_EVENTS } from "../../../_utils/eventUtils";
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
@@ -76,6 +78,7 @@ export default function EventForm({
   onSubmit,
   onCancel,
   initialValues,
+  redirectToHistory = false,
 }) {
   const bannerRef = useRef(null);
   const [preview, setPreview] = useState(null);
@@ -85,6 +88,7 @@ export default function EventForm({
     message: "",
     severity: "success",
   });
+  const router = useRouter();
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
@@ -125,13 +129,28 @@ export default function EventForm({
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
+      console.log('Event submission response:', response.data); // Debug log
+
       // If we reach here, the request was successful
       showSnackbar("Event submitted successfully!", "success");
+      
+      // Notify other tabs/windows about the new event
+      console.log('Notifying event change...'); // Debug log
+      notifyEventChange(EVENT_EVENTS.EVENT_SUBMITTED, response.data);
+      
       resetForm();
       setFileName("");
       setPreview(null);
       if (bannerRef.current) {
         bannerRef.current.value = "";
+      }
+
+      // Optionally redirect to history page after successful submission
+      if (redirectToHistory) {
+        console.log('Redirecting to history page...'); // Debug log
+        setTimeout(() => {
+          router.push('/events/history?refresh=true');
+        }, 1500); // Wait 1.5 seconds to show the success message
       }
     } catch (error) {
       showSnackbar(
@@ -254,7 +273,7 @@ export default function EventForm({
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={500}
+        autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

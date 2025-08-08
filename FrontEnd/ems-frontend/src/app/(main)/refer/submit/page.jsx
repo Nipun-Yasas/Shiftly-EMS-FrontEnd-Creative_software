@@ -16,7 +16,7 @@ export default function Refer() {
       }}
     >
       <Box sx={{ width: "100%", p: 5 }}>
-        <ReferForm />
+        <ReferForm redirectToHistory={true} />
       </Box>
     </Paper>
   );
