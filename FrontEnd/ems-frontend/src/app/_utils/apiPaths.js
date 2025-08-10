@@ -39,7 +39,11 @@ export const API_PATHS = {
    UPDATE: (id) => `/api/v1/shiftly/ems/designations/update/${id}`,
   },
   VACANCIES: {
-    GET_ALL_VACANCIES: "/api/v1/shiftly/ems/vacancies/all",
+    ADD: (id) => `/api/v1/shiftly/ems/vacancies/add/${id}`,
+    GET_ALL: "/api/v1/shiftly/ems/vacancies/all",
+    GET_ALL_BY_DEPARTMENT: (departmentId) => `/api/v1/shiftly/ems/vacancies/by-department/${departmentId}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/vacancies/delete/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/vacancies/update/${id}`,
   },
   CANDIDATES: {
     GET_ALL_SUBMISSIONS: "/api/v1/shiftly/ems/admin/candidates/submissions",
