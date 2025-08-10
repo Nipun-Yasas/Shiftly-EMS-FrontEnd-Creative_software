@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import * as Yup from "yup";
+import { Formik, Form } from "formik";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -16,7 +18,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { Formik, Form } from "formik";
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import CustomDataGrid from "../../_components/CustomDataGrid";
@@ -27,7 +28,6 @@ import DeleteDialog from "../../_components/DeleteDialog";
 
 const departmentSchema = Yup.object().shape({
   departmentName: Yup.string().required("Department name is required"),
-  // Add other fields if needed
 });
 
 export default function page() {
@@ -120,7 +120,7 @@ export default function page() {
       setAdmins(response.data);
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to fetch admins",
+        error.response?.data?.message || "No Admins without departments",
         "error"
       );
       setAdmins([]);
@@ -189,7 +189,7 @@ export default function page() {
         showSnackbar("Department added successfully", "success");
       }
       resetForm();
-      fetchDepartments();
+      await fetchDepartments();
     } catch (error) {
       showSnackbar(
         error.response?.data?.message || "Failed to add Department",
@@ -224,7 +224,7 @@ export default function page() {
         >
           <Form>
             <Typography variant="h5" color="text.primary">
-            Add a new department
+              Add a new department
             </Typography>
             <Box
               sx={{
@@ -234,7 +234,6 @@ export default function page() {
                 gap: 2,
               }}
             >
-
               <InputItem>
                 <TextInput
                   name="departmentName"
@@ -249,9 +248,9 @@ export default function page() {
             </Box>
           </Form>
         </Formik>
-        <Typography sx={{mt:5}} variant="h5" color="text.primary">
-            Existing departments
-            </Typography>
+        <Typography sx={{ mt: 5 }} variant="h5" color="text.primary">
+          Existing departments
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -284,7 +283,7 @@ export default function page() {
         onUpdate={handleUpdateRecord}
         row={selectedRecord}
         admins={admins}
-        validationSchema={departmentSchema} // Pass validation schema here
+        validationSchema={departmentSchema}
       />
 
       <DeleteDialog
@@ -293,7 +292,7 @@ export default function page() {
         onConfirm={confirmDelete}
         loading={loading}
         title={"Delete Department"}
-        message={`Are you sure you want to delete department "${selectedRecord?.departmentName}" with admin "${selectedRecord?.adminUserName || ''}"?`}
+        message={`Are you sure you want to delete department "${selectedRecord?.departmentName}" with admin "${selectedRecord?.adminUserName || ""}"?`}
       />
 
       <Snackbar

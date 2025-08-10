@@ -1,5 +1,7 @@
 "use client";
+
 import { useState, useEffect } from "react";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -7,7 +9,6 @@ import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
-
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -19,7 +20,6 @@ import { Formik, Form } from "formik";
 
 import InputItem from "../../../../_components/inputs/InputItem";
 import SelectInput from "../../../../_components/inputs/SelectInput";
-
 import CustomDataGrid from "../../../_components/CustomDataGrid";
 import axiosInstance from "../../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../../_utils/apiPaths";
@@ -30,13 +30,12 @@ export default function AdminsTab({
   admins,
   departments,
   handleEdit,
-  handleDelete,
+  handleDeleteUser,
   editDialogOpen,
   selectedRecord,
   handleSubmit,
   setEditDialogOpen,
 }) {
-  // Fetch designations by selected department
   const [deptDesignations, setDeptDesignations] = useState([]);
   const [desigLoading, setDesigLoading] = useState(false);
 
@@ -54,7 +53,7 @@ export default function AdminsTab({
         API_PATHS.DESIGNATIONS.GET_ALL_BY_DEPARTMENT(departmentId)
       );
       const mapped = (res.data || []).map((d) => ({
-        id: d.id, // backend returns id for designation
+        id: d.id,
         name: d.designationName,
         label: d.designationName,
       }));
@@ -66,7 +65,6 @@ export default function AdminsTab({
     }
   };
 
-  // Preload designations when dialog opens with an existing department
   useEffect(() => {
     if (editDialogOpen && selectedRecord?.departmentId) {
       fetchDesignationsByDepartment(selectedRecord.departmentId);
@@ -87,7 +85,11 @@ export default function AdminsTab({
     { field: "department", headerName: "Department", width: 130 },
     { field: "designationName", headerName: "Designation", width: 140 },
     { field: "reportingPerson", headerName: "Reporting Person", width: 140 },
-    { field: "reportingPersonEmail", headerName: "Reporting Email", width: 160 },
+    {
+      field: "reportingPersonEmail",
+      headerName: "Reporting Email",
+      width: 160,
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -96,7 +98,13 @@ export default function AdminsTab({
       width: 90,
       renderCell: (params) => (
         <Box
-          sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
         >
           {!isAdmin && (
             <>
@@ -112,7 +120,7 @@ export default function AdminsTab({
               <Tooltip title="Delete">
                 <IconButton
                   size="small"
-                  onClick={() => handleDelete(params.row)}
+                  onClick={() => handleDeleteUser(params.row)}
                   sx={{ color: "error.main" }}
                 >
                   <DeleteIcon />
@@ -126,10 +134,23 @@ export default function AdminsTab({
   ];
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", p: 5 }}>
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+    <Box
+      sx={{ display: "flex", justifyContent: "center", width: "100%", p: 5 }}
+    >
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography variant="h6">Edit Admin</Typography>
             <IconButton onClick={() => setEditDialogOpen(false)}>
               <CloseIcon />
@@ -140,8 +161,14 @@ export default function AdminsTab({
           <Formik
             enableReinitialize
             initialValues={{
-              departmentId: departments.find((d) => d.id === selectedRecord?.departmentId) || null,
-              designationId: deptDesignations.find((d) => d.id === selectedRecord?.designationId) || null,
+              departmentId:
+                departments.find(
+                  (d) => d.id === selectedRecord?.departmentId
+                ) || null,
+              designationId:
+                deptDesignations.find(
+                  (d) => d.id === selectedRecord?.designationId
+                ) || null,
             }}
             onSubmit={handleSubmit}
           >
@@ -154,7 +181,6 @@ export default function AdminsTab({
                     options={departments}
                     getOptionLabel={(option) => option.name}
                     onChange={(opt) => {
-                      // set selected department, clear designation, fetch designations
                       setFieldValue("departmentId", opt);
                       setFieldValue("designationId", null);
                       fetchDesignationsByDepartment(opt?.id);
@@ -183,7 +209,9 @@ export default function AdminsTab({
                       onClick={submitForm}
                       variant="contained"
                       disabled={isSubmitting}
-                      startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+                      startIcon={
+                        isSubmitting ? <CircularProgress size={20} /> : null
+                      }
                     >
                       {isSubmitting ? "Saving..." : "Save"}
                     </Button>
@@ -194,7 +222,11 @@ export default function AdminsTab({
           </Formik>
         </DialogContent>
       </Dialog>
-      {loading ? <CircularProgress /> : <CustomDataGrid rows={admins} columns={columns} />}
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <CustomDataGrid rows={admins} columns={columns} />
+      )}
     </Box>
   );
 }

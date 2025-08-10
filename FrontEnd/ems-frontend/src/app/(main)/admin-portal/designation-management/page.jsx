@@ -231,16 +231,16 @@ export default function page() {
             onSubmit={handleSubmit}
           >
             <Form>
-               <Typography variant="h5" color="text.primary">
-                          Add a new designation
-                          </Typography>
+              <Typography variant="h5" color="text.primary">
+                Add a new designation
+              </Typography>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   gap: 2,
-                  mb:5
+                  mb: 5,
                 }}
               >
                 <InputItem>
@@ -258,9 +258,9 @@ export default function page() {
             </Form>
           </Formik>
         )}
-        <Typography  variant="h5" color="text.primary">
-                    Existing designations
-                    </Typography>
+        <Typography variant="h5" color="text.primary">
+          Existing designations
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -291,7 +291,7 @@ export default function page() {
         onClose={() => setEditDialogOpen(false)}
         record={selectedRecord}
         onUpdate={handleUpdateRecord}
-        validationSchema={designationSchema} // Pass validation schema here
+        validationSchema={designationSchema} 
         row={selectedRecord}
       />
 

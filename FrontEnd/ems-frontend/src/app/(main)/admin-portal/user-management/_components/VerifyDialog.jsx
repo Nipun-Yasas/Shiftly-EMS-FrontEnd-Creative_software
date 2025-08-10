@@ -26,14 +26,13 @@ const assignValidationSchema = Yup.object({
   roleId: Yup.object().required("Role is required"),
 });
 
-
 export default function VerifyDialog({
   assignDialogOpen,
   setAssignDialogOpen,
   assigningUser,
   setAssigningUser,
   handleAssignSubmit,
-  onCancel
+  onCancel,
 }) {
   const handleClose = () => {
     setAssignDialogOpen(false);
@@ -47,72 +46,77 @@ export default function VerifyDialog({
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle  sx={{
+      <DialogTitle
+        sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           borderBottom: "1px solid #e0e0e0",
-          pb: 2,
-        }}>
-          Verify and Assign User
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
+        }}
+      >
+        Verify and Assign User
+        <IconButton onClick={handleClose}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ m: 2 }}>
           <Typography variant="body1" sx={{ mb: 1 }}>
             <strong>Username:</strong> {assigningUser?.username}
           </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
+          <Typography variant="body1">
             <strong>Email:</strong> {assigningUser?.email}
           </Typography>
         </Box>
 
         <Formik
-            initialValues={
-              {roleId: null}
-            }
-              validationSchema={assignValidationSchema}
-              onSubmit={handleAssignSubmit}
-              enableReinitialize
-            >
-              {({ isSubmitting, submitForm }) => (
-                <Form>
-                  <Stack spacing={1}>
-                    <InputItem>
-                      <SelectInput
-                        name="roleId"
-                        label="User Role"
-                        options={roles}
-                        getOptionLabel={(option) => option.label}
-                      />
-                    </InputItem>
-                    <Stack
-                      direction="row"
-                      spacing={2}
-                      justifyContent={{ xs: "center", sm: "flex-end" }}
-                      width="100%"
+          initialValues={{ roleId: null }}
+          validationSchema={assignValidationSchema}
+          onSubmit={handleAssignSubmit}
+          enableReinitialize
+        >
+          {({ isSubmitting, submitForm }) => (
+            <Form>
+              <Stack spacing={1}>
+                <InputItem>
+                  <SelectInput
+                    name="roleId"
+                    label="User Role"
+                    options={roles}
+                    getOptionLabel={(option) => option.label}
+                  />
+                </InputItem>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: { xs: "center", md: "flex-end" },
+                    gap: 2,
+                  }}
+                >
+                  {onCancel && (
+                    <Button
+                      color="text.primary"
+                      variant="text"
+                      onClick={onCancel}
                     >
-                      {onCancel && (
-                        <Button color="text.primary" variant="text" onClick={onCancel}>
-                          Cancel
-                        </Button>
-                      )}
-                      <Button
-                        onClick={submitForm}
-                        variant="contained"
-                        disabled={isSubmitting}
-                        startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-                      >
-                        {isSubmitting ? "Saving..." : "Save"}
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Form>
-              )}
-            </Formik>
-
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    onClick={submitForm}
+                    variant="contained"
+                    disabled={isSubmitting}
+                    startIcon={
+                      isSubmitting ? <CircularProgress size={20} /> : null
+                    }
+                  >
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                </Box>
+              </Stack>
+            </Form>
+          )}
+        </Formik>
       </DialogContent>
     </Dialog>
   );

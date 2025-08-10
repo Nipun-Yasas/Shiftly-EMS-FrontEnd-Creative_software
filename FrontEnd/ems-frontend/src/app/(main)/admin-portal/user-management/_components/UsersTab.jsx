@@ -33,18 +33,19 @@ export default function UsersTab({
   user,
   users,
   handleEdit,
-  handleDelete,
+  handleDeleteUser,
   editDialogOpen,
   selectedRecord,
   handleSubmit,
   setEditDialogOpen,
 }) {
-  
   const [deptInfo, setDeptInfo] = useState(null);
   const [deptDesignations, setDeptDesignations] = useState([]);
   const [desigLoading, setDesigLoading] = useState(false);
 
-  const isSuperAdmin = user?.roles?.map((r) => r.toLowerCase()).includes("super_admin");
+  const roles = (user?.roles || []).map((r) => r.toLowerCase());
+  const isSuperAdmin = roles.includes("super_admin");
+  const isAdmin = roles.includes("admin") && !isSuperAdmin;
 
   const fetchDepartmentByAdmin = async (adminId) => {
     if (!adminId) return null;
@@ -115,30 +116,35 @@ export default function UsersTab({
       align: "center",
       headerClassName: "last-column",
       width: 90,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-          {!isSuperAdmin && (
-            <Tooltip title="Edit">
-              <IconButton
-                size="small"
-                onClick={() => handleEdit(params.row)}
-                sx={{ color: "primary.main" }}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Tooltip title="Delete">
-            <IconButton
-              size="small"
-              onClick={() => handleDelete(params.row)}
-              sx={{ color: "error.main" }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
+      renderCell: (params) => {
+        const canDelete = isSuperAdmin || isAdmin && Boolean(params.row?.department);
+        return (
+          <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+            {!isSuperAdmin && (
+              <Tooltip title="Edit">
+                <IconButton
+                  size="small"
+                  onClick={() => handleEdit(params.row)}
+                  sx={{ color: "primary.main" }}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {canDelete && (
+              <Tooltip title="Delete">
+                <IconButton
+                  size="small"
+                  onClick={() => handleDeleteUser(params.row)}
+                  sx={{ color: "error.main" }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        );
+      },
     },
   ];
 

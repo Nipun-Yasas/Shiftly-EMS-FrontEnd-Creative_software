@@ -15,7 +15,8 @@ import axiosInstance from "../../../_utils/axiosInstance";
 import { UserContext } from "../../../context/UserContext";
 
 import AdminsTab from "./_components/AdminsTab";
-import UsersTab from "./_components/UsersTab"
+import UsersTab from "./_components/UsersTab";
+import AllTab from "./_components/AllTab";
 import VerifyTab from "./_components/VerifyTab";
 import VerifyDialog from "./_components/VerifyDialog";
 import DeleteDialog from "../../_components/DeleteDialog";
@@ -24,34 +25,26 @@ import TabPanel from "../../../_components/main/TabPanel";
 import { useDepartments } from "../../../_hooks/useDepartments";
 
 export default function UserManagementPage() {
-  const getInitialTabValue = () => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam === "verify") return 0;
-    if (tabParam === "admins") return 1;
-    if (tabParam === "users") return 2;
-    return 0;
-  };
-
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useContext(UserContext);
 
-  // derive roles
   const roles = (user?.roles || []).map((r) => r.toLowerCase());
   const isSuperAdmin = roles.includes("super_admin");
 
-  // visible tabs depending on role
-  const tabKeys = isSuperAdmin ? ["verify", "admins", "users"] : ["admins", "users"];
+  const tabKeys = isSuperAdmin
+    ? ["verify", "all", "admins", "users"]
+    : ["admins", "users"];
 
-  // compute initial tab index from URL (fallback to first visible tab)
   const [tabValue, setTabValue] = useState(() => {
     const tabParam = searchParams.get("tab");
     const idx = tabKeys.indexOf(tabParam || tabKeys[0]);
     return idx === -1 ? 0 : idx;
   });
-  const [unVerified,setUnVerified] = useState([]);
+  const [unVerified, setUnVerified] = useState([]);
   const [admins, setAdmins] = useState([]);
-  const [users,setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [all, setAll] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -63,11 +56,10 @@ export default function UserManagementPage() {
     message: "",
     severity: "success",
   });
-  const [refreshInterval, setRefreshInterval] = useState(null);
 
   const { departments } = useDepartments();
 
-   const showSnackbar = (message, severity = "success") => {
+  const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
 
@@ -86,6 +78,22 @@ export default function UserManagementPage() {
     }
   };
 
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.SUPER_ADMIN.GET_ALL_VERIFIED
+      );
+
+      setAll(response.data);
+      console.log(all);
+    } catch (error) {
+      showSnackbar("Error fetching All Users", "error");
+      setAll([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchAdmins = async () => {
     setLoading(true);
@@ -124,16 +132,26 @@ export default function UserManagementPage() {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const payload = {
-        designationId: typeof values.designationId === "object" ? values.designationId?.id : values.designationId,
-        departmentId: typeof values.departmentId === "object" ? values.departmentId?.id : values.departmentId,
+        designationId:
+          typeof values.designationId === "object"
+            ? values.designationId?.id
+            : values.designationId,
+        departmentId:
+          typeof values.departmentId === "object"
+            ? values.departmentId?.id
+            : values.departmentId,
         reportingPersonId: user?.id,
       };
 
-      await axiosInstance.post(API_PATHS.EMPLOYEE.ADD(selectedRecord.id), payload);
+      await axiosInstance.post(
+        API_PATHS.EMPLOYEE.ADD(selectedRecord.id),
+        payload
+      );
       showSnackbar("User updated successfully", "success");
       setEditDialogOpen(false);
       setSelectedRecord(null);
-      fetchAdmins();
+      await fetchAdmins();
+      await fetchUsers();
     } catch (error) {
       showSnackbar("Error updating user", "error");
     } finally {
@@ -152,15 +170,15 @@ export default function UserManagementPage() {
         verifyData
       );
 
-      fetchUnverified();
-
-      showSnackbar("User verified and assigned successfully", "success");
+      await fetchUnverified();
+      await fetchAll();
+      await fetchAdmins();
+      await fetchUsers();
+      showSnackbar("Role assigned successfully", "success");
 
       setAssignDialogOpen(false);
       setAssigningUser(null);
       resetForm();
-
-      await fetchAdmins();
     } catch (error) {
       showSnackbar("Network error. Please check your connection.", "error");
     } finally {
@@ -173,13 +191,30 @@ export default function UserManagementPage() {
     try {
       setLoading(true);
       const userId = selectedRecord.id ?? selectedRecord.userId;
-      await axiosInstance.delete(
-        API_PATHS.SUPER_ADMIN.DELETE_USER(userId)
-      );
-      showSnackbar("User deleted successfully", "success");
-      await fetchUnverified(); 
+      if (isSuperAdmin) {
+        await axiosInstance.delete(API_PATHS.SUPER_ADMIN.DELETE_USER(userId));
+        showSnackbar("User deleted successfully", "success");
+        await fetchUnverified();
+        await fetchAdmins();
+        await fetchUsers();
+        await fetchAll();
+      } else {
+        await axiosInstance.delete(API_PATHS.EMPLOYEE.DELETE(userId));
+        showSnackbar("Employee record deleted successfully", "success");
+        await fetchUsers();
+      }
     } catch (error) {
-      showSnackbar(error.response?.data?.message || "Failed to delete user", "error");
+      if (isSuperAdmin) {
+        showSnackbar(
+          error.response?.data?.message || "Failed to delete user",
+          "error"
+        );
+      } else {
+        showSnackbar(
+          error.response?.data?.message || "Failed to delete Employee record",
+          "error"
+        );
+      }
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);
@@ -187,30 +222,25 @@ export default function UserManagementPage() {
     }
   };
 
-
   const handleEdit = (row) => {
     setSelectedRecord(row);
     setEditDialogOpen(true);
   };
 
-  const handleDelete = (row) => {
-    setSelectedRecord(row);
-    setDeleteConfirmOpen(true);
-  };
-
-  const handleDeleteUser =(row) => {
+  const handleDeleteUser = (row) => {
     setSelectedRecord(row);
     setDeleteDialogOpen(true);
   };
 
   const handleRefresh = () => {
-    fetchAdmins();
+    fetchUnverified();
+    fetchAll();
   };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
     const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", tabKeys[newValue]); 
+    params.set("tab", tabKeys[newValue]);
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -223,64 +253,64 @@ export default function UserManagementPage() {
     const tabParam = searchParams.get("tab") || tabKeys[0];
     const idx = tabKeys.indexOf(tabParam);
     setTabValue(idx === -1 ? 0 : idx);
-  }, [searchParams, isSuperAdmin]); 
-
-  useEffect(() => {
-    const adminTabIndex = tabKeys.indexOf("admins");
-    let localInterval;
-    if (tabValue === adminTabIndex) {
-      localInterval = setInterval(() => {
-        fetchAdmins(false);
-      }, 30000);
-    }
-    return () => {
-      if (localInterval) clearInterval(localInterval);
-    };
-  }, [tabValue, tabKeys]);
+  }, [searchParams, isSuperAdmin]);
 
   useEffect(() => {
     fetchAdmins();
     fetchUsers();
-    {isSuperAdmin && fetchUnverified();}
-    
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (refreshInterval) {
-        clearInterval(refreshInterval);
-      }
-    };
-  }, [refreshInterval]);
+    if (isSuperAdmin) {
+      fetchUnverified();
+      fetchAll();
+    }
+  }, [isSuperAdmin]);
 
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ p: 2 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="user management tabs">
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="user management tabs"
+        >
           {isSuperAdmin && <Tab label="Verify Users" />}
+          {isSuperAdmin && <Tab label="All Users" />}
           <Tab label="Verified Admins" />
           <Tab label="Verified Users" />
         </Tabs>
 
         {isSuperAdmin && (
-          <TabPanel value={tabValue} index={0}>
-            <VerifyTab
-              loading={loading}
-              unVerified={unVerified}
-              onRefresh={handleRefresh}
-              onOpenAssign={handleOpenAssign} 
-            />
-          </TabPanel>
+          <>
+            <TabPanel value={tabValue} index={0}>
+              <VerifyTab
+                loading={loading}
+                unVerified={unVerified}
+                onRefresh={handleRefresh}
+                onOpenAssign={handleOpenAssign}
+                handleDeleteUser={handleDeleteUser}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <AllTab
+                loading={loading}
+                all={all}
+                onOpenAssign={handleOpenAssign}
+                handleDeleteUser={handleDeleteUser}
+              />
+            </TabPanel>
+          </>
         )}
 
-        <TabPanel value={tabValue} index={isSuperAdmin ? 1 : 0}>
+        <TabPanel value={tabValue} index={isSuperAdmin ? 2 : 0}>
           <AdminsTab
             loading={loading}
             user={user}
             admins={admins}
             departments={departments}
             handleEdit={handleEdit}
-            handleDelete={handleDelete}
+            handleDeleteUser={handleDeleteUser}
             editDialogOpen={editDialogOpen}
             selectedRecord={selectedRecord}
             setEditDialogOpen={setEditDialogOpen}
@@ -289,13 +319,13 @@ export default function UserManagementPage() {
           />
         </TabPanel>
 
-        <TabPanel value={tabValue} index={isSuperAdmin ? 2 : 1}>
+        <TabPanel value={tabValue} index={isSuperAdmin ? 3 : 1}>
           <UsersTab
             loading={loading}
             user={user}
             users={users}
             handleEdit={handleEdit}
-            handleDelete={handleDelete}
+            handleDeleteUser={handleDeleteUser}
             editDialogOpen={editDialogOpen}
             selectedRecord={selectedRecord}
             setEditDialogOpen={setEditDialogOpen}
@@ -316,18 +346,18 @@ export default function UserManagementPage() {
           }}
         />
 
-       <DeleteDialog
-      open={deleteDialogOpen}
-      onClose={() => handleDeleteUser}
-      onConfirm={deleteUser}
-      loading={loading}
-      title="Delete User"
-      message={`Are you sure you want to delete the user "${selectedRecord?.username}" (${selectedRecord?.email})? This action cannot be undone.`}
-    />
+        <DeleteDialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={deleteUser}
+          loading={loading}
+          title="Delete User"
+          message={`Are you sure you want to delete the user "${selectedRecord?.username}" (${selectedRecord?.email})? This action cannot be undone.`}
+        />
 
         <Snackbar
           open={snackbar.open}
-          autoHideDuration={6000}
+          autoHideDuration={2000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >

@@ -10,6 +10,7 @@ export const API_PATHS = {
   SUPER_ADMIN: {
     VERIFY_EMPLOYEE: (id) => `/superadmin/employee/${id}/verify`,
     GET_ALL_UNVERIFIED: "/superadmin/unverified",
+    GET_ALL_VERIFIED : "/superadmin/verified",
     GET_ADMIN_WITHOUT_DEPARTMENTS: "/superadmin/admins/without-department",
     DELETE_USER: (id) => `/users/delete/${id}`
   },
@@ -17,36 +18,23 @@ export const API_PATHS = {
     GET_ALL: "/users/all",
     GET_ALL_ADMINS: "/users/admins/all",
     GET_ALL_USERS: "/users/all-users",
-    GET_USER_BY_ID: (id) => `/users/${id}`,
-    UPDATE_USER: (id) => `/users/update/${id}`,
     DELETE_USER: (id) => `/users/delete/${id}`,
   },
   EMPLOYEE: {
     ADD: (userId) => `/api/v1/shiftly/ems/employee/add/${userId}`,
-    GET_ALL_EMPLOYEES: "/api/v1/shiftly/ems/employee/all",
-    GET_EMPLOYEE_BY_ID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
     DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
-    UPDATE_EMPLOYEE: (id) => `/api/v1/shiftly/ems/employee/update/${id}`,
-    GET_PROFILE: "/api/v1/shiftly/ems/employee/profile",
-    UPDATE_PROFILE: "/api/v1/shiftly/ems/employee/profile",
-    SELF_UPDATE: "/api/v1/shiftly/ems/employee/self-update",
-    GET_ADMINS_BY_DEPARTMENT: (departmentName) => `/api/v1/shiftly/ems/employee/admins-by-department/${departmentName}`,
   },
   DEPARTMENTS: {
-    //super admin end point
     ADD: "/api/v1/shiftly/ems/departments/add",
     GET_ALL: "/api/v1/shiftly/ems/departments/all",
     DEPARTMENT_ADMIN_ASSIGN: (departmentid, userid) => `/api/v1/shiftly/ems/departments/assign/${userid}/department/${departmentid}`,
     DELETE : (departmentId) => `/api/v1/shiftly/ems/departments/delete/${departmentId}`,
-
-    GET_DEPARTMENTS_WITH_ADMIN: "/api/v1/shiftly/ems/departments/with-admin",
     GET_DEPARTMENT_BY_ADMINID: (id) => `/api/v1/shiftly/ems/departments/by-admin/${id}`,
   },
   DESIGNATIONS:{
    ADD:(id) => `/api/v1/shiftly/ems/designations/add/${id}`,
    GET_ALL: "/api/v1/shiftly/ems/designations/all",
    GET_ALL_BY_DEPARTMENT: (departmentId) => `/api/v1/shiftly/ems/designations/by-department/${departmentId}`,
-   GET_DESIGNATION_BY_ID: (id) => `/api/v1/shiftly/ems/designations/${id}`,
    DELETE: (id) => `/api/v1/shiftly/ems/designations/delete/${id}`,
    UPDATE: (id) => `/api/v1/shiftly/ems/designations/update/${id}`,
   },
