@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Paper from "@mui/material/Paper";
@@ -15,6 +15,7 @@ import Alert from "@mui/material/Alert";
 import SendIcon from "@mui/icons-material/Send";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
+ 
 
 import dayjs from "dayjs";
 
@@ -31,10 +32,45 @@ export default function LettersAdminPage() {
 	const [rows, setRows] = useState([]);
 	const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 	const [sendingId, setSendingId] = useState(null);
+	const [loading, setLoading] = useState(false);
+    
 
 	const showSnackbar = (message, severity = "success") => {
 		setSnackbar({ open: true, message, severity });
 	};
+
+	const mapToRow = (e, idx) => ({
+		id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
+		name: e.employeeName || e.name || e.userName || "",
+		email: e.email || e.employeeEmail || e.recipientEmail || "",
+		department: e.department || e.team || "",
+		letterType: e.letterType || e.type || "",
+		requestedAt: e.requestedAt || e.createdAt || e.date || null,
+		status: (e.status || "pending").toString().toLowerCase(),
+		letterHtml: e.letterHtml || e.content || "",
+		fields: e.fields || {},
+	});
+
+	const fetchRequests = async (silent = false) => {
+		if (!silent) setLoading(true);
+		try {
+			const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.ALL);
+			const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+			const mapped = list.map(mapToRow);
+			setRows(mapped.sort((a,b) => (b.requestedAt ? new Date(b.requestedAt).getTime() : 0) - (a.requestedAt ? new Date(a.requestedAt).getTime() : 0)));
+		} catch (e) {
+			setRows([]);
+			showSnackbar(e?.response?.data?.message || "Failed to load requests", "error");
+		} finally {
+			if (!silent) setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchRequests();
+		const i = setInterval(() => fetchRequests(true), 30000);
+		return () => clearInterval(i);
+	}, []);
 
 	// Placeholder "send" using known API path; adjust payload to backend contract when available
 	const handleSend = async (row) => {
@@ -56,6 +92,21 @@ export default function LettersAdminPage() {
 			showSnackbar("Letter sent successfully");
 		} catch (error) {
 			showSnackbar(error?.response?.data?.message || "Failed to send letter", "error");
+		} finally {
+			setSendingId(null);
+		}
+	};
+
+	const handleGenerate = async (row) => {
+		try {
+			setSendingId(row.id);
+			const res = await axiosInstance.post(API_PATHS.LETTER.GENERATE_FROM_REQUEST(row.id));
+			const html = res.data?.letterHtml || res.data?.data?.letterHtml;
+			if (!html) throw new Error('No letter HTML returned');
+			setRows(prev => prev.map(r => r.id === row.id ? { ...r, letterHtml: html, status: 'generated' } : r));
+			showSnackbar('Letter generated');
+		} catch (e) {
+			showSnackbar(e?.response?.data?.message || e.message || 'Failed to generate', 'error');
 		} finally {
 			setSendingId(null);
 		}
@@ -88,16 +139,17 @@ export default function LettersAdminPage() {
 		{
 			field: "actions",
 			headerName: "Actions",
-			width: 160,
+			width: 200,
 			headerClassName: "last-column",
 			sortable: false,
 			renderCell: (params) => (
 				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="Generate / Review">
+					<Tooltip title="Generate from request">
 						<span>
 							<IconButton
 								size="small"
-								onClick={() => router.push("/letter")}
+								onClick={() => handleGenerate(params.row)}
+								disabled={sendingId === params.row?.id}
 								color="primary"
 							>
 								<ContentPasteGoIcon />
@@ -108,7 +160,7 @@ export default function LettersAdminPage() {
 						<span>
 							<IconButton
 								size="small"
-								onClick={() => router.push("/letter")}
+								onClick={() => window.open().document.write(params.row.letterHtml || '<p>No content</p>')}
 								color="info"
 							>
 								<VisibilityIcon />
@@ -120,7 +172,7 @@ export default function LettersAdminPage() {
 							<IconButton
 								size="small"
 								onClick={() => handleSend(params.row)}
-								disabled={!params.row?.email || sendingId === params.row?.id}
+								disabled={!params.row?.email || !params.row?.letterHtml || sendingId === params.row?.id}
 								color="success"
 							>
 								<SendIcon />
@@ -132,6 +184,8 @@ export default function LettersAdminPage() {
 		},
 	];
 
+    
+
 	return (
 		<Paper elevation={3} sx={{ width: "100%", height: "100%" }}>
 			<Box sx={{ p: 3 }}>
@@ -139,9 +193,12 @@ export default function LettersAdminPage() {
 					<Typography variant="h4" sx={{ fontWeight: "bold", color: "text.primary" }}>
 						Letters Management
 					</Typography>
-					<Button variant="contained" onClick={() => router.push("/letter")}>
-						New Letter
-					</Button>
+					<Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+						<Typography variant="caption" color="textSecondary">Auto-refresh: 30s</Typography>
+						<Button variant="contained" onClick={() => router.push("/letter")}>
+							New Letter
+						</Button>
+					</Box>
 				</Box>
 
 				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

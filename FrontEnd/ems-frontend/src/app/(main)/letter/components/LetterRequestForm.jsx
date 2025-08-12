@@ -19,7 +19,7 @@ import TextInput from "../../../_components/inputs/TextInput";
 import DateInput from "../../../_components/inputs/DateInput";
 import { letterTypes, fieldTypeSpecifications } from '../letterTypes';
 
-const LetterRequestForm = ({ letterType, onBack, onGenerate }) => {
+const LetterRequestForm = ({ letterType, onBack, onGenerate, isAdmin = false }) => {
   const theme = useTheme();
 
   // Find the config for the selected letter type
@@ -77,11 +77,10 @@ const LetterRequestForm = ({ letterType, onBack, onGenerate }) => {
             >
               {letterType}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: theme.palette.text}}
-            >
-              Please fill in the required information to generate your letter
+            <Typography variant="body2" sx={{ color: theme.palette.text}}>
+              {isAdmin
+                ? 'Please fill in the required information to generate the letter'
+                : 'Please fill in the required information to submit your letter request to HR'}
             </Typography>
           </Box>
         </Box>
@@ -158,21 +157,13 @@ const LetterRequestForm = ({ letterType, onBack, onGenerate }) => {
                 }}
               >
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 'bold',
-                      color: theme.palette.text,
-                      mb: 1
-                    }}
-                  >
-                    Ready to Generate Your Letter?
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.text, mb: 1 }}>
+                    {isAdmin ? 'Ready to Generate the Letter?' : 'Ready to Submit Your Request?'}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme.palette.text.secondary }}
-                  >
-                    Review your information and click generate to create your letter
+                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                    {isAdmin
+                      ? 'Review the information and click generate to create the letter'
+                      : 'Review the information and click submit to send your request to HR'}
                   </Typography>
                 </Box>
 
@@ -213,7 +204,7 @@ const LetterRequestForm = ({ letterType, onBack, onGenerate }) => {
                       height: 40
                     }}
                   >
-                    Generate Letter
+                    {isAdmin ? 'Generate Letter' : 'Submit Request'}
                   </Button>
                 </Box>
               </Paper>

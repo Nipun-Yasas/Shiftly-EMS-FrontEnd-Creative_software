@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Paper from "@mui/material/Paper";
@@ -19,18 +19,18 @@ import DialogActions from "@mui/material/DialogActions";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
-import RefreshIcon from "@mui/icons-material/Refresh";
+ 
 import SendIcon from "@mui/icons-material/Send";
 
 import dayjs from "dayjs";
 
-import CustomDataGrid from "../../_components/CustomDataGrid";
+import { DataGrid } from "@mui/x-data-grid";
 import { getStatusColor, getStatusIcon } from "../../admin-portal/_helpers/colorhelper";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
-import { getUserData, saveUserData } from "../../../_utils/localStorageUtils";
+import { getUserData, saveUserData, isDataFresh } from "../../../_utils/localStorageUtils";
 
-// Local storage key used to persist letter history per user
+// Local storage key used to cache letter history per user (fallback/cache)
 const LS_KEY = "letterHistory";
 
 export default function LetterHistory() {
@@ -40,39 +40,30 @@ export default function LetterHistory() {
 	const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 	const [toDelete, setToDelete] = useState(null);
-
 	const [stats, setStats] = useState({ total: 0, generated: 0, sent: 0 });
+	const [recentlyUpdated, setRecentlyUpdated] = useState(new Set());
 
 	const showSnackbar = (message, severity = "success") => setSnackbar({ open: true, message, severity });
 
 	const mapEntriesToRows = (entries = []) => {
-		return (entries || []).map((e, idx) => ({
-			id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
-			letterType: e.letterType || e.type || "",
-			requestedAt: e.requestedAt || e.createdAt || e.date || null,
-			recipientEmail: e.recipientEmail || e.email || "",
-			status: (e.status || "generated").toString().toLowerCase(),
-			letterHtml: e.letterHtml || e.content || "",
-			fields: e.fields || {},
-		})).sort((a, b) => (b.requestedAt ? new Date(b.requestedAt).getTime() : 0) - (a.requestedAt ? new Date(a.requestedAt).getTime() : 0));
-	};
-
-	const loadHistory = (silent = false) => {
-		if (!silent) setLoading(true);
-		try {
-			const entries = getUserData(LS_KEY, []);
-			const mapped = mapEntriesToRows(entries);
-			setRows(mapped);
-			updateStats(mapped);
-		} catch (e) {
-			setRows([]);
-		} finally {
-			if (!silent) setLoading(false);
-		}
+		return (entries || [])
+			.map((e, idx) => ({
+				id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
+				letterType: e.letterType || e.type || "",
+				requestedAt: e.requestedAt || e.createdAt || e.date || null,
+				recipientEmail: e.recipientEmail || e.email || "",
+				status: (e.status || "generated").toString().toLowerCase(),
+				letterHtml: e.letterHtml || e.content || "",
+				fields: e.fields || {},
+			}))
+			.sort(
+				(a, b) =>
+					(b.requestedAt ? new Date(b.requestedAt).getTime() : 0) -
+					(a.requestedAt ? new Date(a.requestedAt).getTime() : 0)
+			);
 	};
 
 	const saveHistory = (newRows) => {
-		// Persist minimal fields back to LS
 		const entries = newRows.map((r) => ({
 			id: r.id,
 			letterType: r.letterType,
@@ -90,6 +81,53 @@ export default function LetterHistory() {
 		const sent = data.filter((d) => d.status === "sent").length;
 		const generated = total - sent;
 		setStats({ total, generated, sent });
+	};
+
+	const checkForStatusUpdates = (oldRows, newRows) => {
+		const updatedIds = new Set();
+		oldRows.forEach((oldRow) => {
+			const newRow = newRows.find((n) => n.id === oldRow.id);
+			if (newRow && oldRow.status !== newRow.status) {
+				updatedIds.add(newRow.id);
+				const message = `Letter status updated to ${newRow.status}`;
+				const sev = newRow.status === "sent" ? "success" : "info";
+				showSnackbar(message, sev);
+			}
+		});
+		if (updatedIds.size > 0) {
+			setRecentlyUpdated(updatedIds);
+			setTimeout(() => setRecentlyUpdated(new Set()), 8000);
+		}
+	};
+
+	const loadHistory = async (silent = false) => {
+		if (!silent) setLoading(true);
+		try {
+			const useCache = silent && isDataFresh(LS_KEY, 30 * 1000);
+			if (useCache) {
+				const cached = getUserData(LS_KEY, []);
+				const mapped = mapEntriesToRows(cached);
+				setRows(mapped);
+				updateStats(mapped);
+				return;
+			}
+			const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.MY);
+			const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+			const mapped = mapEntriesToRows(list);
+			if (silent && rows.length > 0) {
+				checkForStatusUpdates(rows, mapped);
+			}
+			setRows(mapped);
+			updateStats(mapped);
+			saveHistory(mapped);
+		} catch (e) {
+			const cached = getUserData(LS_KEY, []);
+			const mapped = mapEntriesToRows(cached);
+			setRows(mapped);
+			updateStats(mapped);
+		} finally {
+			if (!silent) setLoading(false);
+		}
 	};
 
 	useEffect(() => {
@@ -113,7 +151,6 @@ export default function LetterHistory() {
 	};
 
 	const handleView = (row) => {
-		// Navigate to the letter generation page for now
 		router.push("/letter");
 	};
 
@@ -189,7 +226,7 @@ export default function LetterHistory() {
 			sortable: false,
 			renderCell: (params) => (
 				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="View / Edit">
+					<Tooltip title="View">
 						<IconButton size="small" onClick={() => handleView(params.row)} color="primary">
 							<VisibilityIcon />
 						</IconButton>
@@ -228,21 +265,20 @@ export default function LetterHistory() {
 		},
 	];
 
-	const [searchText, setSearchText] = useState("");
-	const filteredRows = useMemo(() => {
-		if (!searchText.trim()) return rows;
-		const q = searchText.toLowerCase();
-		return rows.filter((r) =>
-			(r.letterType || "").toLowerCase().includes(q) ||
-			(r.recipientEmail || "").toLowerCase().includes(q)
-		);
-	}, [rows, searchText]);
-
 	return (
 		<Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
 			<Box sx={{ width: "100%", p: 5 }}>
 				{/* Stats and actions */}
-				<Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+				<Box
+					sx={{
+						display: "flex",
+						gap: 2,
+						mb: 3,
+						flexWrap: "wrap",
+						alignItems: "center",
+						justifyContent: "space-between",
+					}}
+				>
 					<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
 						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#e3f2fd", minWidth: 120, textAlign: "center" }}>
 							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#1976d2" }}>{stats.total}</span>
@@ -263,25 +299,51 @@ export default function LetterHistory() {
 						<Typography variant="caption" color="textSecondary">
 							Auto-refresh: 30s
 						</Typography>
-						<Tooltip title="Refresh Letter History">
-							<IconButton onClick={() => loadHistory()} disabled={loading} sx={{ color: "primary.main" }}>
-								<RefreshIcon />
-							</IconButton>
-						</Tooltip>
+                        
 						<Box sx={{ display: "flex", gap: 1, ml: 2 }}>
-							<input
-								type="text"
-								placeholder="Search by type or email"
-								value={searchText}
-								onChange={(e) => setSearchText(e.target.value)}
-								style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #ccc", outline: "none" }}
-							/>
 							<Button variant="contained" onClick={() => router.push("/letter")}>New Letter</Button>
 						</Box>
 					</Box>
 				</Box>
 
-				<CustomDataGrid rows={filteredRows} columns={columns} />
+				{/* Data grid */}
+				<Box sx={{ width: "100%" }}>
+					<DataGrid
+						rows={rows}
+						columns={columns}
+						loading={loading}
+						pageSizeOptions={[10, 50, 100]}
+						initialState={{ pagination: { paginationModel: { page: 0, pageSize: 10 } } }}
+						disableSelectionOnClick
+						getRowClassName={(params) => (recentlyUpdated.has(params.row.id) ? "recently-updated-row" : "")}
+						sx={{
+							"& .recently-updated-row": {
+								backgroundColor: "#f3e5f5",
+								animation: "pulse 2s ease-in-out",
+							},
+							"@keyframes pulse": {
+								"0%": { backgroundColor: "#f3e5f5" },
+								"50%": { backgroundColor: "#e1bee7" },
+								"100%": { backgroundColor: "#f3e5f5" },
+							},
+									// Thinner scrollbars
+									"& .MuiDataGrid-virtualScroller": {
+										scrollbarWidth: "thin",
+									},
+									"& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+										height: 6,
+										width: 8,
+									},
+									"& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb": {
+										backgroundColor: "#bdbdbd",
+										borderRadius: 8,
+									},
+									"& .MuiDataGrid-virtualScroller::-webkit-scrollbar-track": {
+										backgroundColor: "transparent",
+									},
+						}}
+					/>
+				</Box>
 			</Box>
 
 			{/* Delete confirmation */}
@@ -289,7 +351,9 @@ export default function LetterHistory() {
 				<DialogTitle>Remove this letter from your history?</DialogTitle>
 				<DialogActions>
 					<Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-					<Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+					<Button onClick={confirmDelete} color="error" variant="contained">
+						Delete
+					</Button>
 				</DialogActions>
 			</Dialog>
 
