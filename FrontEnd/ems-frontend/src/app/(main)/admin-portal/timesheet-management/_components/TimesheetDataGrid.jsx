@@ -1,296 +1,143 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
+import Tooltip from "@mui/material/Tooltip";
+import Chip from "@mui/material/Chip";
+import Cancel from "@mui/icons-material/Cancel";
+import CheckCircle from "@mui/icons-material/CheckCircle";
 
-import { DataGrid } from "@mui/x-data-grid";
-import { getStatusColor } from "../../_helpers/colorhelper";
-import axiosInstance from "../../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../../_utils/apiPaths";
+import dayjs from "dayjs";
 
-export default function TimesheetDataGrid({
-  data,
-  type = "employee",
-  onViewTimesheets,
-  onApprove,
-  onReject,
-  showTeamColumn = false,
-  showProjectColumn = false,
+import {
+  getStatusColor,
+  getStatusIcon,
+  getWorkModeColor,
+} from "../../_helpers/colorhelper";
+
+import CustomDataGrid from "../../../_components/CustomDataGrid";
+
+export default function TimeSheetDataGrid({
+  timeSheets,
+  loading,
+  handleUpdateStatus,
+  showApprovalActions = false,
 }) {
-  // User summary data grid columns (for distinct users)
-  const userColumns = [
+  const columns = [
     {
-      field: "name",
+      field: "employeeName",
       headerName: "Employee Name",
-      width: 200,
-    },
-    {
-      field: "department",
-      headerName: "Department",
       width: 150,
     },
     {
-      field: "team",
-      headerName: "Team",
-      width: 120,
-    },
-    {
-      field: "totalEntries",
-      headerName: "Total Entries",
-      width: 120,
-      align: "center",
-    },
-    {
-      field: "totalHours",
-      headerName: "Total Hours",
-      width: 120,
-      align: "center",
-      renderCell: (params) => (
-        <span>{params.value?.toFixed(1) || '0.0'}</span>
-      ),
-    },
-    {
-      field: "pendingCount",
-      headerName: "Pending",
-      width: 100,
-      align: "center",
-      renderCell: (params) => (
-        <Chip
-          label={params.value || 0}
-          color="warning"
-          size="small"
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: "approvedCount",
-      headerName: "Approved",
-      width: 100,
-      align: "center",
-      renderCell: (params) => (
-        <Chip
-          label={params.value || 0}
-          color="success"
-          size="small"
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 120,
-      headerClassName: "last-column",
-      align: "center",
-      sortable: false,
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            gap: 0.5,
-            mt: 1,
-            width: "100%",
-            justifyContent: "center",
-          }}
-        >
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<VisibilityIcon />}
-            onClick={() => onViewTimesheets(params.row)}
-            sx={{ fontSize: '0.75rem' }}
-          >
-            View All
-          </Button>
-        </Box>
-      ),
-    },
-  ];
-
-  // Employee data grid columns (original timesheet entries)
-  const employeeColumns = [
-    {
-      field: "date",
-      headerName: "Submit date",
-      width: 150,
-    },
-    {
-      field: "mode",
+      field: "departmentName",
       headerName: "Department",
-      width: 170,
-    },
-    ...(showTeamColumn
-      ? [
-          {
-            field: "team",
-            headerName: "Team",
-            width: 150,
-          },
-        ]
-      : []),
-    ...(showProjectColumn
-      ? [
-          {
-            field: "project",
-            headerName: "Project",
-            width: 200,
-          },
-        ]
-      : []),
-
-      {
-        field: "activity",
-        headerName: "Submit date",
-        width: 150,
-      },
-      {
-        field: "hours",
-        headerName: "Department",
-        width: 170,
-      },
-      
-      {
-        field: "status",
-        headerName: "Department",
-        width: 170,
-      },
-
-
-
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 100,
-      headerClassName: "last-column",
-      align: "center",
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            gap: 0.5,
-            mt: 1,
-            width: "100%",
-            justifyContent: "center",
-          }}
-        >
-          <Button
-            variant="text"
-            size="small"
-            startIcon={<VisibilityIcon />}
-            onClick={() => onViewTimesheets(params.row)}
-          >
-            View
-          </Button>
-        </Box>
-      ),
-    },
-  ];
-
-  const timesheetColumns = [
-    {
-      field: "date",
-      headerName: "Date",
-      width: 120,
+      width: 150,
     },
     {
       field: "mode",
       headerName: "Work Mode",
-      width: 100,
-    },
-    {
-      field: "activity",
-      headerName: "Activity",
-      width: 350,
-    },
-    {
-      field: "hours",
-      headerName: "Hours",
-      width: 80,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 100,
+      width: 120,
       renderCell: (params) => (
         <Chip
           label={params.value}
-          color={getStatusColor(params.value)}
+          color={getWorkModeColor(params.value)}
           size="small"
         />
       ),
     },
     {
+      field: "hours",
+      headerName: "Hours",
+      width: 70,
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      width: 110,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: "activity",
+      headerName: "Activity",
+      width: 230,
+    },
+    {
       field: "actions",
       headerName: "Actions",
+      width: 110,
       headerClassName: "last-column",
-      align: "center",
-      sortable: false,
-      renderCell: (params) =>
-        params.row.status === "Pending" ? (
-          <Box
-            sx={{
-              display: "flex",
-              gap: 0.5,
-              mt: 1,
-              width: "100%",
-              justifyContent: "center",
-            }}
-          >
-            <IconButton
-              size="small"
-              color="success"
-              onClick={() => onApprove(params.row.id)}
-              title="Approve"
-            >
-              <CheckCircleIcon />
-            </IconButton>
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => onReject(params.row.id)}
-              title="Reject"
-            >
-              <CancelIcon />
-            </IconButton>
-          </Box>
-        ) : null,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
+          {showApprovalActions && params.row.status === "pending" && (
+            <>
+              <Tooltip title="Approve Time Sheet">
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "approve")
+                  }
+                  color="success"
+                >
+                  <CheckCircle />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Reject Time Sheet">
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "reject")
+                  }
+                  color="error"
+                >
+                  <Cancel />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </Box>
+      ),
     },
   ];
 
-  // Determine which columns to use based on type
-  const getColumns = () => {
-    switch (type) {
-      case "users":
-        return userColumns;
-      case "timesheet":
-        return timesheetColumns;
-      default:
-        return employeeColumns;
-    }
-  };
-
-  const columns = getColumns();
-
   return (
-    <Box sx={{ height: "auto", width: "100%" }}>
-      <DataGrid
-        rows={data}
-        columns={columns}
-        rowsPerPageOptions={[10]}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 10 },
-          },
-        }}
-        pageSizeOptions={[10, 50, 100]}
-      />
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <CustomDataGrid rows={timeSheets} columns={columns} />
+      )}
     </Box>
   );
 }

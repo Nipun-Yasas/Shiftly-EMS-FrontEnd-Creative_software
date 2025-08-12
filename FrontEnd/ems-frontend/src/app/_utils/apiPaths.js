@@ -23,6 +23,7 @@ export const API_PATHS = {
   EMPLOYEE: {
     ADD: (userId) => `/api/v1/shiftly/ems/employee/add/${userId}`,
     DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
+    GET_BY_USERID: (id) => `/api/v1/shiftly/ems/employee/${id}`
   },
   DEPARTMENTS: {
     ADD: "/api/v1/shiftly/ems/departments/add",
@@ -37,6 +38,18 @@ export const API_PATHS = {
    GET_ALL_BY_DEPARTMENT: (departmentId) => `/api/v1/shiftly/ems/designations/by-department/${departmentId}`,
    DELETE: (id) => `/api/v1/shiftly/ems/designations/delete/${id}`,
    UPDATE: (id) => `/api/v1/shiftly/ems/designations/update/${id}`,
+  },
+  TIMESHEETS: {
+    //admin endpoints
+    GET_ALL: "/api/v1/shiftly/ems/timesheets/all",
+    GET_BY_ADMINID: (id) => `/api/v1/shiftly/ems/timesheets/admin/${id}`,
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/timesheets/status/${id}`,
+    
+    //user endpoints
+    ADD: (id) => `/api/v1/shiftly/ems/timesheets/add/${id}`,
+    GET_BY_EMPLOYEEID: (id) => `/api/v1/shiftly/ems/timesheets/employee/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/timesheets/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/timesheets/delete/${id}`,
   },
   VACANCIES: {
     ADD: (id) => `/api/v1/shiftly/ems/vacancies/add/${id}`,
@@ -111,14 +124,6 @@ export const API_PATHS = {
     GENERATE: "/api/v1/shiftly/ems/ai-letter/generate",
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
-  },
-  TIMESHEETS: {
-    ADD: "/api/v1/shiftly/ems/timesheets/add",
-    UPDATE: (id) => `/api/v1/shiftly/ems/timesheets/update/${id}`,
-    DELETE: (id) => `/api/v1/shiftly/ems/timesheets/delete/${id}`,
-    GET_ALL: "/api/v1/shiftly/ems/timesheets/all",
-    BY_USER: (userId) => `/api/v1/shiftly/ems/timesheets/user/${userId}`,
-    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/timesheets/status/${id}`,
   },
   EVENTS: {
     // Admin endpoints

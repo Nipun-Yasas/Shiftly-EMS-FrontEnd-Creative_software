@@ -25,25 +25,25 @@ const theme = createTheme({
         },
         error: {
           main: "#F44336",
-          light: "#ef5350",
+          light: "#ff908eff",
           dark: "#c62828",
           contrastText: "#fff"
         },
         warning: {
           main: "#ed6c02",
-          light: "#ff9800",
+          light: "#ffd79aff",
           dark: "#e65100",
           contrastText: "#fff"
         },
         info: {
           main: "#0288d1",
-          light: "#03a9f4",
+          light: "#acd4ffff",
           dark: "#01579b",
           contrastText: "#fff"
         },
         success: {
           main: "#2e7d32",
-          light: "#4caf50",
+          light: "#73e177ff",
           dark: "#1b5e20",
           contrastText: "#fff"
         },
@@ -89,7 +89,7 @@ const theme = createTheme({
           main: "#F44336",
           light: "#ef5350",
           dark: "#c62828",
-          contrastText: "#fff"
+          contrastText: "rgba(0, 0, 0, 0.87)"
         },
         warning: {
           main: "#ffa726",

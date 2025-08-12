@@ -18,6 +18,8 @@ export const getStatusColor = (status) => {
       return 'error';
     case 'pending':
       return 'warning';
+    case 'total':
+    return 'info';
     default:
       return 'default';
   }
@@ -38,6 +40,20 @@ export const getStatusIcon = (status) => {
       return <AccessTime />;
     default:
       return <Receipt />;
+  }
+};
+
+export const getWorkModeColor = (mode) => {
+  const normalizedMode = mode?.toLowerCase();
+  switch (normalizedMode) {
+    case 'online':
+      return 'info';
+    case 'on-site':
+      return 'success';
+    case 'hybrid':
+      return 'warning';
+    default:
+      return 'default';
   }
 };
 
