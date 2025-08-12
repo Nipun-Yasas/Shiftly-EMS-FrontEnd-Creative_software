@@ -124,6 +124,13 @@ export const API_PATHS = {
     GENERATE: "/api/v1/shiftly/ems/ai-letter/generate",
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
+    REQUEST: {
+      ADD: "/api/v1/shiftly/ems/ai-letter/requests",
+      MY: "/api/v1/shiftly/ems/ai-letter/requests/my",
+      ALL: "/api/v1/shiftly/ems/ai-letter/requests/all",
+      GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}`,
+    },
+    GENERATE_FROM_REQUEST: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}/generate`,
   },
   EVENTS: {
     // Admin endpoints

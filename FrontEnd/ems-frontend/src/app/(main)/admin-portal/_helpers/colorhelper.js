@@ -12,6 +12,10 @@ export const getStatusColor = (status) => {
       return 'success';
     case 'unread':
       return 'warning';
+    case 'generated':
+      return 'info';
+    case 'sent':
+      return 'success';
     case 'approved':
       return 'success';
     case 'rejected':
@@ -31,6 +35,10 @@ export const getStatusIcon = (status) => {
     case "unread":
       return <AccessTime />;
     case "read":
+      return <CheckCircle />;
+    case 'generated':
+      return <Receipt />;
+    case 'sent':
       return <CheckCircle />;
     case "approved":
       return <CheckCircle />;
