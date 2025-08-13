@@ -26,21 +26,6 @@ export default function CustomDataGrid({ rows, columns }) {
       sx={{
         height: "auto",
         width: "100%",
-        // Thinner scrollbars (horizontal + vertical)
-        "& .MuiDataGrid-virtualScroller": {
-          scrollbarWidth: "thin",
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
-          height: 0, // horizontal bar height
-          width: 6, // vertical bar width
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb": {
-          backgroundColor: "#bdbdbd",
-          borderRadius: 8,
-        },
-        "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-track": {
-          backgroundColor: "transparent",
-        },
       }}
     >
       <DataGrid

@@ -7,16 +7,17 @@ import LeavesDataGrid from "./LeavesDataGrid";
 export default function AllTab({
   leaves,
   loading,
-  onViewDetails,
-  onApprovalAction,
+  onViewClaim,
+  handleUpdateStatus,
 }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
       <LeavesDataGrid
-        loading={loading}
         leaves={leaves}
-        onViewDetails={onViewDetails}
-        onApprovalAction={onApprovalAction}
+        loading={loading}
+        onViewClaim={onViewClaim}
+        handleUpdateStatus={handleUpdateStatus}
+        showApprovalActions={true}
       />
     </Box>
   );

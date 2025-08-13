@@ -2,92 +2,74 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
-
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
+import Cancel from "@mui/icons-material/Cancel";
+import CheckCircle from "@mui/icons-material/CheckCircle";
 
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import dayjs from "dayjs";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import {
-  getStatusColor,
-  getStatusIcon,
-  getLeaveTypeColor,
-} from "../../_helpers/colorhelper";
 
-import { DataGrid } from "@mui/x-data-grid";
+import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
 
-export default function LeavesDataGrid({
-  loading,
+import CustomDataGrid from "../../../_components/CustomDataGrid";
+
+export default function TimeSheetDataGrid({
   leaves,
-  onViewDetails,
-  onApprovalAction,
+  loading,
+  handleUpdateStatus,
+  showApprovalActions = false,
 }) {
-  const leaveColumns = [
-    { field: "employeeName", headerName: "Employee", width: 150 },
-    { field: "department", headerName: "Department", width: 130 },
+  const columns = [
+    {
+      field: "employeeName",
+      headerName: "Employee Name",
+      width: 120,
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      width: 150,
+    },
     {
       field: "leaveType",
-      headerName: "Type",
-      width: 100,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          style={{
-            backgroundColor: getLeaveTypeColor(params.value),
-            color: "white",
-          }}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          icon={getStatusIcon(params.value)}
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: "leaveDuration",
-      headerName: "Duration",
+      headerName: "Leave Type",
       width: 90,
-      renderCell: (params) =>
-        `${params.value} day${params.value > 1 ? "s" : ""}`,
+      renderCell: (params) => <span>{params.value}</span>,
     },
     {
       field: "leaveFrom",
-      headerName: "From",
+      headerName: "Leave From",
       width: 110,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
     },
     {
       field: "leaveTo",
-      headerName: "To",
+      headerName: "Leave To",
       width: 110,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
     },
+    { field: "reason", headerName: "Reason", width: 160 },
+    { field: "coverPersonName", headerName: "Cover Person", width: 120 },
     {
-      field: "submissionDate",
-      headerName: "Submitted",
-      width: 120,
-      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+      field: "status",
+      headerName: "Status",
+      width: 110,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 120,
+      width: 90,
       headerClassName: "last-column",
-      align: "center",
       renderCell: (params) => (
         <Box
           sx={{
@@ -98,33 +80,30 @@ export default function LeavesDataGrid({
             justifyContent: "center",
           }}
         >
-          <Tooltip title="View Details">
-            <IconButton
-              size="small"
-              onClick={() => onViewDetails(params.row)}
-              color="primary"
-            >
-              <VisibilityIcon />
-            </IconButton>
-          </Tooltip>
-          {params.row.status === "pending" && (
+          {showApprovalActions && params.row.status === "pending" && (
             <>
-              <Tooltip title="Approve Leave">
+              <Tooltip title="Approve Time Sheet">
                 <IconButton
                   size="small"
-                  onClick={() => onApprovalAction(params.row, "approve")}
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "approve")
+                  }
                   color="success"
                 >
-                  <CheckCircleIcon />
+                  <CheckCircle />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Reject Leave">
+              <Tooltip title="Reject Time Sheet">
                 <IconButton
                   size="small"
-                  onClick={() => onApprovalAction(params.row, "reject")}
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "reject")
+                  }
                   color="error"
                 >
-                  <CancelIcon />
+                  <Cancel />
                 </IconButton>
               </Tooltip>
             </>
@@ -133,28 +112,20 @@ export default function LeavesDataGrid({
       ),
     },
   ];
+
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-          <CircularProgress />
-        </Box>
+        <CircularProgress />
       ) : (
-        <Box sx={{ height: "auto", width: "100%" }}>
-          <DataGrid
-            rows={leaves}
-            columns={leaveColumns}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 50, 100]}
-          />
-        </Box>
+        <CustomDataGrid rows={leaves} columns={columns} />
       )}
-    </>
+    </Box>
   );
 }

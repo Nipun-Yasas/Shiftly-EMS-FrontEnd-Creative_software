@@ -1,272 +1,257 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { usePathname } from 'next/navigation';
-import axiosInstance from "../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../_utils/apiPaths";
-import { DataGrid } from "@mui/x-data-grid";
-import { Paper, Box, Typography, Snackbar, Alert, Chip } from "@mui/material";
-import { IconButton, Tooltip, Dialog, DialogTitle, DialogActions, Button, DialogContent, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from "@mui/icons-material";
+import { useState, useEffect, useContext } from "react";
+
+import dayjs from "dayjs";
+
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RefreshIcon from "@mui/icons-material/Refresh";
+
+import CircularProgress from "@mui/material/CircularProgress";
+import EditDialog from "../_components/EditDialog";
+import DeleteDialog from "../../_components/DeleteDialog";
+import CustomDataGrid from "../../_components/CustomDataGrid";
 import {
   getStatusIcon,
   getStatusColor,
 } from "../../admin-portal/_helpers/colorhelper";
 
+import axiosInstance from "../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../_utils/apiPaths";
+import { UserContext } from "../../../context/UserContext";
+
 export default function LeaveHistory() {
-  const pathname = usePathname();
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [attribute, setAttribute] = useState("Leave To");
-  // Delete dialog state
-  const [leaveToDelete, setLeaveToDelete] = useState(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  // Edit dialog state
-  const [leaveToEdit, setLeaveToEdit] = useState(null);
+  const [employee, setEmployee] = useState("");
+  const [employees, setEmployees] = useState([]);
+  const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ leave_type: '', leave_from: '', leave_to: '', reason: '', cover_person: '', leave_status: '' });
-  const [totalLeaves, setTotalLeaves] = useState(0);
-  const [pendingLeaves, setPendingLeaves] = useState(0);
-  const [approvedLeaves, setApprovedLeaves] = useState(0);
-  const [rejectedLeaves, setRejectedLeaves] = useState(0);
-  const [pollingInterval, setPollingInterval] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-  const [recentlyUpdated, setRecentlyUpdated] = useState(new Set());
 
-  useEffect(() => {
-    // Initial load
-    fetchLeaveHistory();
-    
-    // Set up polling for real-time updates
-    const interval = setInterval(() => {
-      fetchLeaveHistory(true); // Silent refresh
-    }, 30000); // Poll every 30 seconds
-    
-    setPollingInterval(interval);
-
-    // Cleanup on unmount
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [pathname]);
-
-  // Cleanup polling interval when component unmounts
-  useEffect(() => {
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [pollingInterval]);
-
-  const fetchLeaveHistory = (silent = false) => {
-    if (!silent) setLoading(true);
-    
-    axiosInstance.get(API_PATHS.LEAVES.GET_MY_LEAVES)
-      .then((res) => {
-        // Map backend data to DataGrid row format
-        const mappedRows = res.data.map((leave) => ({
-          id: leave.id,
-          leave_type: leave.leaveType || '',
-          leave_from: leave.leaveFrom || '',
-          leave_to: leave.leaveTo || '',
-          reason: leave.reason || '',
-          cover_person: leave.coverPersonName || '',
-          report_to: leave.reportToName || '',
-          leave_status: leave.leaveStatus || '',
-        }));
-        
-        // Check if there are any status changes for notifications
-        if (silent && rows.length > 0) {
-          checkForStatusUpdates(rows, mappedRows);
-        }
-        
-        setRows(mappedRows);
-        updateLeaveCounts(mappedRows);
-        if (!silent) setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch leave history:", err);
-        if (!silent) {
-          setError("Failed to fetch leave history");
-          setLoading(false);
-        }
-      });
-  };
-
-  // Check for status changes and show notifications
-  const checkForStatusUpdates = (oldRows, newRows) => {
-    const updatedIds = new Set();
-    
-    oldRows.forEach(oldLeave => {
-      const newLeave = newRows.find(newL => newL.id === oldLeave.id);
-      if (newLeave && oldLeave.leave_status !== newLeave.leave_status) {
-        updatedIds.add(newLeave.id);
-        
-        // Status changed - show notification
-        const statusText = newLeave.leave_status.toLowerCase();
-        const message = `Your leave request has been ${statusText}`;
-        
-        // Show toast notification
-        const severity = statusText === 'approved' ? 'success' : statusText === 'rejected' ? 'error' : 'info';
-        showSnackbar(message, severity);
-        
-        // Optional: Show browser notification if permission is granted
-        if (Notification.permission === 'granted') {
-          new Notification('Leave Status Update', {
-            body: message,
-            icon: '/shiftly-logo.png'
-          });
-        }
-      }
-    });
-    
-    // Update recently updated set
-    if (updatedIds.size > 0) {
-      setRecentlyUpdated(updatedIds);
-      // Clear the highlight after 10 seconds
-      setTimeout(() => {
-        setRecentlyUpdated(new Set());
-      }, 10000);
-    }
-  };
+  const { user } = useContext(UserContext);
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
-
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Request notification permission on component mount
-  useEffect(() => {
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
+  const fetchEmployee = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.EMPLOYEE.GET_BY_USERID(user.id)
+      );
+      setEmployee(response.data);
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to fetch employee",
+        "error"
+      );
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const fetchEmployeesInSameDepartment = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.EMPLOYEE.GET_BY_DEPARTMENTID(employee.departmentId)
+      );
+      setEmployees(response.data);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLeaves = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.LEAVES.GET_BY_EMPLOYEEID(employee.employeeId)
+      );
+
+      if (!response.data || response.data.length === 0) {
+        setLeaves([]);
+        return;
+      }
+      setLeaves(
+        (response.data || []).map((r) => ({
+          ...r,
+          status: r.status?.toLowerCase(),
+          leave_type: r.leave_type,
+        }))
+      );
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to fetch Leaves",
+        "error"
+      );
+      setLeaves([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployee();
+    fetchEmployeesInSameDepartment();
   }, []);
+
+  useEffect(() => {
+    if (employee && employee.employeeId) {
+      fetchLeaves();
+    }
+  }, [employee]);
+
+  const handleEdit = (record) => {
+    setSelectedRecord(record);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (record) => {
+    setSelectedRecord(record);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleUpdate = async (values, { setSubmitting }) => {
+    if (!selectedRecord) return;
+    setLoading(true);
+    try {
+      const payload = {
+        leave_type: values.leaveType?.name || values.leave_type || "",
+        leave_from: values.leave_from,
+        leave_to: values.leave_to,
+        reason: values.reason,
+        cover_person: values.cover_person,
+        leave_status: values.leave_status,
+      };
+      await axiosInstance.put(
+        API_PATHS.LEAVES.UPDATE(selectedRecord.id),
+        payload
+      );
+      await fetchLeaves();
+      showSnackbar("Leave updated successfully");
+      setEditDialogOpen(false);
+      setSelectedRecord(null);
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to update record",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
+    }
+  };
+
+  const DeleteRecord = async () => {
+    if (!selectedRecord) return;
+
+    setLoading(true);
+    try {
+      await axiosInstance.delete(API_PATHS.LEAVES.DELETE(selectedRecord.id));
+
+      await fetchLeaves();
+      showSnackbar("Leave deleted successfully.", "success");
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to delete leave",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setSelectedRecord(null);
+    }
+  };
 
   // Function to update leave counts
   const updateLeaveCounts = (leaves) => {
     const total = leaves.length;
-    const pending = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'pending').length;
-    const approved = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'approved').length;
-    const rejected = leaves.filter(leave => leave.leave_status?.toLowerCase() === 'rejected').length;
-    
+    const pending = leaves.filter(
+      (leave) => leave.leave_status?.toLowerCase() === "pending"
+    ).length;
+    const approved = leaves.filter(
+      (leave) => leave.leave_status?.toLowerCase() === "approved"
+    ).length;
+    const rejected = leaves.filter(
+      (leave) => leave.leave_status?.toLowerCase() === "rejected"
+    ).length;
+
     setTotalLeaves(total);
     setPendingLeaves(pending);
     setApprovedLeaves(approved);
     setRejectedLeaves(rejected);
   };
 
-  // Delete logic
-  const handleDelete = (row) => {
-    setLeaveToDelete(row);
-    setDeleteConfirmOpen(true);
-  };
-  const confirmDelete = () => {
-    axiosInstance.delete(API_PATHS.LEAVES.DELETE_MY_LEAVE(leaveToDelete.id))
-      .then(() => {
-        const updatedRows = rows.filter((r) => r.id !== leaveToDelete.id);
-        setRows(updatedRows);
-        updateLeaveCounts(updatedRows);
-        setDeleteConfirmOpen(false);
-        setLeaveToDelete(null);
-      })
-      .catch(() => {
-        setError("Failed to delete leave");
-        setDeleteConfirmOpen(false);
-      });
-  };
-
-  // Edit logic
-  const handleEdit = (row) => {
-    setLeaveToEdit(row);
-    setEditForm({
-      leave_type: row.leave_type,
-      leave_from: row.leave_from,
-      leave_to: row.leave_to,
-      reason: row.reason,
-      cover_person: row.cover_person,
-      leave_status: row.leave_status,
-    });
-    setEditDialogOpen(true);
-  };
-  const handleEditFormChange = (field, value) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
-  };
-  const confirmEdit = () => {
-    // Prepare payload for backend
-    const payload = {
-      leaveType: editForm.leave_type,
-      leaveFrom: editForm.leave_from,
-      leaveTo: editForm.leave_to,
-      reason: editForm.reason,
-      coverPersonName: editForm.cover_person,
-      leaveStatus: editForm.leave_status,
-    };
-    axiosInstance.put(API_PATHS.LEAVES.UPDATE_MY_LEAVE(leaveToEdit.id), payload)
-      .then((res) => {
-        const updatedRows = rows.map((r) => r.id === leaveToEdit.id ? {
-          ...r,
-          leave_type: res.data.leaveType,
-          leave_from: res.data.leaveFrom,
-          leave_to: res.data.leaveTo,
-          reason: res.data.reason,
-          cover_person: res.data.coverPersonName,
-          leave_status: res.data.leaveStatus,
-        } : r);
-        setRows(updatedRows);
-        updateLeaveCounts(updatedRows);
-        setEditDialogOpen(false);
-        setLeaveToEdit(null);
-      })
-      .catch(() => {
-        setError("Failed to update leave");
-        setEditDialogOpen(false);
-      });
-  };
-
-  const attributeMap = {
-    "Leave Id": "id",
-    "Leave Type": "leave_type",
-    "Leave From": "leave_from",
-    "Leave To": "leave_to",
-    "Cover Person": "cover_person",
-    Status: "leave_status",
-  };
-
-  const filteredRows = useMemo(() => {
-    if (!searchText.trim()) return rows;
-    const field = attributeMap[attribute];
-    return rows.filter((row) =>
-      row[field]?.toString().toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [searchText, attribute, rows]);
-
-  // Columns with working actions
   const columns = [
-    { field: "leave_type", headerName: "Leave Type", width: 150, renderCell: (params) => (<span>{params.value}</span>), },
-    { field: "leave_from", headerName: "Leave From", width: 150 },
-    { field: "leave_to", headerName: "Leave To", width: 150 },
-    { field: "reason", headerName: "Reason", width: 150 },
-    { field: "cover_person", headerName: "Cover Person", width: 150 },
-    { field: "leave_status", headerName: "Status", width: 150, renderCell: (params) => (
-      <Chip
-        icon={getStatusIcon(params.value.toLowerCase())}
-        label={params.value}
-        color={getStatusColor(params.value.toLowerCase())}
-        size="small"
-      />
-    ), },
+    {
+      field: "employeeName",
+      headerName: "Employee Name",
+      width: 120,
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      width: 150,
+    },
+    {
+      field: "leaveType",
+      headerName: "Leave Type",
+      width: 90,
+      renderCell: (params) => <span>{params.value}</span>,
+    },
+    {
+      field: "leaveFrom",
+      headerName: "Leave From",
+      width: 110,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
+    {
+      field: "leaveTo",
+      headerName: "Leave To",
+      width: 110,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
+    { field: "reason", headerName: "Reason", width: 160 },
+    { field: "coverPersonName", headerName: "Cover Person", width: 120 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 110,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -274,28 +259,34 @@ export default function LeaveHistory() {
       headerClassName: "last-column",
       width: 90,
       renderCell: (params) => {
-        const isPending = params.row.leave_status?.toLowerCase() === 'pending';
-        
-        if (!isPending) {
-          // Show no actions for approved or rejected leaves
-          return (
-            <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-              <span style={{ fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
-                No actions
-              </span>
-            </Box>
-          );
-        }
+        const isPending = params.row.status === "pending";
 
+        if (!isPending) return null;
         return (
-          <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              mt: 1,
+              width: "100%",
+              justifyContent: "center",
+            }}
+          >
             <Tooltip title="Edit">
-              <IconButton size="small" onClick={() => handleEdit(params.row)} sx={{ color: "primary.main" }}>
+              <IconButton
+                size="small"
+                onClick={() => handleEdit(params.row)}
+                sx={{ color: "primary.main" }}
+              >
                 <EditIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
-              <IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+              <IconButton
+                size="small"
+                onClick={() => handleDelete(params.row)}
+                sx={{ color: "error.main" }}
+              >
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -308,211 +299,130 @@ export default function LeaveHistory() {
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
-        {/* Leave Statistics */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          mb: 3, 
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#e3f2fd',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1976d2' }}>
-                {totalLeaves}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Total Leaves</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#fff3e0',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#f57c00' }}>
-                {pendingLeaves}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Pending</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#dcedc8',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#388e3c' }}>
-                {approvedLeaves}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Approved</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#ffcdd2',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#d32f2f' }}>
-                {rejectedLeaves}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Rejected</div>
-            </Box>
-          </Box>
-
-          {/* Refresh Button */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="textSecondary">
-              Auto-refresh: 30s
-            </Typography>
-            <Tooltip title="Refresh Leave History">
-              <IconButton 
-                onClick={() => fetchLeaveHistory()} 
-                disabled={loading}
-                sx={{ color: 'primary.main' }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Tooltip title="Refresh Time Sheets">
+            <Button
+              variant="outlined"
+              onClick={fetchLeaves}
+              size="small"
+              startIcon={<RefreshIcon />}
+              disabled={loading}
+            >
+              Refresh
+            </Button>
+          </Tooltip>
         </Box>
 
-        {error && <div style={{ color: 'red', marginBottom: 16 }}>{error}</div>}
-        <DataGrid
-          rows={filteredRows}
-          columns={columns}
-          loading={loading}
-          height="auto"
-          pageSize={10}
-          rowsPerPageOptions={[5, 10, 20]}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
+        <Grid container spacing={2} my={3}>
+          {[
+            { label: "Total  ", color: "info", value: leaves.length },
+            {
+              label: "Pending",
+              color: "warning",
+              value: leaves.filter((d) => d.status?.toLowerCase() === "pending")
+                .length,
             },
-          }}
-          pageSizeOptions={[5, 10, 20]}
-          disableSelectionOnClick
-          getRowClassName={(params) => {
-            return recentlyUpdated.has(params.row.id) ? 'recently-updated-row' : '';
-          }}
-          sx={{
-            '& .recently-updated-row': {
-              backgroundColor: '#f3e5f5',
-              animation: 'pulse 2s infinite',
+            {
+              label: "Approved",
+              color: "success",
+              value: leaves.filter(
+                (d) => d.status?.toLowerCase() === "approved"
+              ).length,
             },
-            '@keyframes pulse': {
-              '0%': {
-                backgroundColor: '#f3e5f5',
-              },
-              '50%': {
-                backgroundColor: '#e1bee7',
-              },
-              '100%': {
-                backgroundColor: '#f3e5f5',
-              },
+            {
+              label: "Rejected",
+              color: "error",
+              value: leaves.filter(
+                (d) => d.status?.toLowerCase() === "rejected"
+              ).length,
             },
-          }}
-        />
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
-          <DialogTitle>Are you sure you want to delete this leave?</DialogTitle>
-          <DialogActions>
-            <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-            <Button onClick={confirmDelete} color="error">Delete</Button>
-          </DialogActions>
-        </Dialog>
-        {/* Edit Dialog */}
-        <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
-          <DialogTitle>Edit Leave</DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 350 }}>
-            <FormControl fullWidth>
-              <InputLabel>Leave Type</InputLabel>
-              <Select
-                value={editForm.leave_type}
-                onChange={e => handleEditFormChange('leave_type', e.target.value)}
-                label="Leave Type"
+          ].map((card, index) => (
+            <Grid item key={index}>
+              <Card
+                sx={{
+                  minWidth: { xs: "125px", sm: "125px", lg: "200px" },
+                  maxHeight: "60px",
+                  textAlign: "center",
+                  bgcolor: `${card.color}.light`,
+                  borderRadius: 10,
+                }}
+                elevation={0}
               >
-                <MenuItem value="SICK">Sick</MenuItem>
-                <MenuItem value="CASUAL">Casual</MenuItem>
-                <MenuItem value="MATERNITY">Maternity</MenuItem>
-                <MenuItem value="OTHER">Other</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="Leave From"
-              type="date"
-              value={editForm.leave_from}
-              onChange={e => handleEditFormChange('leave_from', e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-            <TextField
-              label="Leave To"
-              type="date"
-              value={editForm.leave_to}
-              onChange={e => handleEditFormChange('leave_to', e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-            <TextField
-              label="Reason"
-              value={editForm.reason}
-              onChange={e => handleEditFormChange('reason', e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Cover Person"
-              value={editForm.cover_person}
-              onChange={e => handleEditFormChange('cover_person', e.target.value)}
-              fullWidth
-            />
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={editForm.leave_status}
-                onChange={e => handleEditFormChange('leave_status', e.target.value)}
-                label="Status"
-              >
-                <MenuItem value="PENDING">Pending</MenuItem>
-                <MenuItem value="APPROVED">Approved</MenuItem>
-                <MenuItem value="REJECTED">Rejected</MenuItem>
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-            <Button onClick={confirmEdit} variant="contained">Save</Button>
-          </DialogActions>
-        </Dialog>
-        
-        {/* Toast Notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
+                <CardContent
+                  sx={{
+                    gap: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: "bold",
+                      color: `${card.color}.dark`,
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    {card.value}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.85rem",
+                      color: `${card.color}.contrastText`,
+                    }}
+                  >
+                    {card.label}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <CustomDataGrid rows={leaves} columns={columns} />
+        )}
       </Box>
+
+      <EditDialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedRecord(null);
+        }}
+        record={selectedRecord}
+        handleUpdate={handleUpdate}
+        employees={employees}
+      />
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={DeleteRecord}
+        loading={loading}
+        title="Delete Leave request"
+        message="Are you sure you want to delete this leave request?"
+      />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }

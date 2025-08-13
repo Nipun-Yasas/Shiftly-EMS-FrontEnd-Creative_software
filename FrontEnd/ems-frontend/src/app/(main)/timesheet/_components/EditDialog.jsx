@@ -14,7 +14,7 @@ const workModeOptions = [
   { id: 3, name: "Hybrid" },
 ];
 
-export default function EditTimesheetDialog({
+export default function EditDialog({
   open,
   onClose,
   record,

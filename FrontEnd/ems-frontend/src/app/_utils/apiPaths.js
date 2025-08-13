@@ -23,7 +23,8 @@ export const API_PATHS = {
   EMPLOYEE: {
     ADD: (userId) => `/api/v1/shiftly/ems/employee/add/${userId}`,
     DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
-    GET_BY_USERID: (id) => `/api/v1/shiftly/ems/employee/${id}`
+    GET_BY_USERID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
+    GET_BY_DEPARTMENTID: (id) => `/api/v1/shiftly/ems/employee/by-department/${id}`
   },
   DEPARTMENTS: {
     ADD: "/api/v1/shiftly/ems/departments/add",
@@ -50,6 +51,18 @@ export const API_PATHS = {
     GET_BY_EMPLOYEEID: (id) => `/api/v1/shiftly/ems/timesheets/employee/${id}`,
     UPDATE: (id) => `/api/v1/shiftly/ems/timesheets/update/${id}`,
     DELETE: (id) => `/api/v1/shiftly/ems/timesheets/delete/${id}`,
+  },
+  LEAVES: {
+     //admin endpoints
+    GET_ALL: "/api/v1/shiftly/ems/leaves/all",
+    GET_BY_ADMINID: (id) => `/api/v1/shiftly/ems/leaves/admin/${id}`,
+    UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/leaves/status/${id}`,
+
+    //user endpoints
+    ADD: (id) => `/api/v1/shiftly/ems/leaves/add/${id}`,
+    GET_BY_EMPLOYEEID: (id) => `/api/v1/shiftly/ems/leaves/employee/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/leaves/delete/${id}`,
   },
   VACANCIES: {
     ADD: (id) => `/api/v1/shiftly/ems/vacancies/add/${id}`,
@@ -106,20 +119,6 @@ export const API_PATHS = {
     REJECT_CLAIM: (id) => `/api/v1/shiftly/ems/claims/reject/${id}`,
     GET_CLAIM_BY_ID: (id) => `/api/v1/shiftly/ems/claims/${id}`,
   },
-  LEAVES: {
-    GET_MY_LEAVES: "/api/v1/shiftly/ems/leaves/my",
-    UPDATE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/update/${id}`,
-    DELETE_MY_LEAVE: (id) => `/api/v1/shiftly/ems/leaves/delete/${id}`,
-    ADD_MY_LEAVE: "/api/v1/shiftly/ems/leaves/apply",
-    GET_ALL: "/api/v1/shiftly/ems/leaves/all",
-    // Admin endpoints - using the actual backend implementation
-    GET_ALL_LEAVES_ADMIN: "/api/v1/shiftly/ems/leaves/all",
-    UPDATE_LEAVE_STATUS: (id) => `/api/v1/shiftly/ems/leaves/status/${id}`,
-    // Legacy endpoints (for fallback)
-    APPROVE_LEAVE_ADMIN: (id) => `/api/v1/shiftly/ems/leaves/${id}/approve`,
-    REJECT_LEAVE_ADMIN: (id) => `/api/v1/shiftly/ems/leaves/${id}/reject`,
-  },
-
   LETTER: {
     GENERATE: "/api/v1/shiftly/ems/ai-letter/generate",
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,

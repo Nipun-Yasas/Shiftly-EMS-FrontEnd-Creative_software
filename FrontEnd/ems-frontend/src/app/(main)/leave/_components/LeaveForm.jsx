@@ -1,19 +1,17 @@
 "use client";
 
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { useEffect, useState } from "react";
+
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import InputItem from "../../../../_components/inputs/InputItem";
-import TextInput from "../../../../_components/inputs/TextInput";
-import SelectInput from "../../../../_components/inputs/SelectInput";
-import DateInput from "../../../../_components/inputs/DateInput";
-import axiosInstance from "../../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../../_utils/apiPaths";
+import InputItem from "../../../_components/inputs/InputItem";
+import TextInput from "../../../_components/inputs/TextInput";
+import SelectInput from "../../../_components/inputs/SelectInput";
+import DateInput from "../../../_components/inputs/DateInput";
 
 const leaveOptions = [
   { id: 1, name: "Casual Leave", value: "casual" },
@@ -23,34 +21,33 @@ const leaveOptions = [
   { id: 5, name: "Other", value: "other" },
 ];
 
-const LeaveForm = ({ onSubmitSuccess }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedLeave, setSelectedLeave] = useState(leaveOptions[0]);
-
-  const initialValues = {
-    leave_type: leaveOptions[0].value,
-    leave_from: "",
-    leave_to: "",
-    duration: "",
-    cover_person: "",
-    report_to: "",
-    reason: "",
-  };
-
+export default function LeaveForm({
+  edit = false,
+  handleSubmit,
+  initialValues,
+  employees,
+}) {
   const validationSchema = Yup.object({
-    leave_type: Yup.mixed()
+    leaveType: Yup.mixed()
       .transform((val) => (val && typeof val === "object" ? val.value : val))
       .required("Leave Type is required")
       .typeError("Leave Type must be a string"),
-    leave_from: Yup.date().required("Start date is required"),
-    leave_to: Yup.date()
-      .min(Yup.ref("leave_from"), "End date must be after start date")
+    leaveFrom: Yup.date().required("Start date is required"),
+    leaveTo: Yup.date()
+      .min(Yup.ref("leaveFrom"), "End date must be after start date")
       .required("End date is required"),
     duration: Yup.number()
       .typeError("Must be a number")
       .required("Duration is required"),
-    cover_person: Yup.string().required("Cover person is required"),
-    report_to: Yup.string().required("Report person is required"),
+    coverPersonId: Yup.mixed()
+      .transform((val) => {
+        if (val && typeof val === "object") {
+          return String(val.userId ?? val.id ?? val.employeeId ?? "");
+        }
+        return val;
+      })
+      .required("Cover person is required")
+      .typeError("Cover person must be a string"),
     reason: Yup.string().required("Leave reason is required"),
   });
 
@@ -68,52 +65,34 @@ const LeaveForm = ({ onSubmitSuccess }) => {
   return (
     <Box>
       <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={async (values, { resetForm }) => {
-          try {
-            setIsSubmitting(true);
-            // Ensure leaveType is a string, not an object
-            const leaveTypeValue =
-              typeof values.leave_type === "object" &&
-              values.leave_type !== null
-                ? values.leave_type.value
-                : values.leave_type;
-            const payload = {
-              leaveType: leaveTypeValue,
-              leaveFrom: values.leave_from,
-              leaveTo: values.leave_to,
-              duration: values.duration,
-              coverPersonName: values.cover_person,
-              reportToName: values.report_to,
-              reason: values.reason,
-              leaveStatus: "PENDING",
-            };
-            await axiosInstance.post(API_PATHS.LEAVES.ADD_MY_LEAVE, payload);
-            resetForm();
-            setSelectedLeave(leaveOptions[0]);
-            onSubmitSuccess();
-          } catch (error) {
-            console.error("Submit error:", error);
-          } finally {
-            setIsSubmitting(false);
+        initialValues={
+          initialValues || {
+            leaveType: null,
+            leaveFrom: "",
+            leaveTo: "",
+            duration: "",
+            coverPersonId: null,
+            reason: "",
           }
-        }}
+        }
+        validationSchema={validationSchema}
+        enableReinitialize={true}
+        onSubmit={handleSubmit}
       >
-        {({ values, setFieldValue }) => {
+        {({ values, setFieldValue, resetForm, isSubmitting }) => {
           useEffect(() => {
             const duration = calculateDuration(
-              values.leave_from,
-              values.leave_to
+              values.leaveFrom,
+              values.leaveTo
             );
             if (duration !== "") {
               setFieldValue("duration", duration);
             }
-          }, [values.leave_from, values.leave_to, setFieldValue]);
+          }, [values.leaveFrom, values.leaveTo, setFieldValue]);
 
           return (
             <Form>
-              <Stack spacing={2}>
+              <Stack spacing={3} sx={{ m: 3 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -124,7 +103,7 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                 >
                   <InputItem>
                     <SelectInput
-                      name="leave_type"
+                      name="leaveType"
                       label="Leave Type"
                       options={leaveOptions}
                       getOptionLabel={(option) => option.name || ""}
@@ -142,14 +121,14 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                 >
                   <InputItem>
                     <DateInput
-                      name="leave_from"
+                      name="leaveFrom"
                       disablePast={true}
                       label="Leave From"
                     />
                   </InputItem>
                   <InputItem>
                     <DateInput
-                      name="leave_to"
+                      name="leaveTo"
                       disablePast={true}
                       label="Leave To"
                     />
@@ -185,10 +164,21 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                   }}
                 >
                   <InputItem>
-                    <TextInput name="cover_person" label="Cover Person" />
-                  </InputItem>
-                  <InputItem>
-                    <TextInput name="report_to" label="Report to Person" />
+                    <SelectInput
+                      name="coverPersonId"
+                      label="Cover Person"
+                      options={employees}
+                      getOptionLabel={(option) =>
+                        option?.fullName ||
+                        option?.employeeName ||
+                        option?.name ||
+                        ""
+                      }
+                      isOptionEqualToValue={(a, b) =>
+                        (a?.userId ?? a?.id ?? a?.employeeId) ===
+                        (b?.userId ?? b?.id ?? b?.employeeId)
+                      }
+                    />
                   </InputItem>
                 </Box>
 
@@ -206,27 +196,29 @@ const LeaveForm = ({ onSubmitSuccess }) => {
                     display: "flex",
                     justifyContent: { xs: "center", md: "flex-end" },
                     gap: 2,
-                    pt: 2,
                   }}
-                ><Button
-                    type="reset"
+                >
+                  <Button
                     color="text.primary"
-                    onClick={() => {
-                      resetForm();
-                    }}
+                    type="button"
+                    onClick={() => resetForm()}
+                    disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
-                  
                   <Button
                     type="submit"
                     variant="contained"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Submitting..." : "Request Leave"}
+                    {isSubmitting
+                      ? edit
+                        ? "Updating..."
+                        : "Submitting..."
+                      : edit
+                        ? "Update"
+                        : "Submit"}
                   </Button>
-
-                  
                 </Box>
               </Stack>
             </Form>
@@ -235,6 +227,4 @@ const LeaveForm = ({ onSubmitSuccess }) => {
       </Formik>
     </Box>
   );
-};
-
-export default LeaveForm;
+}

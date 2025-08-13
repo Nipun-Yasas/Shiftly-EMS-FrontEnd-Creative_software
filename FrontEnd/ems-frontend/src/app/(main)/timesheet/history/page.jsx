@@ -37,7 +37,7 @@ import { UserContext } from "../../../context/UserContext";
 
 export default function TimeSheetHistory() {
   const [timeSheets, setTimeSheets] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [employee, setEmployee] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -94,7 +94,7 @@ export default function TimeSheetHistory() {
       );
     } catch (error) {
       showSnackbar(
-        error.response?.timeSheets?.message || "Failed to fetch Time Sheets",
+        error.response?.data?.message || "Failed to fetch Time Sheets",
         "error"
       );
       setTimeSheets([]);
@@ -386,7 +386,7 @@ export default function TimeSheetHistory() {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

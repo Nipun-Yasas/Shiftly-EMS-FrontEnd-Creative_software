@@ -5,19 +5,20 @@ import Box from "@mui/material/Box";
 
 import LeavesDataGrid from "./LeavesDataGrid";
 
-export default function LeavesTab({
+export default function PendingTab({
   leaves,
   loading,
-  onViewDetails,
-  onApprovalAction,
+  onViewClaim,
+  handleUpdateStatus,
 }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
       <LeavesDataGrid
-        loading={loading}
         leaves={leaves}
-        onViewDetails={onViewDetails}
-        onApprovalAction={onApprovalAction}
+        loading={loading}
+        onViewClaim={onViewClaim}
+        handleUpdateStatus={handleUpdateStatus}
+        showApprovalActions={true}
       />
     </Box>
   );

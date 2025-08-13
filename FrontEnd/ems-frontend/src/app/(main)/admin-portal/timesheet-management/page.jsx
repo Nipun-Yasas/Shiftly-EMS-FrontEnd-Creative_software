@@ -143,7 +143,7 @@ export default function page() {
               />
               <Tab label="Approved" />
               <Tab label="Rejected" />
-              <Tab label="All Claims" />
+              <Tab label="All Time Sheets" />
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
