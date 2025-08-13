@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material';
 import { useContext } from 'react';
 import Snackbar from '@mui/material/Snackbar';
@@ -9,7 +9,7 @@ import Alert from '@mui/material/Alert';
 import axiosInstance from '../../_utils/axiosInstance';
 import { API_PATHS } from '../../_utils/apiPaths';
 import { UserContext } from '../../context/UserContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUserData, saveUserData } from '../../_utils/localStorageUtils';
 
 import LetterTypeSelector from './components/LetterTypeSelector';
@@ -19,6 +19,7 @@ import LetterGenerationInterface from './components/LetterGenerationInterface';
 const RequestLetter = () => {
   const theme = useTheme();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useContext(UserContext);
   const [currentStep, setCurrentStep] = useState('selection'); // 'selection', 'form', 'generation' (admins only)
   const [selectedLetterType, setSelectedLetterType] = useState(null);
@@ -98,6 +99,46 @@ const RequestLetter = () => {
     setSelectedLetterType(null);
     setFormData(null);
   };
+
+  // Reverse map backend enum to display name
+  const mapEnumToLetterTypeName = (enumVal) => {
+    switch ((enumVal || '').toString()) {
+      case 'EPF_ETF_NAME_CHANGE_LETTER': return 'EPF/ETF Name Change Letter';
+      case 'SKILL_ASSESSMENT_LETTER': return 'Letter for Skill Assessment';
+      case 'SALARY_UNDERTAKING_LETTER': return 'Salary Undertaking Letter';
+      case 'SALARY_CONFIRMATION_LETTER': return 'Salary Confirmation Letter';
+      case 'EMPLOYMENT_CONFIRMATION_LETTER': return 'Employment Confirmation Letter';
+      default: return enumVal || '';
+    }
+  };
+
+  // If requestId is provided (from admin list), and user is admin, jump directly to generation UI
+  useEffect(() => {
+    const requestId = searchParams?.get('requestId');
+    if (!requestId) return;
+    const roles = (user?.roles || []).map(r => r.toLowerCase());
+    const isAdmin = roles.includes('admin') || roles.includes('super_admin');
+    if (!isAdmin) {
+      // Non-admins go to submit flow
+      router.replace('/letter/submit');
+      return;
+    }
+    (async () => {
+      try {
+        const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.GET_BY_ID(requestId));
+        const data = res?.data?.data || res?.data || {};
+        const typeName = mapEnumToLetterTypeName(data.letterType || data.type);
+        const fields = data.fields || {};
+        if (!typeName) throw new Error('Invalid letter type');
+        setSelectedLetterType(typeName);
+        setFormData(fields);
+        setCurrentStep('generation');
+      } catch (e) {
+        setSnackbar({ open: true, message: e?.response?.data?.message || e.message || 'Failed to load request', severity: 'error' });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <>

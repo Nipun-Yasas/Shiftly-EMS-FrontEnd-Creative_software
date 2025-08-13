@@ -15,6 +15,8 @@ import Alert from "@mui/material/Alert";
 import SendIcon from "@mui/icons-material/Send";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
  
 
 import dayjs from "dayjs";
@@ -97,19 +99,20 @@ export default function LettersAdminPage() {
 		}
 	};
 
-	const handleGenerate = async (row) => {
-		try {
-			setSendingId(row.id);
-			const res = await axiosInstance.post(API_PATHS.LETTER.GENERATE_FROM_REQUEST(row.id));
-			const html = res.data?.letterHtml || res.data?.data?.letterHtml;
-			if (!html) throw new Error('No letter HTML returned');
-			setRows(prev => prev.map(r => r.id === row.id ? { ...r, letterHtml: html, status: 'generated' } : r));
-			showSnackbar('Letter generated');
-		} catch (e) {
-			showSnackbar(e?.response?.data?.message || e.message || 'Failed to generate', 'error');
-		} finally {
-			setSendingId(null);
-		}
+	// Redirect to centralized letter generation page with requestId
+	const handleGenerate = (row) => {
+		router.push(`/admin-portal/letters/generate/${row.id}`);
+	};
+
+	// For now, redirect to the same page for updating (admin can adjust in generator)
+	const handleUpdate = (row) => {
+		router.push(`/admin-portal/letters/generate/${row.id}`);
+	};
+
+	// Local reject (no backend endpoint defined in API_PATHS). Optimistic UI only.
+	const handleReject = (row) => {
+		setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, status: 'rejected' } : r)));
+		showSnackbar('Request rejected');
 	};
 
 	const columns = [
@@ -139,29 +142,39 @@ export default function LettersAdminPage() {
 		{
 			field: "actions",
 			headerName: "Actions",
-			width: 200,
+			width: 280,
 			headerClassName: "last-column",
 			sortable: false,
 			renderCell: (params) => (
 				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="Generate from request">
+					<Tooltip title="Generate">
 						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleGenerate(params.row)}
-								disabled={sendingId === params.row?.id}
-								color="primary"
-							>
+							<IconButton size="small" onClick={() => handleGenerate(params.row)} color="primary">
 								<ContentPasteGoIcon />
 							</IconButton>
 						</span>
 					</Tooltip>
+					<Tooltip title="Update">
+						<span>
+							<IconButton size="small" onClick={() => handleUpdate(params.row)} color="info">
+								<EditIcon />
+							</IconButton>
+						</span>
+					</Tooltip>
+					<Tooltip title="Reject">
+						<span>
+							<IconButton size="small" onClick={() => handleReject(params.row)} sx={{ color: 'error.main' }}>
+								<CloseIcon />
+							</IconButton>
+						</span>
+					</Tooltip>
+					{/* Optional: keep preview and send when content exists */}
 					<Tooltip title="Preview">
 						<span>
 							<IconButton
 								size="small"
 								onClick={() => window.open().document.write(params.row.letterHtml || '<p>No content</p>')}
-								color="info"
+								color="default"
 							>
 								<VisibilityIcon />
 							</IconButton>

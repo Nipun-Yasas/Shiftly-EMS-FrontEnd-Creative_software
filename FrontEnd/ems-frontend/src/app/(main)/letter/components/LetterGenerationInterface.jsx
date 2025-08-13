@@ -31,7 +31,7 @@ import {
   Print
 } from '@mui/icons-material';
 import { BASE_URL, API_PATHS } from '../../../_utils/apiPaths';
-// import { Editor } from '@tinymce/tinymce-react';
+import { Editor } from '@tinymce/tinymce-react';
 
 
 // Helper to split plain text into page-sized chunks

@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
@@ -21,6 +24,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
  
 import SendIcon from "@mui/icons-material/Send";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 import dayjs from "dayjs";
 
@@ -132,8 +136,6 @@ export default function LetterHistory() {
 
 	useEffect(() => {
 		loadHistory();
-		const interval = setInterval(() => loadHistory(true), 30000);
-		return () => clearInterval(interval);
 	}, []);
 
 	const handleDelete = (row) => {
@@ -170,6 +172,10 @@ export default function LetterHistory() {
 		URL.revokeObjectURL(url);
 	};
 
+	const handleManualRefresh = () => {
+		loadHistory(false);
+	};
+
 	const handleSend = async (row) => {
 		if (!row.recipientEmail) {
 			showSnackbar("Recipient email not set for this letter", "error");
@@ -197,31 +203,46 @@ export default function LetterHistory() {
 	};
 
 	const columns = [
-		{ field: "letterType", headerName: "Letter Type", width: 220 },
 		{
 			field: "requestedAt",
 			headerName: "Requested On",
-			width: 150,
+			width: 140,
+			valueGetter: (params) => params.value || params.row?.requestedAt || null,
 			renderCell: (params) => (params.value ? dayjs(params.value).format("MMM DD, YYYY") : "-"),
+			sortComparator: (a, b) => {
+				const ta = a ? new Date(a).getTime() : 0;
+				const tb = b ? new Date(b).getTime() : 0;
+				return ta - tb;
+			},
 		},
-		{ field: "recipientEmail", headerName: "Recipient", width: 200 },
+		{ field: "letterType", headerName: "Letter Type", width: 240, flex: 1 },
+		{
+			field: "recipientEmail",
+			headerName: "Recipient",
+			width: 220,
+			renderCell: (params) => params.value || "-",
+		},
 		{
 			field: "status",
 			headerName: "Status",
-			width: 130,
-			renderCell: (params) => (
-				<Chip
-					icon={getStatusIcon(params.value)}
-					label={(params.value || "generated").toString().charAt(0).toUpperCase() + (params.value || "generated").toString().slice(1)}
-					color={getStatusColor(params.value || "pending")}
-					size="small"
-				/>
-			),
+			width: 140,
+			renderCell: (params) => {
+				const val = (params.value || "").toString().toLowerCase();
+				const label = val ? val.charAt(0).toUpperCase() + val.slice(1) : "-";
+				return (
+					<Chip
+						icon={getStatusIcon(val)}
+						label={label}
+						color={getStatusColor(val || "pending")}
+						size="small"
+					/>
+				);
+			},
 		},
 		{
 			field: "actions",
 			headerName: "Actions",
-			width: 180,
+			width: 200,
 			headerClassName: "last-column",
 			sortable: false,
 			renderCell: (params) => (
@@ -236,7 +257,7 @@ export default function LetterHistory() {
 							<IconButton
 								size="small"
 								onClick={() => handleDownload(params.row)}
-								disabled={!params.row.letterHtml}
+								disabled={!params.row?.letterHtml}
 								color="info"
 							>
 								<DownloadIcon />
@@ -248,7 +269,7 @@ export default function LetterHistory() {
 							<IconButton
 								size="small"
 								onClick={() => handleSend(params.row)}
-								disabled={!params.row.recipientEmail || !params.row.letterHtml}
+								disabled={!params.row?.recipientEmail || !params.row?.letterHtml}
 								color="success"
 							>
 								<SendIcon />
@@ -268,6 +289,20 @@ export default function LetterHistory() {
 	return (
 		<Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
 			<Box sx={{ width: "100%", p: 5 }}>
+				{/* Top-right refresh (align like timesheet history) */}
+				<Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+					<Tooltip title="Refresh Letters">
+						<Button
+							variant="outlined"
+							onClick={handleManualRefresh}
+							size="small"
+							startIcon={<RefreshIcon />}
+							disabled={loading}
+						>
+							Refresh
+						</Button>
+					</Tooltip>
+				</Box>
 				{/* Stats and actions */}
 				<Box
 					sx={{
@@ -279,30 +314,59 @@ export default function LetterHistory() {
 						justifyContent: "space-between",
 					}}
 				>
-					<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#e3f2fd", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#1976d2" }}>{stats.total}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Total Letters</div>
-						</Box>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#fff3e0", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#f57c00" }}>{stats.generated}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Generated</div>
-						</Box>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#dcedc8", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#388e3c" }}>{stats.sent}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Sent</div>
-						</Box>
-					</Box>
+					<Grid container spacing={2} my={1} sx={{ alignItems: 'center' }}>
+						{[
+							{ label: "Total Letters", color: "info", value: stats.total },
+							{ label: "Generated", color: "warning", value: stats.generated },
+							{ label: "Sent", color: "success", value: stats.sent },
+						].map((card, index) => (
+							<Grid item key={index}>
+								<Card
+									sx={{
+										minWidth: { xs: "125px", sm: "125px", lg: "200px" },
+										maxHeight: "60px",
+										textAlign: "center",
+										bgcolor: `${card.color}.light`,
+										borderRadius: 10,
+									}}
+									elevation={0}
+								>
+									<CardContent
+										sx={{
+											gap: 2,
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+											py: 1.25,
+										}}
+									>
+										<Typography
+											variant="h6"
+											sx={{
+												fontWeight: "bold",
+												color: `${card.color}.dark`,
+												fontSize: "1.2rem",
+											}}
+										>
+											{card.value}
+										</Typography>
+										<Typography
+											sx={{
+												fontSize: "0.85rem",
+												color: `${card.color}.contrastText`,
+											}}
+										>
+											{card.label}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+						))}
+					</Grid>
 
 					{/* Right side actions */}
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-						<Typography variant="caption" color="textSecondary">
-							Auto-refresh: 30s
-						</Typography>
-                        
-						<Box sx={{ display: "flex", gap: 1, ml: 2 }}>
-							<Button variant="contained" onClick={() => router.push("/letter")}>New Letter</Button>
-						</Box>
+						<Button variant="contained" onClick={() => router.push("/letter/submit")}>New Letter</Button>
 					</Box>
 				</Box>
 
