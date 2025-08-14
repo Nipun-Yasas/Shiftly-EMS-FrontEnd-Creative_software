@@ -207,6 +207,19 @@ export default function page() {
       ),
     },
     {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
+      ),
+    },
+    {
       field: "fileUrl",
       headerName: "Resume file",
       width: 130,
