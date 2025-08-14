@@ -12,9 +12,11 @@ import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import SendIcon from "@mui/icons-material/Send";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+// Removed preview/send actions per requirements
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
+// Removed update/reject actions per requirements
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
+import MarkEmailUnreadIcon from "@mui/icons-material/MarkEmailUnread";
  
 
 import dayjs from "dayjs";
@@ -31,25 +33,26 @@ export default function LettersAdminPage() {
 	// In absence of a backend list endpoint, keep an empty set; wire up later
 	const [rows, setRows] = useState([]);
 	const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-	const [sendingId, setSendingId] = useState(null);
 	const [loading, setLoading] = useState(false);
+    const [updatingId, setUpdatingId] = useState(null);
     
 
 	const showSnackbar = (message, severity = "success") => {
 		setSnackbar({ open: true, message, severity });
 	};
 
-	const mapToRow = (e, idx) => ({
-		id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
-		name: e.employeeName || e.name || e.userName || "",
-		email: e.email || e.employeeEmail || e.recipientEmail || "",
-		department: e.department || e.team || "",
-		letterType: e.letterType || e.type || "",
-		requestedAt: e.requestedAt || e.createdAt || e.date || null,
-		status: (e.status || "pending").toString().toLowerCase(),
-		letterHtml: e.letterHtml || e.content || "",
-		fields: e.fields || {},
-	});
+    const mapToRow = (e, idx) => ({
+        id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
+        // Use DTO-provided fields first
+        name: e.employeeName || e.name || e.userName || e.employee_name || "",
+        employeeName: e.employeeName || e.name || e.userName || e.employee_name || "",
+        department: e.departmentName || e.department || e.team || "",
+        letterType: e.letterType || e.type || "",
+        requestedAt: e.requestedAt || e.requested_at || e.createdAt || e.date || null,
+        status: (e.status || "unread").toString().toLowerCase(),
+        letterHtml: e.letterHtml || e.content || "",
+        fields: e.fields || {},
+    });
 
 	const fetchRequests = async (silent = false) => {
 		if (!silent) setLoading(true);
@@ -66,55 +69,34 @@ export default function LettersAdminPage() {
 		}
 	};
 
+	const handleUpdateStatus = async (row, status) => {
+		try {
+			setUpdatingId(row.id);
+			await axiosInstance.put(`${API_PATHS.LETTER.REQUEST.UPDATE_STATUS(row.id)}?status=${encodeURIComponent(status)}`);
+			setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, status: status.toString().toLowerCase() } : r)));
+			showSnackbar(`Status updated to ${status}`);
+		} catch (error) {
+			showSnackbar(error?.response?.data?.message || "Failed to update status", "error");
+		} finally {
+			setUpdatingId(null);
+		}
+	};
+
 	useEffect(() => {
 		fetchRequests();
 		const i = setInterval(() => fetchRequests(true), 30000);
 		return () => clearInterval(i);
 	}, []);
 
-	// Placeholder "send" using known API path; adjust payload to backend contract when available
-	const handleSend = async (row) => {
-		try {
-			setSendingId(row.id);
-			// Minimal payload example; update to match backend expectations
-			const payload = {
-				recipient: row.email || row.recipientEmail,
-				subject: `${row.letterType || "Letter"} - ${row.name || row.employeeName || "Employee"}`,
-				content: row.letterHtml || "", // Ensure you pass the generated HTML/content when available
-			};
-			if (!payload.recipient) {
-				showSnackbar("Recipient email missing for this row", "error");
-				return;
-			}
-			await axiosInstance.post(API_PATHS.LETTER.SEND, payload);
-			// Optimistic UI update of status if rows come from state
-			setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, status: "sent" } : r)));
-			showSnackbar("Letter sent successfully");
-		} catch (error) {
-			showSnackbar(error?.response?.data?.message || "Failed to send letter", "error");
-		} finally {
-			setSendingId(null);
-		}
+	// Redirect to centralized letter generation page with requestId
+	const handleGenerate = (row) => {
+		router.push(`/admin-portal/letters/generate/${row.id}`);
 	};
 
-	const handleGenerate = async (row) => {
-		try {
-			setSendingId(row.id);
-			const res = await axiosInstance.post(API_PATHS.LETTER.GENERATE_FROM_REQUEST(row.id));
-			const html = res.data?.letterHtml || res.data?.data?.letterHtml;
-			if (!html) throw new Error('No letter HTML returned');
-			setRows(prev => prev.map(r => r.id === row.id ? { ...r, letterHtml: html, status: 'generated' } : r));
-			showSnackbar('Letter generated');
-		} catch (e) {
-			showSnackbar(e?.response?.data?.message || e.message || 'Failed to generate', 'error');
-		} finally {
-			setSendingId(null);
-		}
-	};
+	// No separate update/reject actions in simplified UI
 
 	const columns = [
-		{ field: "name", headerName: "Employee", width: 160, valueGetter: (p) => p.row?.name || p.row?.employeeName || "" },
-		{ field: "email", headerName: "Email", width: 180 },
+        { field: "employeeName", headerName: "Employee", width: 180, valueGetter: (p) => p.row?.employeeName || p.row?.name || "" },
 		{ field: "department", headerName: "Department", width: 140 },
 		{ field: "letterType", headerName: "Letter Type", width: 220 },
 		{
@@ -130,8 +112,8 @@ export default function LettersAdminPage() {
 			renderCell: (params) => (
 				<Chip
 					icon={getStatusIcon(params.value)}
-					label={(params.value || "pending").toString().charAt(0).toUpperCase() + (params.value || "pending").toString().slice(1)}
-					color={getStatusColor(params.value || "pending")}
+                    label={(params.value || "unread").toString().charAt(0).toUpperCase() + (params.value || "unread").toString().slice(1)}
+                    color={getStatusColor(params.value || "unread")}
 					size="small"
 				/>
 			),
@@ -139,48 +121,48 @@ export default function LettersAdminPage() {
 		{
 			field: "actions",
 			headerName: "Actions",
-			width: 200,
+            width: 220,
 			headerClassName: "last-column",
 			sortable: false,
-			renderCell: (params) => (
-				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="Generate from request">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleGenerate(params.row)}
-								disabled={sendingId === params.row?.id}
-								color="primary"
-							>
-								<ContentPasteGoIcon />
-							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Preview">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => window.open().document.write(params.row.letterHtml || '<p>No content</p>')}
-								color="info"
-							>
-								<VisibilityIcon />
-							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Send">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleSend(params.row)}
-								disabled={!params.row?.email || !params.row?.letterHtml || sendingId === params.row?.id}
-								color="success"
-							>
-								<SendIcon />
-							</IconButton>
-						</span>
-					</Tooltip>
-				</Box>
-			),
+            renderCell: (params) => (
+                <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                    <Tooltip title="Generate">
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleGenerate(params.row)}
+                                color="primary"
+                            >
+                                <ContentPasteGoIcon />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="Mark as Read">
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleUpdateStatus(params.row, 'READ')}
+                                disabled={updatingId === params.row?.id}
+                                color="secondary"
+                            >
+                                <MarkEmailReadIcon />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="Mark as Unread">
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleUpdateStatus(params.row, 'UNREAD')}
+                                disabled={updatingId === params.row?.id}
+                                color="default"
+                            >
+                                <MarkEmailUnreadIcon />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Box>
+            ),
 		},
 	];
 

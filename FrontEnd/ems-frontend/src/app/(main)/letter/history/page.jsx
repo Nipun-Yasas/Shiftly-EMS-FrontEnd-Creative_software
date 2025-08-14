@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
@@ -21,6 +24,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
  
 import SendIcon from "@mui/icons-material/Send";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 import dayjs from "dayjs";
 
@@ -29,14 +33,27 @@ import { getStatusColor, getStatusIcon } from "../../admin-portal/_helpers/color
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { getUserData, saveUserData, isDataFresh } from "../../../_utils/localStorageUtils";
+import { UserContext } from "../../../context/UserContext";
+import useLetterRequests from "../../../_hooks/useLetterRequests";
 
 // Local storage key used to cache letter history per user (fallback/cache)
 const LS_KEY = "letterHistory";
 
 export default function LetterHistory() {
 	const router = useRouter();
+	const { user } = useContext(UserContext);
+	const { 
+		letterRequests, 
+		loading, 
+		error, 
+		getLetterRequestsByEmployee, 
+		deleteLetterRequest, 
+		updateLetterRequest,
+		refreshLetterRequests,
+		clearError 
+	} = useLetterRequests();
+	
 	const [rows, setRows] = useState([]);
-	const [loading, setLoading] = useState(false);
 	const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 	const [toDelete, setToDelete] = useState(null);
@@ -46,20 +63,107 @@ export default function LetterHistory() {
 	const showSnackbar = (message, severity = "success") => setSnackbar({ open: true, message, severity });
 
 	const mapEntriesToRows = (entries = []) => {
+		console.log("Backend data received:", entries);
 		return (entries || [])
-			.map((e, idx) => ({
-				id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
-				letterType: e.letterType || e.type || "",
-				requestedAt: e.requestedAt || e.createdAt || e.date || null,
-				recipientEmail: e.recipientEmail || e.email || "",
-				status: (e.status || "generated").toString().toLowerCase(),
-				letterHtml: e.letterHtml || e.content || "",
-				fields: e.fields || {},
-			}))
+			.filter(e => e && typeof e === 'object') // Filter out null/undefined entries
+			.map((e, idx) => {
+				console.log(`Processing entry ${idx}:`, e);
+				console.log(`Available fields in entry:`, Object.keys(e));
+				console.log(`RequestedAt field:`, e.requestedAt);
+				console.log(`Requested_at field:`, e.requested_at);
+				
+				// Parse fieldsJson if it exists
+				let parsedFields = {};
+				try {
+					if (e.fieldsJson && typeof e.fieldsJson === 'string') {
+						parsedFields = JSON.parse(e.fieldsJson);
+					} else if (e.fields && typeof e.fields === 'object') {
+						parsedFields = e.fields;
+					}
+				} catch (jsonError) {
+					console.warn('Failed to parse fieldsJson:', jsonError);
+					parsedFields = e.fields || {};
+				}
+
+				const mappedRow = {
+					id: e.id ?? e.requestId ?? e.createdAt ?? `temp-${idx + 1}`,
+					letterType: e.letterType || e.type || "",
+					// Handle LocalDateTime from backend - it might come as various formats:
+					// 1. ISO string with 'T': "2025-08-14T15:15:25.545188"
+					// 2. Space separated: "2025-08-14 15:15:25.545188"
+					// 3. Array format: [2025, 8, 14, 15, 15, 25, 545188000] (some Java serializers)
+					requestedAt: (() => {
+						const timestamp = e.requestedAt || e.requested_at || e.requestedDate || e.createdAt || e.created_at || e.timestamp;
+						
+						if (!timestamp) {
+							console.warn(`No timestamp found for entry ${idx}. Using current time.`);
+							return new Date().toISOString();
+						}
+						
+						// Handle array format from LocalDateTime serialization
+						if (Array.isArray(timestamp) && timestamp.length >= 6) {
+							const [year, month, day, hour, minute, second, nano] = timestamp;
+							const date = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+							console.log(`Converted array timestamp:`, timestamp, 'to:', date.toISOString());
+							return date.toISOString();
+						}
+						
+						// Handle string formats
+						if (typeof timestamp === 'string') {
+							console.log(`Processing string timestamp:`, timestamp);
+							return timestamp;
+						}
+						
+						console.log(`Using timestamp as-is:`, timestamp);
+						return timestamp;
+					})(),
+					recipientEmail: parsedFields.recipientEmail || parsedFields.email || e.recipientEmail || e.email || "",
+					status: (e.status || "pending").toString().toLowerCase(),
+					letterHtml: e.generatedLetterHtml || e.letterHtml || e.content || "",
+					fields: parsedFields,
+					// Additional fields from backend
+					employeeId: e.employeeId,
+					departmentName: e.departmentName,
+					employeeName: e.employeeName,
+					fieldsJson: e.fieldsJson,
+				};
+				
+				console.log(`Mapped row ${idx}:`, mappedRow);
+				return mappedRow;
+			})
+			.filter(row => row.id != null) // Ensure all rows have valid IDs
 			.sort(
-				(a, b) =>
-					(b.requestedAt ? new Date(b.requestedAt).getTime() : 0) -
-					(a.requestedAt ? new Date(a.requestedAt).getTime() : 0)
+				(a, b) => {
+					// Handle LocalDateTime format from backend
+					const getTimestamp = (dateVal) => {
+						if (!dateVal) return 0;
+						try {
+							// Handle array format from LocalDateTime serialization
+							if (Array.isArray(dateVal) && dateVal.length >= 6) {
+								const [year, month, day, hour, minute, second, nano] = dateVal;
+								return new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000)).getTime();
+							}
+							
+							// Handle string format
+							if (typeof dateVal === 'string') {
+								// Convert space to 'T' for ISO compatibility if needed
+								let isoStr = dateVal;
+								if (dateVal.includes(' ') && !dateVal.includes('T')) {
+									isoStr = dateVal.replace(' ', 'T');
+								}
+								return new Date(isoStr).getTime();
+							}
+							
+							// Handle other formats
+							return new Date(dateVal).getTime();
+						} catch (error) {
+							console.warn("Error converting timestamp in sort:", dateVal, error);
+							return 0;
+						}
+					};
+					
+					return getTimestamp(b.requestedAt) - getTimestamp(a.requestedAt);
+				}
 			);
 	};
 
@@ -90,7 +194,7 @@ export default function LetterHistory() {
 			if (newRow && oldRow.status !== newRow.status) {
 				updatedIds.add(newRow.id);
 				const message = `Letter status updated to ${newRow.status}`;
-				const sev = newRow.status === "sent" ? "success" : "info";
+				const sev = ["sent","read","unread","approved","rejected"].includes((newRow.status||'').toString().toLowerCase()) ? "success" : "info";
 				showSnackbar(message, sev);
 			}
 		});
@@ -101,8 +205,10 @@ export default function LetterHistory() {
 	};
 
 	const loadHistory = async (silent = false) => {
-		if (!silent) setLoading(true);
 		try {
+			clearError();
+			
+			// Use cached data for silent refreshes if recent
 			const useCache = silent && isDataFresh(LS_KEY, 30 * 1000);
 			if (useCache) {
 				const cached = getUserData(LS_KEY, []);
@@ -111,43 +217,72 @@ export default function LetterHistory() {
 				updateStats(mapped);
 				return;
 			}
-			const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.MY);
-			const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-			const mapped = mapEntriesToRows(list);
+
+			// Get employee ID from user context
+			const employeeId = user?.employeeId || user?.id;
+			if (!employeeId) {
+				showSnackbar("Employee ID not found. Please login again.", "error");
+				return;
+			}
+
+			// Fetch from backend using new endpoint
+			const data = await getLetterRequestsByEmployee(employeeId);
+			console.log("Raw backend response:", data);
+			const mapped = mapEntriesToRows(data);
+			console.log("Final mapped rows:", mapped);
+			
 			if (silent && rows.length > 0) {
 				checkForStatusUpdates(rows, mapped);
 			}
+			
 			setRows(mapped);
 			updateStats(mapped);
 			saveHistory(mapped);
 		} catch (e) {
+			console.error('Failed to load letter history:', e);
+			// Fallback to cached data
 			const cached = getUserData(LS_KEY, []);
 			const mapped = mapEntriesToRows(cached);
 			setRows(mapped);
 			updateStats(mapped);
-		} finally {
-			if (!silent) setLoading(false);
+			
+			if (!silent) {
+				showSnackbar(error || "Failed to load letter history", "error");
+			}
 		}
 	};
 
 	useEffect(() => {
-		loadHistory();
-		const interval = setInterval(() => loadHistory(true), 30000);
-		return () => clearInterval(interval);
-	}, []);
+		if (user) {
+			loadHistory();
+		}
+	}, [user]);
+
+	// Update rows when letterRequests changes
+	useEffect(() => {
+		if (letterRequests && letterRequests.length > 0) {
+			const mapped = mapEntriesToRows(letterRequests);
+			setRows(mapped);
+			updateStats(mapped);
+		}
+	}, [letterRequests]);
 
 	const handleDelete = (row) => {
 		setToDelete(row);
 		setDeleteConfirmOpen(true);
 	};
 
-	const confirmDelete = () => {
-		const updated = rows.filter((r) => r.id !== toDelete.id);
-		setRows(updated);
-		saveHistory(updated);
-		updateStats(updated);
-		setDeleteConfirmOpen(false);
-		setToDelete(null);
+	const confirmDelete = async () => {
+		try {
+			await deleteLetterRequest(toDelete.id);
+			showSnackbar("Letter request deleted successfully", "success");
+		} catch (e) {
+			console.error('Failed to delete letter request:', e);
+			showSnackbar(error || "Failed to delete letter request", "error");
+		} finally {
+			setDeleteConfirmOpen(false);
+			setToDelete(null);
+		}
 	};
 
 	const handleView = (row) => {
@@ -159,16 +294,41 @@ export default function LetterHistory() {
 			showSnackbar("No content to download", "warning");
 			return;
 		}
+		
+		// Handle LocalDateTime format for filename
+		let formattedDate = "unknown";
+		try {
+			if (row.requestedAt) {
+				let dateStr = row.requestedAt;
+				if (typeof dateStr === 'string' && dateStr.includes(' ') && !dateStr.includes('T')) {
+					dateStr = dateStr.replace(' ', 'T');
+				}
+				formattedDate = dayjs(dateStr).format("YYYYMMDD_HHmm");
+			}
+		} catch (error) {
+			console.warn("Error formatting date for filename:", row.requestedAt, error);
+		}
+		
 		const blob = new Blob([row.letterHtml], { type: "text/html;charset=utf-8" });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");
 		a.href = url;
-		a.download = `${(row.letterType || "letter").replace(/\s+/g, "_")}_${dayjs(row.requestedAt).format("YYYYMMDD_HHmm")}.html`;
+		a.download = `${(row.letterType || "letter").replace(/\s+/g, "_")}_${formattedDate}.html`;
 		document.body.appendChild(a);
 		a.click();
 		a.remove();
 		URL.revokeObjectURL(url);
 	};
+
+	const handleManualRefresh = () => {
+		loadHistory(false);
+	};
+
+	// Polling to keep read status in sync when admin updates
+	useEffect(() => {
+		const interval = setInterval(() => loadHistory(true), 15000);
+		return () => clearInterval(interval);
+	}, []);
 
 	const handleSend = async (row) => {
 		if (!row.recipientEmail) {
@@ -197,77 +357,196 @@ export default function LetterHistory() {
 	};
 
 	const columns = [
-		{ field: "letterType", headerName: "Letter Type", width: 220 },
 		{
 			field: "requestedAt",
 			headerName: "Requested On",
-			width: 150,
-			renderCell: (params) => (params.value ? dayjs(params.value).format("MMM DD, YYYY") : "-"),
+			width: 140,
+			valueGetter: (params) => {
+				if (!params || !params.row) return null;
+				
+				const timestamp = params.row.requestedAt ||
+					params.row.requested_at ||
+					params.row.requestedDate ||
+					params.row.createdAt ||
+					params.row.created_at ||
+					params.row.timestamp ||
+					params.value || null;
+				
+				console.log("Column valueGetter - Timestamp value:", timestamp, "for row:", params.row.id);
+				console.log("Column valueGetter - Full row data:", params.row);
+				
+				// Handle array format from LocalDateTime serialization
+				if (Array.isArray(timestamp) && timestamp.length >= 6) {
+					const [year, month, day, hour, minute, second, nano] = timestamp;
+					const date = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+					console.log("Column valueGetter - Converted array to date:", date.toISOString());
+					return date.toISOString();
+				}
+				
+				return timestamp;
+			},
+			renderCell: (params) => {
+				const val = params.value;
+				if (!val) return "-";
+				
+				try {
+					let dateToFormat;
+					
+					// Handle array format from LocalDateTime serialization
+					if (Array.isArray(val) && val.length >= 6) {
+						const [year, month, day, hour, minute, second, nano] = val;
+						dateToFormat = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+						console.log("RenderCell - Converted array to date:", dateToFormat);
+					} else if (typeof val === 'string') {
+						// Handle LocalDateTime format from Java backend (2025-08-14 15:15:25.545188)
+						// Convert space to 'T' to make it ISO compatible if needed
+						let dateStr = val;
+						if (val.includes(' ') && !val.includes('T')) {
+							dateStr = val.replace(' ', 'T');
+						}
+						dateToFormat = new Date(dateStr);
+						console.log("RenderCell - Processing string:", val, "converted to:", dateToFormat);
+					} else {
+						dateToFormat = new Date(val);
+					}
+					
+					const date = dayjs(dateToFormat);
+					return date.isValid() ? date.format("MMM DD, YYYY") : String(val);
+				} catch (error) {
+					console.warn("Error parsing date:", val, error);
+					return String(val) || "-";
+				}
+			},
+			sortComparator: (a, b) => {
+				if (!a && !b) return 0;
+				if (!a) return 1;
+				if (!b) return -1;
+				
+				try {
+					const convertToTimestamp = (val) => {
+						// Handle array format from LocalDateTime serialization
+						if (Array.isArray(val) && val.length >= 6) {
+							const [year, month, day, hour, minute, second, nano] = val;
+							return new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000)).getTime();
+						}
+						
+						// Handle string format
+						if (typeof val === 'string') {
+							let dateStr = val;
+							if (val.includes(' ') && !val.includes('T')) {
+								dateStr = val.replace(' ', 'T');
+							}
+							return new Date(dateStr).getTime();
+						}
+						
+						// Handle other formats
+						return new Date(val).getTime();
+					};
+					
+					const ta = convertToTimestamp(a);
+					const tb = convertToTimestamp(b);
+					return ta - tb;
+				} catch (error) {
+					console.warn("Error comparing dates:", a, b, error);
+					return 0;
+				}
+			},
 		},
-		{ field: "recipientEmail", headerName: "Recipient", width: 200 },
+		{ field: "letterType", headerName: "Letter Type", width: 240, flex: 1 },
+		{
+			field: "recipientEmail",
+			headerName: "Recipient",
+			width: 220,
+			renderCell: (params) => {
+				if (!params || !params.row) return "-";
+				return params.value || "-";
+			},
+		},
 		{
 			field: "status",
 			headerName: "Status",
-			width: 130,
-			renderCell: (params) => (
-				<Chip
-					icon={getStatusIcon(params.value)}
-					label={(params.value || "generated").toString().charAt(0).toUpperCase() + (params.value || "generated").toString().slice(1)}
-					color={getStatusColor(params.value || "pending")}
-					size="small"
-				/>
-			),
+			width: 140,
+			renderCell: (params) => {
+				if (!params || !params.row) return <Chip label="-" size="small" />;
+				const val = (params.value || "").toString().toLowerCase();
+				const label = val ? val.charAt(0).toUpperCase() + val.slice(1) : "-";
+				return (
+					<Chip
+						icon={getStatusIcon(val)}
+						label={label}
+						color={getStatusColor(val || "pending")}
+						size="small"
+					/>
+				);
+			},
 		},
 		{
 			field: "actions",
 			headerName: "Actions",
-			width: 180,
+			width: 200,
 			headerClassName: "last-column",
 			sortable: false,
-			renderCell: (params) => (
-				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="View">
-						<IconButton size="small" onClick={() => handleView(params.row)} color="primary">
-							<VisibilityIcon />
-						</IconButton>
-					</Tooltip>
-					<Tooltip title="Download">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleDownload(params.row)}
-								disabled={!params.row.letterHtml}
-								color="info"
-							>
-								<DownloadIcon />
+			renderCell: (params) => {
+				if (!params || !params.row) return null;
+				return (
+					<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+						<Tooltip title="View">
+							<IconButton size="small" onClick={() => handleView(params.row)} color="primary">
+								<VisibilityIcon />
 							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Send">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleSend(params.row)}
-								disabled={!params.row.recipientEmail || !params.row.letterHtml}
-								color="success"
-							>
-								<SendIcon />
+						</Tooltip>
+						<Tooltip title="Download">
+							<span>
+								<IconButton
+									size="small"
+									onClick={() => handleDownload(params.row)}
+									disabled={!params.row?.letterHtml}
+									color="info"
+								>
+									<DownloadIcon />
+								</IconButton>
+							</span>
+						</Tooltip>
+						<Tooltip title="Send">
+							<span>
+								<IconButton
+									size="small"
+									onClick={() => handleSend(params.row)}
+									disabled={!params.row?.recipientEmail || !params.row?.letterHtml}
+									color="success"
+								>
+									<SendIcon />
+								</IconButton>
+							</span>
+						</Tooltip>
+						<Tooltip title="Delete from history">
+							<IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+								<DeleteIcon />
 							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Delete from history">
-						<IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
-							<DeleteIcon />
-						</IconButton>
-					</Tooltip>
-				</Box>
-			),
+						</Tooltip>
+					</Box>
+				);
+			},
 		},
 	];
 
 	return (
 		<Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
 			<Box sx={{ width: "100%", p: 5 }}>
+				{/* Top-right refresh (align like timesheet history) */}
+				<Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+					<Tooltip title="Refresh Letters">
+						<Button
+							variant="outlined"
+							onClick={handleManualRefresh}
+							size="small"
+							startIcon={<RefreshIcon />}
+							disabled={loading}
+						>
+							Refresh
+						</Button>
+					</Tooltip>
+				</Box>
 				{/* Stats and actions */}
 				<Box
 					sx={{
@@ -279,43 +558,72 @@ export default function LetterHistory() {
 						justifyContent: "space-between",
 					}}
 				>
-					<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#e3f2fd", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#1976d2" }}>{stats.total}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Total Letters</div>
-						</Box>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#fff3e0", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#f57c00" }}>{stats.generated}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Generated</div>
-						</Box>
-						<Box sx={{ p: 2, borderRadius: 1, backgroundColor: "#dcedc8", minWidth: 120, textAlign: "center" }}>
-							<span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#388e3c" }}>{stats.sent}</span>
-							<div style={{ fontSize: "0.85rem", color: "#666" }}>Sent</div>
-						</Box>
-					</Box>
+					<Grid container spacing={2} my={1} sx={{ alignItems: 'center' }}>
+						{[
+							{ label: "Total Letters", color: "info", value: stats.total },
+							{ label: "Generated", color: "warning", value: stats.generated },
+							{ label: "Sent", color: "success", value: stats.sent },
+						].map((card, index) => (
+							<Grid item key={index}>
+								<Card
+									sx={{
+										minWidth: { xs: "125px", sm: "125px", lg: "200px" },
+										maxHeight: "60px",
+										textAlign: "center",
+										bgcolor: `${card.color}.light`,
+										borderRadius: 10,
+									}}
+									elevation={0}
+								>
+									<CardContent
+										sx={{
+											gap: 2,
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+											py: 1.25,
+										}}
+									>
+										<Typography
+											variant="h6"
+											sx={{
+												fontWeight: "bold",
+												color: `${card.color}.dark`,
+												fontSize: "1.2rem",
+											}}
+										>
+											{card.value}
+										</Typography>
+										<Typography
+											sx={{
+												fontSize: "0.85rem",
+												color: `${card.color}.contrastText`,
+											}}
+										>
+											{card.label}
+										</Typography>
+									</CardContent>
+								</Card>
+							</Grid>
+						))}
+					</Grid>
 
 					{/* Right side actions */}
 					<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-						<Typography variant="caption" color="textSecondary">
-							Auto-refresh: 30s
-						</Typography>
-                        
-						<Box sx={{ display: "flex", gap: 1, ml: 2 }}>
-							<Button variant="contained" onClick={() => router.push("/letter")}>New Letter</Button>
-						</Box>
+						<Button variant="contained" onClick={() => router.push("/letter/submit")}>New Letter</Button>
 					</Box>
 				</Box>
 
 				{/* Data grid */}
 				<Box sx={{ width: "100%" }}>
 					<DataGrid
-						rows={rows}
+						rows={rows.filter(row => row && row.id != null) || []}
 						columns={columns}
 						loading={loading}
 						pageSizeOptions={[10, 50, 100]}
 						initialState={{ pagination: { paginationModel: { page: 0, pageSize: 10 } } }}
 						disableSelectionOnClick
-						getRowClassName={(params) => (recentlyUpdated.has(params.row.id) ? "recently-updated-row" : "")}
+						getRowClassName={(params) => (recentlyUpdated.has(params?.row?.id) ? "recently-updated-row" : "")}
 						sx={{
 							"& .recently-updated-row": {
 								backgroundColor: "#f3e5f5",

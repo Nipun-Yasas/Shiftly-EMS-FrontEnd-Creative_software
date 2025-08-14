@@ -30,8 +30,9 @@ import {
   Email,
   Print
 } from '@mui/icons-material';
-import { BASE_URL, API_PATHS } from '../../../_utils/apiPaths';
-// import { Editor } from '@tinymce/tinymce-react';
+import { API_PATHS } from '../../../_utils/apiPaths';
+import axiosInstance from '../../../_utils/axiosInstance';
+import { Editor } from '@tinymce/tinymce-react';
 
 
 // Helper to split plain text into page-sized chunks
@@ -115,7 +116,7 @@ function splitHtmlByBodyHeight(html, bodyHeightPx = 836) {
   return chunks;
 }
 
-const LetterGenerationInterface = ({ letterType, formData, onBack, onStartOver }) => {
+const LetterGenerationInterface = ({ letterType, formData, onBack, onStartOver, requestId }) => {
   const theme = useTheme();
   const [generationStep, setGenerationStep] = useState(0);
   const [generatedLetterHtml, setGeneratedLetterHtml] = useState('');
@@ -165,19 +166,21 @@ const LetterGenerationInterface = ({ letterType, formData, onBack, onStartOver }
           setGenerationStep(i);
         }
         // Actual API call
-        const response = await fetch(`${BASE_URL}${API_PATHS.LETTER.GENERATE}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            letterType: mapLetterTypeToEnum(letterType),
-            fields: formData
-          })
-        });
-        if (!response.ok) throw new Error('Failed to generate letter');
-        const result = await response.json();
-        if (!result.success || !result.letterHtml) throw new Error(result.message || 'No letter generated');
-        setGeneratedLetterHtml(result.letterHtml);
-        setEditedLetterHtml(result.letterHtml);
+        let htmlContent = '';
+        if (requestId) {
+          // Admin endpoint: POST /letters/generate/{id} returns plain HTML string
+          const res = await axiosInstance.post(API_PATHS.LETTER.REQUEST.GENERATE(requestId));
+          htmlContent = typeof res?.data === 'string' ? res.data : (res?.data?.letterHtml || res?.data?.data || '');
+          if (!htmlContent) throw new Error('No letter generated');
+        } else {
+          // Generic generator expects enum + fields
+          const payload = { letterType: mapLetterTypeToEnum(letterType), fields: formData };
+          const res = await axiosInstance.post(API_PATHS.LETTER.GENERATE, payload);
+          htmlContent = typeof res?.data === 'string' ? res.data : (res?.data?.letterHtml || res?.data?.data || '');
+          if (!htmlContent) throw new Error('No letter generated');
+        }
+        setGeneratedLetterHtml(htmlContent);
+        setEditedLetterHtml(htmlContent);
         setGenerationStep(3);
       } catch (err) {
         setError(err.message || 'Error generating letter');
@@ -187,7 +190,7 @@ const LetterGenerationInterface = ({ letterType, formData, onBack, onStartOver }
     };
     fetchGeneratedLetter();
     // eslint-disable-next-line
-  }, [letterType, formData]);
+  }, [letterType, formData, requestId]);
 
   // Add a ref for the preview container
   const previewRef = React.useRef(null);
