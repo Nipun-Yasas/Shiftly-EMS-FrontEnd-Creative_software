@@ -63,9 +63,15 @@ export default function LetterHistory() {
 	const showSnackbar = (message, severity = "success") => setSnackbar({ open: true, message, severity });
 
 	const mapEntriesToRows = (entries = []) => {
+		console.log("Backend data received:", entries);
 		return (entries || [])
 			.filter(e => e && typeof e === 'object') // Filter out null/undefined entries
 			.map((e, idx) => {
+				console.log(`Processing entry ${idx}:`, e);
+				console.log(`Available fields in entry:`, Object.keys(e));
+				console.log(`RequestedAt field:`, e.requestedAt);
+				console.log(`Requested_at field:`, e.requested_at);
+				
 				// Parse fieldsJson if it exists
 				let parsedFields = {};
 				try {
@@ -79,25 +85,85 @@ export default function LetterHistory() {
 					parsedFields = e.fields || {};
 				}
 
-				return {
+				const mappedRow = {
 					id: e.id ?? e.requestId ?? e.createdAt ?? `temp-${idx + 1}`,
 					letterType: e.letterType || e.type || "",
-					requestedAt: e.requestedAt || e.createdAt || e.date || null,
+					// Handle LocalDateTime from backend - it might come as various formats:
+					// 1. ISO string with 'T': "2025-08-14T15:15:25.545188"
+					// 2. Space separated: "2025-08-14 15:15:25.545188"
+					// 3. Array format: [2025, 8, 14, 15, 15, 25, 545188000] (some Java serializers)
+					requestedAt: (() => {
+						const timestamp = e.requestedAt || e.requested_at || e.requestedDate || e.createdAt || e.created_at || e.timestamp;
+						
+						if (!timestamp) {
+							console.warn(`No timestamp found for entry ${idx}. Using current time.`);
+							return new Date().toISOString();
+						}
+						
+						// Handle array format from LocalDateTime serialization
+						if (Array.isArray(timestamp) && timestamp.length >= 6) {
+							const [year, month, day, hour, minute, second, nano] = timestamp;
+							const date = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+							console.log(`Converted array timestamp:`, timestamp, 'to:', date.toISOString());
+							return date.toISOString();
+						}
+						
+						// Handle string formats
+						if (typeof timestamp === 'string') {
+							console.log(`Processing string timestamp:`, timestamp);
+							return timestamp;
+						}
+						
+						console.log(`Using timestamp as-is:`, timestamp);
+						return timestamp;
+					})(),
 					recipientEmail: parsedFields.recipientEmail || parsedFields.email || e.recipientEmail || e.email || "",
 					status: (e.status || "pending").toString().toLowerCase(),
 					letterHtml: e.generatedLetterHtml || e.letterHtml || e.content || "",
 					fields: parsedFields,
 					// Additional fields from backend
 					employeeId: e.employeeId,
-					additionalDetails: e.additionalDetails,
-					fieldsJson: e.fieldsJson, // Keep original for debugging
+					departmentName: e.departmentName,
+					employeeName: e.employeeName,
+					fieldsJson: e.fieldsJson,
 				};
+				
+				console.log(`Mapped row ${idx}:`, mappedRow);
+				return mappedRow;
 			})
 			.filter(row => row.id != null) // Ensure all rows have valid IDs
 			.sort(
-				(a, b) =>
-					(b.requestedAt ? new Date(b.requestedAt).getTime() : 0) -
-					(a.requestedAt ? new Date(a.requestedAt).getTime() : 0)
+				(a, b) => {
+					// Handle LocalDateTime format from backend
+					const getTimestamp = (dateVal) => {
+						if (!dateVal) return 0;
+						try {
+							// Handle array format from LocalDateTime serialization
+							if (Array.isArray(dateVal) && dateVal.length >= 6) {
+								const [year, month, day, hour, minute, second, nano] = dateVal;
+								return new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000)).getTime();
+							}
+							
+							// Handle string format
+							if (typeof dateVal === 'string') {
+								// Convert space to 'T' for ISO compatibility if needed
+								let isoStr = dateVal;
+								if (dateVal.includes(' ') && !dateVal.includes('T')) {
+									isoStr = dateVal.replace(' ', 'T');
+								}
+								return new Date(isoStr).getTime();
+							}
+							
+							// Handle other formats
+							return new Date(dateVal).getTime();
+						} catch (error) {
+							console.warn("Error converting timestamp in sort:", dateVal, error);
+							return 0;
+						}
+					};
+					
+					return getTimestamp(b.requestedAt) - getTimestamp(a.requestedAt);
+				}
 			);
 	};
 
@@ -128,7 +194,7 @@ export default function LetterHistory() {
 			if (newRow && oldRow.status !== newRow.status) {
 				updatedIds.add(newRow.id);
 				const message = `Letter status updated to ${newRow.status}`;
-				const sev = newRow.status === "sent" ? "success" : "info";
+				const sev = ["sent","read","unread","approved","rejected"].includes((newRow.status||'').toString().toLowerCase()) ? "success" : "info";
 				showSnackbar(message, sev);
 			}
 		});
@@ -161,7 +227,9 @@ export default function LetterHistory() {
 
 			// Fetch from backend using new endpoint
 			const data = await getLetterRequestsByEmployee(employeeId);
+			console.log("Raw backend response:", data);
 			const mapped = mapEntriesToRows(data);
+			console.log("Final mapped rows:", mapped);
 			
 			if (silent && rows.length > 0) {
 				checkForStatusUpdates(rows, mapped);
@@ -226,11 +294,26 @@ export default function LetterHistory() {
 			showSnackbar("No content to download", "warning");
 			return;
 		}
+		
+		// Handle LocalDateTime format for filename
+		let formattedDate = "unknown";
+		try {
+			if (row.requestedAt) {
+				let dateStr = row.requestedAt;
+				if (typeof dateStr === 'string' && dateStr.includes(' ') && !dateStr.includes('T')) {
+					dateStr = dateStr.replace(' ', 'T');
+				}
+				formattedDate = dayjs(dateStr).format("YYYYMMDD_HHmm");
+			}
+		} catch (error) {
+			console.warn("Error formatting date for filename:", row.requestedAt, error);
+		}
+		
 		const blob = new Blob([row.letterHtml], { type: "text/html;charset=utf-8" });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");
 		a.href = url;
-		a.download = `${(row.letterType || "letter").replace(/\s+/g, "_")}_${dayjs(row.requestedAt).format("YYYYMMDD_HHmm")}.html`;
+		a.download = `${(row.letterType || "letter").replace(/\s+/g, "_")}_${formattedDate}.html`;
 		document.body.appendChild(a);
 		a.click();
 		a.remove();
@@ -240,6 +323,12 @@ export default function LetterHistory() {
 	const handleManualRefresh = () => {
 		loadHistory(false);
 	};
+
+	// Polling to keep read status in sync when admin updates
+	useEffect(() => {
+		const interval = setInterval(() => loadHistory(true), 15000);
+		return () => clearInterval(interval);
+	}, []);
 
 	const handleSend = async (row) => {
 		if (!row.recipientEmail) {
@@ -274,13 +363,93 @@ export default function LetterHistory() {
 			width: 140,
 			valueGetter: (params) => {
 				if (!params || !params.row) return null;
-				return params.value || params.row.requestedAt || null;
+				
+				const timestamp = params.row.requestedAt ||
+					params.row.requested_at ||
+					params.row.requestedDate ||
+					params.row.createdAt ||
+					params.row.created_at ||
+					params.row.timestamp ||
+					params.value || null;
+				
+				console.log("Column valueGetter - Timestamp value:", timestamp, "for row:", params.row.id);
+				console.log("Column valueGetter - Full row data:", params.row);
+				
+				// Handle array format from LocalDateTime serialization
+				if (Array.isArray(timestamp) && timestamp.length >= 6) {
+					const [year, month, day, hour, minute, second, nano] = timestamp;
+					const date = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+					console.log("Column valueGetter - Converted array to date:", date.toISOString());
+					return date.toISOString();
+				}
+				
+				return timestamp;
 			},
-			renderCell: (params) => (params.value ? dayjs(params.value).format("MMM DD, YYYY") : "-"),
+			renderCell: (params) => {
+				const val = params.value;
+				if (!val) return "-";
+				
+				try {
+					let dateToFormat;
+					
+					// Handle array format from LocalDateTime serialization
+					if (Array.isArray(val) && val.length >= 6) {
+						const [year, month, day, hour, minute, second, nano] = val;
+						dateToFormat = new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000));
+						console.log("RenderCell - Converted array to date:", dateToFormat);
+					} else if (typeof val === 'string') {
+						// Handle LocalDateTime format from Java backend (2025-08-14 15:15:25.545188)
+						// Convert space to 'T' to make it ISO compatible if needed
+						let dateStr = val;
+						if (val.includes(' ') && !val.includes('T')) {
+							dateStr = val.replace(' ', 'T');
+						}
+						dateToFormat = new Date(dateStr);
+						console.log("RenderCell - Processing string:", val, "converted to:", dateToFormat);
+					} else {
+						dateToFormat = new Date(val);
+					}
+					
+					const date = dayjs(dateToFormat);
+					return date.isValid() ? date.format("MMM DD, YYYY") : String(val);
+				} catch (error) {
+					console.warn("Error parsing date:", val, error);
+					return String(val) || "-";
+				}
+			},
 			sortComparator: (a, b) => {
-				const ta = a ? new Date(a).getTime() : 0;
-				const tb = b ? new Date(b).getTime() : 0;
-				return ta - tb;
+				if (!a && !b) return 0;
+				if (!a) return 1;
+				if (!b) return -1;
+				
+				try {
+					const convertToTimestamp = (val) => {
+						// Handle array format from LocalDateTime serialization
+						if (Array.isArray(val) && val.length >= 6) {
+							const [year, month, day, hour, minute, second, nano] = val;
+							return new Date(year, month - 1, day, hour, minute, second, Math.floor(nano / 1000000)).getTime();
+						}
+						
+						// Handle string format
+						if (typeof val === 'string') {
+							let dateStr = val;
+							if (val.includes(' ') && !val.includes('T')) {
+								dateStr = val.replace(' ', 'T');
+							}
+							return new Date(dateStr).getTime();
+						}
+						
+						// Handle other formats
+						return new Date(val).getTime();
+					};
+					
+					const ta = convertToTimestamp(a);
+					const tb = convertToTimestamp(b);
+					return ta - tb;
+				} catch (error) {
+					console.warn("Error comparing dates:", a, b, error);
+					return 0;
+				}
 			},
 		},
 		{ field: "letterType", headerName: "Letter Type", width: 240, flex: 1 },
