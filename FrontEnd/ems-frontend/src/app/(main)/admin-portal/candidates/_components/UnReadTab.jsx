@@ -3,23 +3,14 @@ import { Box } from "@mui/material";
 
 import ReferDataGrid from "./ReferDataGrid";
 
-export default function UnReadTab({
-  candidates,
-  loading,
-  onViewDetails,
-  onMarkAsRead,
-  onMarkAsUnread,
-  onDownloadFile, // Make sure this prop is included
-}) {
+export default function UnReadTab({ candidates, loading, handleUpdateStatus }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
       <ReferDataGrid
-        rows={candidates}
+        candidates={candidates}
         loading={loading}
-        onViewDetails={onViewDetails}
-        onMarkAsRead={onMarkAsRead}
-        onMarkAsUnread={onMarkAsUnread}
-        onDownloadFile={onDownloadFile} // Pass it to ReferDataGrid
+        handleUpdateStatus={handleUpdateStatus}
+        showApprovalActions={true}
       />
     </Box>
   );

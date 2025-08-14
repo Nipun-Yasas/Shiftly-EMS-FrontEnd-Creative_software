@@ -45,19 +45,6 @@ export default function FormikFileUpload({
     }
   };
 
-  const resetFile = () => {
-    setFieldValue(name, null);
-    setFileName("");
-    setPreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  useEffect(() => {
-    if (!values[name]) resetFile();
-  }, [values[name]]);
-
   return (
     <>
       <Box display="flex" justifyContent="center" width="100%">

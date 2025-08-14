@@ -1,24 +1,17 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 
 import InputItem from "../../../_components/inputs/InputItem";
 import TextInput from "../../../_components/inputs/TextInput";
 import SelectInput from "../../../_components/inputs/SelectInput";
 import FileUpload from "../../../_components/inputs/FileUpload";
-import axiosInstance from "../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../_utils/apiPaths";
-import { notifyReferralChange, REFERRAL_EVENTS } from "../../../_utils/referralUtils";
-import { useVacancies } from "../../../_hooks/useVacancies";
 
 const validationSchema = Yup.object({
   vacancy: Yup.object().nullable().required("Vacancy is required"),
@@ -37,7 +30,7 @@ const validationSchema = Yup.object({
     .max(500, "Message must be less than 500 characters")
     .required("Message is required"),
 
-  resume: Yup.mixed()
+  file: Yup.mixed()
     .test("required", "Resume is required", function (value) {
       const { edit } = this.options.context || {};
       if (edit) return true;
@@ -60,91 +53,18 @@ const validationSchema = Yup.object({
 });
 
 export default function ReferForm({
+  vacancies,
   edit = false,
-  onSubmit,
-  onCancel,
+  handleSubmit,
   initialValues,
-  redirectToHistory = false,
 }) {
   const resumeRef = useRef(null);
   const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState(initialValues?.resume || "");
-  const { vacancies, loading: vacanciesLoading } = useVacancies();
-  const router = useRouter();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const [fileName, setFileName] = useState(initialValues?.file || "");
 
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  // Handle form submission
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      setSubmitting(true);
-      if (onSubmit) {
-        // If parent provides onSubmit, use it
-        await onSubmit(values, { resetForm });
-      }
-
-      const formData = new FormData();
-      formData.append("vacancyId", values.vacancy?.id || values.vacancy);
-      formData.append("applicantName", values.applicantName);
-      formData.append("applicantEmail", values.applicantEmail);
-      formData.append("message", values.message);
-      if (values.resume) {
-        formData.append("file", values.resume);
-
-        const response = await axiosInstance.post(
-          API_PATHS.REFERRALS.ADD,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        console.log('Referral submission response:', response.data); // Debug log
-
-        if (response.status === 200) {
-          showSnackbar("Referral submitted successfully!", "success");
-          
-          // Notify other tabs/windows about the new referral
-          console.log('Notifying referral change...'); // Debug log
-          notifyReferralChange(REFERRAL_EVENTS.REFERRAL_SUBMITTED, response.data);
-          
-          resetForm();
-          setFileName("");
-          setPreview(null);
-          if (resumeRef.current) {
-            resumeRef.current.value = "";
-          }
-
-          // Optionally redirect to history page after successful submission
-          if (redirectToHistory) {
-            console.log('Redirecting to history page...'); // Debug log
-            setTimeout(() => {
-              router.push('/refer/history?refresh=true');
-            }, 1500); // Wait 1.5 seconds to show the success message
-          }
-        }
-      }
-    } catch (error) {
-      showSnackbar(
-        error.response?.data?.message || "Failed to submit event.",
-        "error"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
-    <>
+    
       <Formik
         initialValues={
           initialValues || {
@@ -152,14 +72,21 @@ export default function ReferForm({
             applicantName: "",
             applicantEmail: "",
             message: "",
-            resume: null,
+            file: null,
           }
         }
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
         context={{ edit }}
+        onReset={() => {
+        setFileName("");
+        setPreview(null);
+        if (resumeRef.current) {
+          resumeRef.current.value = "";
+        }
+      }}
       >
-        {({ isSubmitting, resetForm }) => (
+        {({ isSubmitting}) => (
           <Form>
             <Stack>
               <Box
@@ -173,12 +100,9 @@ export default function ReferForm({
                 <InputItem>
                   <SelectInput
                     name="vacancy"
+                    label="Select a Vacancy"
                     options={vacancies}
-                    getOptionLabel={(option) => option.name || ""}
-                    label={
-                      vacanciesLoading ? "Loading vacancies..." : "Vacancy"
-                    }
-                    disabled={vacanciesLoading}
+                    getOptionLabel={(option) => option.vacancyName || ""}
                   />
                 </InputItem>
                 <InputItem>
@@ -225,7 +149,7 @@ export default function ReferForm({
 
               <InputItem>
                 <FileUpload
-                  name="resume"
+                  name="file"
                   label="Upload Resume"
                   fileTypes=".pdf,.jpg,.jpeg"
                   fileName={fileName}
@@ -246,18 +170,6 @@ export default function ReferForm({
                   <Button
                     color="text.primary"
                     type="reset"
-                    onClick={() => {
-                      if (onCancel) {
-                        onCancel();
-                      } else {
-                        resetForm();
-                        setFileName("");
-                        setPreview(null);
-                        if (resumeRef.current) {
-                          resumeRef.current.value = "";
-                        }
-                      }
-                    }}
                     disabled={isSubmitting}
                   >
                     Cancel
@@ -281,20 +193,5 @@ export default function ReferForm({
           </Form>
         )}
       </Formik>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={500}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </>
   );
 }

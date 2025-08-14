@@ -1,43 +1,46 @@
 "use client";
 
-import { useState, useEffect, useContext, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
 
 import dayjs from "dayjs";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
-import Chip from "@mui/material/Chip";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
+import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import DownloadIcon from "@mui/icons-material/Download";
 
-import { API_PATHS } from "../../../_utils/apiPaths";
-import axiosInstance from "../../../_utils/axiosInstance";
+import CircularProgress from "@mui/material/CircularProgress";
+import EditDialog from "../_components/EditDialog";
+import DeleteDialog from "../../_components/DeleteDialog";
+import CustomDataGrid from "../../_components/CustomDataGrid";
 import {
   getStatusIcon,
   getStatusColor,
 } from "../../admin-portal/_helpers/colorhelper";
-import { notifyEventChange, listenForEventChanges, EVENT_EVENTS } from "../../../_utils/eventUtils";
-import DeleteDialog from "../../_components/DeleteDialog";
-import EditDialog from "../_components/EditDialog";
-import { UserContext } from "../../../context/UserContext";
-import CustomDataGrid from "../../_components/CustomDataGrid";
 
-export default function EventHistory() {
-  const [data, setData] = useState([]);
+import axiosInstance from "../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../_utils/apiPaths";
+import { UserContext } from "../../../context/UserContext";
+
+export default function TimeSheetHistory() {
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [employee, setEmployee] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -46,8 +49,6 @@ export default function EventHistory() {
   });
 
   const { user } = useContext(UserContext);
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
@@ -56,145 +57,60 @@ export default function EventHistory() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const fetchEvents = useCallback(async () => {
-    if (!user?.id) {
-      console.log('No user ID available, skipping fetch');
-      return;
-    }
+  const fetchEmployee = async () => {
     setLoading(true);
     try {
-      console.log('Fetching events for user ID:', user.id);
-      let response;
-      
-      try {
-        // Try the user-specific endpoint first (similar to claims)
-        response = await axiosInstance.get(API_PATHS.EVENTS.GET_MY_EVENTS(user.id));
-      } catch (error) {
-        console.log('User-specific endpoint failed, trying fallback...');
-        // Fallback to the original endpoint if user-specific doesn't exist
-        response = await axiosInstance.get("/api/v1/shiftly/ems/events/my");
-      }
-
-      console.log('Events API Response:', response.data);
-
-      if (!response.data || response.data.length === 0) {
-        console.log('No events found');
-        setData([]);
-        return;
-      }
-      
-      // Map backend fields correctly and ensure each row has an id for DataGrid
-      const eventsWithIds = response.data.map((event, index) => ({
-        ...event,
-        id: event.id || index + 1,
-        title: event.title || '',
-        eventType: event.eventType || '',
-        enableDate: event.enableDate || '',
-        expireDate: event.expireDate || '',
-        status: event.status || 'Pending',
-        imageUrl: event.imageUrl || '',
-      }));
-      
-      console.log('Processed events data:', eventsWithIds);
-      setData(eventsWithIds);
+      const response = await axiosInstance.get(
+        API_PATHS.EMPLOYEE.GET_BY_USERID(user.id)
+      );
+      setEmployee(response.data);
     } catch (error) {
-      console.error('Error fetching events:', error);
-      console.error('Error response:', error.response);
-      console.error('Error status:', error.response?.status);
-      console.error('Error data:', error.response?.data);
-      
       showSnackbar(
-        error.response?.data?.message || "Failed to fetch data",
+        error.response?.data?.message || "Failed to fetch employee",
         "error"
       );
-      setData([]);
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  };
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    fetchEvents();
-  }, [user, fetchEvents]);
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.EVENTS.GET_BY_EMPLOYEEID(employee.employeeId)
+      );
 
-  // Add router change listener to refresh when navigating to this page
-  useEffect(() => {
-    const handleRouteChange = () => {
-      if (user?.id) {
-        console.log('Route changed to event history, refreshing data...');
-        fetchEvents();
+      if (!response.data || response.data.length === 0) {
+        setEvents([]);
+        return;
       }
-    };
+      setEvents(
+        (response.data || []).map((r) => ({
+          ...r,
+          status: r.status?.toLowerCase(),
+        }))
+      );
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to fetch Events",
+        "error"
+      );
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Refresh when component mounts or user navigates to this page
-    handleRouteChange();
-  }, [user?.id, fetchEvents]);
-
-  // Listen for URL parameter changes (e.g., when redirected from submit page)
   useEffect(() => {
-    const refresh = searchParams.get('refresh');
-    if (refresh === 'true' && user?.id) {
-      console.log('Refresh parameter detected, fetching events...');
+    fetchEmployee();
+  }, []);
+
+  useEffect(() => {
+    if (employee && employee.employeeId) {
       fetchEvents();
-      // Clean up the URL parameter
-      router.replace('/events/history', { scroll: false });
     }
-  }, [searchParams, user?.id, fetchEvents, router]);
-
-  // Add visibility change listener to refresh data when user comes back to this page
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && user?.id) {
-        fetchEvents();
-      }
-    };
-
-    const handleFocus = () => {
-      if (user?.id) {
-        fetchEvents();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [fetchEvents, user?.id]);
-
-  // Add periodic refresh every 30 seconds when the page is visible
-  useEffect(() => {
-    let intervalId;
-    
-    if (user?.id && !document.hidden) {
-      intervalId = setInterval(() => {
-        fetchEvents();
-      }, 30000); // Refresh every 30 seconds
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [fetchEvents, user?.id]);
-
-  // Listen for storage events to refresh when events are submitted in other tabs
-  useEffect(() => {
-    const cleanup = listenForEventChanges((event) => {
-      if (user?.id && [EVENT_EVENTS.EVENT_SUBMITTED, EVENT_EVENTS.EVENT_UPDATED, EVENT_EVENTS.EVENT_DELETED].includes(event.type)) {
-        console.log('Event change detected:', event.type);
-        fetchEvents();
-      }
-    });
-
-    return cleanup;
-  }, [fetchEvents, user?.id]);
+  }, [employee]);
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -206,43 +122,51 @@ export default function EventHistory() {
     setDeleteDialogOpen(true);
   };
 
-  const handleUpdateRecord = async (id, data) => {
+  const handleUpdate = async (values, { setSubmitting, resetForm }) => {
+    if (!selectedRecord) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.put(API_PATHS.EVENTS.UPDATE(id), data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
-      // Notify other tabs about the update
-      notifyEventChange(EVENT_EVENTS.EVENT_UPDATED, { id, ...response.data });
-      
-      await fetchEvents();
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("eventType", values.eventType?.name);
+      formData.append("enableDate", values.enableDate);
+      formData.append("expireDate", values.expireDate);
+      if (values.image) {
+        formData.append("image", values.image);
+      }
+
+      await axiosInstance.put(
+        API_PATHS.EVENTS.UPDATE(selectedRecord.id),
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      showSnackbar("Event updated successfully", "success");
+      resetForm();
+      setEditDialogOpen(false);
+      setSelectedRecord(null);
     } catch (error) {
       showSnackbar(
         error.response?.data?.message || "Failed to update record",
         "error"
       );
-      throw error; // Re-throw to let EditDialog handle the error
     } finally {
       setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const confirmDelete = async () => {
+  const DeleteRecord = async () => {
     if (!selectedRecord) return;
 
     setLoading(true);
     try {
       await axiosInstance.delete(API_PATHS.EVENTS.DELETE(selectedRecord.id));
-      
-      // Notify other tabs about the deletion
-      notifyEventChange(EVENT_EVENTS.EVENT_DELETED, { id: selectedRecord.id });
-      
+
       await fetchEvents();
       showSnackbar("Event deleted successfully.", "success");
     } catch (error) {
       showSnackbar(
-        error.response?.data?.message || "Failed to delete event",
+        error.response?.data?.message || "Failed to delete Event",
         "error"
       );
     } finally {
@@ -278,7 +202,7 @@ export default function EventHistory() {
     {
       field: "status",
       headerName: "Status",
-      width: 140,
+      width: 120,
       renderCell: (params) => (
         <Chip
           icon={getStatusIcon(params.value.toLowerCase())}
@@ -322,22 +246,12 @@ export default function EventHistory() {
       field: "actions",
       headerName: "Actions",
       align: "center",
-      width: 120,
       headerClassName: "last-column",
+      width: 100,
       renderCell: (params) => {
-        const isPending = params.row.status?.toLowerCase() === 'pending';
-        
-        if (!isPending) {
-          // Show no actions for approved or rejected events
-          return (
-            <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-              <span style={{ fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
-                No actions
-              </span>
-            </Box>
-          );
-        }
+        const isPending = params.row.status === "pending";
 
+        if (!isPending) return null;
         return (
           <Box
             sx={{
@@ -373,125 +287,120 @@ export default function EventHistory() {
   ];
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        height: "100%",
-        width: "100%",
-      }}
-    >
+    <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
-        {/* Event Statistics */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          mb: 3, 
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#e3f2fd',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1976d2' }}>
-                {data.length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Total Events</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#fff3e0',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#f57c00' }}>
-                {data.filter(event => event.status?.toLowerCase() === 'pending').length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Pending</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#dcedc8',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#388e3c' }}>
-                {data.filter(event => event.status?.toLowerCase() === 'approved').length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Approved</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#ffcdd2',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#d32f2f' }}>
-                {data.filter(event => event.status?.toLowerCase() === 'rejected').length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Rejected</div>
-            </Box>
-          </Box>
-
-          {/* Refresh Button */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="textSecondary">
-              Auto-refresh: 30s
-            </Typography>
-            <Tooltip title="Refresh Event History">
-              <IconButton 
-                onClick={fetchEvents} 
-                disabled={loading}
-                sx={{ color: 'primary.main' }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Tooltip title="Refresh Events">
+            <Button
+              variant="outlined"
+              onClick={fetchEvents}
+              size="small"
+              startIcon={<RefreshIcon />}
+              disabled={loading}
+            >
+              Refresh
+            </Button>
+          </Tooltip>
         </Box>
+
+        <Grid container spacing={2} my={3}>
+          {[
+            { label: "Total  ", color: "info", value: events.length },
+            {
+              label: "Pending",
+              color: "warning",
+              value: events.filter((d) => d.status?.toLowerCase() === "pending")
+                .length,
+            },
+            {
+              label: "Approved",
+              color: "success",
+              value: events.filter(
+                (d) => d.status?.toLowerCase() === "approved"
+              ).length,
+            },
+            {
+              label: "Rejected",
+              color: "error",
+              value: events.filter(
+                (d) => d.status?.toLowerCase() === "rejected"
+              ).length,
+            },
+          ].map((card, index) => (
+            <Grid item key={index}>
+              <Card
+                sx={{
+                  minWidth: { xs: "125px", sm: "125px", lg: "200px" },
+                  maxHeight: "60px",
+                  textAlign: "center",
+                  bgcolor: `${card.color}.light`,
+                  borderRadius: 10,
+                }}
+                elevation={0}
+              >
+                <CardContent
+                  sx={{
+                    gap: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: "bold",
+                      color: `${card.color}.dark`,
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    {card.value}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.85rem",
+                      color: `${card.color}.contrastText`,
+                    }}
+                  >
+                    {card.label}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <CustomDataGrid rows={data} columns={columns} />
+          <CustomDataGrid rows={events} columns={columns} />
         )}
       </Box>
 
       <EditDialog
         open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedRecord(null);
+        }}
         record={selectedRecord}
-        onUpdate={handleUpdateRecord}
+        handleUpdate={handleUpdate}
       />
 
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
+        onConfirm={DeleteRecord}
         loading={loading}
+        title="Delete Event"
+        message="Are you sure you want to delete this event?"
       />
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

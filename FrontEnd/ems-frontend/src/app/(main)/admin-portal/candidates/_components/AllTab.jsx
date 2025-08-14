@@ -1,25 +1,18 @@
+"use client";
+
 import React from "react";
 import Box from "@mui/material/Box";
 
 import ReferDataGrid from "./ReferDataGrid";
 
-export default function AllTab({
-  candidates,
-  loading,
-  onViewDetails,
-  onMarkAsRead,
-  onMarkAsUnread,
-  onDownloadFile, 
-}) {
+export default function AllTab({ candidates, loading, handleUpdateStatus }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
       <ReferDataGrid
-        rows={candidates}
+        candidates={candidates}
         loading={loading}
-        onViewDetails={onViewDetails}
-        onMarkAsRead={onMarkAsRead}
-        onMarkAsUnread={onMarkAsUnread}
-        onDownloadFile={onDownloadFile} // Pass it to ReferDataGrid
+        handleUpdateStatus={handleUpdateStatus}
+        showApprovalActions={true}
       />
     </Box>
   );

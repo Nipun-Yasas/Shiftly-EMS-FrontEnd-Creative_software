@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useContext, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -11,31 +10,30 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import DownloadIcon from "@mui/icons-material/Download";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import EditDialog from "../_components/EditDialog";
 import DeleteDialog from "../../_components/DeleteDialog";
 import CustomDataGrid from "../../_components/CustomDataGrid";
-import {
-  getStatusIcon,
-  getStatusColor,
-} from "../../admin-portal/_helpers/colorhelper";
 
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
-import { notifyReferralChange, listenForReferralChanges, REFERRAL_EVENTS } from "../../../_utils/referralUtils";
-import { useVacancies } from "../../../_hooks/useVacancies";
 import { UserContext } from "../../../context/UserContext";
 
-export default function ReferHistory() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function page() {
+  const [refferals, setRefferals] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [employee, setEmployee] = useState("");
+  const [vacancies, setVacancies] = useState([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -46,9 +44,6 @@ export default function ReferHistory() {
   });
 
   const { user } = useContext(UserContext);
-  const { vacancies } = useVacancies();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
@@ -57,138 +52,74 @@ export default function ReferHistory() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const fetchReferrals = useCallback(async () => {
-    if (!user?.id) {
-      console.log('No user ID available, skipping fetch');
-      return;
-    }
+  const fetchEmployee = async () => {
     setLoading(true);
     try {
-      console.log('Fetching referrals for user ID:', user.id);
       const response = await axiosInstance.get(
-        API_PATHS.REFERRALS.MY_REFERRALS
+        API_PATHS.EMPLOYEE.GET_BY_USERID(user.id)
       );
-
-      console.log('Referrals API Response:', response.data);
-
-      if (!response.data || response.data.length === 0) {
-        console.log('No referrals found');
-        setData([]);
-        return;
-      }
-      
-      // Map backend fields correctly and ensure each row has an id for DataGrid
-      const referralsWithIds = response.data.map((referral, index) => ({
-        ...referral,
-        id: referral.id || index + 1,
-        vacancyName: referral.vacancyName || '',
-        applicantName: referral.applicantName || '',
-        applicantEmail: referral.applicantEmail || '',
-        message: referral.message || '',
-        fileUrl: referral.fileUrl || '',
-        status: referral.status || 'unread',
-      }));
-      
-      console.log('Processed referrals data:', referralsWithIds);
-      setData(referralsWithIds);
+      setEmployee(response.data);
     } catch (error) {
-      console.error('Error fetching referrals:', error);
-      console.error('Error response:', error.response);
-      console.error('Error status:', error.response?.status);
-      console.error('Error data:', error.response?.data);
-      
       showSnackbar(
-        error.response?.data?.message || "Failed to fetch data",
+        error.response?.data?.message || "Failed to fetch employee",
         "error"
       );
-      setData([]);
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  };
 
-  useEffect(() => {
-    if (!user) {
-      return;
+   const fetchVacancies = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.VACANCIES.GET_ALL_BY_DEPARTMENT(employee.departmentId)
+      );
+      setVacancies(response.data);
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
-    fetchReferrals();
-  }, [user, vacancies, fetchReferrals]);
+  };
 
-  // Add router change listener to refresh when navigating to this page
-  useEffect(() => {
-    const handleRouteChange = () => {
-      if (user?.id) {
-        console.log('Route changed to referral history, refreshing data...');
-        fetchReferrals();
+  const fetchRefferals = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.REFERRALS.GET_BY_EMPLOYEEID(employee.employeeId)
+      );
+
+      if (!response.data || response.data.length === 0) {
+        setRefferals([]);
+        return;
       }
-    };
-
-    // Refresh when component mounts or user navigates to this page
-    handleRouteChange();
-  }, [user?.id, fetchReferrals]);
-
-  // Listen for URL parameter changes (e.g., when redirected from submit page)
-  useEffect(() => {
-    const refresh = searchParams.get('refresh');
-    if (refresh === 'true' && user?.id) {
-      console.log('Refresh parameter detected, fetching referrals...');
-      fetchReferrals();
-      // Clean up the URL parameter
-      router.replace('/refer/history', { scroll: false });
+      setRefferals(
+        (response.data || []).map((r) => ({
+          ...r,
+          status: r.status?.toLowerCase(),
+        }))
+      );
+    } catch (error) {
+      showSnackbar(
+        error.response?.data?.message || "Failed to fetch Claim",
+        "error"
+      );
+      setRefferals([]);
+    } finally {
+      setLoading(false);
     }
-  }, [searchParams, user?.id, fetchReferrals, router]);
+  };
 
-  // Add visibility change listener to refresh data when user comes back to this page
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && user?.id) {
-        fetchReferrals();
-      }
-    };
+    fetchEmployee();
+  }, []);
 
-    const handleFocus = () => {
-      if (user?.id) {
-        fetchReferrals();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [fetchReferrals, user?.id]);
-
-  // Add periodic refresh every 30 seconds when the page is visible
   useEffect(() => {
-    let intervalId;
-    
-    if (user?.id && !document.hidden) {
-      intervalId = setInterval(() => {
-        fetchReferrals();
-      }, 30000); // Refresh every 30 seconds
+    if (employee && employee.employeeId) {
+      fetchRefferals();
+      fetchVacancies();
     }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [fetchReferrals, user?.id]);
-
-  // Listen for storage events to refresh when referrals are submitted in other tabs
-  useEffect(() => {
-    const cleanup = listenForReferralChanges((event) => {
-      if (user?.id && [REFERRAL_EVENTS.REFERRAL_SUBMITTED, REFERRAL_EVENTS.REFERRAL_UPDATED, REFERRAL_EVENTS.REFERRAL_DELETED].includes(event.type)) {
-        console.log('Referral change detected:', event.type);
-        fetchReferrals();
-      }
-    });
-
-    return cleanup;
-  }, [fetchReferrals, user?.id]);
+  }, [employee]);
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -200,17 +131,28 @@ export default function ReferHistory() {
     setDeleteDialogOpen(true);
   };
 
-  const handleUpdateRecord = async (id, data) => {
+  const handleUpdate = async (values, { setSubmitting,resetForm }) => {
+    if (!selectedRecord) return;
     setLoading(true);
     try {
-      const response = await axiosInstance.put(API_PATHS.REFERRALS.UPDATE(id), data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
-      // Notify other tabs about the update
-      notifyReferralChange(REFERRAL_EVENTS.REFERRAL_UPDATED, { id, ...response.data });
-      
-      await fetchReferrals();
+      const formData = new FormData();
+      formData.append("vacancyId", values.vacancy?.id);
+      formData.append("applicantName", values.applicantName);
+      formData.append("applicantEmail", values.applicantEmail);
+      formData.append("message", values.message );
+      if (values.file) {
+        formData.append("file", values.file);
+      }
+
+      await axiosInstance.put(
+        API_PATHS.REFERRALS.UPDATE(selectedRecord.id),
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      showSnackbar("Referral updated successfully", "success");
+      resetForm();
+      setEditDialogOpen(false);
+      setSelectedRecord(null);
     } catch (error) {
       showSnackbar(
         error.response?.data?.message || "Failed to update record",
@@ -218,20 +160,18 @@ export default function ReferHistory() {
       );
     } finally {
       setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const confirmDelete = async () => {
+  const DeleteRecord = async () => {
     if (!selectedRecord) return;
 
     setLoading(true);
     try {
       await axiosInstance.delete(API_PATHS.REFERRALS.DELETE(selectedRecord.id));
-      
-      // Notify other tabs about the deletion
-      notifyReferralChange(REFERRAL_EVENTS.REFERRAL_DELETED, { id: selectedRecord.id });
-      
-      await fetchReferrals();
+
+      await fetchRefferals();
       showSnackbar("Referral deleted successfully.", "success");
     } catch (error) {
       showSnackbar(
@@ -246,9 +186,9 @@ export default function ReferHistory() {
   };
 
   const columns = [
-    { field: "vacancyName", headerName: "Vacancy", width: 150 },
-    { field: "applicantName", headerName: "Candidate Name", width: 150 },
-    { field: "applicantEmail", headerName: "Candidate Email", width: 170 },
+    { field: "vacancyName", headerName: "Vacancy", width: 200 },
+    { field: "applicantName", headerName: "Candidate Name", width: 200 },
+    { field: "applicantEmail", headerName: "Candidate Email", width: 200 },
     {
       field: "message",
       headerName: "Message",
@@ -297,39 +237,25 @@ export default function ReferHistory() {
       },
     },
     {
-      field: "status",
-      headerName: "Referral State",
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          icon={getStatusIcon(params.value.toLowerCase())}
-          label={params.value}
-          color={getStatusColor(params.value.toLowerCase())}
-          size="small"
-        />
-      ),
-    },
-    {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      align: "center",
       headerClassName: "last-column",
+      width: 100,
       renderCell: (params) => {
-        const isRead = params.row.status?.toLowerCase() === 'read';
-        
-        if (isRead) {
-          // Show no actions for read referrals
-          return (
-            <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: "100%", justifyContent: "center" }}>
-              <span style={{ fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
-                No actions
-              </span>
-            </Box>
-          );
-        }
+        const isPending = params.row.status === "unread";
 
+        if (!isPending) return null;
         return (
-          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              mt: 1,
+              width: "100%",
+              justifyContent: "center",
+            }}
+          >
             <Tooltip title="Edit">
               <IconButton
                 size="small"
@@ -357,98 +283,105 @@ export default function ReferHistory() {
   return (
     <Paper elevation={3} sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ width: "100%", p: 5 }}>
-        {/* Referral Statistics */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          mb: 3, 
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#e3f2fd',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1976d2' }}>
-                {data.length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Total Referrals</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#fff3e0',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#f57c00' }}>
-                {data.filter(referral => referral.status?.toLowerCase() === 'unread').length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Unread</div>
-            </Box>
-            
-            <Box sx={{ 
-              p: 2, 
-              borderRadius: 1, 
-              backgroundColor: '#dcedc8',
-              minWidth: 120,
-              textAlign: 'center'
-            }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#388e3c' }}>
-                {data.filter(referral => referral.status?.toLowerCase() === 'read').length}
-              </span>
-              <div style={{ fontSize: '0.85rem', color: '#666' }}>Read</div>
-            </Box>
-          </Box>
-
-          {/* Refresh Button */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="textSecondary">
-              Auto-refresh: 30s
-            </Typography>
-            <Tooltip title="Refresh Referral History">
-              <IconButton 
-                onClick={fetchReferrals} 
-                disabled={loading}
-                sx={{ color: 'primary.main' }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Tooltip title="Refresh Refferals">
+            <Button
+              variant="outlined"
+              onClick={fetchRefferals}
+              size="small"
+              startIcon={<RefreshIcon />}
+              disabled={loading}
+            >
+              Refresh
+            </Button>
+          </Tooltip>
         </Box>
+
+        <Grid container spacing={2} my={3}>
+          {[
+            { label: "Total  ", color: "info", value: refferals.length },
+            {
+              label: "Unread",
+              color: "warning",
+              value: refferals.filter((d) => d.status?.toLowerCase() === "unread")
+                .length,
+            },
+            {
+              label: "Read",
+              color: "success",
+              value: refferals.filter(
+                (d) => d.status?.toLowerCase() === "read"
+              ).length,
+            },
+            
+          ].map((card, index) => (
+            <Grid item key={index}>
+              <Card
+                sx={{
+                  minWidth: { xs: "125px", sm: "125px", lg: "200px" },
+                  maxHeight: "60px",
+                  textAlign: "center",
+                  bgcolor: `${card.color}.light`,
+                  borderRadius: 10,
+                }}
+                elevation={0}
+              >
+                <CardContent
+                  sx={{
+                    gap: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: "bold",
+                      color: `${card.color}.dark`,
+                      fontSize: "1.2rem",
+                    }}
+                  >
+                    {card.value}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.85rem",
+                      color: `${card.color}.contrastText`,
+                    }}
+                  >
+                    {card.label}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <CustomDataGrid rows={data} columns={columns} />
+          <CustomDataGrid rows={refferals} columns={columns} />
         )}
       </Box>
 
       <EditDialog
         open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedRecord(null);
+        }}
         record={selectedRecord}
-        onUpdate={handleUpdateRecord}
+        handleUpdate={handleUpdate}
+        vacancies={vacancies}
       />
 
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
+        onConfirm={DeleteRecord}
         loading={loading}
         title="Delete Referral"
         message="Are you sure you want to delete this referral?"
@@ -456,7 +389,7 @@ export default function ReferHistory() {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >

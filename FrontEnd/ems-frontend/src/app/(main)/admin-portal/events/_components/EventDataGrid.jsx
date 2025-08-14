@@ -8,31 +8,44 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import Download from "@mui/icons-material/Download";
+import Cancel from "@mui/icons-material/Cancel";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import DownloadIcon from "@mui/icons-material/Download";
 
-import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 
 import { getStatusIcon, getStatusColor } from "../../_helpers/colorhelper";
+import CustomDataGrid from "../../../_components/CustomDataGrid";
 
 export default function EventDataGrid({
-  loading,
   events,
-  onApprovalAction,
-  showApprovalActions = true,
+  loading,
+  handleUpdateStatus,
+  showApprovalActions = false,
 }) {
-  const eventColumns = [
-    
-    { field: "title", headerName: "Event Title", width: 200 },
-    { field: "organizer", headerName: "Name", width: 170 },
-    { field: "department", headerName: "Department", width: 160 },
-    { field: "eventType", headerName: "Type", width: 160 },
+  const columns = [
     {
-      field: "startDate",
-      headerName: "Event Date",
+      field: "employeeName",
+      headerName: "Employee Name",
       width: 150,
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      width: 150,
+    },
+    { field: "title", headerName: "Event Title", width: 100 },
+    { field: "eventType", headerName: "Type", width: 110 },
+    {
+      field: "enableDate",
+      headerName: "Start Date",
+      width: 110,
+      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+    },
+    {
+      field: "expireDate",
+      headerName: "End Date",
+      width: 110,
       renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
     },
     {
@@ -41,68 +54,82 @@ export default function EventDataGrid({
       width: 110,
       renderCell: (params) => (
         <Chip
-          icon={getStatusIcon(params.value)}
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
           size="small"
         />
       ),
     },
     {
       field: "imageUrl",
-      headerName: "Banner",
-      width: 120,
-      sortable: false,
+      headerName: "Event File",
+      width: 130,
       renderCell: (params) => {
         const imageUrl = params.value;
-        
-        return imageUrl && imageUrl.trim() !== "" ? (
+        if (!imageUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + imageUrl;
+        return (
           <Button
+            component="a"
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
             variant="outlined"
             size="small"
-            startIcon={<Download />}
-            onClick={() => window.open(`http://localhost:8080${imageUrl}`, '_blank')}
-            sx={{ 
-              fontSize: '0.75rem',
-              minWidth: 'auto',
+            sx={{
+              fontSize: "0.75rem",
+              minWidth: "auto",
               px: 1,
-              py: 0.5
+              py: 0.5,
             }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
           >
             Download
           </Button>
-        ) : (
-          <span style={{ color: '#999' }}>No banner</span>
         );
       },
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 90,
       headerClassName: "last-column",
-      align: "center",
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5, mt: 1, width: '100%', justifyContent: 'center' }}>
-          
-          {showApprovalActions && (params.row.status === "pending" || params.row.status === "PENDING") && (
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            mt: 1,
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
+          {showApprovalActions && params.row.status === "pending" && (
             <>
               <Tooltip title="Approve Event">
                 <IconButton
                   size="small"
-                  onClick={() => onApprovalAction(params.row, "approve")}
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "approve")
+                  }
                   color="success"
                 >
-                  <CheckCircleIcon />
+                  <CheckCircle />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Reject Event">
                 <IconButton
                   size="small"
-                  onClick={() => onApprovalAction(params.row, "reject")}
+                  onClick={() =>
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "reject")
+                  }
                   color="error"
                 >
-                  <CancelIcon />
+                  <Cancel />
                 </IconButton>
               </Tooltip>
             </>
@@ -113,27 +140,18 @@ export default function EventDataGrid({
   ];
 
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-          <CircularProgress />
-        </Box>
+        <CircularProgress />
       ) : (
-        <Box sx={{ height: 'auto', width: "100%" }}>
-          <DataGrid
-            rows={events}
-            columns={eventColumns}
-            pageSize={10}
-            rowsPerPageOptions={[5, 10, 20]}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[5, 10, 20]}
-          />
-        </Box>
+        <CustomDataGrid rows={events} columns={columns} />
       )}
-    </>
+    </Box>
   );
 }

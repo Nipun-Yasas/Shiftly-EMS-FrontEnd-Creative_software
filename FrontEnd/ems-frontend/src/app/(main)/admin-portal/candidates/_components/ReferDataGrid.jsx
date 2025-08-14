@@ -1,104 +1,140 @@
+"use client";
+
 import React from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import { Box, Chip, IconButton, Tooltip } from "@mui/material";
-import {
-  CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as UnreadIcon,
-  Download as DownloadIcon,
-} from "@mui/icons-material";
-import dayjs from "dayjs";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Chip from "@mui/material/Chip";
+
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import DownloadIcon from "@mui/icons-material/Download";
+
+import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
+import CustomDataGrid from "../../../_components/CustomDataGrid";
 
 export default function ReferDataGrid({
-  rows,
+  candidates,
   loading,
-  onDownloadFile,
-  onViewDetails,
-  onMarkAsRead,
-  onMarkAsUnread
+  handleUpdateStatus,
+  showApprovalActions = false,
 }) {
-  const candidateColumns = [
-    { field: "firstName", headerName: "Name", width: 130 },
-    { field: "email", headerName: "Email", width: 210 },
-    { field: "position", headerName: "Position", width: 180 },
+  const columns = [
     {
-      field: "submissionDate",
-      headerName: "Submitted",
-      width: 180,
-      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+      field: "employeeName",
+      headerName: "Employee Name",
+      width: 150,
+    },
+    { field: "vacancyName", headerName: "Vacancy", width: 120 },
+    { field: "applicantName", headerName: "Candidate", width: 120 },
+    { field: "applicantEmail", headerName: "Candidate Email", width: 170 },
+    {
+      field: "message",
+      headerName: "Message",
+      width: 190,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            maxWidth: "100%",
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "status",
       headerName: "Status",
-      width: 120,
+      width: 100,
       renderCell: (params) => (
-        <Tooltip title={`Click to mark as ${params.value === "read" ? "unread" : "read"}`}>
-          <Chip
-            icon={params.value === "read" ? <CheckCircleIcon /> : <UnreadIcon />}
-            label={params.value}
-            color={params.value === "read" ? "success" : "warning"}
-            size="small"
-            onClick={() => {
-              console.log('Status clicked for:', params.row);
-              if (params.value === "read") {
-                onMarkAsUnread && onMarkAsUnread(params.row.id);
-              } else {
-                onMarkAsRead && onMarkAsRead(params.row.id);
-              }
-            }}
-            sx={{ 
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.8,
-                transform: 'scale(1.05)',
-                transition: 'all 0.2s ease-in-out'
-              }
-            }}
-          />
-        </Tooltip>
+        <Chip
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
+          size="small"
+        />
       ),
     },
     {
-      field: "file",
-      headerName: "File Name",
-      width: 100,
+      field: "fileUrl",
+      headerName: "Resume file",
+      width: 130,
+      renderCell: (params) => {
+        const fileUrl = params.value;
+        if (!fileUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + fileUrl;
+        return (
+          <Button
+            component="a"
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            variant="outlined"
+            size="small"
+            sx={{
+              fontSize: "0.75rem",
+              minWidth: "auto",
+              px: 1,
+              py: 0.5,
+            }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
+          >
+            Download
+          </Button>
+        );
+      },
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 80,
       headerClassName: "last-column",
-      align: "center",
       renderCell: (params) => (
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            gap: 0.5,
             mt: 1,
+            width: "100%",
+            justifyContent: "center",
           }}
         >
-          <Tooltip title={params.row.fileUrl ? "Download File" : "No file available"}>
-            <IconButton
-              size="small"
-              onClick={() => {
-                console.log('Download clicked for:', params.row); // Debug log
-                if (onDownloadFile && typeof onDownloadFile === 'function') {
-                  onDownloadFile(params.row);
-                } else {
-                  console.error('onDownloadFile is not a function:', onDownloadFile);
+          {showApprovalActions && params.row.status === "unread" && (
+            <Tooltip title="Mark as read">
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleUpdateStatus && handleUpdateStatus(params.row, "read")
                 }
-              }}
-              sx={{ color: '#E91E63' }}
-              disabled={!params.row.fileUrl}
-            >
-              <DownloadIcon />
-            </IconButton>
-          </Tooltip>
+                color="success"
+              >
+                <CheckCircle />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       ),
     },
   ];
 
   return (
-    <DataGrid
-      rows={rows}
-      columns={candidateColumns}
-      pageSize={10}
-    />
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <CustomDataGrid rows={candidates} columns={columns} />
+      )}
+    </Box>
   );
 }

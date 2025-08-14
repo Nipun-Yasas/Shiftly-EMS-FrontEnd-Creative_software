@@ -1,31 +1,38 @@
 "use client";
 
-import React from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Chip from "@mui/material/Chip";
+
 import Cancel from "@mui/icons-material/Cancel";
 import CheckCircle from "@mui/icons-material/CheckCircle";
-import Download from "@mui/icons-material/Download";
+import DownloadIcon from "@mui/icons-material/Download";
 
-import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 
 import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
+import CustomDataGrid from "../../../_components/CustomDataGrid";
 
 export default function ClaimsDataGrid({
   claims,
   loading,
-  height = "auto",
-  onApprovalAction,
+  handleUpdateStatus,
   showApprovalActions = false,
 }) {
-  const claimColumns = [
-    { field: "employee_name", headerName: "Employee", width: 150 },
-    { field: "department", headerName: "Department", width: 150 },
+  const columns = [
+    {
+      field: "employeeName",
+      headerName: "Employee Name",
+      width: 150,
+    },
+    {
+      field: "departmentName",
+      headerName: "Department",
+      width: 150,
+    },
     { field: "type", headerName: "Type", width: 110 },
     {
       field: "claimDate",
@@ -42,45 +49,50 @@ export default function ClaimsDataGrid({
     {
       field: "status",
       headerName: "Status",
-      width: 130,
+      width: 120,
       renderCell: (params) => (
         <Chip
-          icon={getStatusIcon(params.value)}
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
+          icon={getStatusIcon(params.value.toLowerCase())}
+          label={params.value}
+          color={getStatusColor(params.value.toLowerCase())}
           size="small"
         />
       ),
     },
     {
       field: "claimUrl",
-      headerName: "File",
-      width: 120,
-      sortable: false,
-      renderCell: (params) => 
-        params.value ? (
+      headerName: "Claim File",
+      width: 150,
+      renderCell: (params) => {
+        const claimUrl = params.value;
+        if (!claimUrl) return "No file";
+        const fullUrl = "http://localhost:8080" + claimUrl;
+        return (
           <Button
+            component="a"
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
             variant="outlined"
             size="small"
-            startIcon={<Download />}
-            onClick={() => window.open(`http://localhost:8080${params.value}`, '_blank')}
-            sx={{ 
-              fontSize: '0.75rem',
-              minWidth: 'auto',
+            sx={{
+              fontSize: "0.75rem",
+              minWidth: "auto",
               px: 1,
-              py: 0.5
+              py: 0.5,
             }}
+            startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
           >
             Download
           </Button>
-        ) : (
-          <span style={{ color: '#999' }}>No file</span>
-        ),
+        );
+      },
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 110,
+      width: 100,
       headerClassName: "last-column",
       renderCell: (params) => (
         <Box
@@ -98,7 +110,8 @@ export default function ClaimsDataGrid({
                 <IconButton
                   size="small"
                   onClick={() =>
-                    onApprovalAction && onApprovalAction(params.row, "approve")
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "approve")
                   }
                   color="success"
                 >
@@ -109,7 +122,8 @@ export default function ClaimsDataGrid({
                 <IconButton
                   size="small"
                   onClick={() =>
-                    onApprovalAction && onApprovalAction(params.row, "reject")
+                    handleUpdateStatus &&
+                    handleUpdateStatus(params.row, "reject")
                   }
                   color="error"
                 >
@@ -124,25 +138,18 @@ export default function ClaimsDataGrid({
   ];
 
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-          <CircularProgress />
-        </Box>
+        <CircularProgress />
       ) : (
-        <Box sx={{ height: height, width: "100%" }}>
-          <DataGrid
-            rows={claims}
-            columns={claimColumns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 25, 50]}
-          />
-        </Box>
+        <CustomDataGrid rows={claims} columns={columns} />
       )}
-    </>
+    </Box>
   );
 }

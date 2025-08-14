@@ -5,20 +5,14 @@ import Box from "@mui/material/Box";
 
 import EventDataGrid from "./EventDataGrid";
 
-export default function AllTab({
-  loading,
-  events,
-  onViewDetails,
-  onApprovalAction,
-}) {
+export default function AllTab({ events, loading, handleUpdateStatus }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
       <EventDataGrid
+        events={events}
         loading={loading}
-        events={events.filter((e) => e.status !== "pending")}
-        onViewDetails={onViewDetails}
-        onApprovalAction={onApprovalAction}
-        showApprovalActions={false}
+        handleUpdateStatus={handleUpdateStatus}
+        showApprovalActions={true}
       />
     </Box>
   );

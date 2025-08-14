@@ -8,7 +8,6 @@ import TimeSheetDataGrid from "./TimeSheetDataGrid";
 export default function PendingTab({
   timeSheets,
   loading,
-  onViewClaim,
   handleUpdateStatus,
 }) {
   return (
@@ -16,7 +15,6 @@ export default function PendingTab({
       <TimeSheetDataGrid
         timeSheets={timeSheets}
         loading={loading}
-        onViewClaim={onViewClaim}
         handleUpdateStatus={handleUpdateStatus}
         showApprovalActions={true}
       />

@@ -3,24 +3,10 @@ import { Box } from "@mui/material";
 
 import ReferDataGrid from "./ReferDataGrid";
 
-export default function ReadTab({
-  candidates,
-  loading,
-  onViewDetails,
-  onMarkAsRead,
-  onMarkAsUnread,
-  onDownloadFile, // Make sure this prop is included
-}) {
+export default function ReadTab({ candidates, loading }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
-      <ReferDataGrid
-        rows={candidates}
-        loading={loading}
-        onViewDetails={onViewDetails}
-        onMarkAsRead={onMarkAsRead}
-        onMarkAsUnread={onMarkAsUnread}
-        onDownloadFile={onDownloadFile} // Pass it to ReferDataGrid
-      />
+      <ReferDataGrid candidates={candidates} loading={loading} />
     </Box>
   );
 }

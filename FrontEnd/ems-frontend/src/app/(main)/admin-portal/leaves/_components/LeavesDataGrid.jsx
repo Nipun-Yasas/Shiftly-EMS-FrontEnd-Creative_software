@@ -82,7 +82,7 @@ export default function TimeSheetDataGrid({
         >
           {showApprovalActions && params.row.status === "pending" && (
             <>
-              <Tooltip title="Approve Time Sheet">
+              <Tooltip title="Approve Leave">
                 <IconButton
                   size="small"
                   onClick={() =>
@@ -94,7 +94,7 @@ export default function TimeSheetDataGrid({
                   <CheckCircle />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Reject Time Sheet">
+              <Tooltip title="Reject Leave">
                 <IconButton
                   size="small"
                   onClick={() =>

@@ -5,14 +5,10 @@ import Box from "@mui/material/Box";
 
 import LeavesDataGrid from "./LeavesDataGrid";
 
-export default function RejectedTab({ leaves, loading, onViewClaim }) {
+export default function RejectedTab({ leaves, loading }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
-      <LeavesDataGrid
-        leaves={leaves}
-        loading={loading}
-        onViewClaim={onViewClaim}
-      />
+      <LeavesDataGrid leaves={leaves} loading={loading} />
     </Box>
   );
 }

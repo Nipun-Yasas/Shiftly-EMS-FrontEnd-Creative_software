@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 
@@ -15,37 +13,20 @@ import Close from "@mui/icons-material/Close";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import Cancel from "@mui/icons-material/Cancel";
 
-export default function ClaimApprovalDialog({
+export default function ActionDialog({
   open,
   onClose,
-  selectedClaim,
+  selectedRecord,
   action,
-  onApprove,
-  onReject,
+  onRead,
+  onUnRead,
 }) {
-  const [reason, setReason] = useState("");
-
-  const handleApprove = () => {
-    if (onApprove) {
-      onApprove(reason);
-    }
-    setReason("");
-  };
-
-  const handleReject = () => {
-    if (onReject) {
-      onReject(reason);
-    }
-    setReason("");
-  };
-
   const handleClose = () => {
-    setReason("");
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}  fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle>
         <Box
           sx={{
@@ -55,25 +36,24 @@ export default function ClaimApprovalDialog({
           }}
         >
           <Typography variant="h6">
-            {action === "approve" ? "Approve Claim" : "Reject Claim"}
+            {action === "read" ? "Mark as Read" : "Mark as Unread"}
           </Typography>
           <IconButton onClick={handleClose}>
             <Close />
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent >
-        {selectedClaim && (
+      <DialogContent>
+        {selectedRecord && (
           <Box>
             <Typography variant="body1" gutterBottom>
-              are you sure you want to {action} the claim for{" "}
-              {selectedClaim.employee_name}?
+              Are you sure you want to {action} this record for{" "}
+              {selectedRecord.employeeName || "this employee"}?
             </Typography>
-            
           </Box>
         )}
       </DialogContent>
-      <DialogActions sx={{p:2}}>
+      <DialogActions sx={{ p: 2 }}>
         <Box
           sx={{
             justifyContent: { xs: "center", md: "flex-end" },
@@ -85,27 +65,25 @@ export default function ClaimApprovalDialog({
           <Button color="text.primary" onClick={handleClose}>
             Cancel
           </Button>
-          {action === "approve" ? (
+          {action === "read" ? (
             <Button
               color="success"
               variant="contained"
               startIcon={<CheckCircle />}
-              onClick={handleApprove}
+              onClick={() => onRead && onRead()}
             >
-              Approve
+              mark as Read
             </Button>
           ) : (
             <Button
               color="error"
               variant="contained"
               startIcon={<Cancel />}
-              onClick={handleReject}
+              onClick={() => onUnRead && onUnRead()}
             >
-              Reject
+              mark as Unread
             </Button>
           )}
-
-          
         </Box>
       </DialogActions>
     </Dialog>
