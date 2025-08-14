@@ -13,10 +13,10 @@ export default function CustomAppTitle() {
       }}
     >
       <Image
-        src="/shiftly-logo.png"
+        src="/shiftlyLogo.svg"
         alt="Company Logo"
-        width={75}
-        height={50}
+        width={100}
+        height={100}
       />
     </Box>
   );

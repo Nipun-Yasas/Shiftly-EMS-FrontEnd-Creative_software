@@ -17,6 +17,11 @@ const DateInput = ({ name, label, disablePast = false, ...props }) => {
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <DesktopDatePicker
         label={label}
+         sx={{
+        "& label": {
+          color: "text.primary",
+        },
+      }}
         value={field.value ? dayjs(field.value) : null}
         onChange={(date) => {
           if (dayjs.isDayjs(date) && date.isValid()) {
@@ -31,6 +36,7 @@ const DateInput = ({ name, label, disablePast = false, ...props }) => {
             error: Boolean(meta.touched && meta.error),
             helperText: meta.touched && meta.error ? meta.error : "",
           },
+          
         }}
       />
     </LocalizationProvider>

@@ -69,7 +69,7 @@ export default function page() {
     }
   };
 
-   const fetchVacancies = async () => {
+  const fetchVacancies = async () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(
@@ -131,7 +131,7 @@ export default function page() {
     setDeleteDialogOpen(true);
   };
 
-  const handleUpdate = async (values, { setSubmitting,resetForm }) => {
+  const handleUpdate = async (values, { setSubmitting, resetForm }) => {
     if (!selectedRecord) return;
     setLoading(true);
     try {
@@ -139,7 +139,7 @@ export default function page() {
       formData.append("vacancyId", values.vacancy?.id);
       formData.append("applicantName", values.applicantName);
       formData.append("applicantEmail", values.applicantEmail);
-      formData.append("message", values.message );
+      formData.append("message", values.message);
       if (values.file) {
         formData.append("file", values.file);
       }
@@ -303,27 +303,27 @@ export default function page() {
             {
               label: "Unread",
               color: "warning",
-              value: refferals.filter((d) => d.status?.toLowerCase() === "unread")
-                .length,
+              value: refferals.filter(
+                (d) => d.status?.toLowerCase() === "unread"
+              ).length,
             },
             {
               label: "Read",
               color: "success",
-              value: refferals.filter(
-                (d) => d.status?.toLowerCase() === "read"
-              ).length,
+              value: refferals.filter((d) => d.status?.toLowerCase() === "read")
+                .length,
             },
-            
           ].map((card, index) => (
             <Grid item key={index}>
               <Card
-                sx={{
+                sx={(theme) => ({
                   minWidth: { xs: "125px", sm: "125px", lg: "200px" },
                   maxHeight: "60px",
                   textAlign: "center",
-                  bgcolor: `${card.color}.light`,
+                  bgcolor: theme.palette[card.color]?.light,
                   borderRadius: 10,
-                }}
+                  border: `2px solid ${theme.palette[card.color]?.main}`,
+                })}
                 elevation={0}
               >
                 <CardContent
@@ -347,7 +347,7 @@ export default function page() {
                   <Typography
                     sx={{
                       fontSize: "0.85rem",
-                      color: `${card.color}.contrastText`,
+                      color: "#000000",
                     }}
                   >
                     {card.label}

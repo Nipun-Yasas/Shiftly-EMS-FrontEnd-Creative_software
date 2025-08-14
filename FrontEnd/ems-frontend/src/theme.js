@@ -27,25 +27,25 @@ const theme = createTheme({
           main: "#F44336",
           light: "#ff908eff",
           dark: "#c62828",
-          contrastText: "#fff"
+          contrastText: "#ffffff"
         },
         warning: {
           main: "#ed6c02",
           light: "#ffd79aff",
           dark: "#e65100",
-          contrastText: "#fff"
+          contrastText: "#ffffff"
         },
         info: {
           main: "#0288d1",
           light: "#acd4ffff",
           dark: "#01579b",
-          contrastText: "#fff"
+          contrastText: "#ffffff"
         },
         success: {
           main: "#2e7d32",
           light: "#73e177ff",
           dark: "#1b5e20",
-          contrastText: "#fff"
+          contrastText: "#ffffff"
         },
         textblack: {
           main: '#000000',
@@ -89,25 +89,25 @@ const theme = createTheme({
           main: "#F44336",
           light: "#ef5350",
           dark: "#c62828",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          contrastText: "#000000"
         },
         warning: {
           main: "#ffa726",
           light: "#ffb74d",
           dark: "#f57c00",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          contrastText: "#000000"
         },
         info: {
           main: "#29b6f6",
           light: "#4fc3f7",
           dark: "#0288d1",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          contrastText: "#000000"
         },
         success: {
           main: "#66bb6a",
           light: "#81c784",
           dark: "#388e3c",
-          contrastText: "rgba(0, 0, 0, 0.87)"
+          contrastText: "#000000"
         },
         textblack: {
           main: '#ffffff',

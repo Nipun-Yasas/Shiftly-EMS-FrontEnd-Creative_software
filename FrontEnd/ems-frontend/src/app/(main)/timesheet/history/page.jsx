@@ -315,13 +315,14 @@ export default function TimeSheetHistory() {
           ].map((card, index) => (
             <Grid item key={index}>
               <Card
-                sx={{
+                sx={(theme) => ({
                   minWidth: { xs: "125px", sm: "125px", lg: "200px" },
                   maxHeight: "60px",
                   textAlign: "center",
-                  bgcolor: `${card.color}.light`,
+                  bgcolor: theme.palette[card.color]?.light,
                   borderRadius: 10,
-                }}
+                  border: `2px solid ${theme.palette[card.color]?.main}`,
+                })}
                 elevation={0}
               >
                 <CardContent
@@ -345,7 +346,7 @@ export default function TimeSheetHistory() {
                   <Typography
                     sx={{
                       fontSize: "0.85rem",
-                      color: `${card.color}.contrastText`,
+                      color: "#000000",
                     }}
                   >
                     {card.label}
