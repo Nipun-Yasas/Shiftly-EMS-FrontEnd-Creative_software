@@ -10,11 +10,10 @@ import { UserContext } from "../../../../context/UserContext";
 
 import ReadonlyTextInput from "./ReadonlyTextInput";
 
-const BasicInfoTab = ({ employeeData }) => {
+const BasicInfoTab = ({ employee }) => {
   const theme = useTheme();
   const { user } = useContext(UserContext);
 
-  // Format date function
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -34,7 +33,6 @@ const BasicInfoTab = ({ employeeData }) => {
       }}
     >
       <Stack spacing={3}>
-        {/* Left Column */}
         <Box>
           <Stack spacing={3}>
             <Box
@@ -48,14 +46,11 @@ const BasicInfoTab = ({ employeeData }) => {
               <ReadonlyTextInput
                 label="Full Name"
                 value={
-                  employeeData?.firstName && employeeData?.lastName
-                    ? `${employeeData.firstName} ${employeeData.lastName}`
-                    : employeeData?.username || ""
-                }
+                  employee?.fullName || ""}
               />
               <ReadonlyTextInput
                 label="Email"
-                value={user?.email || employeeData?.user?.email || ""}
+                value={user?.email || ""}
               />
             </Box>
             <Box
@@ -68,11 +63,11 @@ const BasicInfoTab = ({ employeeData }) => {
             >
               <ReadonlyTextInput
                 label="Department"
-                value={user?.department || employeeData?.department?.name || ""}
+                value={employee?.department || ""}
               />
               <ReadonlyTextInput
                 label="Designation"
-                value={user?.designation || employeeData?.designation || ""}
+                value={employee?.designationName || ""}
               />
             </Box>
             <Box
@@ -85,11 +80,11 @@ const BasicInfoTab = ({ employeeData }) => {
             >
               <ReadonlyTextInput
                 label="Gender"
-                value={employeeData?.gender || ""}
+                value={employee?.gender || ""}
               />
               <ReadonlyTextInput
                 label="Date of Birth"
-                value={formatDate(employeeData?.dob)}
+                value={formatDate(employee?.dob)}
               />
             </Box>
 
@@ -103,12 +98,12 @@ const BasicInfoTab = ({ employeeData }) => {
             >
               <ReadonlyTextInput
                 label="Location"
-                value={employeeData?.location || ""}
+                value={employee?.location || ""}
               />
               
               <ReadonlyTextInput
                 label="Team"
-                value={employeeData?.teamName || ""}
+                value={employee?.teamName || ""}
               />
             </Box>
             <Box
@@ -121,11 +116,11 @@ const BasicInfoTab = ({ employeeData }) => {
             >
               <ReadonlyTextInput
                 label="Reporting Person"
-                value={user?.reportingPerson || ""}
+                value={employee?.reportingPerson || ""}
               />
               <ReadonlyTextInput
                 label="Reporting Person Email"
-                value={user?.reportingPersonEmail || ""}
+                value={employee?.reportingPersonEmail || ""}
               />
             </Box>
           </Stack>

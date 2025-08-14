@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense, useContext } from "react";
+
 import { useRouter } from "next/navigation";
 
 import FolderIcon from "@mui/icons-material/Folder";
@@ -23,45 +24,33 @@ import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { getProfilePicture } from "../../../_utils/profilePictureUtils";
 
-const Employee = () => {
+export default function EmployeePage() {
   const theme = useTheme();
   const router = useRouter();
   const { user } = useContext(UserContext);
-  const [employeeData, setEmployeeData] = useState(null);
+  const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Get user's profile picture from localStorage
   const userProfilePicture = getProfilePicture(user?.id || user?.username);
 
-  useEffect(() => {
-    checkEmployeeProfile();
-  }, []);
-
-  const checkEmployeeProfile = async () => {
+    const fetchEmployee = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
-
-      if (response.data) {
-        setEmployeeData(response.data);
-      }
+      const response = await axiosInstance.get(
+        API_PATHS.EMPLOYEE.GET_BY_USERID(user.id)
+      );
+      setEmployee(response.data);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // If no employee profile found, redirect to update page
-        router.push("/employee/update");
-        return;
-      } else {
-        // Log only unexpected errors
-        setError("Error loading employee profile. Please try again.");
-      }
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchEmployee();
+  }, []);
+
   const handleUpdateProfile = () => {
-    // Navigate to the employee update form
     router.push("/employee/update");
   };
 
@@ -88,7 +77,6 @@ const Employee = () => {
         overflow: "hidden",
       }}
     >
-      {/* Header Section with Avatar and Basic Info */}
       <Paper
         elevation={3}
         sx={{
@@ -104,7 +92,6 @@ const Employee = () => {
           mb: { xs: 2, sm: 3 },
         }}
       >
-        {/* Left Section - Avatar and Name */}
         <Box
           display="flex"
           alignItems="center"
@@ -154,13 +141,10 @@ const Employee = () => {
               mt: { xs: 1, sm: 0 },
             }}
           >
-            {employeeData?.firstName && employeeData?.lastName
-              ? `${employeeData.firstName} ${employeeData.lastName}`
-              : employeeData?.username || "Employee Name"}
+            {employee?.fullName || ""}
           </Typography>
         </Box>
 
-        {/* Right Section - Job Info */}
         <Box
           sx={{
             color: theme.palette.text,
@@ -172,8 +156,7 @@ const Employee = () => {
             minWidth: { xs: "100%", sm: "auto" },
           }}
         >
-          {/* Job Title/Designation */}
-          {(user?.designation || employeeData?.designation) && (
+          {employee?.designationName && (
             <Box
               display="flex"
               alignItems="center"
@@ -199,13 +182,12 @@ const Employee = () => {
                   color: theme.palette.text,
                 }}
               >
-                {user?.email || employeeData?.email}
+                {user?.email || ""}
               </Typography>
             </Box>
           )}
 
-          {/* Department (Read-only) */}
-          {(user?.department || employeeData?.department) && (
+          {(employee?.department) && (
             <Box
               display="flex"
               alignItems="center"
@@ -232,13 +214,11 @@ const Employee = () => {
                   wordBreak: "break-word",
                 }}
               >
-                {user?.department || employeeData?.department?.name || "Department"}
               </Typography>
             </Box>
           )}
 
-          {/* Location */}
-          {employeeData?.location && (
+          {employee?.location && (
             <Box
               display="flex"
               alignItems="center"
@@ -259,14 +239,13 @@ const Employee = () => {
                   wordBreak: "break-word",
                 }}
               >
-                <LocationOnIcon/> {employeeData.location}
+                <LocationOnIcon/> {employee.location}
               </Typography>
             </Box>
           )}
         </Box>
       </Paper>
 
-      {/* Tabs Container */}
       <Box
         sx={{
           borderRadius: { xs: 2, sm: 3 },
@@ -275,27 +254,10 @@ const Employee = () => {
         }}
       >
         <Suspense fallback={<CircularProgress />}>
-          <TabBar theme={theme} employeeData={employeeData} />
+          <TabBar theme={theme} employee={employee} />
         </Suspense>
       </Box>
     </Box>
   );
 };
 
-const EmployeePage = () => {
-  const router = useRouter();
-  const { user } = useContext(UserContext);
-  // If user context is missing, or user is authenticated but has no employee profile, redirect
-  useEffect(() => {
-    if (!user) {
-      router.replace("/employee/update");
-    }
-  }, [user, router]);
-  return (
-    <Suspense fallback={<CircularProgress />}>
-      <Employee />
-    </Suspense>
-  );
-};
-
-export default EmployeePage;

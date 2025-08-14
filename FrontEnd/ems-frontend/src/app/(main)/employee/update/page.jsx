@@ -110,80 +110,57 @@ export default function EmployeeUpdatePage() {
   const { teams, loading: loadingTeams } = useTeams(teamsDepartmentId);
 
   const [loading, setLoading] = useState(true);
-  const [employeeData, setEmployeeData] = useState(null);
+  const [employee, setEmployee] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Track editing state
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  useEffect(() => {
-    fetchEmployeeProfile();
-  }, []);
-
-  const fetchEmployeeProfile = async () => {
+   const fetchEmployee = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null); // Clear any previous errors
-
-      const response = await axiosInstance.get(API_PATHS.EMPLOYEE.GET_PROFILE);
-
-      if (response.data) {
-        setEmployeeData(response.data);
-        setIsEditing(true);
-      }
+      const response = await axiosInstance.get(
+        API_PATHS.EMPLOYEE.GET_BY_USERID(user.id)
+      );
+      setEmployee(response.data);
     } catch (error) {
-      // Only log unexpected errors (not 404s for new users)
-      if (error.response?.status !== 404) {
-      }
-
-      if (error.response && error.response.status === 404) {
-        // This is expected for new users creating their first profile
-        setIsEditing(false);
-        setEmployeeData(null);
-        // Don't set error state for expected 404 - this is normal for new users
-      } else if (error.response && error.response.status === 401) {
-        setError(
-          "You are not authorized to access this profile. Please log in again."
-        );
-      } else if (error.response && error.response.status === 403) {
-        setError("You don't have permission to access this profile.");
-      } else if (error.request) {
-        setError("Network error. Please check your connection and try again.");
-      } else {
-        setError("Error loading profile data. Please try again.");
-      }
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchEmployee();
+  }, []);
+
+
   const getInitialValues = () => {
     // Always use the localStorage image if available
-    const userId = employeeData?.id || employeeData?.username || user?.id || user?.username;
+    const userId = employee?.id || employee?.username || user?.id || user?.username;
     const localProfilePicture = getProfilePicture(userId);
-    if (employeeData) {
+    if (employee) {
       return {
-        firstName: employeeData.firstName || "",
-        lastName: employeeData.lastName || "",
+        firstName: employee.firstName || "",
+        lastName: employee.lastName || "",
         gender:
-          genderOptions.find((g) => g.name === employeeData.gender) || null,
-        dob: employeeData.dob || "",
-        location: employeeData.location || "",
+          genderOptions.find((g) => g.name === employee.gender) || null,
+        dob: employee.dob || "",
+        location: employee.location || "",
         team:
           teams.find(
             (t) =>
-              t.id === employeeData.teamId || t.name === employeeData.teamName
+              t.id === employee.teamId || t.name === employee.teamName
           ) || null,
-        skills: Array.isArray(employeeData.skills)
-          ? employeeData.skills.join("\n")
-          : employeeData.skills || "",
-        education: Array.isArray(employeeData.education)
-          ? employeeData.education.join("\n")
-          : employeeData.education || "",
-        experience: Array.isArray(employeeData.experience)
-          ? employeeData.experience.join("\n")
-          : employeeData.experience || "",
-        profilePicture: localProfilePicture || employeeData.profilePicture || null,
+        skills: Array.isArray(employee.skills)
+          ? employee.skills.join("\n")
+          : employee.skills || "",
+        education: Array.isArray(employee.education)
+          ? employee.education.join("\n")
+          : employee.education || "",
+        experience: Array.isArray(employee.experience)
+          ? employee.experience.join("\n")
+          : employee.experience || "",
+        profilePicture: localProfilePicture || employee.profilePicture || null,
       };
     }
     return {
@@ -213,15 +190,14 @@ export default function EmployeeUpdatePage() {
       setError(null);
       setSuccess(null);
 
-      // Transform data to match backend expectations (arrays instead of strings)
       const employeePayload = {
         firstName: values.firstName,
         lastName: values.lastName,
         gender: values.gender?.name || values.gender,
         dob: values.dob,
         location: values.location,
-        teamId: values.team?.id || null, // Send team ID
-        teamName: values.team?.name || null, // Send team name for reference
+        teamId: values.team?.id || null,
+        teamName: values.team?.name || null, 
         skills: values.skills
           ? values.skills.split("\n").filter((skill) => skill.trim() !== "")
           : [],
@@ -233,51 +209,30 @@ export default function EmployeeUpdatePage() {
           : [],
       };
 
-      let response;
-      if (employeeData?.employeeId) {
-        // Update existing profile
-        response = await axiosInstance.put(
-          API_PATHS.EMPLOYEE.UPDATE_PROFILE,
+      const response = await axiosInstance.put(
+          API_PATHS.EMPLOYEE.UPDATE(employee?.employeeId),
           employeePayload
-        );
-      } else {
-        // Create new profile - use the correct endpoint
-        response = await axiosInstance.put(
-          API_PATHS.EMPLOYEE.UPDATE_PROFILE,
-          employeePayload
-        );
-      }
+      );
 
       if (response.data) {
         setSuccess("Employee profile created successfully!");
         showSnackbar("Profile updated successfully!", "success");
-        // Update the employee profile cache so the layout will allow navigation
         employeeProfileCache.setStatus(true);
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
       }
     } catch (error) {
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-        showSnackbar(error.response.data.message, "error");
-      } else {
-        setError("Error updating employee profile. Please try again.");
         showSnackbar("Error updating employee profile. Please try again.", "error");
-      }
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleBack = () => {
-    // If user has an existing profile, go back to profile page
-    // If user is creating a new profile, they can't go back (they'll be blocked anyway)
     if (isEditing) {
       router.push("/employee/profile");
     } else {
-      // For new users, don't allow going back as they need to complete their profile
-      // Maybe redirect to dashboard or just stay on the same page
       router.push("/dashboard");
     }
   };
@@ -307,21 +262,18 @@ export default function EmployeeUpdatePage() {
           sx={{ fontSize: 60, color: theme.palette.primary.main, my: 2 }}
         />
         <Typography variant="h4" sx={{ mb: 1, color: theme.palette.text }}>
-          {employeeData ? "Update Employee Profile" : "Create Employee Profile"}
+          {employee ? "Update Employee Profile" : "Create Employee Profile"}
         </Typography>
         <Typography variant="body1" sx={{ color: theme.palette.text }}>
-          {employeeData
+          {employee
             ? "Update your employee information below"
             : "Complete your employee profile to access all features"}
         </Typography>
       </Box>
 
-      {/* Alerts */}
-
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
@@ -334,7 +286,7 @@ export default function EmployeeUpdatePage() {
       <Formik
         initialValues={getInitialValues()}
         validationSchema={validationSchema}
-        context={{ employeeData }}
+        context={{ employee }}
         onSubmit={handleSubmit}
         enableReinitialize
       >
@@ -349,7 +301,6 @@ export default function EmployeeUpdatePage() {
                   Personal Information
                 </Typography>
 
-                {/* Profile Picture Upload */}
                 <Box
                   sx={{
                     display: "flex",
@@ -518,7 +469,7 @@ export default function EmployeeUpdatePage() {
                   >
                     {isSubmitting
                       ? "Saving..."
-                      : employeeData
+                      : employee
                         ? "Update Profile"
                         : "Create Profile"}
                   </Button>

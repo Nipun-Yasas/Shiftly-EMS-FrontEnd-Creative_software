@@ -23,7 +23,7 @@ const tabs = [
   { label: "Skills", value: 4, component: SkillsTab },
 ];
 
-const TabBar = ({ theme, employeeData }) => {
+const TabBar = ({ theme, employee }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [tabValue, setTabValue] = useState(0);
@@ -98,7 +98,7 @@ const TabBar = ({ theme, employeeData }) => {
             const Component = tab.component;
             return (
               <TabPanel key={tab.value} value={tabValue} index={tab.value}>
-                <Component employeeData={employeeData} />
+                <Component employee={employee} />
               </TabPanel>
             );
           })}

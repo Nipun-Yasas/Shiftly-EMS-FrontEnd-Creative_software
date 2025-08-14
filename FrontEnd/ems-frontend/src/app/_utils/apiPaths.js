@@ -22,9 +22,10 @@ export const API_PATHS = {
   },
   EMPLOYEE: {
     ADD: (userId) => `/api/v1/shiftly/ems/employee/add/${userId}`,
-    DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
     GET_BY_USERID: (id) => `/api/v1/shiftly/ems/employee/${id}`,
-    GET_BY_DEPARTMENTID: (id) => `/api/v1/shiftly/ems/employee/by-department/${id}`
+    GET_BY_DEPARTMENTID: (id) => `/api/v1/shiftly/ems/employee/by-department/${id}`,
+    DELETE: (id) => `/api/v1/shiftly/ems/employee/delete/${id}`,
+    UPDATE: (id) => `/api/v1/shiftly/ems/employee/update/${id}`,
   },
   DEPARTMENTS: {
     ADD: "/api/v1/shiftly/ems/departments/add",

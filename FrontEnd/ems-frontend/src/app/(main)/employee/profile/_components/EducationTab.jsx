@@ -16,18 +16,17 @@ import Button from '@mui/material/Button';
 import TextInput from '@/app/_components/inputs/TextInput';
 import InputItem from '@/app/_components/inputs/InputItem';
 
-const EducationTab = ({ employeeData }) => {
+const EducationTab = ({ employee }) => {
   const theme = useTheme();
 
-  // State for education list
-  const [educationList, setEducationList] = useState(Array.isArray(employeeData?.education) ? employeeData.education : (employeeData?.education ? [employeeData.education] : []));
+  const [educationList, setEducationList] = useState(Array.isArray(employee?.education) ? employee.education : (employee?.education ? [employee.education] : []));
   const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  // Keep state in sync if employeeData changes
+  // Keep state in sync if employee changes
   useEffect(() => {
-    setEducationList(Array.isArray(employeeData?.education) ? employeeData.education : (employeeData?.education ? [employeeData.education] : []));
-  }, [employeeData]);
+    setEducationList(Array.isArray(employee?.education) ? employee.education : (employee?.education ? [employee.education] : []));
+  }, [employee]);
 
   // Add new education(s)
   const handleAddEducation = (newEducation) => {
