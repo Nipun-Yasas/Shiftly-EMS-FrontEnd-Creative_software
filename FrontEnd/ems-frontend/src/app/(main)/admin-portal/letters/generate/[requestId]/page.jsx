@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Box, Paper, CircularProgress, Typography, Alert, Button } from "@mui/material";
 
-import axiosInstance from "../../../../_utils/axiosInstance";
-import { API_PATHS } from "../../../../_utils/apiPaths";
+import axiosInstance from "../../../../../_utils/axiosInstance";
+import { API_PATHS } from "../../../../../_utils/apiPaths";
 import LetterGenerationInterface from "../../../../letter/components/LetterGenerationInterface";
 
 // Map backend enum to display name used by the generator
@@ -36,12 +36,29 @@ export default function AdminGenerateLetterPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.GET_BY_ID(requestId));
-        const data = res?.data?.data || res?.data || {};
-        const typeName = mapEnumToLetterTypeName(data.letterType || data.type);
-        if (!typeName) throw new Error('Invalid letter type');
-        setLetterType(typeName);
-        setFormData(data.fields || {});
+        // Primary: fetch specific request
+        try {
+          const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.GET_BY_ID(requestId));
+          const data = res?.data?.data || res?.data || {};
+          const typeName = mapEnumToLetterTypeName(data.letterType || data.type);
+          if (!typeName) throw new Error('Invalid letter type');
+          setLetterType(typeName);
+          setFormData(data.fields || {});
+        } catch (innerErr) {
+          // Fallback: fetch all and find by id
+          const listRes = await axiosInstance.get(API_PATHS.LETTER.REQUEST.ALL);
+          const list = Array.isArray(listRes?.data) ? listRes.data : (listRes?.data?.data || []);
+          const match = (list || []).find((r) => String(r?.id ?? r?.requestId) === String(requestId));
+          if (match) {
+            const typeName = mapEnumToLetterTypeName(match.letterType || match.type);
+            setLetterType(typeName || 'Letter');
+            setFormData(match.fields || {});
+          } else {
+            // As last resort, continue with requestId only; generator will call backend
+            setLetterType('Letter');
+            setFormData({});
+          }
+        }
       } catch (e) {
         setError(e?.response?.data?.message || e.message || 'Failed to load request');
       } finally {
@@ -76,6 +93,7 @@ export default function AdminGenerateLetterPage() {
     <LetterGenerationInterface
       letterType={letterType}
       formData={formData || {}}
+      requestId={requestId}
       onBack={() => router.push('/admin-portal/letters')}
       onStartOver={() => router.push('/admin-portal/letters')}
     />

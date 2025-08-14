@@ -138,7 +138,7 @@ export const API_PATHS = {
       GENERATE: (id) => `/api/v1/shiftly/ems/letters/generate/${id}`,
       
       // Legacy endpoints (for fallback)
-      GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}`,
+      GET_BY_ID: (id) => `/api/v1/shiftly/ems/letters/${id}`,
     },
     GENERATE_FROM_REQUEST: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}/generate`,
   },

@@ -27,6 +27,7 @@ const RequestLetter = () => {
   const [selectedLetterType, setSelectedLetterType] = useState(null);
   const [formData, setFormData] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [requestIdForGeneration, setRequestIdForGeneration] = useState(null);
 
   // Map frontend letterType to backend enum (same mapping used in generation UI)
   const mapLetterTypeToEnum = (type) => {
@@ -157,6 +158,7 @@ const RequestLetter = () => {
         if (!typeName) throw new Error('Invalid letter type');
         setSelectedLetterType(typeName);
         setFormData(fields);
+        setRequestIdForGeneration(requestId);
         setCurrentStep('generation');
       } catch (e) {
         setSnackbar({ open: true, message: e?.response?.data?.message || e.message || 'Failed to load request', severity: 'error' });
@@ -184,6 +186,7 @@ const RequestLetter = () => {
         <LetterGenerationInterface
           letterType={selectedLetterType}
           formData={formData}
+          requestId={requestIdForGeneration}
           onBack={handleBackToForm}
           onStartOver={handleStartOver}
         />
