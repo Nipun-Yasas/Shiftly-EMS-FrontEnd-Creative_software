@@ -11,6 +11,7 @@ import { API_PATHS } from '../../_utils/apiPaths';
 import { UserContext } from '../../context/UserContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getUserData, saveUserData } from '../../_utils/localStorageUtils';
+import useLetterRequests from '../../_hooks/useLetterRequests';
 
 import LetterTypeSelector from './components/LetterTypeSelector';
 import LetterRequestForm from './components/LetterRequestForm';
@@ -21,6 +22,7 @@ const RequestLetter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useContext(UserContext);
+  const { createLetterRequest, error: letterError, clearError } = useLetterRequests();
   const [currentStep, setCurrentStep] = useState('selection'); // 'selection', 'form', 'generation' (admins only)
   const [selectedLetterType, setSelectedLetterType] = useState(null);
   const [formData, setFormData] = useState(null);
@@ -52,12 +54,34 @@ const RequestLetter = () => {
       setCurrentStep('generation');
       return;
     }
+
     try {
-      await axiosInstance.post(API_PATHS.LETTER.REQUEST.ADD, {
+      // Get employee ID from user context
+      const employeeId = user?.employeeId || user?.id;
+      if (!employeeId) {
+        setSnackbar({ open: true, message: 'Employee ID not found. Please login again.', severity: 'error' });
+        return;
+      }
+
+      // Clear any previous errors
+      clearError();
+
+      // Create letter request using the new backend endpoint
+      // The backend DTO expects fields as Map<String, Object>
+      // Also ensure employeeId is included in the fields for the service layer
+      const enrichedFormData = {
+        ...data.formData,
+        employeeId: employeeId.toString() // Ensure employeeId is in the fields as the service expects it
+      };
+
+      const requestData = {
         letterType: mapLetterTypeToEnum(data.letterType),
-        fields: data.formData,
-      });
-      setSnackbar({ open: true, message: 'Letter request submitted', severity: 'success' });
+        fields: enrichedFormData, // Send as object to match DTO structure
+      };
+
+      await createLetterRequest(employeeId, requestData);
+      
+      setSnackbar({ open: true, message: 'Letter request submitted successfully', severity: 'success' });
       setTimeout(() => router.push('/letter/history'), 400);
     } catch (e) {
       // Fallback: cache request locally if backend unreachable, so history still shows it
@@ -79,7 +103,8 @@ const RequestLetter = () => {
         setTimeout(() => router.push('/letter/history'), 400);
         return;
       }
-      setSnackbar({ open: true, message: e?.response?.data?.message || 'Failed to submit request', severity: 'error' });
+      const errorMessage = letterError || e?.response?.data?.message || 'Failed to submit request';
+      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
     }
   };
 

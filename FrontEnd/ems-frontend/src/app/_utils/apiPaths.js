@@ -125,9 +125,19 @@ export const API_PATHS = {
     GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/${id}`,
     SEND: "/api/v1/shiftly/ems/ai-letter/send",
     REQUEST: {
-      ADD: "/api/v1/shiftly/ems/ai-letter/requests",
-      MY: "/api/v1/shiftly/ems/ai-letter/requests/my",
-      ALL: "/api/v1/shiftly/ems/ai-letter/requests/all",
+      // User endpoints
+      ADD: (employeeId) => `/api/v1/shiftly/ems/letters/add/${employeeId}`,
+      MY: (employeeId) => `/api/v1/shiftly/ems/letters/employee/${employeeId}`,
+      UPDATE: (id) => `/api/v1/shiftly/ems/letters/update/${id}`,
+      DELETE: (id) => `/api/v1/shiftly/ems/letters/delete/${id}`,
+      
+      // Admin endpoints
+      ALL: "/api/v1/shiftly/ems/letters/all",
+      BY_ADMIN: (adminUserId) => `/api/v1/shiftly/ems/letters/admin/${adminUserId}`,
+      UPDATE_STATUS: (id) => `/api/v1/shiftly/ems/letters/status/${id}`,
+      GENERATE: (id) => `/api/v1/shiftly/ems/letters/generate/${id}`,
+      
+      // Legacy endpoints (for fallback)
       GET_BY_ID: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}`,
     },
     GENERATE_FROM_REQUEST: (id) => `/api/v1/shiftly/ems/ai-letter/requests/${id}/generate`,

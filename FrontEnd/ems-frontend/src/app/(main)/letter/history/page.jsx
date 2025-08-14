@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import Paper from "@mui/material/Paper";
@@ -33,14 +33,27 @@ import { getStatusColor, getStatusIcon } from "../../admin-portal/_helpers/color
 import axiosInstance from "../../../_utils/axiosInstance";
 import { API_PATHS } from "../../../_utils/apiPaths";
 import { getUserData, saveUserData, isDataFresh } from "../../../_utils/localStorageUtils";
+import { UserContext } from "../../../context/UserContext";
+import useLetterRequests from "../../../_hooks/useLetterRequests";
 
 // Local storage key used to cache letter history per user (fallback/cache)
 const LS_KEY = "letterHistory";
 
 export default function LetterHistory() {
 	const router = useRouter();
+	const { user } = useContext(UserContext);
+	const { 
+		letterRequests, 
+		loading, 
+		error, 
+		getLetterRequestsByEmployee, 
+		deleteLetterRequest, 
+		updateLetterRequest,
+		refreshLetterRequests,
+		clearError 
+	} = useLetterRequests();
+	
 	const [rows, setRows] = useState([]);
-	const [loading, setLoading] = useState(false);
 	const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 	const [toDelete, setToDelete] = useState(null);
@@ -51,15 +64,36 @@ export default function LetterHistory() {
 
 	const mapEntriesToRows = (entries = []) => {
 		return (entries || [])
-			.map((e, idx) => ({
-				id: e.id ?? e.requestId ?? e.createdAt ?? idx + 1,
-				letterType: e.letterType || e.type || "",
-				requestedAt: e.requestedAt || e.createdAt || e.date || null,
-				recipientEmail: e.recipientEmail || e.email || "",
-				status: (e.status || "generated").toString().toLowerCase(),
-				letterHtml: e.letterHtml || e.content || "",
-				fields: e.fields || {},
-			}))
+			.filter(e => e && typeof e === 'object') // Filter out null/undefined entries
+			.map((e, idx) => {
+				// Parse fieldsJson if it exists
+				let parsedFields = {};
+				try {
+					if (e.fieldsJson && typeof e.fieldsJson === 'string') {
+						parsedFields = JSON.parse(e.fieldsJson);
+					} else if (e.fields && typeof e.fields === 'object') {
+						parsedFields = e.fields;
+					}
+				} catch (jsonError) {
+					console.warn('Failed to parse fieldsJson:', jsonError);
+					parsedFields = e.fields || {};
+				}
+
+				return {
+					id: e.id ?? e.requestId ?? e.createdAt ?? `temp-${idx + 1}`,
+					letterType: e.letterType || e.type || "",
+					requestedAt: e.requestedAt || e.createdAt || e.date || null,
+					recipientEmail: parsedFields.recipientEmail || parsedFields.email || e.recipientEmail || e.email || "",
+					status: (e.status || "pending").toString().toLowerCase(),
+					letterHtml: e.generatedLetterHtml || e.letterHtml || e.content || "",
+					fields: parsedFields,
+					// Additional fields from backend
+					employeeId: e.employeeId,
+					additionalDetails: e.additionalDetails,
+					fieldsJson: e.fieldsJson, // Keep original for debugging
+				};
+			})
+			.filter(row => row.id != null) // Ensure all rows have valid IDs
 			.sort(
 				(a, b) =>
 					(b.requestedAt ? new Date(b.requestedAt).getTime() : 0) -
@@ -105,8 +139,10 @@ export default function LetterHistory() {
 	};
 
 	const loadHistory = async (silent = false) => {
-		if (!silent) setLoading(true);
 		try {
+			clearError();
+			
+			// Use cached data for silent refreshes if recent
 			const useCache = silent && isDataFresh(LS_KEY, 30 * 1000);
 			if (useCache) {
 				const cached = getUserData(LS_KEY, []);
@@ -115,41 +151,70 @@ export default function LetterHistory() {
 				updateStats(mapped);
 				return;
 			}
-			const res = await axiosInstance.get(API_PATHS.LETTER.REQUEST.MY);
-			const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
-			const mapped = mapEntriesToRows(list);
+
+			// Get employee ID from user context
+			const employeeId = user?.employeeId || user?.id;
+			if (!employeeId) {
+				showSnackbar("Employee ID not found. Please login again.", "error");
+				return;
+			}
+
+			// Fetch from backend using new endpoint
+			const data = await getLetterRequestsByEmployee(employeeId);
+			const mapped = mapEntriesToRows(data);
+			
 			if (silent && rows.length > 0) {
 				checkForStatusUpdates(rows, mapped);
 			}
+			
 			setRows(mapped);
 			updateStats(mapped);
 			saveHistory(mapped);
 		} catch (e) {
+			console.error('Failed to load letter history:', e);
+			// Fallback to cached data
 			const cached = getUserData(LS_KEY, []);
 			const mapped = mapEntriesToRows(cached);
 			setRows(mapped);
 			updateStats(mapped);
-		} finally {
-			if (!silent) setLoading(false);
+			
+			if (!silent) {
+				showSnackbar(error || "Failed to load letter history", "error");
+			}
 		}
 	};
 
 	useEffect(() => {
-		loadHistory();
-	}, []);
+		if (user) {
+			loadHistory();
+		}
+	}, [user]);
+
+	// Update rows when letterRequests changes
+	useEffect(() => {
+		if (letterRequests && letterRequests.length > 0) {
+			const mapped = mapEntriesToRows(letterRequests);
+			setRows(mapped);
+			updateStats(mapped);
+		}
+	}, [letterRequests]);
 
 	const handleDelete = (row) => {
 		setToDelete(row);
 		setDeleteConfirmOpen(true);
 	};
 
-	const confirmDelete = () => {
-		const updated = rows.filter((r) => r.id !== toDelete.id);
-		setRows(updated);
-		saveHistory(updated);
-		updateStats(updated);
-		setDeleteConfirmOpen(false);
-		setToDelete(null);
+	const confirmDelete = async () => {
+		try {
+			await deleteLetterRequest(toDelete.id);
+			showSnackbar("Letter request deleted successfully", "success");
+		} catch (e) {
+			console.error('Failed to delete letter request:', e);
+			showSnackbar(error || "Failed to delete letter request", "error");
+		} finally {
+			setDeleteConfirmOpen(false);
+			setToDelete(null);
+		}
 	};
 
 	const handleView = (row) => {
@@ -207,7 +272,10 @@ export default function LetterHistory() {
 			field: "requestedAt",
 			headerName: "Requested On",
 			width: 140,
-			valueGetter: (params) => params.value || params.row?.requestedAt || null,
+			valueGetter: (params) => {
+				if (!params || !params.row) return null;
+				return params.value || params.row.requestedAt || null;
+			},
 			renderCell: (params) => (params.value ? dayjs(params.value).format("MMM DD, YYYY") : "-"),
 			sortComparator: (a, b) => {
 				const ta = a ? new Date(a).getTime() : 0;
@@ -220,13 +288,17 @@ export default function LetterHistory() {
 			field: "recipientEmail",
 			headerName: "Recipient",
 			width: 220,
-			renderCell: (params) => params.value || "-",
+			renderCell: (params) => {
+				if (!params || !params.row) return "-";
+				return params.value || "-";
+			},
 		},
 		{
 			field: "status",
 			headerName: "Status",
 			width: 140,
 			renderCell: (params) => {
+				if (!params || !params.row) return <Chip label="-" size="small" />;
 				const val = (params.value || "").toString().toLowerCase();
 				const label = val ? val.charAt(0).toUpperCase() + val.slice(1) : "-";
 				return (
@@ -245,44 +317,47 @@ export default function LetterHistory() {
 			width: 200,
 			headerClassName: "last-column",
 			sortable: false,
-			renderCell: (params) => (
-				<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-					<Tooltip title="View">
-						<IconButton size="small" onClick={() => handleView(params.row)} color="primary">
-							<VisibilityIcon />
-						</IconButton>
-					</Tooltip>
-					<Tooltip title="Download">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleDownload(params.row)}
-								disabled={!params.row?.letterHtml}
-								color="info"
-							>
-								<DownloadIcon />
+			renderCell: (params) => {
+				if (!params || !params.row) return null;
+				return (
+					<Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+						<Tooltip title="View">
+							<IconButton size="small" onClick={() => handleView(params.row)} color="primary">
+								<VisibilityIcon />
 							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Send">
-						<span>
-							<IconButton
-								size="small"
-								onClick={() => handleSend(params.row)}
-								disabled={!params.row?.recipientEmail || !params.row?.letterHtml}
-								color="success"
-							>
-								<SendIcon />
+						</Tooltip>
+						<Tooltip title="Download">
+							<span>
+								<IconButton
+									size="small"
+									onClick={() => handleDownload(params.row)}
+									disabled={!params.row?.letterHtml}
+									color="info"
+								>
+									<DownloadIcon />
+								</IconButton>
+							</span>
+						</Tooltip>
+						<Tooltip title="Send">
+							<span>
+								<IconButton
+									size="small"
+									onClick={() => handleSend(params.row)}
+									disabled={!params.row?.recipientEmail || !params.row?.letterHtml}
+									color="success"
+								>
+									<SendIcon />
+								</IconButton>
+							</span>
+						</Tooltip>
+						<Tooltip title="Delete from history">
+							<IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
+								<DeleteIcon />
 							</IconButton>
-						</span>
-					</Tooltip>
-					<Tooltip title="Delete from history">
-						<IconButton size="small" onClick={() => handleDelete(params.row)} sx={{ color: "error.main" }}>
-							<DeleteIcon />
-						</IconButton>
-					</Tooltip>
-				</Box>
-			),
+						</Tooltip>
+					</Box>
+				);
+			},
 		},
 	];
 
@@ -373,13 +448,13 @@ export default function LetterHistory() {
 				{/* Data grid */}
 				<Box sx={{ width: "100%" }}>
 					<DataGrid
-						rows={rows}
+						rows={rows.filter(row => row && row.id != null) || []}
 						columns={columns}
 						loading={loading}
 						pageSizeOptions={[10, 50, 100]}
 						initialState={{ pagination: { paginationModel: { page: 0, pageSize: 10 } } }}
 						disableSelectionOnClick
-						getRowClassName={(params) => (recentlyUpdated.has(params.row.id) ? "recently-updated-row" : "")}
+						getRowClassName={(params) => (recentlyUpdated.has(params?.row?.id) ? "recently-updated-row" : "")}
 						sx={{
 							"& .recently-updated-row": {
 								backgroundColor: "#f3e5f5",
