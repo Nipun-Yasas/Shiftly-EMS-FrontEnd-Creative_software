@@ -15,7 +15,7 @@ import { API_PATHS } from "../../../_utils/apiPaths";
 import axiosInstance from "../../../_utils/axiosInstance";
 import { UserContext } from "../../../context/UserContext";
 
-import UnreadTab from "./_components/UnreadTab";
+import UnReadTab from "./_components/UnReadTab";
 import ReadTab from "./_components/ReadTab";
 import AllTab from "./_components/AllTab";
 import ActionDialog from "./_components/ActionDialog";
@@ -144,7 +144,7 @@ export default function page() {
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
-              <UnreadTab
+              <UnReadTab
                 {...tabProps}
                 candidates={getFilteredCandidates("unread")}
               />
