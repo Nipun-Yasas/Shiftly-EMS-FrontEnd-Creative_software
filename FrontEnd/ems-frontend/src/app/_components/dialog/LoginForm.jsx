@@ -34,9 +34,6 @@ export default function LoginForm(props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { updateUser } = useContext(UserContext);
 
-  console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
-
-
   const initialValues = {
     username: "",
     password: "",
