@@ -15,7 +15,7 @@ import { getStatusColor, getStatusIcon } from "../../_helpers/colorhelper";
 
 import CustomDataGrid from "../../../_components/CustomDataGrid";
 
-export default function TimeSheetDataGrid({
+export default function TimeSheets({
   leaves,
   loading,
   handleUpdateStatus,

@@ -2,12 +2,12 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
-import TimeSheetDataGrid from "./TimeSheetDataGrid";
+import TimeSheets from "./TimeSheets";
 
 export default function AllTab({ timeSheets, loading, handleUpdateStatus }) {
   return (
     <Box sx={{ p: 3, mb: 3 }}>
-      <TimeSheetDataGrid
+      <TimeSheets
         timeSheets={timeSheets}
         loading={loading}
         handleUpdateStatus={handleUpdateStatus}

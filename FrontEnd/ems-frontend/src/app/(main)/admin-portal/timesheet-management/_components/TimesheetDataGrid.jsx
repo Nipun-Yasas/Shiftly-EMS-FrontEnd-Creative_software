@@ -19,7 +19,7 @@ import {
 
 import CustomDataGrid from "../../../_components/CustomDataGrid";
 
-export default function TimeSheetDataGrid({
+export default function TimeSheets({
   timeSheets,
   loading,
   handleUpdateStatus,
