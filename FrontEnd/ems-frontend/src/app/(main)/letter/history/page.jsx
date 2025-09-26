@@ -115,6 +115,13 @@ export default function LetterHistory() {
   const columns = [
     { field: "letterType", headerName: "Letter Type", width: 240, flex: 1 },
     {
+      field: "createdAt",
+      headerName: "Requested At",
+      flex: 1,
+      minWidth: 200,
+      renderCell: () =>"2025-8-15",
+    },
+    {
       field: "status",
       headerName: "Status",
       width: 120,

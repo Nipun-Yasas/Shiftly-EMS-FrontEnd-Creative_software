@@ -34,7 +34,7 @@ export default function VerifyTab({
       headerName: "Created Date",
       flex: 1,
       minWidth: 200,
-      renderCell: (params) => dayjs(params.value).format("MMM DD, YYYY"),
+      renderCell: () =>"2025-8-15",
     },
     {
       field: "actions",

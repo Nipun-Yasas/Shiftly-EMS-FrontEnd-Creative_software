@@ -26,43 +26,9 @@ const TeamContainer = styled(Box)({
 
 export default function Organization() {
   const [teams, setTeams] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [openTeam, setOpenTeam] = useState(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    Promise.all(
-      departments.map(dept =>
-        fetch(`${BASE_URL}${API_PATHS.DEPARTMENTS.GET_USERS_BY_DEPARTMENT(dept)}`)
-          .then(res => {
-            if (!res.ok) throw new Error(`Failed to fetch ${dept}`);
-            return res.json();
-          })
-          .then(data => ({
-            name: dept,
-            members: data.length,
-            team: data.map(member => ({
-              name: member.username,
-              role: member.designation
-            }))
-          }))
-          .catch(err => ({
-            name: dept,
-            members: 0,
-            team: [],
-            error: err.message
-          }))
-      )
-    ).then(results => {
-      setTeams(results);
-      setLoading(false);
-    }).catch(err => {
-      setError('Failed to load teams');
-      setLoading(false);
-    });
-  }, []);
 
   const handleOpenTeam = (idx) => setOpenTeam(idx);
   const handleCloseTeam = () => setOpenTeam(null);

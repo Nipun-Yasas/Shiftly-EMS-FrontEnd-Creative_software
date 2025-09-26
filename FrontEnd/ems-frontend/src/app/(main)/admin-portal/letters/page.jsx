@@ -112,6 +112,13 @@ export default function LettersAdminPage() {
     { field: "departmentName", headerName: "Department", width: 140 },
     { field: "letterType", headerName: "Letter Type", width: 250 },
     {
+      field: "createdAt",
+      headerName: "Requested At",
+      flex: 1,
+      minWidth: 200,
+      renderCell: () =>"2025-8-15",
+    },
+    {
       field: "status",
       headerName: "Status",
       width: 120,
