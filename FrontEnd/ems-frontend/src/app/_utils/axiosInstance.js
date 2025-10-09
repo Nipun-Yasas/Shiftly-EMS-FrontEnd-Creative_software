@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
     if (!error.response) {
       // Network error - server is not running or unreachable
       if (error.code === 'ECONNREFUSED' || error.message === 'Network Error') {
-        console.warn('Backend server is not running. Please start the server at http://localhost:8080');
+        console.warn('Backend server is not running. Please start the server at render');
         // Create a more user-friendly error message
         const networkError = new Error('Backend server is not available. Please contact your administrator.');
         networkError.isNetworkError = true;

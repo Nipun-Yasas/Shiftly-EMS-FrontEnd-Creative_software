@@ -85,7 +85,7 @@ export default function LoginForm(props) {
     } catch (error) {
       // Handle network errors first
       if (error.isNetworkError || error.message === 'Network Error' || !error.response) {
-        setError("Cannot connect to server. Please check if the backend server is running at http://localhost:8080");
+        setError("Server is restarting. Please try again later.");
         setSubmitting(false);
         return;
       }
