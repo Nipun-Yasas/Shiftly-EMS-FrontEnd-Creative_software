@@ -177,6 +177,26 @@ export default function LoginForm(props) {
                   />
                 </FormItem>
 
+                {/* Demo Credentials */}
+                <Box
+                  sx={{
+                    backgroundColor: '#f5f5f5',
+                    padding: 1.5,
+                    borderRadius: 1,
+                    border: '1px solid #e0e0e0'
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.75rem",
+                      color: '#666',
+                      textAlign: 'center'
+                    }}
+                  >
+                    Demo: Username: <strong>superadmin</strong> | Password: <strong>admin1234</strong>
+                  </Typography>
+                </Box>
+
                 <Box
                   sx={{
                     display: "flex",
@@ -211,24 +231,23 @@ export default function LoginForm(props) {
                   </Typography>
                 )}
                 <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      width: "100%",
-                                      flexDirection: { xs: "column", sm: "row" },
-                                      gap: 1,
-                                    }}
-                                  >
-<Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  variant="contained"
-                 
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 1,
+                  }}
                 >
-                  {isSubmitting ? "Logging in..." : "Login"}
-                </Button>
-                                  </Box>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    variant="contained"
+                  >
+                    {isSubmitting ? "Logging in..." : "Login"}
+                  </Button>
+                </Box>
                 
 
                 <Box sx={{ textAlign: "center" }}>
